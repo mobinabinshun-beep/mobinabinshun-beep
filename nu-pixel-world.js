@@ -15,7 +15,7 @@ function makeCity(){
  for(let i=0;i<64;i++)stars.push({x:Math.floor(rand()*W),y:Math.floor(rand()*105),a:.2+rand()*.65,p:rand()*6});
 }
 function skyColors(){return phase==="day"?["#29495d","#496477","#b18b7c"]:phase==="dawn"?["#252a43","#594357","#b17b78"]:phase==="dusk"?["#1b2038","#44334b","#976878"]:["#070f20","#111d34","#26394a"];}
-function updatePhase(){const h=new Date().getHours();phase=h>=6&&h<10?"dawn":h>=10&&h<17?"day":h>=17&&h<20?"dusk":"night";document.documentElement.dataset.worldTime=phase;}
+function updatePhase(){const h=new Date().getHours(),next=h>=6&&h<10?"dawn":h>=10&&h<17?"day":h>=17&&h<20?"dusk":"night";if(next!==phase){phase=next;document.documentElement.dataset.worldTime=phase;if(reduced&&visible)draw(performance.now());}}
 function resize(){canvas.width=W;canvas.height=H;canvas.style.imageRendering="pixelated";}
 function rect(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(Math.round(x),Math.round(y),Math.max(1,Math.round(w)),Math.max(1,Math.round(h)));}
 function draw(t){
@@ -36,11 +36,11 @@ function draw(t){
  // Distant horizon glow and restrained pixel particles.
  rect(0,H-8,W,8,"rgba(5,13,23,.68)");rect(0,H-9,W,1,"rgba(110,191,219,.28)");
  if(!reduced){const count=quality<=2?3:quality<=5?6:10;for(let i=0;i<count;i++){const x=(i*47+Math.floor(t*.006*(i%2?1:-1))+W*4)%W,y=65+(i*29)%85;rect(x,y,1,1,"rgba(128,222,255,.55)");}}
- raf=requestAnimationFrame(draw);
+ if(!reduced)raf=requestAnimationFrame(draw);
 }
 function onPointer(e){if(reduced||e.pointerType==="touch")return;px=Math.max(-8,Math.min(8,(e.clientX/innerWidth-.5)*16));py=Math.max(-5,Math.min(5,(e.clientY/innerHeight-.5)*10));}
-function onVisibility(){visible=!document.hidden;if(visible){last=0;raf=requestAnimationFrame(draw);}else cancelAnimationFrame(raf);}
+function onVisibility(){visible=!document.hidden;if(visible){last=0;if(reduced)draw(performance.now());else raf=requestAnimationFrame(draw);}else cancelAnimationFrame(raf);}
 function start(){resize();makeCity();updatePhase();window.addEventListener("pointermove",onPointer,{passive:true});document.addEventListener("visibilitychange",onVisibility);window.addEventListener("resize",resize,{passive:true});raf=requestAnimationFrame(draw);setInterval(updatePhase,60000);}
-window.NUPixelWorld={setQuality(n){quality=Math.max(1,Math.min(10,Number(n)||4));},destroy(){cancelAnimationFrame(raf);window.removeEventListener("pointermove",onPointer);document.removeEventListener("visibilitychange",onVisibility);}};
+window.NUPixelWorld={setQuality(n){quality=Math.max(1,Math.min(10,Number(n)||4));if(reduced&&visible)draw(performance.now());},destroy(){cancelAnimationFrame(raf);window.removeEventListener("pointermove",onPointer);document.removeEventListener("visibilitychange",onVisibility);}};
 start();
 })();
