@@ -16,7 +16,7 @@ function makeWorld(){
  for(let i=0;i<100;i++)stars.push({x:rand()*W,y:rand()*155,r:rand()>.92?2:1,a:.25+rand()*.65,p:rand()*6});
  for(let i=0;i<7;i++)clouds.push({x:rand()*W,y:15+rand()*82,s:.6+rand()*.8,v:.04+rand()*.12});
  for(let i=0;i<34;i++)particles.push({a:rand()*Math.PI*2,r:rand()*22+5,base:rand()*22+5,z:.3+rand()*.7,s:.15+rand()*.6,seed:rand()*10});
- for(let i=0;i<8;i++)traffic.push({x:rand()*W,y:188+rand()*45,v:.25+rand()*.55,air:i%4===0});
+ for(let i=0;i<8;i++){const air=i%4===0;traffic.push({x:rand()*W,y:air?92+rand()*48:242+rand()*15,v:.25+rand()*.55,air});}
 }
 function clock(){
  const d=new Date();hour=d.getHours()+d.getMinutes()/60;
@@ -55,7 +55,7 @@ function city(t){
  buildings.forEach((b,i)=>{const y=196-b.h*(.42+b.d*.58)+camY*.1;const x=b.x+camX*(.08+b.d*.2);const color=b.d<.35?"#253b4b":b.d<.7?"#1b3446":"#142b3e";rect(x,y,b.w,b.h,color);rect(x+1,y-2,b.w-2,2,"#3a5360");if(b.d>.75){for(const win of b.windows){if(!win.on)continue;const glow=phase==="night"?.75:phase==="dusk"?.34:phase==="dawn"?.2:.07;const flick=reduce?1:.85+.15*Math.sin(t*.001+win.phase);rect(x+win.x,y+win.y,2,2,"rgba(255,205,137,"+(glow*flick)+")");}}});
  // Sparse road lanes and distant traffic, only readable on nearer depth.
  rect(0,239,W,1,"rgba(155,184,173,.22)");
- if(!reduce){traffic.forEach((v,i)=>{v.x=(v.x+v.v*(weatherMode==="game"?1.8:weatherMode==="study"?.5:.18))%W;const y=v.y;rect(v.x,y,v.air?4:6,1,v.air?"#9ac5cf":"#d4b88a");if(v.air)rect(v.x+1,y-1,2,1,"#9ac5cf");});}
+ if(!reduce){traffic.forEach((v,i)=>{v.x=(v.x+v.v*(weatherMode==="game"?1.8:weatherMode==="study"?.5:.18))%W;const y=v.y;if(v.air){rect(v.x,y,7,1,"#a8cbd4");rect(v.x+2,y-2,3,1,"#a8cbd4");rect(v.x+3,y+1,2,1,"rgba(170,210,220,.35)");}else{rect(v.x,y,6,1,"#d4b88a");rect(v.x+1,y-1,3,1,"#b4c8a0");}});}
 }
 function weather(t){
  if(reduce)return;
