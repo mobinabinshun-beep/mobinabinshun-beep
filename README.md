@@ -49,3 +49,32 @@ N.U — Niroo Universe
 
 ### Calibration limitations
 The runtime does not stress-test CPU/GPU, does not guarantee hardware safety, and does not claim to measure actual packet loss across the Internet. A proper throughput and packet-loss test requires a dedicated measurement endpoint and controlled test payloads. The current four-probe diagnostic measures reachability/response to the N.U site only.
+
+
+## Generation 1.4 — pixel world and QA notes
+
+- Added `nu-pixel-world.js`, a separate 320×180 low-resolution pixel-art city renderer. It does not modify the frozen adaptive runtime.
+- Added a restrained procedural skyline, irregular window lights, sparse stars, parallax and local dawn/day/dusk/night palettes.
+- Pixel rendering is capped at 12–24 FPS according to the calibrated quality tier and pauses while the document is hidden. Reduced-motion mode renders a static scene and only redraws when the local sky phase changes.
+- The skyline is a visual placeholder, not a confirmed canonical depiction of Niroo City.
+- Camera updates are throttled; hidden tabs pause the ambient runtime and game animation.
+
+### Known limitations after source review
+
+- The current game economy remains a prototype: Credits, upgrades, capsule filling and the full progression economy are not implemented in the current game module.
+- Mana Collector stops accepting rewards when all configured Mana storage is full; a spend/upgrade interface is not yet available.
+- Chaos consumes 10 Mana per successful shot in the current prototype. Upgrade-based cost reduction is not yet implemented.
+- Chaos damage is a simple one-time boundary encounter per target, not a full collision or enemy-HP simulation.
+- Saves remain browser-local. Cross-device synchronization and offline installation are not yet available.
+- Real-device visual, touch and accessibility testing is still required; source review alone is not proof of runtime correctness.
+
+### QA focus for team testing
+
+1. Verify the world appears after calibration and the pixel skyline is visible behind the content.
+2. Verify the home screen does not start a game automatically.
+3. Open each of the three games; confirm only successful target clicks advance 1/10 through 10/10.
+4. Pause and resume; verify target positions and round progress remain unchanged.
+5. Test Mana storage at capacity and Chaos with fewer than 10 Mana.
+6. In Chaos, allow several masses to cross the lower boundary in the same frame and confirm HP never resets unexpectedly.
+7. Switch browser tabs; verify background animation pauses and resumes.
+8. Enable reduced motion; verify the pixel scene becomes static.
