@@ -15,7 +15,7 @@ The root GitHub Pages site contains an experimental browser-first game hub.
 ## Playable prototypes
 1. **Bubble Hunt:** each successful bubble interaction grants +1 XP.
 2. **Mana Collector:** each successful Mana interaction grants +1 Mana.
-3. **Chaos Attack:** target masses have 5 integrity; each click triggers a simulated N-BI shot; destroying a mass grants +3 XP.
+3. **Chaos Attack:** each successful N-BI shot neutralizes one Chaos mass and grants +3 XP. Unneutralized masses advance toward the defensive boundary; each one that breaches it removes 1 HP.
 
 Each selected round has 10 successful target interactions. Missed clicks do not consume an interaction. The round remains on the selected game until completion or page reload. A fresh launch chooses a random game from the active pool.
 
@@ -23,7 +23,7 @@ Each selected round has 10 successful target interactions. Missed clicks do not 
 - XP and Mana are stored in this browser's localStorage. Clearing browser data or changing browser/device can remove or separate saves.
 - N-BI consumes 10 Mana per successful Chaos shot in the current prototype; upgrade-based cost reduction and the complete economy are not wired yet.
 - Level increases are based on each 100 cumulative XP.
-- The visual world includes a procedural pixel-art skyline placeholder, not an approved canonical NirooCity illustration.
+- The visual world is a source-informed procedural pixel-art interpretation, not an approved canonical NirooCity map or definitive geography.
 - The capability sampler is a conservative heuristic, not a CPU/GPU benchmark or hardware safety guarantee.
 - Ten quality levels currently adjust the ambient particle renderer only; game-specific adaptive budgets remain future work.
 - This prototype is browser-first. It does not yet provide a native Windows, Android, macOS, legacy Java, or downloadable offline launcher.
@@ -78,3 +78,26 @@ The runtime does not stress-test CPU/GPU, does not guarantee hardware safety, an
 6. In Chaos, allow several masses to cross the lower boundary in the same frame and confirm HP never resets unexpectedly.
 7. Switch browser tabs; verify background animation pauses and resumes.
 8. Enable reduced motion; verify the pixel scene becomes static.
+
+
+## Generation 1.5 — layered Niroo City horizon and input camera
+
+- Reworked `nu-pixel-world.js` into a 480×270 renderer with sky, solar arc, moon, night-only stars, moving clouds, desert ridges, forest belt, tropical coast, river, terraced fields, layered skyline, green rooftops and distant traffic.
+- Nearer buildings have slightly more detail; distant silhouettes remain low-detail to preserve performance.
+- The three ambient movement profiles are Sleep (very slow orbit), Study (slow circular drift) and Game (radial particles accelerate near the center and slow toward the edges).
+- Mouse camera follows the pointer after mouse input is detected. Touch camera activates on a touch gesture and moves opposite to the finger drag. UI controls are excluded from camera gestures; touch drags do not count as game interactions.
+- XP capsule spans the lower edge of the game view. Mana is displayed in a smaller capsule above it. Fill boundary markers and +1 feedback are positioned at the current fill edge.
+- HP keeps its heartbeat-like light pulse and now has a moving scanner sweep.
+- Chaos masses advance toward the defensive boundary. Every mass not neutralized by N-BI causes one HP damage on crossing, then disappears. A successful shot neutralizes one mass.
+
+### Source and canon boundary
+
+The visual design uses the published Niroo City descriptions of integration between technology and nature, green terraces, suspended paths, markets, public spaces and distant/hovering traffic as references. The specific desert, forest, coast, river and farm arrangement in the renderer is a visual composition proposal, not confirmed map geography. The N.U overview describes Niroo City as a safe haven founded by Binam Binshun and frames Niroo/Chaos and Mana as central world concepts. See the source register in `NU-WORLD-VISUAL-BIBLE-G1.5.md`.
+
+### Remaining QA
+
+- Verify touch drag and target tap separately on at least one Android/iOS device.
+- Verify local sunrise/noon/sunset/night transitions by temporarily changing device time or testing at different hours.
+- Verify the Chaos damage boundary, simultaneous breaches and death reset.
+- Verify the full-width capsule layout on portrait and landscape screens.
+- Real-device performance and live Pages deployment remain unverified by source review alone.
