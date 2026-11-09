@@ -36,29 +36,33 @@
     "Pixel skyline is procedural placeholder art and is not yet a canonical, source-confirmed Niroo City illustration.",
     "Generation 1.5 expands the renderer into a layered, source-neutral landscape with a moving sun arc, night-only stars, river, forest, coast, fields, city terraces and distant traffic.",
     "Mouse camera follows pointer after first mouse movement; touch camera activates after first touch gesture and uses inverse drag. Drag gestures are excluded from game interactions.",
-    "Chaos targets now advance toward the defensive boundary; each unneutralized mass causes one HP damage and is removed. A successful N-BI interaction neutralizes one mass."
+    "Chaos targets now advance toward the defensive boundary; each unneutralized mass causes one HP damage and is removed. A successful N-BI interaction neutralizes one mass.",
+    "Generation 1.5 adds separate mouse-follow and inverse touch-drag camera input; drag gestures are excluded from gameplay interactions.",
+    "Unneutralized Chaos masses move toward the defensive boundary; each mass crossing causes one HP damage and then disappears.",
+    "Niroo City terrain geography in the renderer is a non-canonical visual proposal based on published urban descriptions; see NU-WORLD-VISUAL-BIBLE-G1.5.md."
   ],
   "rendering": {
     "pixelWorld": {
       "file": "nu-pixel-world.js",
+      "version": "0.2",
       "logicalResolution": "480x270",
       "frameRateByQuality": "12-24 fps",
       "timeCycle": "local dawn/day/dusk/night; stars only at night",
       "layers": [
         "sky and celestial bodies",
-        "clouds and sky particles",
-        "desert ridge, forest belt and tropical coast",
-        "radial atmosphere particles",
-        "depth-scaled Niroo City skyline and green terraces",
-        "river and agricultural terraces",
-        "subtle traffic and atmospheric haze"
+        "moving cloud bands",
+        "desert ridges, forest belt and tropical coast",
+        "center-origin atmospheric particles",
+        "depth-scaled city skyline and green terraces",
+        "river and cultivated terrace rows",
+        "distant road and airborne traffic"
       ],
       "weatherModes": {
-        "sleep": "very slow orbital breeze",
+        "sleep": "near-static slow orbit",
         "study": "slow circular drift",
-        "game": "radial particles accelerate near center and decelerate toward the edges"
+        "game": "radial particles fast near center and decelerating toward edges"
       },
-      "reducedMotion": "static scene; redraw on time phase changes",
+      "reducedMotion": "static scene; redraw only on time phase changes",
       "independentLayer": true
     },
     "gameplay": "transparent full-page overlay"
