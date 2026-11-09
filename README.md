@@ -107,3 +107,18 @@ The visual design uses the published Niroo City descriptions of integration betw
 
 - `NU-WORLD-VISUAL-BIBLE-G1.5.md` — source-grounded IP facts, visual proposals, canon boundaries and renderer architecture.
 - `QA-GEN-1.5.md` — source review and manual team test checklist.
+
+
+## Generation 1.6 — gameplay feedback and visual corrections
+
+- Chaos approach speed now doubles across successive targets (1, 2, 4, 8; capped at 8). A mass neutralized by N-BI is removed; every remaining mass that reaches the defensive boundary causes 1 HP damage.
+- A successful object interaction displays its exact round count (1/10 through 10/10) at the clicked object.
+- Completing a full 10-interaction round restores 1 HP, capped at 10.
+- XP capsule occupies the full bottom rail; Mana display is positioned on the left-side upper rail. The HP bar has a moving ECG-style scanner trace with intensity tied to remaining HP.
+- Bubble targets are larger and Mana particles are smaller to make their relative search difficulty more intentional.
+- Mouse camera listeners are attached only after the first mouse movement. Touch camera remains a separate inverse-drag path; drag gestures do not count as taps.
+- Aircraft use a higher altitude band; ground traffic stays on the road band to reduce intersections with the city skyline.
+
+### Economy not yet implemented
+
+The nine Mana capsule upgrade levels, N-BI shot-cost reduction (down to one Mana per shot), HP capsule purchase/refill, X/N Credits, savings/investment and betting modes are not implemented. The current Chaos shot still costs one full 10-Mana capsule. This is intentionally disclosed rather than represented as complete.
