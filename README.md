@@ -21,9 +21,9 @@ Each selected round has 10 successful target interactions. Missed clicks do not 
 
 ## Prototype limitations — read before team testing
 - XP and Mana are stored in this browser's localStorage. Clearing browser data or changing browser/device can remove or separate saves.
-- Chaos training shots are currently free; final N-BI Mana costs and upgrade economy are not wired yet.
+- N-BI consumes 10 Mana per successful Chaos shot in the current prototype; upgrade-based cost reduction and the complete economy are not wired yet.
 - Level increases are based on each 100 cumulative XP.
-- The visual world is a procedural lightweight placeholder, not an approved canonical NirooCity illustration.
+- The visual world includes a procedural pixel-art skyline placeholder, not an approved canonical NirooCity illustration.
 - The capability sampler is a conservative heuristic, not a CPU/GPU benchmark or hardware safety guarantee.
 - Ten quality levels currently adjust the ambient particle renderer only; game-specific adaptive budgets remain future work.
 - This prototype is browser-first. It does not yet provide a native Windows, Android, macOS, legacy Java, or downloadable offline launcher.
