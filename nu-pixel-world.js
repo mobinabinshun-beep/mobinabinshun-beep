@@ -42,5 +42,5 @@ function onPointer(e){if(reduced||e.pointerType==="touch")return;px=Math.max(-8,
 function onVisibility(){visible=!document.hidden;if(visible){last=0;if(reduced)draw(performance.now());else raf=requestAnimationFrame(draw);}else cancelAnimationFrame(raf);}
 function start(){resize();makeCity();updatePhase();window.addEventListener("pointermove",onPointer,{passive:true});document.addEventListener("visibilitychange",onVisibility);window.addEventListener("resize",resize,{passive:true});raf=requestAnimationFrame(draw);setInterval(updatePhase,60000);}
 window.NUPixelWorld={setQuality(n){quality=Math.max(1,Math.min(10,Number(n)||4));if(reduced&&visible)draw(performance.now());},destroy(){cancelAnimationFrame(raf);window.removeEventListener("pointermove",onPointer);document.removeEventListener("visibilitychange",onVisibility);}};
-start();
+window.addEventListener("nu:calibrated",start,{once:true});
 })();
