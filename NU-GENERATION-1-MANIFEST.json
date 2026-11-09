@@ -3,7 +3,7 @@
   "generation": 1,
   "runtime": "N.U Adaptive Runtime",
   "runtimeVersion": "0.1-prototype",
-  "packageVersion": "0.1.5",
+  "packageVersion": "0.1.6",
   "entry": "index.html",
   "modules": [
     "nu-engine.js",
@@ -39,7 +39,14 @@
     "Chaos targets now advance toward the defensive boundary; each unneutralized mass causes one HP damage and is removed. A successful N-BI interaction neutralizes one mass.",
     "Generation 1.5 adds separate mouse-follow and inverse touch-drag camera input; drag gestures are excluded from gameplay interactions.",
     "Unneutralized Chaos masses move toward the defensive boundary; each mass crossing causes one HP damage and then disappears.",
-    "Niroo City terrain geography in the renderer is a non-canonical visual proposal based on published urban descriptions; see NU-WORLD-VISUAL-BIBLE-G1.5.md."
+    "Niroo City terrain geography in the renderer is a non-canonical visual proposal based on published urban descriptions; see NU-WORLD-VISUAL-BIBLE-G1.5.md.",
+    "Generation 1.6: successful object interactions show an exact n/10 marker at the clicked object's location.",
+    "Chaos approach speed doubles by target sequence (1, 2, 4, 8; capped at 8); every mass not neutralized that reaches the boundary causes 1 HP damage.",
+    "Completing a full 10-interaction game round restores 1 HP up to the maximum of 10.",
+    "XP rail spans the bottom edge; Mana capsule rail is placed at the left side above it; HP display now includes a moving ECG-style scanner trace.",
+    "Aircraft are placed in an upper altitude band and road traffic in a ground band to reduce intersections with buildings.",
+    "The nine Mana capsule upgrade levels and N-BI shot-cost reduction are not yet implemented; current Chaos shot still costs 10 Mana.",
+    "The city layout is an art-direction proposal, not a canonical map. Published sources describe Niroo City as green, engineered, sustainable, and founded by Binam Binshun, but do not establish a definitive skyline layout."
   ],
   "rendering": {
     "pixelWorld": {
@@ -49,13 +56,13 @@
       "frameRateByQuality": "12-24 fps",
       "timeCycle": "local dawn/day/dusk/night; stars only at night",
       "layers": [
-        "sky and celestial bodies",
-        "moving cloud bands",
-        "desert ridges, forest belt and tropical coast",
-        "center-origin atmospheric particles",
-        "depth-scaled city skyline and green terraces",
-        "river and cultivated terrace rows",
-        "distant road and airborne traffic"
+        "sky and solar/lunar bodies",
+        "clouds and night-only stars",
+        "left forest / central dry ridges / right tropical coast",
+        "center-origin atmospheric particles with radial depth",
+        "multi-depth city silhouettes",
+        "river and cultivated terraces",
+        "aircraft at upper altitude and road vehicles at ground altitude"
       ],
       "weatherModes": {
         "sleep": "near-static slow orbit",
