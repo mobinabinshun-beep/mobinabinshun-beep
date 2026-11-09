@@ -5,7 +5,7 @@ const canvas=document.getElementById("pixel-world");
 if(!canvas)return;
 const ctx=canvas.getContext("2d",{alpha:true});
 const W=320,H=180;
-let quality=4,raf=0,last=0,visible=true,reduced=!!(matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches);
+let quality=4,raf=0,last=0,visible=true,reduced=!!(typeof matchMedia==="function"&&matchMedia("(prefers-reduced-motion: reduce)").matches);
 let px=0,py=0,phase="night",seed=20261109,buildings=[],stars=[];
 function rand(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;}
 function makeCity(){
@@ -16,7 +16,7 @@ function makeCity(){
 }
 function skyColors(){return phase==="day"?["#29495d","#496477","#b18b7c"]:phase==="dawn"?["#252a43","#594357","#b17b78"]:phase==="dusk"?["#1b2038","#44334b","#976878"]:["#070f20","#111d34","#26394a"];}
 function updatePhase(){const h=new Date().getHours(),next=h>=6&&h<10?"dawn":h>=10&&h<17?"day":h>=17&&h<20?"dusk":"night";if(next!==phase){phase=next;document.documentElement.dataset.worldTime=phase;if(reduced&&visible)draw(performance.now());}}
-function resize(){canvas.width=W;canvas.height=H;canvas.style.imageRendering="pixelated";}
+function resize(){canvas.width=W;canvas.height=H;canvas.style.imageRendering="pixelated";if(reduced&&visible)draw(performance.now());}
 function rect(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(Math.round(x),Math.round(y),Math.max(1,Math.round(w)),Math.max(1,Math.round(h)));}
 function draw(t){
  if(!visible)return;
