@@ -24,7 +24,7 @@ function clock(){
  document.documentElement.dataset.worldTime=phase;
 }
 function sunPosition(){
- const angle=(hour-6)/12*Math.PI;return {x:W*(.5+.43*Math.cos(angle)),y:40+70*Math.sin(Math.max(0,angle))};
+ const angle=(hour-6)/12*Math.PI;return {x:W*(.5+.43*Math.cos(angle)),y:116-76*Math.sin(Math.max(0,angle))};
 }
 function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),Math.max(1,Math.round(w)),Math.max(1,Math.round(h)));}
 function poly(points,c){ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(points[0][0],points[0][1]);for(let i=1;i<points.length;i++)ctx.lineTo(points[i][0],points[i][1]);ctx.closePath();ctx.fill();}
@@ -35,14 +35,14 @@ function sky(){
  else{rect(386,42,13,13,"#d9e9f0");rect(390,39,8,3,"#d9e9f0");rect(393,52,4,3,"#a8c2d2");}
  if(phase==="night"){for(const s of stars){const a=reduce?s.a:s.a*(.7+.3*Math.sin(last*.001+s.p));rect(s.x,s.y,s.r,s.r,"rgba(220,239,255,"+a+")");}}
  // Thin, slow cloud banks; muted in study and almost still in sleep.
- for(const c of clouds){const x=(c.x+camX*.05+W)%W;const alpha=phase==="day"?.12:.08;rect(x,c.y,24*c.s,2,"rgba(206,224,232,"+alpha+")");rect(x+5,c.y-2,12*c.s,2,"rgba(206,224,232,"+(alpha*.7)+")");}
+ for(const c of clouds){const x=(c.x+t*.002*c.v+camX*.05+W*4)%W;const alpha=phase==="day"?.12:.08;rect(x,c.y,24*c.s,2,"rgba(206,224,232,"+alpha+")");rect(x+5,c.y-2,12*c.s,2,"rgba(206,224,232,"+(alpha*.7)+")");}
 }
 function land(){
  // Far desert ridge and low mountains: no neon, low detail at distance.
  poly([[0,164],[0,142],[40,127],[83,143],[130,119],[179,145],[224,125],[273,148],[328,128],[376,144],[425,123],[480,145],[480,270],[0,270]],"#344653");
  poly([[0,175],[0,157],[54,147],[102,163],[151,144],[203,165],[252,149],[303,169],[351,146],[409,166],[452,151],[480,160],[480,270],[0,270]],"#263f46");
  // A quiet tropical coast at one edge, with dark forest belt at the other.
- rect(0,180,78,90,"#263e37");for(let i=0;i<16;i++){const x=i*6+rand()*3;rect(x,167-rand()*9,3,14+rand()*9,"#1c332f");rect(x-2,165-rand()*6,7,4,"#365342");}
+ rect(0,180,78,90,"#263e37");for(let i=0;i<16;i++){const x=i*6+(i*17%3);const top=161-(i*11%9);rect(x,top,3,14+(i*7%9),"#1c332f");rect(x-2,top-2,7,4,"#365342");}
  poly([[385,190],[480,181],[480,270],[395,270]],"#254b5a");poly([[390,192],[480,184],[480,190],[395,199]],"#9a9a7c");
  // River bends from the distant valley toward the foreground.
  poly([[210,173],[225,170],[251,190],[273,208],[306,230],[323,270],[284,270],[278,237],[248,214],[229,191]],"#356a78");
@@ -72,6 +72,6 @@ function draw(t){
 function resize(){canvas.width=W;canvas.height=H;if(reduce&&started)draw(performance.now());}
 function setCamera(x,y){camX=clamp(x,-28,28);camY=clamp(y,-20,20);document.documentElement.style.setProperty("--camera-x",camX+"px");document.documentElement.style.setProperty("--camera-y",camY+"px");}
 function start(){if(started)return;started=true;makeWorld();clock();resize();if(!reduce)raf=requestAnimationFrame(draw);else draw(performance.now());document.addEventListener("visibilitychange",()=>{visible=!document.hidden;if(visible){last=0;if(!reduce)raf=requestAnimationFrame(draw);else draw(performance.now());}else cancelAnimationFrame(raf);});window.addEventListener("resize",resize,{passive:true});setInterval(()=>{const old=phase;clock();if(reduce&&old!==phase)draw(performance.now());},30000);}
-window.NUPixelWorld={setQuality(n){quality=clamp(Number(n)||4,1,10);},setCamera, setWeatherMode(mode){if(["sleep","study","game"].includes(mode))weatherMode=mode;},getPhase(){return phase;}};
+window.NUPixelWorld={setQuality(n){quality=clamp(Number(n)||4,1,10);},setCamera, lastTouchWasDrag:false, setWeatherMode(mode){if(["sleep","study","game"].includes(mode))weatherMode=mode;},getPhase(){return phase;}};
 window.addEventListener("nu:calibrated",start,{once:true});
 })();
