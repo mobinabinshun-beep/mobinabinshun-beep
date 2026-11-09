@@ -59,3 +59,18 @@ body.article-mode #game-view .hud,body.article-mode #game-view .bars{opacity:.9}
 .mana-capsules{position:static;display:flex;gap:3px;align-items:center;padding-bottom:1px}
 .mana-slot{display:block;width:18px;height:9px;border:1px solid #69dfff99;border-radius:8px;background:#061c2a;overflow:hidden;box-shadow:inset 0 0 4px #2abfff44}
 .mana-slot i{display:block;height:100%;background:linear-gradient(90deg,#145b91,#75eaff);box-shadow:0 0 7px #4bdcff;transition:width .2s}
+
+/* Generation 1.3 — readable resource feedback and subtle camera parallax */
+:root{--camera-x:0px;--camera-y:0px}
+#world-canvas{transform:translate3d(calc(var(--camera-x)*-.32),calc(var(--camera-y)*-.32),0);transition:transform .18s ease-out}
+.horizon{transform:translate3d(calc(var(--camera-x)*-.55),calc(var(--camera-y)*-.4),0);transition:transform .22s ease-out}
+.round-progress{position:fixed;z-index:7;left:50%;bottom:48px;transform:translateX(-50%);min-width:58px;padding:4px 10px;border:1px solid #8bdfff66;border-radius:20px;background:rgba(3,13,22,.72);backdrop-filter:blur(10px);color:#c8f4ff;font-size:10px;font-weight:800;letter-spacing:.12em;text-align:center;box-shadow:0 0 13px #48cfff22}
+.round-progress:after{content:"";display:block;height:2px;margin-top:4px;border-radius:4px;background:linear-gradient(90deg,#58dfff var(--round-progress,0%),#173447 var(--round-progress,0%));transition:background .18s}
+.capsule-gain{position:absolute;left:50%;top:-22px;transform:translateX(-50%);z-index:8;font-size:12px;font-weight:900;letter-spacing:.04em;pointer-events:none;animation:capsule-rise 1s ease-out forwards;text-shadow:0 0 10px currentColor}
+.capsule-gain.xp{color:#a7ff62}.capsule-gain.mana{color:#65dcff}
+@keyframes capsule-rise{0%{opacity:0;transform:translate(-50%,8px) scale(.8)}18%{opacity:1}100%{opacity:0;transform:translate(-50%,-20px) scale(1.1)}}
+.hp-track{position:relative;overflow:hidden}
+.hp-track:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 0 20%,#ffb0beaa 45%,transparent 62%);opacity:.4;animation:heartbeat-sweep 2.1s linear infinite;pointer-events:none}
+@keyframes heartbeat-sweep{from{transform:translateX(-100%)}to{transform:translateX(180%)}}
+@media(prefers-reduced-motion:reduce){#world-canvas,.horizon{transform:none;transition:none}.hp-track:after{animation:none}.capsule-gain{animation:none;opacity:1}}
+@media(max-width:700px){.round-progress{bottom:46px}}
