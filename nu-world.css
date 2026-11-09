@@ -74,3 +74,10 @@ body.article-mode #game-view .hud,body.article-mode #game-view .bars{opacity:.9}
 @keyframes heartbeat-sweep{from{transform:translateX(-100%)}to{transform:translateX(180%)}}
 @media(prefers-reduced-motion:reduce){#world-canvas,.horizon{transform:none;transition:none}.hp-track:after{animation:none}.capsule-gain{animation:none;opacity:1}}
 @media(max-width:700px){.round-progress{bottom:46px}}
+
+/* Local-clock Niroo City sky phases */
+.sky{transition:background 2.8s ease,filter 2.8s ease}
+:root[data-world-time="dawn"] .sky{background:radial-gradient(ellipse at 48% 70%,rgba(151,103,107,.22),transparent 48%),linear-gradient(180deg,#17182a 0%,#342b3d 58%,#25303a 100%)}
+:root[data-world-time="day"] .sky{background:radial-gradient(ellipse at 48% 70%,rgba(65,128,154,.25),transparent 48%),linear-gradient(180deg,#14283a 0%,#18364a 58%,#203746 100%)}
+:root[data-world-time="dusk"] .sky{background:radial-gradient(ellipse at 48% 70%,rgba(166,93,91,.2),transparent 48%),linear-gradient(180deg,#17192d 0%,#392b3a 58%,#1b2937 100%)}
+:root[data-world-time="night"] .sky{background:radial-gradient(ellipse at 48% 70%,rgba(31,76,106,.34),transparent 48%),linear-gradient(180deg,#050b18 0%,#091522 58%,#101c28 100%)}
