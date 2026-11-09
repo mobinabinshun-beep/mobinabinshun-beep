@@ -88,3 +88,20 @@ body.article-mode #game-view .hud,body.article-mode #game-view .bars{opacity:.9}
 #pixel-world{position:fixed;inset:0;width:100%;height:100%;z-index:-3;display:block;pointer-events:none;image-rendering:pixelated;image-rendering:crisp-edges;opacity:.96;transform:translate3d(calc(var(--camera-x)*-.48),calc(var(--camera-y)*-.34),0);transition:transform .24s ease-out}
 .horizon{z-index:-1;pointer-events:none}
 @media(prefers-reduced-motion:reduce){#pixel-world{transform:none;transition:none}}
+
+/* Generation 1.5 — full-width resource capsule, visible hit counter and scanner HP */
+#game-view.active .bars{position:fixed;left:12px;right:12px;bottom:9px;display:grid;grid-template-columns:1fr;grid-template-rows:12px 12px;gap:15px;align-items:center;justify-items:stretch;z-index:8;pointer-events:none}
+#game-view.active .bar-wrap{width:100%;height:12px;min-width:0}
+#game-view.active .bar-wrap:first-child{grid-row:2;width:100%;height:13px}
+#game-view.active .bar-wrap:nth-child(2){grid-row:1;justify-self:center;width:min(38vw,300px);height:10px}
+#game-view.active .mana-capsules{position:absolute;right:0;top:-13px;display:flex;gap:3px}
+#game-view.active .round-progress{bottom:58px;z-index:10;min-width:68px;font-size:11px}
+#game-view.active .hp-bar{min-width:220px;gap:10px}
+#game-view.active .hp-track{width:112px;height:8px;border:1px solid #ff829366;background:repeating-linear-gradient(90deg,#35111b 0 5px,#541a28 5px 6px)}
+#game-view.active #hp-fill{position:relative;background:linear-gradient(90deg,#8d102e,#ff315b 65%,#ff9cac);box-shadow:0 0 7px #ff315b,0 0 17px #ff315b88;animation:heartbeat 1.35s infinite}
+#game-view.active .hp-track:after{width:18px;inset:0 auto 0 -20px;background:linear-gradient(90deg,transparent,#fff0f3,#ff526c,transparent);opacity:.85;animation:heartbeat-sweep 1.6s linear infinite}
+#game-view.active .bar-wrap:first-child:after{content:"";position:absolute;left:var(--capsule-boundary,0%);top:-3px;height:18px;width:2px;background:#e7ffe0;box-shadow:0 0 7px #a7ff62;pointer-events:none}
+#game-view.active .bar-wrap:nth-child(2):after{content:"";position:absolute;left:var(--capsule-boundary,0%);top:-3px;height:15px;width:2px;background:#e7fbff;box-shadow:0 0 7px #55dfff;pointer-events:none}
+.capsule-gain{z-index:12;top:-23px;white-space:nowrap;text-shadow:0 0 9px currentColor,0 1px 3px #000}
+#game-view.active .round-progress:after{height:3px}
+@media(max-width:700px){#game-view.active .bars{left:8px;right:8px;bottom:8px;gap:16px}#game-view.active .bar-wrap:nth-child(2){width:min(48vw,250px)}#game-view.active .round-progress{bottom:59px}#game-view.active .hp-track{width:86px}}
