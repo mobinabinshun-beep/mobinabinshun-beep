@@ -29,3 +29,25 @@ body.article-mode #article-view .article p{line-height:1.9}
 #game-view.active .hud-chip{background:rgba(4,15,25,.48);backdrop-filter:blur(12px)}
 @media(max-width:700px){#game-view.active .view-head{top:8px;left:8px;right:8px}#game-view.active .hud{top:52px}#game-view.active .game-controls{bottom:72px;right:8px}}
 @media(prefers-reduced-motion:reduce){.world{transition:none;opacity:1}}
+
+/* Generation 1.2 visual and layout corrections */
+#home-view.active{display:block}
+#home-view .hero,#home-view #library-section,#home-view>section:last-child{max-width:760px;margin-left:auto;margin-right:auto}
+#home-view .articles{grid-template-columns:minmax(0,680px);justify-content:center}
+#home-view .section-head{display:block;text-align:center}
+#game-view.active{z-index:4;pointer-events:none}
+#game-view.active .game-stage{pointer-events:none}
+#game-view.active .game-stage canvas{pointer-events:none}
+#game-view.active .view-head,#game-view.active .game-controls{pointer-events:auto}
+body.article-mode #home-view{display:none}
+body.article-mode #game-view{z-index:2}
+body.article-mode #game-view .game-stage{pointer-events:none}
+body.article-mode #article-view{z-index:7;left:50%;top:50%;transform:translate(-50%,-50%);width:min(520px,calc(100% - 30px));}
+body.article-mode #game-view .hud,body.article-mode #game-view .bars{opacity:.9}
+.hp-bar{position:fixed;top:13px;left:50%;transform:translateX(-50%);z-index:6;display:flex;align-items:center;gap:9px;padding:7px 12px;border:1px solid #ff526c66;border-radius:30px;background:rgba(25,5,13,.62);backdrop-filter:blur(12px);font-size:10px;color:#ff8a9b;pointer-events:none;min-width:180px}
+.hp-track{height:5px;width:78px;background:#42121d;border-radius:8px;overflow:hidden}
+#hp-fill{height:100%;width:100%;background:linear-gradient(90deg,#a91535,#ff526c);box-shadow:0 0 10px #ff526c;transition:width .2s;animation:heartbeat 1.8s infinite}
+@keyframes heartbeat{0%,100%{opacity:.85}8%{opacity:1}14%{opacity:.72}20%{opacity:1}}
+.mana-capsules{position:absolute;right:0;top:-18px;color:#75ddff;font-size:8px;white-space:nowrap;text-shadow:0 0 8px #27bfff}
+.float-text.damage{color:#ff526c}
+@media(prefers-reduced-motion:reduce){#hp-fill{animation:none}}
