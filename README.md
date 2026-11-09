@@ -101,3 +101,9 @@ The visual design uses the published Niroo City descriptions of integration betw
 - Verify the Chaos damage boundary, simultaneous breaches and death reset.
 - Verify the full-width capsule layout on portrait and landscape screens.
 - Real-device performance and live Pages deployment remain unverified by source review alone.
+
+
+### Generation 1.5 reference documents
+
+- `NU-WORLD-VISUAL-BIBLE-G1.5.md` — source-grounded IP facts, visual proposals, canon boundaries and renderer architecture.
+- `QA-GEN-1.5.md` — source review and manual team test checklist.
