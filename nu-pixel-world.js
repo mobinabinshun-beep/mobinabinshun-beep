@@ -1,46 +1,77 @@
-/* N.U Pixel World v0.1 — independent, low-resolution parallax city layer. */
+/* N.U World Renderer v0.2 — layered pixel horizon, procedural and source-neutral. */
 (function(){
 "use strict";
-const canvas=document.getElementById("pixel-world");
-if(!canvas)return;
-const ctx=canvas.getContext("2d",{alpha:true});
-const W=320,H=180;
-let quality=4,raf=0,last=0,visible=true,reduced=!!(typeof matchMedia==="function"&&matchMedia("(prefers-reduced-motion: reduce)").matches);
-let px=0,py=0,phase="night",seed=20261109,buildings=[],stars=[];
-function rand(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;}
-function makeCity(){
- buildings=[];stars=[];
- let x=-5;
- while(x<W+8){const width=10+Math.floor(rand()*19),height=19+Math.floor(rand()*57);buildings.push({x,width,height,shade:Math.floor(rand()*3),windows:Array.from({length:Math.floor(width*height/34)},()=>({x:2+Math.floor(rand()*Math.max(3,width-4)),y:4+Math.floor(rand()*Math.max(5,height-6)),on:rand()>.48,t:rand()*6}))});x+=width+2+Math.floor(rand()*5);}
- for(let i=0;i<64;i++)stars.push({x:Math.floor(rand()*W),y:Math.floor(rand()*105),a:.2+rand()*.65,p:rand()*6});
+const canvas=document.getElementById("pixel-world");if(!canvas)return;
+const ctx=canvas.getContext("2d",{alpha:true});if(!ctx)return;
+const W=480,H=270;
+let quality=4,raf=0,last=0,visible=true,started=false;
+const reduce=typeof matchMedia==="function"&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+let phase="night",hour=0,camX=0,camY=0,weatherMode="sleep",particles=[],clouds=[],buildings=[],stars=[],traffic=[];
+let seed=0x4e553031;
+const rand=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function makeWorld(){
+ buildings=[];stars=[];clouds=[];particles=[];traffic=[];
+ let x=-8;while(x<W+12){const w=13+rand()*29|0,h=16+rand()*66|0;buildings.push({x,w,h,d:rand(),windows:Array.from({length:Math.floor(w*h/95)},()=>({x:2+rand()*(w-4),y:3+rand()*(h-5),on:rand()>.68,phase:rand()*8}))});x+=w+3+rand()*9;}
+ for(let i=0;i<100;i++)stars.push({x:rand()*W,y:rand()*155,r:rand()>.92?2:1,a:.25+rand()*.65,p:rand()*6});
+ for(let i=0;i<7;i++)clouds.push({x:rand()*W,y:15+rand()*82,s:.6+rand()*.8,v:.04+rand()*.12});
+ for(let i=0;i<34;i++)particles.push({a:rand()*Math.PI*2,r:rand()*160+18,z:.3+rand()*.7,s:.15+rand()*.6,seed:rand()*10});
+ for(let i=0;i<8;i++)traffic.push({x:rand()*W,y:188+rand()*45,v:.25+rand()*.55,air:i%4===0});
 }
-function skyColors(){return phase==="day"?["#29495d","#496477","#b18b7c"]:phase==="dawn"?["#252a43","#594357","#b17b78"]:phase==="dusk"?["#1b2038","#44334b","#976878"]:["#070f20","#111d34","#26394a"];}
-function updatePhase(){const h=new Date().getHours(),next=h>=6&&h<10?"dawn":h>=10&&h<17?"day":h>=17&&h<20?"dusk":"night";if(next!==phase){phase=next;document.documentElement.dataset.worldTime=phase;if(reduced&&visible)draw(performance.now());}}
-function resize(){canvas.width=W;canvas.height=H;canvas.style.imageRendering="pixelated";if(reduced&&visible)draw(performance.now());}
-function rect(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(Math.round(x),Math.round(y),Math.max(1,Math.round(w)),Math.max(1,Math.round(h)));}
+function clock(){
+ const d=new Date();hour=d.getHours()+d.getMinutes()/60;
+ phase=hour<5.5||hour>=20.5?"night":hour<7.5?"dawn":hour<17.5?"day":"dusk";
+ document.documentElement.dataset.worldTime=phase;
+}
+function sunPosition(){
+ const angle=(hour-6)/12*Math.PI;return {x:W*(.5+.43*Math.cos(angle)),y:40+70*Math.sin(Math.max(0,angle))};
+}
+function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),Math.max(1,Math.round(w)),Math.max(1,Math.round(h)));}
+function poly(points,c){ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(points[0][0],points[0][1]);for(let i=1;i<points.length;i++)ctx.lineTo(points[i][0],points[i][1]);ctx.closePath();ctx.fill();}
+function sky(){
+ const pal=phase==="day"?["#426c85","#8ba5a0","#c6b49a"]:phase==="dawn"?["#202c49","#73566b","#d0937b"]:phase==="dusk"?["#18243c","#60465a","#b87970"]:["#050d20","#14243a","#263b4a"];
+ const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,pal[0]);g.addColorStop(.62,pal[1]);g.addColorStop(1,pal[2]);ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+ const sun=sunPosition();if(phase!=="night"){rect(sun.x-5,sun.y-5,10,10,phase==="dawn"||phase==="dusk"?"#ffd0a0":"#f5e1a6");rect(sun.x-9,sun.y-2,18,4,"#f5d6a0");}
+ else{rect(386,42,13,13,"#d9e9f0");rect(390,39,8,3,"#d9e9f0");rect(393,52,4,3,"#a8c2d2");}
+ if(phase==="night"){for(const s of stars){const a=reduce?s.a:s.a*(.7+.3*Math.sin(last*.001+s.p));rect(s.x,s.y,s.r,s.r,"rgba(220,239,255,"+a+")");}}
+ // Thin, slow cloud banks; muted in study and almost still in sleep.
+ for(const c of clouds){const x=(c.x+camX*.05+W)%W;const alpha=phase==="day"?.12:.08;rect(x,c.y,24*c.s,2,"rgba(206,224,232,"+alpha+")");rect(x+5,c.y-2,12*c.s,2,"rgba(206,224,232,"+(alpha*.7)+")");}
+}
+function land(){
+ // Far desert ridge and low mountains: no neon, low detail at distance.
+ poly([[0,164],[0,142],[40,127],[83,143],[130,119],[179,145],[224,125],[273,148],[328,128],[376,144],[425,123],[480,145],[480,270],[0,270]],"#344653");
+ poly([[0,175],[0,157],[54,147],[102,163],[151,144],[203,165],[252,149],[303,169],[351,146],[409,166],[452,151],[480,160],[480,270],[0,270]],"#263f46");
+ // A quiet tropical coast at one edge, with dark forest belt at the other.
+ rect(0,180,78,90,"#263e37");for(let i=0;i<16;i++){const x=i*6+rand()*3;rect(x,167-rand()*9,3,14+rand()*9,"#1c332f");rect(x-2,165-rand()*6,7,4,"#365342");}
+ poly([[385,190],[480,181],[480,270],[395,270]],"#254b5a");poly([[390,192],[480,184],[480,190],[395,199]],"#9a9a7c");
+ // River bends from the distant valley toward the foreground.
+ poly([[210,173],[225,170],[251,190],[273,208],[306,230],[323,270],[284,270],[278,237],[248,214],[229,191]],"#356a78");
+ poly([[218,176],[225,174],[252,196],[273,216],[301,239],[312,270],[301,270],[293,244],[266,221],[244,202]],"#6a9a9b");
+ // Terraced fields / cultivated rows.
+ for(let i=0;i<8;i++){const y=212+i*7;rect(0,y,105,2,i%2?"#405a3e":"#4b6242");for(let x=5;x<100;x+=12)rect(x,y-2,2,3,"#72825a");}
+}
+function city(t){
+ // Far city silhouettes, progressively denser and larger toward the foreground.
+ buildings.forEach((b,i)=>{const y=196-b.h*(.42+b.d*.58)+camY*.1;const x=b.x+camX*(.08+b.d*.2);const color=b.d<.35?"#253b4b":b.d<.7?"#1b3446":"#142b3e";rect(x,y,b.w,b.h,color);rect(x+1,y-2,b.w-2,2,"#3a5360");if(b.d>.75){for(const win of b.windows){if(!win.on)continue;const glow=phase==="night"?.75:phase==="dusk"?.34:phase==="dawn"?.2:.07;const flick=reduce?1:.85+.15*Math.sin(t*.001+win.phase);rect(x+win.x,y+win.y,2,2,"rgba(255,205,137,"+(glow*flick)+")");}}});
+ // Sparse road lanes and distant traffic, only readable on nearer depth.
+ rect(0,239,W,1,"rgba(155,184,173,.22)");
+ if(!reduce){traffic.forEach((v,i)=>{v.x=(v.x+v.v*(weatherMode==="game"?1.8:weatherMode==="study"?.5:.18))%W;const y=v.y;rect(v.x,y,v.air?4:6,1,v.air?"#9ac5cf":"#d4b88a");if(v.air)rect(v.x+1,y-1,2,1,"#9ac5cf");});}
+}
+function weather(t){
+ if(reduce)return;
+ const count=quality<=2?7:quality<=5?15:26;
+ for(let i=0;i<count;i++){const p=particles[i];let speed=p.s*(weatherMode==="game"?(0.8+p.r/150*2.2):weatherMode==="study"?.22:.07);p.r+=speed;if(p.r>230)p.r=12;const a=p.a+(weatherMode==="sleep"?t*.00003:weatherMode==="study"?t*.00008:0);const x=W/2+Math.cos(a)*p.r,y=H/2+Math.sin(a)*p.r*.56;const size=1+p.r/90*p.z;const alpha=clamp((p.r/230)*.55,0,.45);rect(x,y,size,size,"rgba(173,220,229,"+alpha+")");}
+}
 function draw(t){
- if(!visible)return;
- const fps=quality<=2?12:quality<=4?16:quality<=7?20:24,interval=1000/fps;
- if(t-last<interval){raf=requestAnimationFrame(draw);return;}last=t;
- const colors=skyColors();ctx.clearRect(0,0,W,H);
- const grad=ctx.createLinearGradient(0,0,0,H);grad.addColorStop(0,colors[0]);grad.addColorStop(.66,colors[1]);grad.addColorStop(1,colors[2]);ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
- // Pixel moon / sun, with restrained glow made from stepped translucent blocks.
- if(phase==="night"){rect(245+px*.08,25+py*.05,11,11,"#d7e8ed");rect(248+px*.08,22+py*.05,7,3,"#d7e8ed");rect(252+px*.08,29+py*.05,3,4,"#9cb9cc");}
- else{rect(236+px*.08,30+py*.05,12,12,phase==="dawn"?"#f2b18d":"#eacb91");rect(233+px*.08,33+py*.05,18,6,"#eacb91");}
- if(phase!=="day"){for(let i=0;i<(quality<=2?16:quality<=5?32:56);i++){const s=stars[i];const tw=reduced?.45:(.45+Math.sin(t*.001+s.p)*.25);rect(s.x,s.y,1,1,"rgba(220,239,255,"+(s.a*tw)+")");}}
- // Far skyline: sparse, low contrast, deliberately irregular.
- const drift=px*.35;
- buildings.forEach((b,i)=>{const y=H-b.height*.58-15+py*.12;const shade=["#14283a","#172d40","#1a3042"][b.shade];rect(b.x+drift,y,b.width,b.height,shade);rect(b.x+drift+2,y-2,Math.max(2,b.width-4),2,"#29475a");if(b.width>17&&i%4===0)rect(b.x+drift+b.width*.45,y-5,3,5,"#203b50");});
- // Near skyline and window lights.
- buildings.forEach((b,i)=>{const y=H-b.height-9+py*.24;const shade=["#0b1a2a","#0d2031","#102538"][b.shade];rect(b.x+px*.72,y,b.width,b.height,shade);rect(b.x+px*.72+1,y-2,Math.max(2,b.width-2),2,"#345064");b.windows.forEach((w,j)=>{if(!w.on)return;const flicker=reduced?1:(Math.sin(t*.001+w.t+i)*.16+.84);const color=phase==="day"?"rgba(127,178,184,.32)":phase==="dawn"?"rgba(255,190,139,"+(flicker*.72)+")":"rgba(119,220,255,"+(flicker*.85)+")";rect(b.x+px*.72+w.x,y+w.y,2,2,color);});});
- // Distant horizon glow and restrained pixel particles.
- rect(0,H-8,W,8,"rgba(5,13,23,.68)");rect(0,H-9,W,1,"rgba(110,191,219,.28)");
- if(!reduced){const count=quality<=2?3:quality<=5?6:10;for(let i=0;i<count;i++){const x=(i*47+Math.floor(t*.006*(i%2?1:-1))+W*4)%W,y=65+(i*29)%85;rect(x,y,1,1,"rgba(128,222,255,.55)");}}
- if(!reduced)raf=requestAnimationFrame(draw);
+ if(!visible||!started)return;const fps=quality<=2?12:quality<=4?16:quality<=7?20:24,interval=1000/fps;if(t-last<interval){raf=requestAnimationFrame(draw);return;}last=t;
+ ctx.clearRect(0,0,W,H);sky();land();city(t);weather(t);
+ // soft atmospheric haze between the city and the viewer
+ const haze=ctx.createLinearGradient(0,150,0,H);haze.addColorStop(0,"rgba(175,204,199,.03)");haze.addColorStop(1,"rgba(4,13,24,.26)");ctx.fillStyle=haze;ctx.fillRect(0,150,W,120);
+ raf=requestAnimationFrame(draw);
 }
-function onPointer(e){if(reduced||e.pointerType==="touch")return;px=Math.max(-8,Math.min(8,(e.clientX/innerWidth-.5)*16));py=Math.max(-5,Math.min(5,(e.clientY/innerHeight-.5)*10));}
-function onVisibility(){visible=!document.hidden;if(visible){last=0;if(reduced)draw(performance.now());else raf=requestAnimationFrame(draw);}else cancelAnimationFrame(raf);}
-function start(){resize();makeCity();updatePhase();window.addEventListener("pointermove",onPointer,{passive:true});document.addEventListener("visibilitychange",onVisibility);window.addEventListener("resize",resize,{passive:true});raf=requestAnimationFrame(draw);setInterval(updatePhase,60000);}
-window.NUPixelWorld={setQuality(n){quality=Math.max(1,Math.min(10,Number(n)||4));if(reduced&&visible)draw(performance.now());},destroy(){cancelAnimationFrame(raf);window.removeEventListener("pointermove",onPointer);document.removeEventListener("visibilitychange",onVisibility);}};
+function resize(){canvas.width=W;canvas.height=H;if(reduce&&started)draw(performance.now());}
+function setCamera(x,y){camX=clamp(x,-28,28);camY=clamp(y,-20,20);document.documentElement.style.setProperty("--camera-x",camX+"px");document.documentElement.style.setProperty("--camera-y",camY+"px");}
+function start(){if(started)return;started=true;makeWorld();clock();resize();if(!reduce)raf=requestAnimationFrame(draw);else draw(performance.now());document.addEventListener("visibilitychange",()=>{visible=!document.hidden;if(visible){last=0;if(!reduce)raf=requestAnimationFrame(draw);else draw(performance.now());}else cancelAnimationFrame(raf);});window.addEventListener("resize",resize,{passive:true});setInterval(()=>{const old=phase;clock();if(reduce&&old!==phase)draw(performance.now());},30000);}
+window.NUPixelWorld={setQuality(n){quality=clamp(Number(n)||4,1,10);},setCamera, setWeatherMode(mode){if(["sleep","study","game"].includes(mode))weatherMode=mode;},getPhase(){return phase;}};
 window.addEventListener("nu:calibrated",start,{once:true});
 })();
