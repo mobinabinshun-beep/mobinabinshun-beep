@@ -3,7 +3,7 @@
   "generation": 1,
   "runtime": "N.U Adaptive Runtime",
   "runtimeVersion": "0.1-prototype",
-  "packageVersion": "0.1.4",
+  "packageVersion": "0.1.5",
   "entry": "index.html",
   "modules": [
     "nu-engine.js",
@@ -33,14 +33,32 @@
     "Random game is selected on each fresh launch; a running round stays fixed until ended or page reload.",
     "Generation 1.4 adds an independent 320x180 pixel-art city layer with local dawn/day/dusk/night phases and reduced-motion handling.",
     "The adaptive runtime file remains unchanged; pixel-world quality is adjusted after the existing calibration.",
-    "Pixel skyline is procedural placeholder art and is not yet a canonical, source-confirmed Niroo City illustration."
+    "Pixel skyline is procedural placeholder art and is not yet a canonical, source-confirmed Niroo City illustration.",
+    "Generation 1.5 expands the renderer into a layered, source-neutral landscape with a moving sun arc, night-only stars, river, forest, coast, fields, city terraces and distant traffic.",
+    "Mouse camera follows pointer after first mouse movement; touch camera activates after first touch gesture and uses inverse drag. Drag gestures are excluded from game interactions.",
+    "Chaos targets now advance toward the defensive boundary; each unneutralized mass causes one HP damage and is removed. A successful N-BI interaction neutralizes one mass."
   ],
   "rendering": {
     "pixelWorld": {
       "file": "nu-pixel-world.js",
-      "logicalResolution": "320x180",
+      "logicalResolution": "480x270",
       "frameRateByQuality": "12-24 fps",
-      "reducedMotion": "static scene; redraw only on time-phase changes",
+      "timeCycle": "local dawn/day/dusk/night; stars only at night",
+      "layers": [
+        "sky and celestial bodies",
+        "clouds and sky particles",
+        "desert ridge, forest belt and tropical coast",
+        "radial atmosphere particles",
+        "depth-scaled Niroo City skyline and green terraces",
+        "river and agricultural terraces",
+        "subtle traffic and atmospheric haze"
+      ],
+      "weatherModes": {
+        "sleep": "very slow orbital breeze",
+        "study": "slow circular drift",
+        "game": "radial particles accelerate near center and decelerate toward the edges"
+      },
+      "reducedMotion": "static scene; redraw on time phase changes",
       "independentLayer": true
     },
     "gameplay": "transparent full-page overlay"
