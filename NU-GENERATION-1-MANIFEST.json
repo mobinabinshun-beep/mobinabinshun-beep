@@ -28,7 +28,7 @@
   },
   "notes": [
     "This is an experimental browser prototype, not a production game release.",
-    "Chaos training shots are free in this prototype; final N-BI Mana costs are not yet wired.",
+    "N-BI consumes 10 Mana per successful Chaos shot in the current prototype; upgrade-based cost reduction is not yet implemented.",
     "No server account or cloud save exists.",
     "Random game is selected on each fresh launch; a running round stays fixed until ended or page reload.",
     "Generation 1.4 adds an independent 320x180 pixel-art city layer with local dawn/day/dusk/night phases and reduced-motion handling.",
