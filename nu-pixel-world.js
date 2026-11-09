@@ -28,7 +28,7 @@ function sunPosition(){
 }
 function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),Math.max(1,Math.round(w)),Math.max(1,Math.round(h)));}
 function poly(points,c){ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(points[0][0],points[0][1]);for(let i=1;i<points.length;i++)ctx.lineTo(points[i][0],points[i][1]);ctx.closePath();ctx.fill();}
-function sky(){
+function sky(t){
  const pal=phase==="day"?["#426c85","#8ba5a0","#c6b49a"]:phase==="dawn"?["#202c49","#73566b","#d0937b"]:phase==="dusk"?["#18243c","#60465a","#b87970"]:["#050d20","#14243a","#263b4a"];
  const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,pal[0]);g.addColorStop(.62,pal[1]);g.addColorStop(1,pal[2]);ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
  const sun=sunPosition();if(phase!=="night"){rect(sun.x-5,sun.y-5,10,10,phase==="dawn"||phase==="dusk"?"#ffd0a0":"#f5e1a6");rect(sun.x-9,sun.y-2,18,4,"#f5d6a0");}
@@ -64,7 +64,7 @@ function weather(t){
 }
 function draw(t){
  if(!visible||!started)return;const fps=quality<=2?12:quality<=4?16:quality<=7?20:24,interval=1000/fps;if(t-last<interval){raf=requestAnimationFrame(draw);return;}last=t;
- ctx.clearRect(0,0,W,H);sky();land();city(t);weather(t);
+ ctx.clearRect(0,0,W,H);sky(t);land();city(t);weather(t);
  // soft atmospheric haze between the city and the viewer
  const haze=ctx.createLinearGradient(0,150,0,H);haze.addColorStop(0,"rgba(175,204,199,.03)");haze.addColorStop(1,"rgba(4,13,24,.26)");ctx.fillStyle=haze;ctx.fillRect(0,150,W,120);
  raf=requestAnimationFrame(draw);
