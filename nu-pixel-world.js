@@ -15,7 +15,7 @@ function makeWorld(){
  let x=-8;while(x<W+12){const w=13+rand()*29|0,h=16+rand()*66|0;buildings.push({x,w,h,d:rand(),windows:Array.from({length:Math.floor(w*h/95)},()=>({x:2+rand()*(w-4),y:3+rand()*(h-5),on:rand()>.68,phase:rand()*8}))});x+=w+3+rand()*9;}
  for(let i=0;i<100;i++)stars.push({x:rand()*W,y:rand()*155,r:rand()>.92?2:1,a:.25+rand()*.65,p:rand()*6});
  for(let i=0;i<7;i++)clouds.push({x:rand()*W,y:15+rand()*82,s:.6+rand()*.8,v:.04+rand()*.12});
- for(let i=0;i<34;i++)particles.push({a:rand()*Math.PI*2,r:rand()*160+18,z:.3+rand()*.7,s:.15+rand()*.6,seed:rand()*10});
+ for(let i=0;i<34;i++)particles.push({a:rand()*Math.PI*2,r:rand()*22+5,base:rand()*22+5,z:.3+rand()*.7,s:.15+rand()*.6,seed:rand()*10});
  for(let i=0;i<8;i++)traffic.push({x:rand()*W,y:188+rand()*45,v:.25+rand()*.55,air:i%4===0});
 }
 function clock(){
@@ -60,7 +60,20 @@ function city(t){
 function weather(t){
  if(reduce)return;
  const count=quality<=2?7:quality<=5?15:26;
- for(let i=0;i<count;i++){const p=particles[i];let speed=p.s*(weatherMode==="game"?(0.8+p.r/150*2.2):weatherMode==="study"?.22:.07);p.r+=speed;if(p.r>230)p.r=12;const a=p.a+(weatherMode==="sleep"?t*.00003:weatherMode==="study"?t*.00008:0);const x=W/2+Math.cos(a)*p.r,y=H/2+Math.sin(a)*p.r*.56;const size=1+p.r/90*p.z;const alpha=clamp((p.r/230)*.55,0,.45);rect(x,y,size,size,"rgba(173,220,229,"+alpha+")");}
+ for(let i=0;i<count;i++){
+  const p=particles[i];let radius=p.r;
+  if(weatherMode==="game"){
+   const speed=p.s*(1.1+4.2*(1-clamp(p.r/230,0,1)));
+   p.r+=speed;if(p.r>230)p.r=5+p.base;radius=p.r;
+  }else{
+   const rate=weatherMode==="study"?.00013:.000045;
+   radius=p.base+Math.sin(t*.00035+p.seed)*2;p.a+=rate*16;
+  }
+  const a=p.a+(weatherMode==="game"?0:t*.00001);
+  const x=W/2+Math.cos(a)*radius,y=H/2+Math.sin(a)*radius*.56;
+  const size=1+radius/90*p.z,alpha=clamp((radius/230)*.55,0,.45);
+  rect(x,y,size,size,"rgba(173,220,229,"+alpha+")");
+ }
 }
 function draw(t){
  if(!visible||!started)return;const fps=quality<=2?12:quality<=4?16:quality<=7?20:24,interval=1000/fps;if(t-last<interval){raf=requestAnimationFrame(draw);return;}last=t;
