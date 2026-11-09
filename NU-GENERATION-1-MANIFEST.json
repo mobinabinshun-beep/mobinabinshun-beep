@@ -1,0 +1,19 @@
+{
+  "project": "N.U Interactive World",
+  "generation": 1,
+  "runtime": "N.U Adaptive Runtime",
+  "runtimeVersion": "0.1-prototype",
+  "packageVersion": "0.1.0",
+  "entry": "index.html",
+  "modules": ["nu-engine.js", "nu-games.js", "nu-world.css"],
+  "randomPool": ["bubble", "mana", "chaos"],
+  "interactionsPerRound": 10,
+  "save": {"provider": "localStorage", "key": "nu-world-save-v1"},
+  "delivery": {"browser": true, "offline": "after assets are cached; not yet guaranteed", "native": "future adapter required"},
+  "notes": [
+    "This is an experimental browser prototype, not a production game release.",
+    "Chaos training shots are free in this prototype; final N-BI Mana costs are not yet wired.",
+    "No server account or cloud save exists.",
+    "Random game is selected on each fresh launch; a running round stays fixed until ended or page reload."
+  ]
+}
