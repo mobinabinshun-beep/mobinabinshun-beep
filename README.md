@@ -34,3 +34,18 @@ Each selected round has 10 successful target interactions. Missed clicks do not 
 Open the GitHub Pages site and choose **START A RANDOM GAME**. Click targets in the field. Test missed clicks (they should not consume one of the ten successful interactions), then use **NEW ROUND**. Reload to verify local save persistence and confirm that a new round selects a random game.
 
 N.U — Niroo Universe
+
+
+## Generation 1.1 — calibration and interaction repair
+
+- Startup performs a short browser-render sampling pass before enabling the ENTER WORLD action; the world fades in after calibration.
+- Four small same-origin requests estimate round-trip time to the hosted site and count failed probes. This is **not** a general Internet ping or true network packet-loss test.
+- If available, `navigator.connection.downlink` is displayed as a browser-provided approximate link estimate, not a measured throughput test.
+- Gameplay is rendered as a transparent overlay above the world/home content rather than as an opaque boxed minigame.
+- Canvas dimensions and target positions are recalculated after the game overlay becomes visible to avoid zero-size hit testing.
+- Target placement uses five shared procedural formations selected randomly.
+- Pause now freezes the round and the same control resumes it.
+- Pointer interactions are delegated at window level so the full-screen transparent game canvas does not block navigation controls; clicks on buttons and links are excluded.
+
+### Calibration limitations
+The runtime does not stress-test CPU/GPU, does not guarantee hardware safety, and does not claim to measure actual packet loss across the Internet. A proper throughput and packet-loss test requires a dedicated measurement endpoint and controlled test payloads. The current four-probe diagnostic measures reachability/response to the N.U site only.
