@@ -8,3 +8,5 @@ body.article-mode #article-view{display:block;position:fixed;z-index:6;left:50%;
 body.article-mode #article-view .view-head{align-items:center}
 body.article-mode #article-view .article{background:transparent;border:0;box-shadow:none;padding:10px}
 body.article-mode #article-view .article p{line-height:1.9}
+
+.intro-panel{position:relative}.intro-close{position:absolute;right:12px;top:10px;width:34px;height:34px;border:1px solid var(--line);border-radius:50%;background:#081724;color:#dff8ff;font-size:24px;line-height:1;cursor:pointer}.intro-close:hover,.intro-close:focus-visible{border-color:var(--cyan);outline:none;box-shadow:0 0 16px #43caff55}
