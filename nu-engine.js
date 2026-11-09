@@ -22,6 +22,21 @@ function samplePerformance(){
   resolve({level:score,cores,memory,saveData,reducedMotion:reducedMotion(),sampleMs:Math.round(elapsed),frames:count});
  })));
 }
+async function sampleNetwork(){
+ const conn=navigator.connection||navigator.mozConnection||navigator.webkitConnection;
+ const probes=[];let failed=0;
+ for(let i=0;i<4;i++){
+  const started=performance.now();
+  try{
+   const response=await fetch("./README.md?nu_probe="+Date.now()+"_"+i,{cache:"no-store",credentials:"same-origin"});
+   if(!response.ok)throw new Error("probe failed");
+   await response.arrayBuffer();
+   probes.push(Math.round(performance.now()-started));
+  }catch(_){failed++;}
+ }
+ probes.sort((a,b)=>a-b);
+ return {siteRttMs:probes.length?probes[Math.floor(probes.length/2)]:null,probeLossPercent:Math.round(failed/4*100),estimatedDownlinkMbps:conn&&typeof conn.downlink==="number"?conn.downlink:null,effectiveType:conn&&conn.effectiveType||"unknown",probes:probes.length};
+}
 function create(canvas){
  const ctx=canvas.getContext("2d",{alpha:true});
  let quality=5,raf=0,active=true,last=0,particles=[],pointerX=0,pointerY=0;
@@ -32,5 +47,5 @@ function create(canvas){
  resize();const observer=typeof ResizeObserver!=="undefined"?new ResizeObserver(resize):null;if(observer)observer.observe(canvas);else global.addEventListener("resize",resize);raf=requestAnimationFrame(draw);
  return {setQuality(n){quality=clamp(n,1,10);resize();},pause(){active=false;cancelAnimationFrame(raf);},resume(){if(!active){active=true;raf=requestAnimationFrame(draw);}},destroy(){active=false;cancelAnimationFrame(raf);if(observer)observer.disconnect();else global.removeEventListener("resize",resize);global.removeEventListener("pointermove",movePointer);}};
 }
-global.NU={defaults,load:safeLoad,save:safeSave,clamp,samplePerformance,create,storageKey:STORAGE_KEY};
+global.NU={defaults,load:safeLoad,save:safeSave,clamp,samplePerformance,sampleNetwork,create,storageKey:STORAGE_KEY};
 })(window);
