@@ -47,7 +47,8 @@
     "Aircraft are placed in an upper altitude band and road traffic in a ground band to reduce intersections with buildings.",
     "The nine Mana capsule upgrade levels and N-BI shot-cost reduction are not yet implemented; current Chaos shot still costs 10 Mana.",
     "The city layout is an art-direction proposal, not a canonical map. Published sources describe Niroo City as green, engineered, sustainable, and founded by Binam Binshun, but do not establish a definitive skyline layout.",
-    "Generation 1 polish preview branch: ambient round counters hidden; successful interaction progress is shown only at the clicked object; XP/Mana popup text removed while capsule-boundary gain marker is retained; Store navigation and first-visit two-choice guide added. Purchase transactions remain disabled pending approved prices and economy rules."
+    "Generation 1 polish preview branch: ambient round counters hidden; successful interaction progress is shown only at the clicked object; XP/Mana popup text removed while capsule-boundary gain marker is retained; Store navigation and first-visit two-choice guide added. Purchase transactions remain disabled pending approved prices and economy rules.",
+    "Generation 1 layout-mode preview: online mode reserves the central playfield band and active reading column from object spawns; downloadable fullscreen mode can use the full playfield by setting data-nu-layout=\"fullscreen\". Browser QA remains pending."
   ],
   "rendering": {
     "pixelWorld": {
