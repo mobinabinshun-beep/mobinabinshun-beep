@@ -137,3 +137,14 @@ body.article-mode #game-view .hud,body.article-mode #game-view .bars{opacity:.9}
 .demo-profile-warning p,.demo-profile-note{font-size:11px;line-height:1.7;color:#c0d0dc}
 .btn.danger{border-color:#ff526c;background:linear-gradient(135deg,#651c2c,#351522)}
 @media(max-width:600px){.demo-profile-card{grid-template-columns:1fr}.demo-avatar{width:112px}.demo-profile-fields{grid-template-columns:1fr}}
+
+/* N.U Gen1.9 — HP capsule feedback and working virtual store */
+.shop-wallet{font:700 12px/1.5 ui-monospace,monospace;color:#b9e8ff;letter-spacing:.04em}
+.shop-item{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px;margin:14px 0;border:1px solid #a8d9ff33;border-radius:14px;background:linear-gradient(120deg,#0b1c2aee,#101a27dd)}
+.shop-item strong{color:#f3f7ff;font-size:14px}.shop-item p{color:#a9bdcb;font-size:12px;line-height:1.7}
+.shop-actions{display:flex;gap:8px;flex-wrap:wrap}.shop-actions button:disabled{opacity:.42;cursor:not-allowed;filter:saturate(.4)}
+.shop-footnote{font-size:11px;color:#8199aa;line-height:1.7}
+#hp-feedback{position:absolute;left:50%;top:-17px;transform:translateX(-50%);color:#70ff91;font:800 11px ui-monospace,monospace;opacity:0;pointer-events:none;text-shadow:0 0 8px #45ff77}
+#hp-feedback.show{animation:nu-hp-gain .9s ease-out forwards}
+@keyframes nu-hp-gain{0%{opacity:0;transform:translate(-50%,7px) scale(.8)}18%{opacity:1;transform:translate(-50%,0) scale(1.08)}100%{opacity:0;transform:translate(-50%,-13px) scale(1)}}
+@media(max-width:560px){.shop-item{align-items:flex-start;flex-direction:column}.shop-actions{width:100%}.shop-actions button{flex:1}}
