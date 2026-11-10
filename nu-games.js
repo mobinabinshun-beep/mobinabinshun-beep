@@ -42,7 +42,7 @@ const INVENTORY_KEY="nu-world-inventory-v1";
 function readInventory(){try{return Object.assign({hpPills:0},JSON.parse(localStorage.getItem(INVENTORY_KEY)||"{}"));}catch(_){return {hpPills:0};}}
 function writeInventory(inv){try{localStorage.setItem(INVENTORY_KEY,JSON.stringify(inv));}catch(_){}}
 function renderShop(){
- const inv=readInventory(),cost=10,xp=Number(state.save.xp)||0,hp=Number(state.save.hp)||10;
+ const inv=readInventory(),cost=NUEconomy.HP_CAPSULE_COST_XP,xp=Number(state.save.xp)||0,hp=Number(state.save.hp)||10;
  $("shop-wallet").textContent="XP "+xp+" · HP "+hp+"/10 · HP CAPSULES "+inv.hpPills;
  const canBuy=xp>=cost;
  $("shop-buy-pill").disabled=!canBuy;
@@ -53,13 +53,13 @@ function renderShop(){
  $("shop-status").textContent=inv.hpPills?"Each capsule restores up to 10 missing HP, is consumed once, and cannot be used at full HP.":"Available item: HP Capsule. It costs 10 earned XP and restores up to 10 missing HP.";
 }
 function purchaseHpPill(){
- if((Number(state.save.xp)||0)<10)return;
- state.save.xp-=10;const inv=readInventory();inv.hpPills++;writeInventory(inv);save();renderShop();
+ const inv=readInventory();if(!NUEconomy.buyHpCapsule(state.save,inv))return;
+ writeInventory(inv);save();renderShop();
 }
 function useHpPill(){
- const inv=readInventory(),before=Number(state.save.hp)||0;
- if(inv.hpPills<1||before>=10)return;
- const restored=Math.min(10,10-before);state.save.hp=before+restored;inv.hpPills--;writeInventory(inv);save();renderShop();
+ const inv=readInventory(),restored=NUEconomy.useHpCapsule(state.save,inv);
+ if(!restored)return;
+ writeInventory(inv);save();renderShop();
  const feedback=$("hp-feedback");if(feedback){feedback.textContent="+"+restored+" HP";feedback.classList.remove("show");void feedback.offsetWidth;feedback.classList.add("show");}
 }
 function showShop(){ $("home-view").classList.remove("active");$("game-view").classList.remove("active");$("article-view").classList.remove("active");$("shop-view").classList.add("active");document.body.classList.remove("article-mode");const seen=localStorage.getItem("nu-shop-guide-seen")==="1";$("shop-quest").classList.toggle("hidden",seen);$("shop-inventory").classList.toggle("hidden",!seen);renderShop();}
