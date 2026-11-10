@@ -122,3 +122,15 @@ The visual design uses the published Niroo City descriptions of integration betw
 ### Economy not yet implemented
 
 The nine Mana capsule upgrade levels, N-BI shot-cost reduction (down to one Mana per shot), HP capsule purchase/refill, X/N Credits, savings/investment and betting modes are not implemented. The current Chaos shot still costs one full 10-Mana capsule. This is intentionally disclosed rather than represented as complete.
+
+
+## Generation 1 — demo profile clarification (2026-11-11)
+
+- Added a menu entry for a **display-only player profile preview**.
+- The square portrait area is a labelled placeholder only. There is no file input, image upload, image persistence, or account registration in the public demo.
+- Profile text fields are optional and transient. Entering text displays a red warning that the public demo cannot protect personal data and advises against entering real/sensitive information.
+- Closing the preview clears all entered demo text immediately. The explicit clear-and-close action does the same.
+- This is not the downloadable local profile, password gate, save protection, parental-control flow, or online account system. Those remain future downloadable/online scope and are archived separately.
+- The previously existing N.U Store navigation and first-visit two-choice guide remain present. Purchasable upgrades/economy are not yet implemented.
+- The adaptive runtime, pixel-world renderer, and game mechanics were not changed in this profile-preview correction.
+- Pre-change backups of `index.html`, `nu-world.css`, `nu-games.js`, and this README are stored under `BACKUPS/GEN1-PRE-PROFILE-CORRECTION-2026-11-11/`.
