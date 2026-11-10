@@ -1,0 +1,10 @@
+{
+  "name": "nu-interactive-world-gen1",
+  "version": "0.1.9",
+  "private": true,
+  "description": "N.U — Niroo Universe Generation 1 browser game prototype",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "check": "node --check nu-economy.js && node --check nu-art-background.js && node --check nu-games.js"
+  }
+}
