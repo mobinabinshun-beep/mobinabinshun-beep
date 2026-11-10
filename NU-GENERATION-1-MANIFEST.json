@@ -3,11 +3,12 @@
   "generation": 1,
   "runtime": "N.U Adaptive Runtime",
   "runtimeVersion": "0.1-prototype",
-  "packageVersion": "0.1.8-dev",
+  "packageVersion": "0.1.9-dev",
   "entry": "index.html",
   "modules": [
     "nu-engine.js",
     "nu-pixel-world.js",
+    "nu-art-background.js",
     "nu-games.js",
     "nu-world.css"
   ],
@@ -27,6 +28,9 @@
     "native": "future adapter required"
   },
   "notes": [
+    "Generation 1.9: removed automatic +1 HP round completion bonus; HP changes only through explicit damage/healing.",
+    "Generation 1.9: separate static-first N.U art compositor adds adaptive astrolabe, star, cloud, golden-beam and water-glint effects; exact supplied artwork asset remains pending at assets/niroo-celestial-city.jpg.",
+    "Generation 1.9: virtual HP Capsule costs 10 XP, is consumed once, restores up to 10 missing HP, and cannot be used at full HP.",
     "Generation 1.8 development: repaired literal newline escaping in the store/game script so the JavaScript parses as source text.",
     "N.U public-test candidate retains the adaptive/network runtime unchanged and keeps the public default branch untouched until the candidate is merged.",
     "Generation 1.7 development: added N.U Store navigation and a first-visit two-choice store guide shell; no unavailable/locked upgrades are displayed.",
