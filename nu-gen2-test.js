@@ -30,7 +30,7 @@ function draw(t){const w=innerWidth,h=innerHeight;ctx.clearRect(0,0,w,h);const s
  ctx.fillStyle="#05080d";ctx.beginPath();ctx.moveTo(0,h*.88);ctx.lineTo(w*.18,h*.84);ctx.lineTo(w*.25,h);ctx.lineTo(0,h);ctx.fill();ctx.beginPath();ctx.moveTo(w,h*.85);ctx.lineTo(w*.8,h*.83);ctx.lineTo(w*.75,h);ctx.lineTo(w,h);ctx.fill();
 }
 function loop(t){if(document.hidden){raf=requestAnimationFrame(loop);return;}const dt=t-last;last=t;if(dt>0){frameTimes.push(dt);if(frameTimes.length>45)frameTimes.shift();if(frameTimes.length===45){const avg=frameTimes.reduce((a,b)=>a+b,0)/45;const next=avg>42?Math.max(1,quality-1):avg<23?Math.min(10,quality+1):quality;if(next!==quality){quality=next;makeParticles();$("quality").textContent="RENDER: "+quality+"/10";}}}draw(t);raf=requestAnimationFrame(loop);}
-function renderWallet(){for(const k of ["xp","mana","xcredit","ncredit"])$(k).textContent=k==="mana"?wallet.mana+" / "+(wallet.manaCapsules*10):wallet[k];$("shield").textContent=wallet.shield+" / 10";$("shieldFill").style.width=wallet.shield*10+"%";$("shieldText").textContent="شارژ "+wallet.shield+" از ۱۰";}
+function renderWallet(){for(const k of ["xp","mana","xcredit","ncredit","coins"])$(k).textContent=k==="mana"?wallet.mana+" / "+(wallet.manaCapsules*10):wallet[k];$("shield").textContent=wallet.shield+" / 10";$("shieldFill").style.width=wallet.shield*10+"%";$("shieldText").textContent="شارژ "+wallet.shield+" از ۱۰";}
 function toast(s){const e=$("toast");e.textContent=s;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),1800);}
 function open(id){$(id).classList.add("open");}
 function close(id){$(id).classList.remove("open");}
