@@ -26,7 +26,11 @@
     "offline": "after assets are cached; not yet guaranteed",
     "native": "future adapter required"
   },
-  "notes": [\n    "Generation 1.7 development: added N.U Store navigation and a first-visit two-choice store guide shell; no unavailable/locked upgrades are displayed.",\n    "Generation 1.7 development: removed duplicate persistent round counters; 1/10–10/10 feedback is object-local after successful interaction.",\n    "Generation 1.7 development: removed floating XP/Mana/reward labels from object interactions; +1 capsule-edge feedback remains.",\n    "Generation 1.7 development: online reading layout retains central spawn exclusion; downloadable full-screen builds may set data-delivery=download to remove it.",
+  "notes": [
+    "Generation 1.7 development: added N.U Store navigation and a first-visit two-choice store guide shell; no unavailable/locked upgrades are displayed.",
+    "Generation 1.7 development: removed duplicate persistent round counters; 1/10–10/10 feedback is object-local after successful interaction.",
+    "Generation 1.7 development: removed floating XP/Mana/reward labels from object interactions; +1 capsule-edge feedback remains.",
+    "Generation 1.7 development: online reading layout retains central spawn exclusion; downloadable full-screen builds may set data-delivery=download to remove it.",
     "This is an experimental browser prototype, not a production game release.",
     "N-BI consumes 10 Mana per successful Chaos shot in the current prototype; upgrade-based cost reduction is not yet implemented.",
     "No server account or cloud save exists.",
