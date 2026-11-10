@@ -148,3 +148,18 @@ body.article-mode #game-view .hud,body.article-mode #game-view .bars{opacity:.9}
 #hp-feedback.show{animation:nu-hp-gain .9s ease-out forwards}
 @keyframes nu-hp-gain{0%{opacity:0;transform:translate(-50%,7px) scale(.8)}18%{opacity:1;transform:translate(-50%,0) scale(1.08)}100%{opacity:0;transform:translate(-50%,-13px) scale(1)}}
 @media(max-width:560px){.shop-item{align-items:flex-start;flex-direction:column}.shop-actions{width:100%}.shop-actions button{flex:1}}
+
+/* N.U Generation 1.9 — reference-art background compositor (static-first) */
+#nu-art-scene{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:
+ radial-gradient(ellipse at 50% 54%,rgba(221,151,73,.28),transparent 32%),
+ radial-gradient(ellipse at 51% 80%,rgba(41,93,111,.25),transparent 44%),
+ linear-gradient(180deg,#05080d 0%,#101a23 48%,#17232a 72%,#060b11 100%);
+}
+#nu-art-scene:before{content:"";position:absolute;inset:0;background-image:url("./assets/niroo-celestial-city.jpg");background-size:cover;background-position:center 52%;opacity:.88;filter:saturate(.82) contrast(1.05)}
+#nu-art-scene:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(2,5,10,.48),transparent 35%,transparent 68%,rgba(2,5,10,.35)),linear-gradient(180deg,rgba(2,5,10,.25),transparent 35%,rgba(3,8,13,.12) 68%,rgba(2,5,10,.48));}
+#nu-art-effects{position:absolute;inset:0;width:100%;height:100%;opacity:.9}
+.world>.shell{position:relative;z-index:2}
+.world>.horizon,.world>#world-canvas,.world>#pixel-world{z-index:1}
+@media(prefers-reduced-motion:reduce){#nu-art-effects{display:none}}
+html[data-nu-art="static"] #nu-art-effects{display:none}
+html[data-nu-art="low"] #nu-art-effects{opacity:.36}
