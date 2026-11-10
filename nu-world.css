@@ -128,3 +128,17 @@ body.article-mode #game-view .hud,body.article-mode #game-view .bars{opacity:.9}
 .shop-quest p,.shop-empty p{font-size:13px;color:#a9bdcb;line-height:1.8}
 .shop-quest-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
 #round-progress,#turn-count{display:none!important}
+
+/* N.U Gen1 demo-only profile preview: no file input, no persistence, no upload. */
+.demo-profile{max-width:760px;margin:18px auto;padding:22px}
+.demo-profile-card{display:grid;grid-template-columns:150px 1fr;gap:20px;align-items:start}
+.demo-avatar{aspect-ratio:1;width:150px;display:grid;place-content:center;text-align:center;border:1px dashed #79dfff88;border-radius:14px;background:linear-gradient(145deg,#122b3b88,#071522aa);color:#9ddfff;font-size:12px;letter-spacing:.12em;line-height:1.6}
+.demo-avatar small{font-size:8px;color:#85a9bd}
+.demo-profile-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.demo-profile-fields label{display:block;font-size:9px;letter-spacing:.18em;color:#8edfff;margin-bottom:6px}
+.demo-profile-fields input{width:100%;min-width:0;border:1px solid var(--line);border-radius:9px;padding:11px;background:#071522;color:#eaf6ff}
+.demo-profile-warning{margin:18px 0;padding:15px;border:1px solid #ff526c;border-radius:12px;background:rgba(72,9,24,.45);box-shadow:0 0 22px #ff526c22}
+.demo-profile-warning strong{color:#ff7187;letter-spacing:.12em;font-size:12px}
+.demo-profile-warning p,.demo-profile-note{font-size:11px;line-height:1.7;color:#c0d0dc}
+.btn.danger{border-color:#ff526c;background:linear-gradient(135deg,#651c2c,#351522)}
+@media(max-width:600px){.demo-profile-card{grid-template-columns:1fr}.demo-avatar{width:112px}.demo-profile-fields{grid-template-columns:1fr}}
