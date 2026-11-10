@@ -66,13 +66,9 @@ body.article-mode #game-view .hud,body.article-mode #game-view .bars{opacity:.9}
 .horizon{transform:translate3d(calc(var(--camera-x)*-.55),calc(var(--camera-y)*-.4),0);transition:transform .22s ease-out}
 .round-progress{position:fixed;z-index:7;left:50%;bottom:48px;transform:translateX(-50%);min-width:58px;padding:4px 10px;border:1px solid #8bdfff66;border-radius:20px;background:rgba(3,13,22,.72);backdrop-filter:blur(10px);color:#c8f4ff;font-size:10px;font-weight:800;letter-spacing:.12em;text-align:center;box-shadow:0 0 13px #48cfff22}
 .round-progress:after{content:"";display:block;height:2px;margin-top:4px;border-radius:4px;background:linear-gradient(90deg,#58dfff var(--round-progress,0%),#173447 var(--round-progress,0%));transition:background .18s}
-.capsule-gain{position:absolute;left:50%;top:-22px;transform:translateX(-50%);z-index:8;font-size:12px;font-weight:900;letter-spacing:.04em;pointer-events:none;animation:capsule-rise 1s ease-out forwards;text-shadow:0 0 10px currentColor}
-.capsule-gain.xp{color:#a7ff62}.capsule-gain.mana{color:#65dcff}
-@keyframes capsule-rise{0%{opacity:0;transform:translate(-50%,8px) scale(.8)}18%{opacity:1}100%{opacity:0;transform:translate(-50%,-20px) scale(1.1)}}
 .hp-track{position:relative;overflow:hidden}
 .hp-track:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 0 20%,#ffb0beaa 45%,transparent 62%);opacity:.4;animation:heartbeat-sweep 2.1s linear infinite;pointer-events:none}
 @keyframes heartbeat-sweep{from{transform:translateX(-100%)}to{transform:translateX(180%)}}
-@media(prefers-reduced-motion:reduce){#world-canvas,.horizon{transform:none;transition:none}.hp-track:after{animation:none}.capsule-gain{animation:none;opacity:1}}
 @media(max-width:700px){.round-progress{bottom:46px}}
 
 /* Local-clock Niroo City sky phases */
@@ -102,7 +98,6 @@ body.article-mode #game-view .hud,body.article-mode #game-view .bars{opacity:.9}
 #game-view.active .hp-track:after{width:18px;inset:0 auto 0 -20px;background:linear-gradient(90deg,transparent,#fff0f3,#ff526c,transparent);opacity:.85;animation:heartbeat-sweep 1.6s linear infinite}
 #game-view.active .bar-wrap:first-child:after{content:"";position:absolute;left:var(--capsule-boundary,0%);top:-3px;height:18px;width:2px;background:#e7ffe0;box-shadow:0 0 7px #a7ff62;pointer-events:none}
 #game-view.active .bar-wrap:nth-child(2):after{content:"";position:absolute;left:var(--capsule-boundary,0%);top:-3px;height:15px;width:2px;background:#e7fbff;box-shadow:0 0 7px #55dfff;pointer-events:none}
-.capsule-gain{z-index:12;top:-23px;white-space:nowrap;text-shadow:0 0 9px currentColor,0 1px 3px #000}
 #game-view.active .round-progress:after{height:3px}
 @media(max-width:700px){#game-view.active .bars{left:8px;right:8px;bottom:8px;gap:16px}#game-view.active .bar-wrap:nth-child(2){width:min(48vw,250px)}#game-view.active .round-progress{bottom:59px}#game-view.active .hp-track{width:86px}}
 
