@@ -120,3 +120,11 @@ body.article-mode #game-view .hud,body.article-mode #game-view .bars{opacity:.9}
 @keyframes nu-hit-pop{0%{opacity:0;scale:.7}15%{opacity:1;scale:1.2}100%{opacity:0;translate:0 -25px}}
 @media(max-width:700px){#game-view.active .bars{left:8px;right:8px;bottom:8px;gap:5px 8px}#game-view.active .bar-wrap:nth-child(2){width:min(38vw,180px)}#game-view.active .hp-track{width:82px}}
 @media(prefers-reduced-motion:reduce){#game-view.active .hp-track:after{animation:none}.hit-progress{animation:none}}
+
+/* N.U Generation 1.7 — store shell and object-only progress feedback */
+#shop-view.active{display:block;max-width:760px;margin:0 auto;padding:24px 0 70px}
+.shop-quest,.shop-empty{padding:22px;margin:18px 0;background:rgba(8,20,31,.78)}
+.shop-quest h3,.shop-empty h3{margin:8px 0;font-size:18px}
+.shop-quest p,.shop-empty p{font-size:13px;color:#a9bdcb;line-height:1.8}
+.shop-quest-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+#round-progress,#turn-count{display:none!important}
