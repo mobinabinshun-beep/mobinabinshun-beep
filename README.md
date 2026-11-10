@@ -134,3 +134,12 @@ The nine Mana capsule upgrade levels, N-BI shot-cost reduction (down to one Mana
 - The previously existing N.U Store navigation and first-visit two-choice guide remain present. Purchasable upgrades/economy are not yet implemented.
 - The adaptive runtime, pixel-world renderer, and game mechanics were not changed in this profile-preview correction.
 - Pre-change backups of `index.html`, `nu-world.css`, `nu-games.js`, and this README are stored under `BACKUPS/GEN1-PRE-PROFILE-CORRECTION-2026-11-11/`.
+
+
+## Generation 1 demo profile interaction refinement (2026-11-11)
+- The display-only profile can now be dismissed by clicking the empty profile backdrop or pressing Enter while the profile is open.
+- Every close route clears all temporary profile text fields and hides the privacy warning.
+- No image upload, file picker, profile persistence, or account creation was added.
+- `nu-games.js` syntax was validated after the change. Browser/device QA and Pages deployment remain pending.
+- Pre-change backup: `BACKUPS/GEN1-PROFILE-BACKDROP-ENTER-2026-11-11/nu-games.js.bak`.
+- Runtime `nu-engine.js` and `nu-pixel-world.js` remain unchanged.
