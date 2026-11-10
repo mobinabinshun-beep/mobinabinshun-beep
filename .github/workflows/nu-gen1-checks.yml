@@ -1,0 +1,20 @@
+name: N.U Generation 1 checks
+on:
+  pull_request:
+    branches:
+      - Official-public-information-and-discovery-hub-for-N.U-(Niroo-Universe),-its-publishing-network,-projects,-publications-and-related-creative-works
+  push:
+    branches:
+      - feature/gen1-cleanup-2026-11-11
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm run check
+      - run: npm test
