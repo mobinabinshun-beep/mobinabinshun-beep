@@ -206,3 +206,6 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 .hp-pill-use{display:inline-flex;align-items:center;gap:5px;padding:2px 7px;min-height:34px}
 .hp-pill-use img{width:28px;height:28px;object-fit:contain;image-rendering:pixelated}
 .hp-pill-use span{font:800 10px/1 ui-monospace,monospace;color:#ffe8a0}
+
+/* N.U Generation 1 transaction feedback: compact, accessible, non-blocking. */
+.transaction-toast{position:fixed;left:50%;bottom:22px;z-index:1200;max-width:min(92vw,520px);padding:10px 16px;border:1px solid rgba(245,202,105,.45);border-radius:10px;background:rgba(8,15,24,.96);color:#ffe8ae;font:700 12px/1.45 ui-monospace,monospace;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.4);opacity:0;transform:translate(-50%,12px);pointer-events:none;transition:opacity .18s ease,transform .18s ease}.transaction-toast.visible{opacity:1;transform:translate(-50%,0)}.transaction-toast.success{border-color:rgba(143,224,133,.55);color:#caffbd}.transaction-toast.warning{border-color:rgba(255,190,90,.55);color:#ffd28a}.hp-pill-use img{width:28px;height:28px;image-rendering:pixelated;object-fit:contain}.hp-pill-icon{image-rendering:pixelated}
