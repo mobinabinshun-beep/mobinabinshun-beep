@@ -1,35 +1,43 @@
-# N.U Modular Graphics Runtime — 2026-11-11
+# N.U Celestial Background & Modular Scene Runtime — 2026-11-12
 
 ## Status
-Experimental integration on `feature/modular-graphics-runtime-2026-11-11`. Not merged into the public default branch. The preservation branch `preservation/public-demo-2026-11-11` was created from the same public baseline before changes.
+Image-first Generation 1 visual candidate on `feature/image-first-celestial-scene-2026-11-12`. This is a separately versioned background presentation change. The default public branch is not changed until review and automated checks pass. The preservation branch remains the original pre-preview public baseline.
 
-## Architecture
-The runtime is split into four independently replaceable engines plus a small orchestrator:
+## Source and visual direction
+- Canonical base asset: `NU-INGEST-ARCHIVE/ASSETS/NU-Celestial-City/Original reference image file for Niroo Universe (N.U).png`.
+- The exact PNG is present in the archive Git tree (blob `d73afd484ef8b459c908c1942ee0f47d27f93aa5`, 2,467,298 bytes). The archive asset record's proposed optimized JPEG is a separate derivative and must not be confused with the existing PNG.
+- The source image is an owner-supplied visual direction, not proof that its exact skyline/map is N.U Canon. The Gen1 Visual Bible marks the definitive city map, architecture, biome order and lighting details as proposals pending a canonical art pack.
 
-1. **Capability & Budget Core** — `nu-graphics-core.js`: reads the existing NU performance sample once, then applies conservative device-memory, CPU-core and Save-Data caps. It produces an immutable, locked profile with DPR, particle, background FPS and game FPS budgets. It does not inspect or change game rules.
-2. **Background Engine** — `nu-background-engine.js`: owns the full-screen image surface and fallback state. It loads the approved archived reference artwork directly from `NU-INGEST-ARCHIVE/ASSETS/NU-Celestial-City/Original reference image file for Niroo Universe (N.U).png` via the raw GitHub asset URL. The archive remains the single source of truth; no second binary is required in this branch.
-3. **Dynamic Layers Engine** — `nu-dynamic-layers.js`: owns low-cost atmospheric particles on a separate transparent canvas. It uses the core budget, pauses on hidden tabs, and disables itself for Reduced Motion or economy tier.
-4. **Game Render Adapter** — `nu-game-render-adapter.js`: exposes display-budget CSS variables and tier metadata to the existing game stage. It does not alter pointer input, collisions, XP, Mana, HP, game timers or persistence.
+## Scene composition
+1. Invariant full-screen source artwork. It is not blurred, pixelated, downsampled by our code, swapped for generated imagery, or removed on low-end devices.
+2. Independent transparent atmosphere compositor: subtle warm light, celestial orbit strokes and low-density motes. The compositor is optional and can be stopped independently.
+3. Camera parallax: uses existing camera input variables to move the image subtly; disabled on economy profile and reduced-motion.
+4. Existing UI and game-stage canvases remain in the foreground. The old procedural world canvas is paused/hidden only after the source image loads successfully; if the asset fails, the old Generation 1 procedural scene is re-enabled as fallback.
 
-`nu-graphics-runtime.js` starts the engines after the existing `nu:calibrated` event and passes one shared profile.
+## Modes
+- Ambient: low-amplitude atmosphere and image parallax.
+- Focus: reduced brightness/motion and sparse effects to protect reading focus.
+- Game: slightly richer atmospheric motion while gameplay UI stays foregrounded.
+- Sleep: almost-static background; effects can be paused for resource saving.
+- Intro/menu/profile/shop overlays freeze the optional compositor and image camera state. Returning to the page resumes the selected mode.
 
-## Platform strategy
-This is a platform-neutral web runtime with platform detection and a narrow adapter boundary. Android, iOS, desktop and other browsers currently use the same web renderer with separate budget caps. Native Android/iOS renderer implementations and native bridge integrations are not included in this first web demo step.
+## Four engine responsibilities
+- Capability/budget core: reuses the one existing bounded startup sample and locks a conservative browser presentation budget.
+- Background engine: owns the source image, image-load fallback, camera and scene mode.
+- Dynamic layers engine: independent transparent Canvas 2D compositor, bounded by the selected budget and reduced-motion/visibility state.
+- Game render adapter: passes display tier to the existing game presentation and pixel renderer APIs; does not alter rules, target generation, XP, Mana, HP or save format.
 
-## Rendering strategy
-- Background artwork is the visual base.
-- Existing sky and pixel-world layers are retained at reduced opacity.
-- Dynamic atmospheric effects are composited independently.
-- Existing game canvas remains the top gameplay surface.
-- Low-tier devices receive fewer/no particles, lower DPR and capped background work.
-- Once sampled, the profile is locked; no continuous device benchmark loop runs.
+## Preservation boundaries
+- `nu-engine.js` remains frozen under `ENGINE-LOCK.md`.
+- Existing game rules, touch/mouse input, collision, economy and save structures remain unchanged.
+- `nu-pixel-world.js` receives only a reversible `setEnabled()` visibility/pause hook; its original procedural renderer remains available as fallback.
+- Native Android/iOS renderers, native packages, offline launcher and server-authoritative online features are not implemented by this browser scene update.
 
-## Known limitations / acceptance blockers
-- The background references the archived PNG directly. Runtime loading still requires the archive asset URL to remain publicly readable and reachable; actual browser rendering has not yet been human-verified.
-- The existing Generation 1 pixel-world renderer still has its own animation loop and timer; this change does not refactor that protected engine.
-- Game FPS budget is exposed as presentation metadata but does not yet throttle the legacy game simulation loop. The existing Generation 1 loop retains its own quality-based frame interval.
-- No real-device Android/iOS/browser human test has been performed.
-- The public deployment is intentionally unchanged until this preview branch passes source checks and is merged.
-
-## Preservation invariants
-Do not rewrite `nu-engine.js`, `nu-pixel-world.js`, game mechanics, collision/input logic, economy state, or save formats as part of this graphics layer. Any later change requires separate regression evidence.
+## Acceptance gates
+- Automated syntax, manifest and local-script checks must pass.
+- Confirm the PNG URL loads from GitHub raw in browser.
+- Check low/economy tier: image still full-quality source; optional effects disabled or minimal.
+- Check balanced/enhanced/ultra: atmosphere and parallax increase only within budget.
+- Check Reduced Motion, hidden-tab pause/resume, intro/menu/profile/shop freeze/resume.
+- Check game-stage UI and all three Generation 1 games remain interactive.
+- Do not call the background core locked/approved until desktop, low-end Android and iOS Safari human tests pass.

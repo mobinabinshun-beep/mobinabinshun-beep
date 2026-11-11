@@ -156,3 +156,10 @@ The nine Mana capsule upgrade levels, N-BI shot-cost reduction (down to one Mana
 - The existing game simulation and interaction code are preserved. The game adapter publishes visual-budget metadata; it does not yet enforce a new game-loop FPS limiter.
 - Native Android/iOS applications, offline packaging, reconstructed high-resolution textures and GPU-specific renderers are not included in this browser preview.
 - This is a public test candidate. Device-level performance, touch, contrast and interaction acceptance still require human testing.
+
+
+## Image-first celestial background preview — 2026-11-12
+
+The public test candidate now has a separately versioned image-first scene direction. The exact archived Celestial City PNG is the invariant base; optional Canvas 2D atmosphere and camera parallax are layered above it. Low-capability profiles keep the original artwork and reduce optional effects rather than replacing or degrading the image. The previous procedural Generation 1 world is paused/hidden only after successful image load and restored on asset failure.
+
+This is still a browser-rendered preview. Native Android/iOS engines, offline launcher packaging and server-backed online play are separate future adapters, not capabilities of this release. See `NU-MODULAR-GRAPHICS-ARCHITECTURE-2026-11-11.md` and the image-first QA checklist for acceptance gates.

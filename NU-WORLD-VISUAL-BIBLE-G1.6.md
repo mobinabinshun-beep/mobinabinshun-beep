@@ -58,3 +58,12 @@ Changing the city renderer must not change game economy. Changing the HUD must n
 - Aircraft and vehicles are minimal silhouettes; their altitude bands are separated but route collision/pathfinding is not implemented.
 - Biome boundaries and water/field geometry are illustrative.
 - A definitive Niroo City architectural reference pack is still needed before calling the skyline canonical.
+
+
+## 2026-11-12 image-first scene direction (Generation 1 preview)
+
+The owner-supplied Celestial City artwork is now the intended invariant visual base for the browser preview. It is an art-direction reference and playable scene backdrop, not a declaration that the exact skyline, map, orbital diagrams, architecture or celestial geography are established N.U Canon.
+
+The original source image remains unchanged at every quality tier. Optional atmosphere, parallax, lighting and particles are independent layers that may be reduced or paused on low-capability devices. The former procedural pixel panorama remains available as a compatibility fallback if the source asset cannot load. The game stage and gameplay objects remain separate foreground surfaces.
+
+The four scene modes are Ambient, Focus, Game and Sleep. Focus reduces visual motion and contrast behind reading content; Game permits a richer but budget-bounded atmosphere; Sleep approaches a static scene. This implementation is a Generation 1 browser preview and does not imply native Android/iOS renderers or a true 3D world.
