@@ -3,7 +3,7 @@
   "generation": 1,
   "runtime": "N.U Adaptive Runtime",
   "runtimeVersion": "0.1-prototype",
-  "packageVersion": "0.3.0-image-first-preview",
+  "packageVersion": "0.3.1-pixel-art-studio",
   "entry": "index.html",
   "modules": [
     "index.html",
@@ -15,7 +15,9 @@
     "nu-dynamic-layers.js",
     "nu-game-render-adapter.js",
     "nu-graphics-runtime.js",
-    "nu-games.js"
+    "nu-games.js",
+    "pixel-art-studio.html",
+    "nu-pixel-art-studio.js"
   ],
   "randomPool": [
     "bubble",
@@ -33,6 +35,7 @@
     "native": "future adapter required"
   },
   "notes": [
+    "Generation 1.9 candidate: added N.U Pixel Art Studio as a separate creative tool in the main library; it is deliberately excluded from the three-game random gameplay pool.",
     "Generation 1.8 development: repaired literal newline escaping in the store/game script so the JavaScript parses as source text.",
     "N.U public-test candidate retains the adaptive/network runtime unchanged and keeps the public default branch untouched until the candidate is merged.",
     "Generation 1.7 development: added N.U Store navigation and a first-visit two-choice store guide shell; no unavailable/locked upgrades are displayed.",
@@ -117,5 +120,15 @@
     "onlineAuthoritativeServices": false,
     "archiveSource": "NU-INGEST-ARCHIVE/ASSETS/NU-Celestial-City/Original reference image file for Niroo Universe (N.U).png",
     "publicAssetStatus": "PENDING_UPLOAD_TO_EXECUTION_REPOSITORY"
-  }
+  },
+  "libraryTools": [
+    {
+      "id": "pixel-art-studio",
+      "name": "N.U Pixel Art Studio",
+      "generation": 1,
+      "entry": "pixel-art-studio.html",
+      "purpose": "Local image import, pixel-grid editing, palette tools, SVG and PNG export",
+      "inRandomPool": false
+    }
+  ]
 }
