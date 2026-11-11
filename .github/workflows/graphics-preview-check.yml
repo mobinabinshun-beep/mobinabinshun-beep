@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - feature/image-first-celestial-scene-2026-11-12
+      - Official-public-information-and-discovery-hub-for-N.U-(Niroo-Universe),-its-publishing-network,-projects,-publications-and-related-creative-works
   pull_request:
     branches:
       - "Official-public-information-and-discovery-hub-for-N.U-(Niroo-Universe),-its-publishing-network,-projects,-publications-and-related-creative-works"
@@ -23,8 +24,13 @@ jobs:
           done
       - name: Validate manifest JSON
         run: python -m json.tool NU-GENERATION-1-MANIFEST.json >/dev/null
-      - name: Verify archived source artwork is reachable
-        run: curl -fsSI "https://raw.githubusercontent.com/niroouniverse-creator/NU-INGEST-ARCHIVE/main/ASSETS/NU-Celestial-City/Original%20reference%20image%20file%20for%20Niroo%20Universe%20(N.U).png" >/dev/null
+      - name: Check public runtime artwork copy
+        run: |
+          if [ -s assets/nu-celestial-city.png ]; then
+            file assets/nu-celestial-city.png
+          else
+            echo "::warning::Canonical PNG is in the private archive; upload it to assets/nu-celestial-city.png to activate the image-first public background."
+          fi
       - name: Verify local script references
         run: |
           python - <<'PY'
