@@ -23,7 +23,9 @@ jobs:
           done
       - name: Validate manifest JSON
         run: python -m json.tool NU-GENERATION-1-MANIFEST.json >/dev/null
-      - name: Verify archived source artwork is reachable\n        run: curl -fsSI "https://raw.githubusercontent.com/niroouniverse-creator/NU-INGEST-ARCHIVE/main/ASSETS/NU-Celestial-City/Original%20reference%20image%20file%20for%20Niroo%20Universe%20(N.U).png" >/dev/null\n      - name: Verify local script references
+      - name: Verify archived source artwork is reachable
+        run: curl -fsSI "https://raw.githubusercontent.com/niroouniverse-creator/NU-INGEST-ARCHIVE/main/ASSETS/NU-Celestial-City/Original%20reference%20image%20file%20for%20Niroo%20Universe%20(N.U).png" >/dev/null
+      - name: Verify local script references
         run: |
           python - <<'PY'
           from pathlib import Path
