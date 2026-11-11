@@ -61,7 +61,7 @@ Editor functions:
 - Aspect-ratio-preserving contain fit with transparent letterboxing.
 - Local 16-color palette extraction/quantization from the imported image.
 - Pencil, eraser, flood fill, color picker, custom color, palette swatches, undo/redo, clear/new canvas, and grid overlay toggle.
-- SVG export creates grouped vector paths from pixel cells with transparent background and crisp-edge rendering. PNG preview export is also available.
+- SVG export creates grouped vector paths from pixel cells with transparent background and crisp-edge rendering. PNG preview export is also available and is rendered from pixel data (not the visible grid overlay).
 - The SVG is vector geometry, not a bitmap hidden inside an SVG wrapper. The export is intended for editable downstream use; palette quantization is destructive relative to the original image, so retain the source image separately.
 
 ## 5. Candidate code fixes
@@ -103,3 +103,11 @@ Editor functions:
 - MDN SVG download behavior: https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/download
 - MDN SVG preserveAspectRatio: https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/preserveAspectRatio
 - N.U implementation repository and archive contain the primary project-specific implementation/governance evidence.
+
+
+## 10. Merge and CI result
+- Pull request #9 was merged into the public default branch by squash merge.
+- Merge commit: `ed465e266eaa944947c9774bb847edda906372ed`.
+- GitHub Actions run #34 (`N.U graphics preview smoke checks`) completed with conclusion `success`; JavaScript syntax, manifest JSON, artwork-presence warning step, and local script references across both pages all completed successfully.
+- The backup branch remains an unchanged reference to baseline `c8107656b1ae78ab9c34ebcd58630bd8a7d5233b`.
+- Human browser/device QA remains outstanding; CI success does not claim full interaction verification.
