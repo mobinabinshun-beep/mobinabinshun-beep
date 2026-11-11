@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - feature/image-first-celestial-scene-2026-11-12
+      - feature/gen1-pixel-art-studio-audit-2026-11-12
       - Official-public-information-and-discovery-hub-for-N.U-(Niroo-Universe),-its-publishing-network,-projects,-publications-and-related-creative-works
   pull_request:
     branches:
@@ -19,7 +20,7 @@ jobs:
           node-version: 20
       - name: Check JavaScript syntax
         run: |
-          for file in nu-engine.js nu-pixel-world.js nu-graphics-core.js nu-background-engine.js nu-dynamic-layers.js nu-game-render-adapter.js nu-graphics-runtime.js nu-games.js; do
+          for file in nu-engine.js nu-pixel-world.js nu-graphics-core.js nu-background-engine.js nu-dynamic-layers.js nu-game-render-adapter.js nu-graphics-runtime.js nu-games.js nu-pixel-art-studio.js; do
             node --check "$file"
           done
       - name: Validate manifest JSON
@@ -36,10 +37,13 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           import re
-          html = Path("index.html").read_text()
-          scripts = re.findall(r'<script src="./([^"]+)"', html)
+          pages = ["index.html", "pixel-art-studio.html"]
+          scripts = []
+          for page in pages:
+              html = Path(page).read_text()
+              scripts.extend(re.findall(r'<script src="./([^"]+)"', html))
           missing = [name for name in scripts if not Path(name).is_file()]
           if missing:
               raise SystemExit("Missing script files: " + ", ".join(missing))
-          print(f"Validated {len(scripts)} local script references")
+          print(f"Validated {len(scripts)} local script references across {len(pages)} pages")
           PY
