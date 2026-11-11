@@ -1,26 +1,21 @@
 # N.U approved background artwork
 
-## Asset to upload
+## Canonical source
+The exact owner-supplied PNG is stored in the private team archive:
+`NU-INGEST-ARCHIVE/ASSETS/NU-Celestial-City/Original reference image file for Niroo Universe (N.U).png`
 
-- Repository path: `assets/niroo-celestial-city.jpg`
-- Dimensions: 1536 × 1024
-- Format: JPEG (optimized from the supplied PNG, RGB, progressive)
-- Size: 400,781 bytes
-- SHA-256: `9c711b8ee75fe36cb0505b210c3cb8738a1d8c25c11b3a54d32b031d165025b5`
-- Intended use: N.U modular background engine, base scene under composited visual layers.
+- Archive blob SHA: `d73afd484ef8b459c908c1942ee0f47d27f93aa5`
+- Archive size: 2,467,298 bytes
+- Archive repository visibility: private
 
-## Important status
+## Required public runtime copy
 
-The image binary is **not yet stored in this Git repository**. The GitHub connector available for this task can create UTF-8 text files and Git blobs, but does not expose a binary-file upload action from the uploaded chat attachment. This README records the intended asset and exact target path; it is not proof that the image has been committed.
+- Exact target path: `assets/nu-celestial-city.png`
+- Use the original PNG without cropping, blurring, palette reduction or lossy conversion.
+- The browser background engine now references this same-origin relative path.
+- Until the binary is uploaded here, the public demo will intentionally fall back to the prior procedural Generation 1 scene. This is why the image-first scene is not yet visible on the public website.
 
-## Upload using GitHub website
+## Upload required
+The original PNG must be uploaded to this public repository through GitHub's **Add file → Upload files** interface. The connected repository tools can update source files but do not provide a binary upload from the local chat attachment. Upload the original image to this folder with the exact filename `nu-celestial-city.png`. After the upload, the existing code will load it automatically on the next Pages deployment.
 
-1. Download the optimized file named `niroo-celestial-city.jpg` from this chat.
-2. Open the repository's `feature/modular-graphics-runtime-2026-11-11` branch.
-3. Open the `assets` folder.
-4. Choose **Add file → Upload files**.
-5. Select `niroo-celestial-city.jpg` and ensure the final path is exactly `assets/niroo-celestial-city.jpg`.
-6. Commit directly to `feature/modular-graphics-runtime-2026-11-11`, not the default/public branch.
-7. After upload, verify the image opens at the file URL and compare its SHA-256 with the value above if possible.
-
-Once uploaded, the background engine's existing asset URL will resolve without changing game code. Do not merge or publish the branch until visual QA passes.
+Do not make the private archive public to solve this. Keep the archive as the canonical source and maintain this one public runtime copy for GitHub Pages.
