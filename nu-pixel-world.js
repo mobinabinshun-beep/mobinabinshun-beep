@@ -4,7 +4,7 @@
 const canvas=document.getElementById("pixel-world");if(!canvas)return;
 const ctx=canvas.getContext("2d",{alpha:true});if(!ctx)return;
 const W=480,H=270;
-let quality=4,raf=0,last=0,visible=true,started=false;
+let quality=4,raf=0,last=0,visible=true,started=false,enabled=true;
 const reduce=typeof matchMedia==="function"&&matchMedia("(prefers-reduced-motion: reduce)").matches;
 let phase="night",hour=0,camX=0,camY=0,weatherMode="sleep",particles=[],clouds=[],buildings=[],stars=[],traffic=[];
 let seed=0x4e553031;
@@ -76,15 +76,15 @@ function weather(t){
  }
 }
 function draw(t){
- if(!visible||!started)return;const fps=quality<=2?12:quality<=4?16:quality<=7?20:24,interval=1000/fps;if(t-last<interval){raf=requestAnimationFrame(draw);return;}last=t;
+ if(!visible||!started||!enabled)return;const fps=quality<=2?12:quality<=4?16:quality<=7?20:24,interval=1000/fps;if(t-last<interval){raf=requestAnimationFrame(draw);return;}last=t;
  ctx.clearRect(0,0,W,H);sky(t);land();city(t);weather(t);
  // soft atmospheric haze between the city and the viewer
  const haze=ctx.createLinearGradient(0,150,0,H);haze.addColorStop(0,"rgba(175,204,199,.03)");haze.addColorStop(1,"rgba(4,13,24,.26)");ctx.fillStyle=haze;ctx.fillRect(0,150,W,120);
- raf=requestAnimationFrame(draw);
+ if(!reduce&&enabled)raf=requestAnimationFrame(draw);
 }
-function resize(){canvas.width=W;canvas.height=H;if(reduce&&started)draw(performance.now());}
+function resize(){canvas.width=W;canvas.height=H;if(reduce&&started&&enabled)draw(performance.now());}
 function setCamera(x,y){camX=clamp(x,-28,28);camY=clamp(y,-20,20);document.documentElement.style.setProperty("--camera-x",camX+"px");document.documentElement.style.setProperty("--camera-y",camY+"px");}
-function start(){if(started)return;started=true;makeWorld();clock();resize();if(!reduce)raf=requestAnimationFrame(draw);else draw(performance.now());document.addEventListener("visibilitychange",()=>{visible=!document.hidden;if(visible){last=0;if(!reduce)raf=requestAnimationFrame(draw);else draw(performance.now());}else cancelAnimationFrame(raf);});window.addEventListener("resize",resize,{passive:true});setInterval(()=>{const old=phase;clock();if(reduce&&old!==phase)draw(performance.now());},30000);}
-window.NUPixelWorld={setQuality(n){quality=clamp(Number(n)||4,1,10);},setCamera, lastTouchWasDrag:false, setWeatherMode(mode){if(["sleep","study","game"].includes(mode))weatherMode=mode;},getPhase(){return phase;}};
+function start(){if(started)return;started=true;makeWorld();clock();resize();if(!reduce)raf=requestAnimationFrame(draw);else draw(performance.now());document.addEventListener("visibilitychange",()=>{visible=!document.hidden;if(visible&&enabled){last=0;if(!reduce)raf=requestAnimationFrame(draw);else draw(performance.now());}else cancelAnimationFrame(raf);});window.addEventListener("resize",resize,{passive:true});setInterval(()=>{const old=phase;clock();if(reduce&&old!==phase&&enabled)draw(performance.now());},30000);}
+window.NUPixelWorld={setQuality(n){quality=clamp(Number(n)||4,1,10);},setEnabled(on){enabled=!!on;if(!enabled){cancelAnimationFrame(raf);ctx.clearRect(0,0,W,H);}else if(started&&visible){last=0;if(!reduce)raf=requestAnimationFrame(draw);else draw(performance.now());}},setCamera, lastTouchWasDrag:false, setWeatherMode(mode){if(["sleep","study","game"].includes(mode))weatherMode=mode;},getPhase(){return phase;}};
 window.addEventListener("nu:calibrated",start,{once:true});
 })();
