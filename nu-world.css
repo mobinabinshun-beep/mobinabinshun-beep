@@ -146,19 +146,21 @@ body.article-mode #game-view .hud,body.article-mode #game-view .bars{opacity:.9}
 
 /* N.U Modular Graphics Runtime — image-first background and layered compositing */
 #nu-background-image{position:fixed;inset:0;z-index:-5;overflow:hidden;pointer-events:none;background:#080b12}
-#nu-background-image img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 52%;opacity:var(--nu-bg-opacity,.58);filter:saturate(.82) contrast(1.04);transform:scale(1.015)}
+#nu-background-image img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 52%;opacity:var(--nu-bg-opacity,.72);filter:saturate(.88) contrast(1.06);transform:scale(1.015)}
 #nu-background-image.asset-missing{background:radial-gradient(ellipse at 50% 45%,#30271f 0%,#141923 44%,#070b12 100%)}
 #nu-background-image.asset-missing:after{content:"N.U BACKGROUND ART · ASSET PENDING";position:absolute;left:12px;bottom:12px;color:#d2a36c88;font:9px ui-monospace,monospace;letter-spacing:.14em}
-.sky{background:linear-gradient(180deg,rgba(5,10,18,.28),rgba(5,10,18,.48) 70%,rgba(5,10,18,.72))}
-#nu-dynamic-layers{opacity:.68;mix-blend-mode:screen}
-#world-canvas{opacity:.34}
-#pixel-world{opacity:.28}
+.sky{background:linear-gradient(180deg,rgba(5,10,18,.14),rgba(5,10,18,.28) 70%,rgba(5,10,18,.46))}
+#nu-dynamic-layers{opacity:.48;mix-blend-mode:screen}
+#world-canvas{opacity:.16}
+#pixel-world{opacity:.22}
 #game-view.active .game-stage{--nu-game-target-fps:30}
 #game-view.active .game-stage canvas{image-rendering:auto}
 body[data-nu-graphics-tier="economy"] #nu-dynamic-layers{display:none}
 body[data-nu-graphics-tier="economy"] #world-canvas{opacity:.12}
 body[data-nu-graphics-tier="economy"] #pixel-world{opacity:.16}
 body[data-nu-graphics-tier="economy"] #nu-background-image img{filter:saturate(.72);transform:none}
-body[data-nu-graphics-tier="balanced"] #nu-dynamic-layers{opacity:.38}
-body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(.95) contrast(1.08)}
+body[data-nu-graphics-tier="economy"] #nu-background-image img{opacity:.62}
+body[data-nu-graphics-tier="balanced"] #nu-dynamic-layers{opacity:.28}
+body[data-nu-graphics-tier="enhanced"] #nu-dynamic-layers{opacity:.42}
+body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) contrast(1.1)}
 @media(prefers-reduced-motion:reduce){#nu-dynamic-layers{display:none!important}#nu-background-image img{transform:none!important}}
