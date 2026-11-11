@@ -195,3 +195,8 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 .shop-item p{margin:5px 0 0;color:#a9bdcb;font-size:12px;line-height:1.6}
 @media(max-width:520px){.shop-item{align-items:flex-start;flex-direction:column}.hp-pill-use{font-size:8px;padding:4px 6px}}
 @media(prefers-reduced-motion:reduce){.hp-gain{animation:none;opacity:1}}
+
+/* Fix: HP HUD is click-through except for its consumable action. */
+.hp-bar{pointer-events:none}
+.hp-bar #hp-pill-use{pointer-events:auto;position:relative;z-index:12;touch-action:manipulation;cursor:pointer}
+.hp-bar #hp-pill-use:focus-visible{outline:2px solid #baff9a;outline-offset:3px}
