@@ -3,13 +3,19 @@
   "generation": 1,
   "runtime": "N.U Adaptive Runtime",
   "runtimeVersion": "0.1-prototype",
-  "packageVersion": "0.1.8-dev",
+  "packageVersion": "0.2.0-graphics-preview",
   "entry": "index.html",
   "modules": [
+    "index.html",
+    "nu-world.css",
     "nu-engine.js",
     "nu-pixel-world.js",
-    "nu-games.js",
-    "nu-world.css"
+    "nu-graphics-core.js",
+    "nu-background-engine.js",
+    "nu-dynamic-layers.js",
+    "nu-game-render-adapter.js",
+    "nu-graphics-runtime.js",
+    "nu-games.js"
   ],
   "randomPool": [
     "bubble",
@@ -79,5 +85,28 @@
       "independentLayer": true
     },
     "gameplay": "transparent full-page overlay"
+  },
+  "graphicsRuntime": {
+    "version": "0.1-preview",
+    "profile": "one-time startup sample; session-locked",
+    "platforms": [
+      "Android browser",
+      "iOS browser",
+      "desktop browser"
+    ],
+    "nativeApps": false,
+    "backgroundAsset": "https://raw.githubusercontent.com/niroouniverse-creator/NU-INGEST-ARCHIVE/main/ASSETS/NU-Celestial-City/Original%20reference%20image%20file%20for%20Niroo%20Universe%20(N.U).png",
+    "layers": [
+      "capability and budget core",
+      "image background",
+      "dynamic atmosphere",
+      "game presentation adapter"
+    ],
+    "knownLimitations": [
+      "no native Android/iOS package",
+      "no offline launcher",
+      "game FPS budget is metadata only; existing game loop remains unchanged",
+      "no human device QA completed"
+    ]
   }
 }
