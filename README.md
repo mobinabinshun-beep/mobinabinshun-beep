@@ -163,3 +163,12 @@ The nine Mana capsule upgrade levels, N-BI shot-cost reduction (down to one Mana
 The public test candidate now has a separately versioned image-first scene direction. The exact archived Celestial City PNG is the invariant base; optional Canvas 2D atmosphere and camera parallax are layered above it. Low-capability profiles keep the original artwork and reduce optional effects rather than replacing or degrading the image. The previous procedural Generation 1 world is paused/hidden only after successful image load and restored on asset failure.
 
 This is still a browser-rendered preview. Native Android/iOS engines, offline launcher packaging and server-backed online play are separate future adapters, not capabilities of this release. See `NU-MODULAR-GRAPHICS-ARCHITECTURE-2026-11-11.md` and the image-first QA checklist for acceptance gates.
+
+## Generation 1 creative tool
+
+**N.U Pixel Art Studio** is listed separately from the three-game random pool at [pixel-art-studio.html](./pixel-art-studio.html).
+- Imports local PNG/JPEG/WebP/GIF image files in the browser; files are not uploaded to a server.
+- Converts the source into a selectable 16–64 pixel square grid using a local reduced palette.
+- Provides pencil, eraser, flood fill, color picker, undo/redo and palette extraction.
+- Exports clean SVG vector rectangles with transparent background, plus a PNG preview.
+- It is a creative tool, not a fourth random gameplay prototype.
