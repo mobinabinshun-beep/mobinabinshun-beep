@@ -200,3 +200,9 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 .hp-bar{pointer-events:none}
 .hp-bar #hp-pill-use{pointer-events:auto;position:relative;z-index:12;touch-action:manipulation;cursor:pointer}
 .hp-bar #hp-pill-use:focus-visible{outline:2px solid #baff9a;outline-offset:3px}
+
+/* N.U golden pixel HP pill icon */
+.hp-pill-icon{width:58px;height:58px;object-fit:contain;image-rendering:pixelated;flex:0 0 58px;border-radius:9px}
+.hp-pill-use{display:inline-flex;align-items:center;gap:5px;padding:2px 7px;min-height:34px}
+.hp-pill-use img{width:28px;height:28px;object-fit:contain;image-rendering:pixelated}
+.hp-pill-use span{font:800 10px/1 ui-monospace,monospace;color:#ffe8a0}
