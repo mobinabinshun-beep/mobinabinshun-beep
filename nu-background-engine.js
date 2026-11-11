@@ -23,7 +23,7 @@ function setQuality(b){
  // Never downsample, blur, or replace the source artwork on low-end devices.
  node.style.setProperty("--nu-image-opacity","1");
 }
-function setMode(next){mode=["ambient","sleep","focus","game"].includes(next)?next:"ambient";if(node)node.dataset.mode=mode;}
+function setMode(next){mode=["ambient","sleep","focus","game"].includes(next)?next:"ambient";if(node)node.dataset.mode=mode;if(g.NUDynamicLayers)g.NUDynamicLayers.setMode(mode);}
 function setFrozen(value){frozen=!!value;if(node)node.dataset.frozen=frozen?"true":"false";if(g.NUDynamicLayers)g.NUDynamicLayers.setFrozen(frozen);}
 function setCamera(x,y){if(!node)return;node.style.setProperty("--nu-scene-x",Math.max(-32,Math.min(32,Number(x)||0))+"px");node.style.setProperty("--nu-scene-y",Math.max(-24,Math.min(24,Number(y)||0))+"px");}
 function getStatus(){return {mounted:!!node,loaded,mode,frozen,asset:ASSET,source:"NU-INGEST-ARCHIVE canonical PNG"};}
