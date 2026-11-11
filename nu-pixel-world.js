@@ -4,7 +4,7 @@
 const canvas=document.getElementById("pixel-world");if(!canvas)return;
 const ctx=canvas.getContext("2d",{alpha:true});if(!ctx)return;
 const W=480,H=270;
-let quality=4,raf=0,last=0,visible=true,started=false,enabled=true;
+let quality=4,raf=0,last=0,visible=true,started=false,enabled=true,clockTimer=0;
 const reduce=typeof matchMedia==="function"&&matchMedia("(prefers-reduced-motion: reduce)").matches;
 let phase="night",hour=0,camX=0,camY=0,weatherMode="sleep",particles=[],clouds=[],buildings=[],stars=[],traffic=[];
 let seed=0x4e553031;
@@ -84,7 +84,9 @@ function draw(t){
 }
 function resize(){canvas.width=W;canvas.height=H;if(reduce&&started&&enabled)draw(performance.now());}
 function setCamera(x,y){camX=clamp(x,-28,28);camY=clamp(y,-20,20);document.documentElement.style.setProperty("--camera-x",camX+"px");document.documentElement.style.setProperty("--camera-y",camY+"px");}
-function start(){if(started)return;started=true;makeWorld();clock();resize();if(!reduce)raf=requestAnimationFrame(draw);else draw(performance.now());document.addEventListener("visibilitychange",()=>{visible=!document.hidden;if(visible&&enabled){last=0;if(!reduce)raf=requestAnimationFrame(draw);else draw(performance.now());}else cancelAnimationFrame(raf);});window.addEventListener("resize",resize,{passive:true});setInterval(()=>{const old=phase;clock();if(reduce&&old!==phase&&enabled)draw(performance.now());},30000);}
-window.NUPixelWorld={setQuality(n){quality=clamp(Number(n)||4,1,10);},setEnabled(on){enabled=!!on;if(!enabled){cancelAnimationFrame(raf);ctx.clearRect(0,0,W,H);}else if(started&&visible){last=0;if(!reduce)raf=requestAnimationFrame(draw);else draw(performance.now());}},setCamera, lastTouchWasDrag:false, setWeatherMode(mode){if(["sleep","study","game"].includes(mode))weatherMode=mode;},getPhase(){return phase;}};
+function updateClock(){const old=phase;clock();if(reduce&&old!==phase&&enabled)draw(performance.now());}
+function setClock(on){if(on&&!clockTimer)clockTimer=setInterval(updateClock,30000);else if(!on&&clockTimer){clearInterval(clockTimer);clockTimer=0;}}
+function start(){if(started)return;started=true;makeWorld();clock();resize();if(!reduce&&enabled)raf=requestAnimationFrame(draw);else if(reduce&&enabled)draw(performance.now());if(enabled)setClock(true);document.addEventListener("visibilitychange",()=>{visible=!document.hidden;if(visible&&enabled){last=0;if(!reduce)raf=requestAnimationFrame(draw);else draw(performance.now());}else cancelAnimationFrame(raf);});window.addEventListener("resize",resize,{passive:true});}
+window.NUPixelWorld={setQuality(n){quality=clamp(Number(n)||4,1,10);},setEnabled(on){enabled=!!on;if(!enabled){cancelAnimationFrame(raf);setClock(false);ctx.clearRect(0,0,W,H);}else if(started&&visible){setClock(true);last=0;if(!reduce)raf=requestAnimationFrame(draw);else draw(performance.now());}},setCamera, lastTouchWasDrag:false, setWeatherMode(mode){if(["sleep","study","game"].includes(mode))weatherMode=mode;},getPhase(){return phase;}};
 window.addEventListener("nu:calibrated",start,{once:true});
 })();
