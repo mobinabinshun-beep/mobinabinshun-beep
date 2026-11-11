@@ -1,11 +1,11 @@
 # N.U Celestial Background & Modular Scene Runtime — 2026-11-12
 
 ## Status
-Image-first Generation 1 visual candidate on `feature/image-first-celestial-scene-2026-11-12`. This is a separately versioned background presentation change. The default public branch is not changed until review and automated checks pass. The preservation branch remains the original pre-preview public baseline.
+Image-first Generation 1 visual code is merged to the default public branch. The public Pages deployment succeeded, but the exact source PNG is stored only in the private team archive; a same-origin runtime copy at `assets/nu-celestial-city.png` is still required before the new image can display. Until then, the legacy procedural background is restored as fallback.
 
 ## Source and visual direction
 - Canonical base asset: `NU-INGEST-ARCHIVE/ASSETS/NU-Celestial-City/Original reference image file for Niroo Universe (N.U).png`.
-- The exact PNG is present in the archive Git tree (blob `d73afd484ef8b459c908c1942ee0f47d27f93aa5`, 2,467,298 bytes). The archive asset record's proposed optimized JPEG is a separate derivative and must not be confused with the existing PNG.
+- The exact PNG is present in the private archive Git tree (blob `d73afd484ef8b459c908c1942ee0f47d27f93aa5`, 2,467,298 bytes). GitHub Actions confirmed that anonymous raw access returns 404 because the archive is private. A public execution-repository copy is required; do not expose the whole archive.
 - The source image is an owner-supplied visual direction, not proof that its exact skyline/map is N.U Canon. The Gen1 Visual Bible marks the definitive city map, architecture, biome order and lighting details as proposals pending a canonical art pack.
 
 ## Scene composition
