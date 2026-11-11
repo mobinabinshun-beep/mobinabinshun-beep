@@ -12,6 +12,6 @@ async function start(sample){
  }catch(error){running=false;console.warn("N.U graphics runtime fallback",error);}
 }
 g.NUGraphicsRuntime={start,setGameActive(active){if(g.NUGameRenderAdapter)g.NUGameRenderAdapter.setMode(active?"game":"world");}};
-g.addEventListener("nu:calibrated",()=>start(),{once:true});
+g.addEventListener("nu:calibrated",event=>start(event&&event.detail&&event.detail.performance),{once:true});
 document.addEventListener("DOMContentLoaded",()=>{g.NUBackgroundEngine&&g.NUBackgroundEngine.mount();},{once:true});
 })(window);
