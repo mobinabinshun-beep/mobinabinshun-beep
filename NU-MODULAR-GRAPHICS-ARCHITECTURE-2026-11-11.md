@@ -25,11 +25,11 @@ This is a platform-neutral web runtime with platform detection and a narrow adap
 - Once sampled, the profile is locked; no continuous device benchmark loop runs.
 
 ## Known limitations / acceptance blockers
-- The background references the archived PNG directly. Runtime loading still requires the archive asset URL to remain publicly readable and reachable.
+- The background references the archived PNG directly. Runtime loading still requires the archive asset URL to remain publicly readable and reachable; actual browser rendering has not yet been human-verified.
 - The existing Generation 1 pixel-world renderer still has its own animation loop and timer; this change does not refactor that protected engine.
-- Game FPS budget is exposed to the stage but does not yet throttle the legacy game simulation loop.
+- Game FPS budget is exposed as presentation metadata but does not yet throttle the legacy game simulation loop. The existing Generation 1 loop retains its own quality-based frame interval.
 - No real-device Android/iOS/browser human test has been performed.
-- No production deployment has been changed.
+- The public deployment is intentionally unchanged until this preview branch passes source checks and is merged.
 
 ## Preservation invariants
 Do not rewrite `nu-engine.js`, `nu-pixel-world.js`, game mechanics, collision/input logic, economy state, or save formats as part of this graphics layer. Any later change requires separate regression evidence.
