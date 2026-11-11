@@ -3,7 +3,7 @@
   "generation": 1,
   "runtime": "N.U Adaptive Runtime",
   "runtimeVersion": "0.1-prototype",
-  "packageVersion": "0.2.0-graphics-preview",
+  "packageVersion": "0.3.0-image-first-preview",
   "entry": "index.html",
   "modules": [
     "index.html",
@@ -87,26 +87,33 @@
     "gameplay": "transparent full-page overlay"
   },
   "graphicsRuntime": {
-    "version": "0.1-preview",
-    "profile": "one-time startup sample; session-locked",
-    "platforms": [
-      "Android browser",
-      "iOS browser",
-      "desktop browser"
+    "version": "0.3-preview",
+    "visualBase": "archived-owner-supplied-png",
+    "assetPath": "NU-INGEST-ARCHIVE/ASSETS/NU-Celestial-City/Original reference image file for Niroo Universe (N.U).png",
+    "assetBlobSha": "d73afd484ef8b459c908c1942ee0f47d27f93aa5",
+    "preserveSourcePixels": true,
+    "tiers": [
+      "economy",
+      "balanced",
+      "enhanced",
+      "ultra"
     ],
-    "nativeApps": false,
-    "backgroundAsset": "https://raw.githubusercontent.com/niroouniverse-creator/NU-INGEST-ARCHIVE/main/ASSETS/NU-Celestial-City/Original%20reference%20image%20file%20for%20Niroo%20Universe%20(N.U).png",
+    "modes": [
+      "ambient",
+      "focus",
+      "game",
+      "sleep"
+    ],
     "layers": [
-      "capability and budget core",
-      "image background",
-      "dynamic atmosphere",
-      "game presentation adapter"
+      "invariant source artwork",
+      "independent Canvas 2D atmosphere",
+      "camera parallax",
+      "foreground game/UI"
     ],
-    "knownLimitations": [
-      "no native Android/iOS package",
-      "no offline launcher",
-      "game FPS budget is metadata only; existing game loop remains unchanged",
-      "no human device QA completed"
-    ]
+    "fallback": "restore Generation 1 procedural renderer when source image fails",
+    "nativeAndroid": false,
+    "nativeIOS": false,
+    "offlineLauncher": false,
+    "onlineAuthoritativeServices": false
   }
 }
