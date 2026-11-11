@@ -56,7 +56,7 @@ Library integration:
 - Adds a direct navigation link from the main menu.
 
 Editor functions:
-- Local file import for PNG, JPEG, WebP and GIF using browser image decoding. The image is processed in the user's browser; no upload endpoint or remote image transmission exists.
+- Local file import for PNG, JPEG, WebP and GIF using createImageBitmap with an HTMLImageElement fallback. The image is processed in the user's browser; no upload endpoint or remote image transmission exists.
 - Square pixel grids at 16, 24, 32, 48 and 64 cells.
 - Aspect-ratio-preserving contain fit with transparent letterboxing.
 - Local 16-color palette extraction/quantization from the imported image.
