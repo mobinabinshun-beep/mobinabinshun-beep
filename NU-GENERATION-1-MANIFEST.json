@@ -89,7 +89,7 @@
   "graphicsRuntime": {
     "version": "0.3-preview",
     "visualBase": "archived-owner-supplied-png",
-    "assetPath": "NU-INGEST-ARCHIVE/ASSETS/NU-Celestial-City/Original reference image file for Niroo Universe (N.U).png",
+    "assetPath": "assets/nu-celestial-city.png",
     "assetBlobSha": "d73afd484ef8b459c908c1942ee0f47d27f93aa5",
     "preserveSourcePixels": true,
     "tiers": [
@@ -114,6 +114,8 @@
     "nativeAndroid": false,
     "nativeIOS": false,
     "offlineLauncher": false,
-    "onlineAuthoritativeServices": false
+    "onlineAuthoritativeServices": false,
+    "archiveSource": "NU-INGEST-ARCHIVE/ASSETS/NU-Celestial-City/Original reference image file for Niroo Universe (N.U).png",
+    "publicAssetStatus": "PENDING_UPLOAD_TO_EXECUTION_REPOSITORY"
   }
 }

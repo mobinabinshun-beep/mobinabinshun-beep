@@ -4,12 +4,12 @@
 - [ ] `node --check` for all loaded runtime/game modules.
 - [ ] Manifest JSON valid.
 - [ ] All local script references resolve.
-- [ ] Image asset path and archive blob SHA match the archive tree.
+- [ ] Public binary exists at `assets/nu-celestial-city.png` and matches the archived PNG (blob SHA `d73afd484ef8b459c908c1942ee0f47d27f93aa5`).
 - [ ] `nu-engine.js` SHA matches ENGINE-LOCK.md.
 - [ ] Pixel renderer pause/resume hook is present and original draw path remains available.
 
 ## Visual acceptance
-- [ ] Exact archive PNG fills the viewport as the visible base (not a small card or dim layer).
+- [ ] Exact public runtime copy of archive PNG fills the viewport as the visible base (not a small card or dim layer).
 - [ ] Old procedural sky/city is hidden only after image load succeeds.
 - [ ] Asset failure restores the original procedural Generation 1 background.
 - [ ] Low/economy: full source image remains clear; optional compositor is minimal/off.
@@ -28,4 +28,4 @@
 - [ ] Android low-end, Android mid/high, iOS Safari and desktop browser checks.
 
 ## Current status
-Source integration candidate only. Automated workflow, Pages publication and human browser/device acceptance must be verified before announcing a finished release.
+Code is merged and Pages deployment succeeded. The public PNG copy is still pending; until it is uploaded the legacy procedural fallback will display. Human browser/device acceptance remains pending.
