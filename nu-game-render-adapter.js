@@ -10,6 +10,8 @@ function apply(p){
  root.style.setProperty("--nu-game-glow",b.glow?"1":".35");
  root.style.setProperty("--nu-game-motion",p.reducedMotion?"0":"1");
  document.body.dataset.nuGraphicsTier=b.tier;
+ if(g.NUPixelWorld&&typeof g.NUPixelWorld.setQuality==="function")g.NUPixelWorld.setQuality(p.level);
+ root.style.setProperty("--nu-game-target-fps",String(b.gameFps));
  const stage=document.getElementById("game-stage");
  if(stage){stage.dataset.graphicsTier=b.tier;stage.style.setProperty("--nu-game-target-fps",String(b.gameFps));}
 }
