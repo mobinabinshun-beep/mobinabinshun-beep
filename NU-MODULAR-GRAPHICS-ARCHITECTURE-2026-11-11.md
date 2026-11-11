@@ -7,7 +7,7 @@ Experimental integration on `feature/modular-graphics-runtime-2026-11-11`. Not m
 The runtime is split into four independently replaceable engines plus a small orchestrator:
 
 1. **Capability & Budget Core** — `nu-graphics-core.js`: reads the existing NU performance sample once, then applies conservative device-memory, CPU-core and Save-Data caps. It produces an immutable, locked profile with DPR, particle, background FPS and game FPS budgets. It does not inspect or change game rules.
-2. **Background Engine** — `nu-background-engine.js`: owns the full-screen image surface and fallback state. It expects the approved artwork at `assets/niroo-celestial-city.jpg`. The artwork file is not yet present in this repository branch; until it is uploaded the engine deliberately shows a dark fallback rather than claiming the image is active.
+2. **Background Engine** — `nu-background-engine.js`: owns the full-screen image surface and fallback state. It loads the approved archived reference artwork directly from `NU-INGEST-ARCHIVE/ASSETS/NU-Celestial-City/Original reference image file for Niroo Universe (N.U).png` via the raw GitHub asset URL. The archive remains the single source of truth; no second binary is required in this branch.
 3. **Dynamic Layers Engine** — `nu-dynamic-layers.js`: owns low-cost atmospheric particles on a separate transparent canvas. It uses the core budget, pauses on hidden tabs, and disables itself for Reduced Motion or economy tier.
 4. **Game Render Adapter** — `nu-game-render-adapter.js`: exposes display-budget CSS variables and tier metadata to the existing game stage. It does not alter pointer input, collisions, XP, Mana, HP, game timers or persistence.
 
@@ -25,7 +25,7 @@ This is a platform-neutral web runtime with platform detection and a narrow adap
 - Once sampled, the profile is locked; no continuous device benchmark loop runs.
 
 ## Known limitations / acceptance blockers
-- Upload the supplied Niroo celestial-city image to `assets/niroo-celestial-city.jpg`; image integration currently falls back because the binary asset is absent.
+- The background references the archived PNG directly. Runtime loading still requires the archive asset URL to remain publicly readable and reachable.
 - The existing Generation 1 pixel-world renderer still has its own animation loop and timer; this change does not refactor that protected engine.
 - Game FPS budget is exposed to the stage but does not yet throttle the legacy game simulation loop.
 - No real-device Android/iOS/browser human test has been performed.
