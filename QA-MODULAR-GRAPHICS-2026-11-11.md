@@ -2,16 +2,17 @@
 
 Branch: `feature/modular-graphics-runtime-2026-11-11`
 
-## Automated/static checks
-- [ ] Verify all five new JavaScript modules load without console errors.
-- [ ] Verify image request to `assets/niroo-celestial-city.jpg` succeeds after the image is uploaded.
-- [ ] Verify `nu:graphics-ready` fires once and profile is immutable.
-- [ ] Verify Reduced Motion disables dynamic canvas.
-- [ ] Verify hidden-tab transition stops animation and visible-tab transition resumes.
-- [ ] Verify economy tier hides dynamic particles and lowers background opacity.
-- [ ] Verify existing game canvas and HUD remain above background layers.
+## Static checks to run before merge
+- [ ] JavaScript syntax checks pass for all runtime modules and Generation 1 scripts.
+- [ ] Manifest parses as valid JSON and lists every loaded module.
+- [ ] All script references in index.html resolve to tracked files.
+- [ ] Archived reference artwork URL returns a valid PNG response.
+- [ ] Calibration event passes the existing sample to the graphics core (no second sample).
+- [ ] Reduced Motion disables the dynamic canvas.
+- [ ] Hidden-tab transition stops animation and visible-tab transition resumes it.
+- [ ] Existing game canvas and HUD remain above background layers.
 
-## Human tests
+## Human tests after public deployment
 - [ ] Android low-end: initial load, scroll, menu, Bubble Hunt, Mana Collector, Chaos Attack.
 - [ ] Android mid/high-end: verify quality and smoothness without excessive heat.
 - [ ] iOS Safari: touch, scroll, rotation, tab resume.
@@ -19,10 +20,13 @@ Branch: `feature/modular-graphics-runtime-2026-11-11`
 - [ ] Reduced Motion OS preference: static visual.
 - [ ] Save XP/Mana, reload, confirm persistence unchanged.
 - [ ] Ten successful interactions and missed taps preserve the existing game rules.
-- [ ] Compare screenshot against approved artwork and ensure text/HUD contrast.
+- [ ] Compare screenshot against the archived artwork and check HUD/text contrast.
 
-## Do not mark as passed until
-A tester supplies device/browser, screen size, graphics tier, console errors, and a short result for each of the three games.
+## Acceptance status
+- Source-level integration: implemented, awaiting CI result.
+- Archive asset URL: configured; browser loading still requires runtime verification.
+- Public Pages deployment: must be verified after merge.
+- Human device testing: pending user feedback.
+- Native Android/iOS packages: out of scope for this web preview.
 
-## Known not yet verified
-The supplied background image is not committed in this branch. The game simulation frame limiter is not wired to the profile yet. Native Android/iOS packages are out of scope for this web-preview branch.
+Do not mark device acceptance as passed until tester supplies device/browser, screen size, quality tier, console errors, and a result for each game.
