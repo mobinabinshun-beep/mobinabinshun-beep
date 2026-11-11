@@ -37,7 +37,7 @@ async function start(existing){
  const b=budget(level);
  profile=Object.freeze({platform:detectPlatform(),level,budget:b,locked:true,
   memoryGb:mem||null,logicalCores:cores||null,saveData,
-  reducedMotion:!!(matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches),
+  reducedMotion:typeof matchMedia==="function"&&matchMedia("(prefers-reduced-motion: reduce)").matches,
   sampledAt:new Date().toISOString()});
  g.NUGraphicsProfile=profile;
  g.dispatchEvent(new CustomEvent("nu:graphics-profile",{detail:profile}));
