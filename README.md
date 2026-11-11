@@ -143,3 +143,16 @@ The nine Mana capsule upgrade levels, N-BI shot-cost reduction (down to one Mana
 - `nu-games.js` syntax was validated after the change. Browser/device QA and Pages deployment remain pending.
 - Pre-change backup: `BACKUPS/GEN1-PROFILE-BACKDROP-ENTER-2026-11-11/nu-games.js.bak`.
 - Runtime `nu-engine.js` and `nu-pixel-world.js` remain unchanged.
+
+
+## Generation 1.9 — modular graphics preview (2026-11-12)
+
+- Added a separate capability/budget core, image-first background engine, independent atmospheric layer, game presentation adapter and runtime orchestrator.
+- The background engine loads the existing N.U Celestial City reference image directly from the public NU-INGEST-ARCHIVE asset; the archive remains the canonical source and no duplicate binary is required.
+- The existing calibration result is passed to the graphics core so the device is sampled only once during startup. Quality is locked for the session; no continuous benchmark loop is run.
+- The core applies conservative memory/core/Save-Data caps. These are browser hints and heuristics, not a hardware benchmark.
+- The existing pixel-world renderer receives the same selected quality level through its public setQuality API. Its source and animation loop are not modified.
+- The dynamic atmosphere layer pauses while the tab is hidden and disables itself for reduced-motion/economy profiles.
+- The existing game simulation and interaction code are preserved. The game adapter publishes visual-budget metadata; it does not yet enforce a new game-loop FPS limiter.
+- Native Android/iOS applications, offline packaging, reconstructed high-resolution textures and GPU-specific renderers are not included in this browser preview.
+- This is a public test candidate. Device-level performance, touch, contrast and interaction acceptance still require human testing.
