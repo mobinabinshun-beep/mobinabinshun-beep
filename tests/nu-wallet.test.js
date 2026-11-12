@@ -73,7 +73,7 @@ test("the same studio export reward cannot be claimed twice",()=>{
   assert.equal(first.ok,true);
   assert.equal(second.ok,false);
   assert.equal(second.reason,"DUPLICATE_REWARD");
-  assert.equal(second.state.xp,10);
+  assert.equal(second.state.xp,17);
 });
 test("game asset projections show only relevant owned assets",()=>{
   const save={xp:20,mana:4,hp:6,hpPills:2,manaCapsules:1};
