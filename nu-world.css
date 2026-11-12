@@ -257,7 +257,7 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 #game-view.active .hp-bar{pointer-events:auto}
 #game-view.active .bar-wrap{pointer-events:auto;cursor:help}
 #game-view.active .hp-bar{cursor:help}
-#game-asset-profile{position:fixed;z-index:1500;left:50%;top:104px;transform:translateX(-50%);width:min(300px,calc(100vw - 28px));padding:11px 14px;border:1px solid #d5ae6c88;border-radius:12px;background:rgba(7,14,23,.96);color:#f6e8c9;box-shadow:0 12px 32px #0009;pointer-events:none;backdrop-filter:blur(12px)}
+#game-asset-profile{position:fixed;z-index:1500;left:0;top:0;transform:none;width:min(300px,calc(100vw - 28px));padding:11px 14px;border:1px solid #d5ae6c88;border-radius:12px;background:rgba(7,14,23,.96);color:#f6e8c9;box-shadow:0 12px 32px #0009;pointer-events:none;backdrop-filter:blur(12px)}
 #game-asset-profile[hidden]{display:none}
 #game-asset-profile>strong{display:block;font-size:10px;letter-spacing:.12em;color:#ffd78a;margin-bottom:8px}
 .game-asset-rows{display:grid;grid-template-columns:1fr auto;gap:5px 14px;font-size:11px}
@@ -269,3 +269,7 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 @media(max-width:600px){#game-asset-profile{top:100px}}
 
 #game-asset-profile>small{display:block;color:#8ea8ba;font-size:9px;letter-spacing:.08em;margin:-4px 0 8px}
+
+/* Studio/HUD repair: clear focus and hover states for keyboard and pointer users. */
+#game-view.active .bar-wrap:focus-visible,#game-view.active .hp-bar:focus-visible{outline:2px solid #ffd78a;outline-offset:4px}
+#game-asset-profile{max-height:min(42vh,260px);overflow:auto;contain:layout paint}
