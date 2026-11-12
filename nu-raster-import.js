@@ -5,6 +5,7 @@
  if(root)root.NURasterImport=api;
 })(typeof globalThis!=="undefined"?globalThis:this,function(){
  "use strict";
+ const MAX_RASTER_PIXELS=3000000;
  function nearest(rgb,colors){
   let best=colors[0],dist=Infinity;
   for(const color of colors){
@@ -15,7 +16,7 @@
   return best;
  }
  function mapPixels(data,width,height,colors,alphaCutoff=0,dither=false){
-  if(!Number.isInteger(width)||!Number.isInteger(height)||width<1||height<1||width*height>262144)throw new RangeError("Raster dimensions exceed the import mapping budget.");
+  if(!Number.isInteger(width)||!Number.isInteger(height)||width<1||height<1||width*height>MAX_RASTER_PIXELS)throw new RangeError("Raster dimensions exceed the 3,000,000-pixel safety ceiling.");
   if(!data||data.length!==width*height*4)throw new TypeError("RGBA buffer length does not match raster dimensions.");
   if(!Array.isArray(colors)||!colors.length||colors.some(c=>typeof c!=="string"||!/^#[0-9a-f]{6}$/i.test(c)))throw new TypeError("A non-empty six-digit hexadecimal palette is required.");
   const cutoff=Math.max(0,Math.min(255,Number(alphaCutoff)||0)),output=Array(width*height).fill(null),errors=dither?new Float32Array(width*height*3):null;
