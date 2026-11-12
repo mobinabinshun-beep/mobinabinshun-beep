@@ -28,7 +28,7 @@ Each selected round has 10 successful target interactions. Missed clicks do not 
 - Ten quality levels currently adjust the ambient particle renderer only; game-specific adaptive budgets remain future work.
 - This prototype is browser-first. It does not yet provide a native Windows, Android, macOS, legacy Java, or downloadable offline launcher.
 - Publication cards link to original Medium sources; original text is not copied.
-- Accounts, cloud saves, comments, paid economy, store, upgrades and downloadable launcher are not included yet.
+- No online accounts, cloud saves, comments, paid economy, multiplayer economy or downloadable launcher is included. The experimental local Store currently supports the HP Capsule transaction only; other upgrades remain unimplemented.
 
 ## Team test
 Open the GitHub Pages site and choose **START A RANDOM GAME**. Click targets in the field. Test missed clicks (they should not consume one of the ten successful interactions), then use **NEW ROUND**. Reload to verify local save persistence and confirm that a new round selects a random game.
@@ -121,7 +121,7 @@ The visual design uses the published Niroo City descriptions of integration betw
 
 ### Economy not yet implemented
 
-The nine Mana capsule upgrade levels, N-BI shot-cost reduction (down to one Mana per shot), HP capsule purchase/refill, X/N Credits, savings/investment and betting modes are not implemented. The current Chaos shot still costs one full 10-Mana capsule. This is intentionally disclosed rather than represented as complete.
+The nine Mana capsule upgrade levels, N-BI shot-cost reduction (down to one Mana per shot), X/N Credits, savings/investment and betting modes are not implemented. The later Generation 1.11 human-test candidate adds only a local HP Capsule purchase/use transaction; it does not complete the wider economy. The current Chaos shot still costs one full 10-Mana capsule.
 
 
 ## Generation 1 — demo profile clarification (2026-11-11)
@@ -234,3 +234,33 @@ This section supersedes the earlier Pixel Art Studio descriptions above where th
 A separate browser-only launcher preview is available at [launcher.html](./launcher.html). It performs bounded browser capability checks before the player enters the demo, offers ten performance levels, saves a local profile, and provides refresh/reset settings plus local JSON export for human-test notes.
 
 This is not yet a native multi-platform installer. Browser CPU/GPU/RAM signals are approximate; the network check measures same-origin reachability/round-trip only. The selected budget is currently stored as a local profile but is not yet consumed by the Generation 1 render/game loops; per-game calibration hooks, native installers, signed extension packages, sandboxing, dependency resolution and rollback remain future work. Human-test reports can be exported locally or submitted through the GitHub issue form. See the `NU-LAUNCHER-*` documents for architecture and acceptance boundaries.
+
+## Generation 1.14 — Studio viewport and import repair candidate (2026-11-12)
+
+This isolated candidate responds to owner-reported human-test defects in the public Creative Studio:
+- Image jumps/clips or appears outside the workspace after import.
+- Raster-to-pixel conversion is hard to inspect or appears not to match the source.
+- The checkerboard/pixel guide is not clearly aligned to the logical artwork pixels.
+- Initial view and scrolling behavior are confusing.
+- Tool controls do not yet communicate familiar editor affordances.
+
+Candidate changes:
+- Replace implicit grid/percentage sizing dependency with deterministic fit-to-view geometry and a ResizeObserver that recalculates the canvas when the actual workspace changes size. The workspace uses one contained scroll frame; the outer stage clips overflow.
+- Use one shared pointer-to-pixel coordinate mapper so brush input follows the displayed pixel grid at every zoom and aspect ratio.
+- Show an original-source preview and source-to-working dimensions while preserving the original file; edits remain on a separate local working copy.
+- Offer smooth resampling for photographs and nearest-neighbor resampling for existing pixel art.
+- Extract raster-to-palette mapping into a tested module and add optional Floyd–Steinberg dithering for gradient-heavy inputs. Transparency cutoff and 2–32 color palette controls remain available.
+- Add visible keyboard shortcut hints for Pencil (B), Eraser (E), Fill (G), Eyedropper (I), Line (L), Rectangle (R), and Ellipse (O). Ctrl/Cmd+Z and Ctrl/Cmd+Y handle undo/redo; F fits the image to view.
+- Resource-bar asset-profile pointer/touch events are stopped before reaching global gameplay handlers; tapping a HUD bar must not count as a game interaction. The profile is positioned beside the selected bar.
+
+New regression suites cover fit-to-view, portrait/landscape aspect ratio, overflow containment, collapsed workspace recovery, pointer-to-pixel mapping, palette mapping, transparency cutoff and optional dithering. Passing Node tests do not prove browser layout correctness; real browser/device acceptance remains pending.
+
+The checkerboard remains a per-logical-pixel transparency visualization, while optional grid lines are a separate guide. At extreme custom dimensions the grid may be disabled for readability/performance; the underlying transparent-pixel pattern is still per image pixel.
+
+### Explicit remaining limits
+- This is still a browser-based pixel/raster editor with palette-reduced contour vectorization. It does not yet provide layers, masks, selections, transforms, text, gradient tools, pressure-sensitive brushes, project-file save/open or non-destructive operation history.
+- NU-GFX-IR/1 is a portable, inspectable intermediate representation (palette/tile/run/edge/region data and render instructions), not GPU machine code or a recovered proprietary driver command stream.
+- True vector tracing infers paths from visible raster boundaries. It cannot recover original hidden layers, source Bézier curves or detail absent from the source image. Bézier fitting, segmentation confidence, layer inference and photo-specific reconstruction remain future stages.
+- Studio XP is local-browser prototype progression. A download initiation can award once per local fingerprint; it is not proof that a file was saved, and localStorage reward controls are not server-authoritative anti-cheat.
+
+The candidate is developed on feature/gen1-studio-viewport-input-repair-2026-11-12, based on the current public human-test head. No merge or new deployment is claimed by this documentation entry.
