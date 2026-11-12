@@ -8,8 +8,8 @@ test("image import defaults to the exact source dimensions",()=>{
  assert.match(js,/const nextW=Math\.max\(1,Math\.round\(sourceWidth\*scale\)\),nextH=Math\.max\(1,Math\.round\(sourceHeight\*scale\)\)/);
 });
 test("import never silently scales an image to fit the device budget",()=>{
- assert.match(js,/if\(requestedCells>safeCells\)/);
- assert.match(js,/above this device's safe editing budget/);
+ assert.doesNotMatch(js,/requestedCells>safeCells/);
+ assert.match(js,/function cellLimit\(\)\{return Infinity;\}/);
  assert.doesNotMatch(js,/budgetScale/);
 });
 test("reduced import detail is an explicit user choice and source preview remains separate",()=>{
@@ -23,10 +23,11 @@ test("high-resolution rendering uses ImageData and history is bounded by image s
  assert.match(js,/function historyLimitFor\(state\)/);
  assert.match(js,/trimHistory\(redoStack,current\)/);
  assert.match(js,/trimHistory\(undoStack,current\)/);
- assert.match(js,/maxCanvasPixels\|\|520000/);
+ assert.doesNotMatch(js,/maxCanvasPixels\|\|520000/);
 });
-test("dimension inputs and image decoder guard share a clear browser canvas limit",()=>{
- assert.match(html,/id="image-width" type="number" min="1" max="16384"/);
- assert.match(html,/id="image-height" type="number" min="1" max="16384"/);
- assert.match(js,/safe browser canvas dimension \(16,384 px per edge\)/);
+test("dimension inputs are not capped by fixed Studio edge limits",()=>{
+ assert.doesNotMatch(html,/id="image-width"[^>]*max=/);
+ assert.doesNotMatch(html,/id="image-height"[^>]*max=/);
+ assert.doesNotMatch(js,/16,384 px per edge/);
+ assert.doesNotMatch(js,/25\*1024\*1024/);
 });
