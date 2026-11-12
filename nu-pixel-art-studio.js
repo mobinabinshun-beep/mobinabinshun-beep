@@ -50,14 +50,42 @@ function quantize(v){return Math.round(v/17)*17;}
 function hex(r,g,b){return "#"+[r,g,b].map(v=>v.toString(16).padStart(2,"0")).join("");}
 function nearest(rgb,colors){let best=colors[0],dist=Infinity;for(const c of colors){const n=[parseInt(c.slice(1,3),16),parseInt(c.slice(3,5),16),parseInt(c.slice(5,7),16)],d=(rgb[0]-n[0])**2+(rgb[1]-n[1])**2+(rgb[2]-n[2])**2;if(d<dist){dist=d;best=c;}}return best;}
 async function decodeImage(file){if(typeof createImageBitmap==="function"){try{return await createImageBitmap(file);}catch(_){}}return new Promise((resolve,reject)=>{const url=URL.createObjectURL(file),img=new Image();img.onload=()=>{URL.revokeObjectURL(url);resolve(img);};img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error("This image format could not be decoded."));};img.src=url;});}
-function imagePalette(data){const hist=new Map();for(let i=0;i<data.length;i+=4){if(data[i+3]<32)continue;const c=hex(quantize(data[i]),quantize(data[i+1]),quantize(data[i+2]));hist.set(c,(hist.get(c)||0)+1);}return [...hist.entries()].sort((a,b)=>b[1]-a[1]).slice(0,16).map(x=>x[0]);}
-$("image-file").addEventListener("change",async e=>{const file=e.target.files&&e.target.files[0];if(!file)return;if(!file.type.startsWith("image/")){announce("Please choose an image file.");return;}try{const bitmap=await decodeImage(file);const temp=document.createElement("canvas");temp.width=width;temp.height=height;const t=temp.getContext("2d",{willReadFrequently:true});const scale=Math.min(width/bitmap.width,height/bitmap.height),w=Math.max(1,Math.round(bitmap.width*scale)),h=Math.max(1,Math.round(bitmap.height*scale)),x=Math.floor((width-w)/2),y=Math.floor((height-h)/2);t.clearRect(0,0,width,height);t.imageSmoothingEnabled=false;t.drawImage(bitmap,x,y,w,h);bitmap.close&&bitmap.close();const data=t.getImageData(0,0,width,height).data;const extracted=imagePalette(data);if(extracted.length)palette=extracted;const before=snapshot();pixels=Array(width*height).fill(null);for(let i=0;i<width*height;i++){const a=data[i*4+3];if(a<32)continue;pixels[i]=nearest([data[i*4],data[i*4+1],data[i*4+2]],palette);}commitHistory(before);imageImported=true;renderPalette();render();announce("Imported locally · "+file.name+" · "+palette.length+" palette colors.");}catch(err){announce("Image import failed: "+(err&&err.message?err.message:"unsupported image"));}finally{e.target.value="";}});
+function imagePalette(data,limit,alphaCutoff){
+ const hist=new Map();
+ for(let i=0;i<data.length;i+=4){if(data[i+3]<=alphaCutoff)continue;const r=Math.round(data[i]/8)*8,g=Math.round(data[i+1]/8)*8,b=Math.round(data[i+2]/8)*8,c=hex(r,g,b),entry=hist.get(c)||{r,g,b,count:0};entry.count++;hist.set(c,entry);}
+ let boxes=hist.size?[ [...hist.values()] ]:[];
+ while(boxes.length<limit){let pick=-1,best=-1,channel=0;
+  boxes.forEach((box,i)=>{if(box.length<2)return;const ranges=[0,1,2].map(k=>Math.max(...box.map(p=>k===0?p.r:k===1?p.g:p.b))-Math.min(...box.map(p=>k===0?p.r:k===1?p.g:p.b))),k=ranges.indexOf(Math.max(...ranges)),score=ranges[k]*box.reduce((n,p)=>n+p.count,0);if(score>best){best=score;pick=i;channel=k;}});
+  if(pick<0||best<=0)break;const box=boxes.splice(pick,1)[0],field=channel===0?"r":channel===1?"g":"b";box.sort((a,b)=>a[field]-b[field]);const total=box.reduce((n,p)=>n+p.count,0);let sum=0,split=1;for(;split<box.length;split++){sum+=box[split-1].count;if(sum>=total/2)break;}boxes.push(box.slice(0,split),box.slice(split));
+ }
+ return boxes.map(box=>{const total=box.reduce((n,p)=>n+p.count,0);return hex(...["r","g","b"].map(k=>Math.round(box.reduce((n,p)=>n+p[k]*p.count,0)/total)));}).slice(0,limit);
+}
+$("palette-limit").addEventListener("input",e=>$("palette-limit-value").textContent=e.target.value);
+$("alpha-cutoff").addEventListener("input",e=>$("alpha-cutoff-value").textContent=e.target.value);
+$("image-file").addEventListener("change",async e=>{
+ const file=e.target.files&&e.target.files[0];if(!file)return;
+ if(!file.type.startsWith("image/")){announce("Please choose a supported image file.");return;}
+ try{
+  const bitmap=await decodeImage(file),maxSide=Number($("import-resolution").value)||128,scale=Math.min(1,maxSide/Math.max(bitmap.width,bitmap.height));
+  let nextW=Math.max(1,Math.round(bitmap.width*scale)),nextH=Math.max(1,Math.round(bitmap.height*scale));
+  const budgetScale=Math.min(1,Math.sqrt(cellLimit()/(nextW*nextH)));nextW=Math.max(1,Math.floor(nextW*budgetScale));nextH=Math.max(1,Math.floor(nextH*budgetScale));
+  const temp=document.createElement("canvas");temp.width=nextW;temp.height=nextH;const t=temp.getContext("2d",{willReadFrequently:true});
+  t.imageSmoothingEnabled=true;t.imageSmoothingQuality="high";t.drawImage(bitmap,0,0,nextW,nextH);bitmap.close&&bitmap.close();
+  const data=t.getImageData(0,0,nextW,nextH).data,alphaCutoff=Number($("alpha-cutoff").value)||0,extracted=imagePalette(data,Number($("palette-limit").value)||16,alphaCutoff);
+  if(!extracted.length)throw new Error("The image contains no visible pixels above the transparency cutoff.");
+  const before=snapshot();width=nextW;height=nextH;pixels=Array(width*height).fill(null);
+  for(let i=0;i<width*height;i++){if(data[i*4+3]<=alphaCutoff)continue;pixels[i]=nearest([data[i*4],data[i*4+1],data[i*4+2]],extracted);}
+  palette=extracted;commitHistory(before);imageImported=true;$("image-width").value=width;$("image-height").value=height;updateCanvasDisplay();renderPalette();render();
+  announce("Imported locally · "+file.name+" · "+width+" × "+height+" px · "+palette.length+" optimized colors.");
+ }catch(err){announce("Image import failed: "+(err&&err.message?err.message:"unsupported image"));}
+ finally{e.target.value="";}
+});
 $("extract-palette").addEventListener("click",()=>{if(!imageImported){announce("Import an image first to extract its palette.");return;}const counts=new Map();pixels.filter(Boolean).forEach(c=>counts.set(c,(counts.get(c)||0)+1));palette=[...counts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,16).map(x=>x[0]);if(!palette.length)palette=defaults.slice();renderPalette();announce("Palette extracted from current artwork.");});
-function svgSource(){const groups=new Map();pixels.forEach((c,i)=>{if(!c)return;if(!groups.has(c))groups.set(c,[]);groups.get(c).push("M"+(i%width)+" "+Math.floor(i/width)+"h1v1h-1z");});const body=[...groups.entries()].map(([c,paths])=>'<path fill="'+c+'" d="'+paths.join("")+'"/>').join("\n");return '<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="'+width+'" height="'+height+'" viewBox="0 0 '+width+' '+height+'" shape-rendering="crispEdges" role="img" aria-labelledby="title desc">\n<title id="title">N.U Pixel Art</title>\n<desc id="desc">Pixel artwork exported from N.U Pixel Art Studio.</desc>\n<g>'+body+'</g>\n</svg>\n';}
+function svgSource(){if(!window.NUSVGVectorizer)throw new Error("SVG vector engine did not load. Refresh the studio and try again.");return window.NUSVGVectorizer.vectorize(pixels,width,height,{mode:$("vector-mode").value});}
 function filename(ext){let n=$("export-name").value.trim().replace(/[^a-z0-9-_]+/gi,"-").replace(/^-+|-+$/g,"").slice(0,48)||"nu-pixel-art";return n+"."+ext;}
 function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
-$("export-svg").addEventListener("click",()=>{const src=svgSource();download(new Blob([src],{type:"image/svg+xml;charset=utf-8"}),filename("svg"));announce("SVG exported · vector pixels · transparent background.");});
-$("export-svg-copy").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(svgSource());announce("SVG source copied to clipboard.");}catch(_){announce("Clipboard permission unavailable; use Download SVG.");}});
+$("export-svg").addEventListener("click",()=>{try{const result=svgSource();download(new Blob([result.source],{type:"image/svg+xml;charset=utf-8"}),filename("svg"));announce("SVG exported · "+result.pathCount+" vector paths · "+result.colorCount+" colors · transparent background.");}catch(err){announce("SVG export failed: "+err.message);}});
+$("export-svg-copy").addEventListener("click",async()=>{try{const result=svgSource();await navigator.clipboard.writeText(result.source);announce("SVG source copied · "+result.pathCount+" paths · "+result.colorCount+" colors.");}catch(err){announce("Clipboard unavailable: "+err.message+" · use Download SVG.");}});
 $("export-png").addEventListener("click",()=>{const out=document.createElement("canvas");out.width=width*16;out.height=height*16;const o=out.getContext("2d");o.imageSmoothingEnabled=false;pixels.forEach((c,i)=>{if(!c)return;o.fillStyle=c;o.fillRect((i%width)*16,Math.floor(i/width)*16,16,16);});out.toBlob(blob=>{if(blob)download(blob,filename("png"));},"image/png");});
 $("show-grid")?.addEventListener("change",render);
 renderPalette();updateCanvasDisplay();render();setTool("pencil");historyButtons();initAdaptive();
