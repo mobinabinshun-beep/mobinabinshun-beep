@@ -19,6 +19,10 @@ test("preserves transparent holes in a ring",()=>{
   assert.equal(result.pathCount,2);
   assert.match(result.source,/fill-rule="evenodd"/);
 });
+test("keeps diagonally touching regions as separate contours",()=>{
+  const result=vectorize(["#000000",null,null,"#000000"],2,2);
+  assert.equal(result.pathCount,2);
+});
 test("supports compact horizontal-run export",()=>{
   const result=vectorize(["#112233","#112233","#112233"],3,1,{mode:"runs"});
   assert.equal(result.mode,"runs");
