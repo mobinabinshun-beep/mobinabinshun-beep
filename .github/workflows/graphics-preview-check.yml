@@ -10,6 +10,7 @@ on:
       - feature/gen1-professional-svg-studio-2026-11-12
       - feature/gen1-human-test-demo-2026-11-12
       - feature/gen1-studio-viewport-input-repair-2026-11-12
+      - feature/gen1-studio-viewport-input-repair-v2-2026-11-12
       - Official-public-information-and-discovery-hub-for-N.U-(Niroo-Universe),-its-publishing-network,-projects,-publications-and-related-creative-works
   pull_request:
     branches:
