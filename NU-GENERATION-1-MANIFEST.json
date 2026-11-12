@@ -19,6 +19,7 @@
     "pixel-art-studio.html",
     "nu-svg-vectorizer.js",
     "nu-graphics-analysis.js",
+    "nu-raster-import.js",
     "nu-studio-layout.js",
     "nu-pixel-art-studio.js",
     "nu-wallet.js",
