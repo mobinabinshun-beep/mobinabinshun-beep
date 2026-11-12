@@ -198,3 +198,32 @@ N.U Pixel Art Studio now includes a separate vectorization engine for imported a
 The editor still uses a color-reduced raster working grid as its input. This is best suited to logos, icons, flat illustrations and pixel art; it is not yet a Bézier curve reconstruction engine for photographic imagery, and fine photographic detail is limited by the selected import resolution and palette size.
 - CI includes geometry regression tests for solid shapes, disconnected regions, transparent holes, compact runs and input validation.
 - Browser/device acceptance and visual comparison against a professional tracing package remain pending.
+
+
+## Generation 1.13 — human-test candidate: Creative Studio, GFX-IR and game asset profiles
+
+This section supersedes the earlier Pixel Art Studio descriptions above where they describe square-only 16–64 grids, fixed-size workspaces, or rectangle-only SVG export.
+
+### Creative Studio
+- The workspace now fits the complete image to the available viewport first. Zoom is relative to that fit; overflow scrollbars stay inside one workspace frame instead of creating nested page/canvas scroll regions.
+- The transparent-art checkerboard is rendered at the logical pixel grid, one cell per artwork pixel. Grid lines can be toggled separately.
+- Familiar tools include pencil, eraser, fill, eyedropper, line, rectangle and ellipse, with adjustable brush size, undo and redo.
+- Import keeps the source aspect ratio, defaults to a 256-pixel longest edge, and offers a 2–32 color median-cut palette and alpha threshold. Source files remain local and unchanged.
+- SVG uses actual editable contour paths with transparent-hole handling. It remains a palette-reduced raster-to-contour workflow, not Bézier reconstruction of arbitrary photographs.
+- NU-GFX-IR/1 export contains palette indices, row runs, 8×8 tile runs, edge map, connected-region bounds and explicit render instructions. It is inspectable structured graphics data; it is **not** GPU driver machine code, shader binary, or a claim of recovering the original GPU pipeline.
+
+### Studio XP and Generation 1 games
+- A successful PNG, SVG or Graphic IR download can grant a local XP reward based on painted pixels, connected regions, vector complexity and palette size.
+- Current provisional reward formula: clamp(1, 25, floor(paintedPixels/256) + floor(regions/8) + floor(paths/24) + floor(colors/8)); artwork below 16 painted pixels earns no XP.
+- The same artwork fingerprint can claim the Studio reward only once in the local save. The reward is written to the existing shared Generation 1 XP balance, so it is available in Bubble Hunt, Mana Collector and Chaos Attack without a separate currency exchange.
+- This is local browser progression, not server-authoritative or cheat-resistant economy. The reward formula is provisional and should be tuned from human test feedback.
+
+### Game-specific asset profiles and HP capsule use
+- Hovering or keyboard-focusing the XP, Mana or HP bars opens a game-scoped asset profile.
+- The profile is a filtered view of the global wallet, not a second set of balances: each game displays only its relevant assets, while Wallet continues to show the full supported Generation 1 inventory.
+- The HP Capsule can be purchased and consumed from the Store; the in-game HP icon remains a direct use action. Full HP and empty inventory are explained without consuming an item.
+- Only implemented assets backed by the local save are displayed.
+
+### Acceptance boundary
+- Automated checks cover JavaScript syntax, wallet rules, SVG contour geometry, GFX-IR structure, manifest JSON and local script references.
+- Browser/device, download, persistence, visual-fidelity and touch acceptance remain human-test tasks. This branch is a public-demo test candidate, not a final product release.
