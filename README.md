@@ -227,3 +227,10 @@ This section supersedes the earlier Pixel Art Studio descriptions above where th
 ### Acceptance boundary
 - Automated checks cover JavaScript syntax, wallet rules, SVG contour geometry, GFX-IR structure, manifest JSON and local script references.
 - Browser/device, download, persistence, visual-fidelity and touch acceptance remain human-test tasks. This branch is a public-demo test candidate, not a final product release.
+
+
+## N.U Launcher — calibration preview
+
+A separate browser-only launcher preview is available at [launcher.html](./launcher.html). It performs bounded browser capability checks before the player enters the demo, offers ten performance levels, saves a local profile, and provides refresh/reset settings plus local JSON export for human-test notes.
+
+This is not yet a native multi-platform installer. Browser CPU/GPU/RAM signals are approximate; the network check measures same-origin reachability/round-trip only. Per-game calibration hooks, a server-side report collector, native installers, signed extension packages, sandboxing, dependency resolution and rollback remain future work. See the `NU-LAUNCHER-*` documents for architecture and acceptance boundaries.
