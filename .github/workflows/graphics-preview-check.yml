@@ -14,6 +14,7 @@ on:
       - feat/gen1-creative-studio-layered-toolkit-2026-11-12
       - feat/studio-compact-workspace-ux-2026-11-12
       - fix/studio-compact-dock-cache-version-2026-11-12
+      - feat/studio-persian-plain-labels-2026-11-12
       - Official-public-information-and-discovery-hub-for-N.U-(Niroo-Universe),-its-publishing-network,-projects,-publications-and-related-creative-works
   pull_request:
     branches:
