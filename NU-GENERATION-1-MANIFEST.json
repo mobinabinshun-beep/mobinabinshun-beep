@@ -3,7 +3,7 @@
   "generation": 1,
   "runtime": "N.U Adaptive Runtime",
   "runtimeVersion": "0.1-prototype",
-  "packageVersion": "0.3.2-adaptive-pixel-workspace",
+  "packageVersion": "0.3.3-player-wallet-profile",
   "entry": "index.html",
   "modules": [
     "index.html",
@@ -18,7 +18,8 @@
     "nu-games.js",
     "pixel-art-studio.html",
     "nu-pixel-art-studio.js",
-    "nu-graphics-core.js"
+    "nu-wallet.js",
+    "nu-player-ui.js"
   ],
   "randomPool": [
     "bubble",
@@ -36,6 +37,7 @@
     "native": "future adapter required"
   },
   "notes": [
+    "Generation 1.11 candidate: adds a local, testable wallet transaction boundary, HP capsule purchase/consumption feedback, owned-asset wallet view and local player identity card; no server account or real-money economy.",
     "Generation 1.10: Pixel Art Studio now uses N.U graphics capability budgets, independent resizable workspace frame, zoom control, rectangular pixel-art dimensions, aspect-ratio lock, nearest-neighbor artwork resizing, and adaptive editable-pixel limits. Original source files remain untouched; only local working copies are resampled.",
     "Generation 1.9 candidate: added N.U Pixel Art Studio as a separate creative tool in the main library; it is deliberately excluded from the three-game random gameplay pool.",
     "Generation 1.8 development: repaired literal newline escaping in the store/game script so the JavaScript parses as source text.",
