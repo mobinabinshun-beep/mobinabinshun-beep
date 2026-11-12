@@ -6,3 +6,5 @@ test("main drawing tools are labeled and moved beside canvas",()=>{for(const n o
 test("advanced controls are accessible tabs rather than a long list",()=>{for(const k of ["palette","layers","fill","transform","adjust","compose","export"])assert.ok(js.includes('data-tab="'+k+'"'));assert.match(js,/role="tablist"/);assert.match(js,/role="tabpanel"/);assert.match(js,/ArrowRight/);assert.match(js,/legacy\.open=false/);});
 test("palette and brush are positioned next to the work surface",()=>{assert.match(js,/studio-brush/);assert.match(js,/panel-palette/);assert.match(js,/Extract active layer colors/);});
 test("browser edition remains local-first",()=>assert.match(html,/Processing stays local in this browser/));
+
+test("quick tools and layers include simple Persian labels for children and first-time users",()=>{for(const label of ["قلم","پاک‌کن","سطل رنگ","نمونه‌رنگ","لایه‌ها","شفافیت","نمایش","قفل"])assert.ok(js.includes(label));});
