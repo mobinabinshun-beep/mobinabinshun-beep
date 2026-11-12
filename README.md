@@ -9,6 +9,7 @@ The root GitHub Pages site contains an experimental browser-first game hub.
 - `nu-world.css` — independently editable visual layer
 - `nu-engine.js` — lightweight adaptive browser runtime and local save helper
 - `nu-games.js` — three Generation 1 interaction prototypes
+- `nu-wallet.js` — Generation 1 local wallet and HP capsule transactions
 - `NU-GENERATION-1-MANIFEST.json` — package/runtime manifest
 - `404.html` — themed not-found page
 
@@ -28,7 +29,10 @@ Each selected round has 10 successful target interactions. Missed clicks do not 
 - Ten quality levels currently adjust the ambient particle renderer only; game-specific adaptive budgets remain future work.
 - This prototype is browser-first. It does not yet provide a native Windows, Android, macOS, legacy Java, or downloadable offline launcher.
 - Publication cards link to original Medium sources; original text is not copied.
-- Accounts, cloud saves, comments, paid economy, store, upgrades and downloadable launcher are not included yet.
+- The Generation 1 store currently offers one local purchase: an HP capsule for 10 XP. The Wallet lists implemented XP, Mana, HP, HP/Mana capsules and level; X/N Credits are explicitly inactive.
+- The Player ID Card uses a generated browser-local ID and optional in-game alias. It is not an online account and should not contain real-world personal information.
+- Wallet transactions and progress are stored in localStorage; they are editable client-side and are not authoritative for multiplayer or shared economies.
+- Accounts, cloud saves, comments, other upgrades, paid economy and downloadable launcher are not included yet.
 
 ## Team test
 Open the GitHub Pages site and choose **START A RANDOM GAME**. Click targets in the field. Test missed clicks (they should not consume one of the ten successful interactions), then use **NEW ROUND**. Reload to verify local save persistence and confirm that a new round selects a random game.
@@ -183,3 +187,14 @@ N.U Pixel Art Studio now uses the existing `nu-graphics-core.js` capability prof
 - The original imported file is never overwritten. Resizing affects only the in-memory working copy; SVG/PNG exports use the current working dimensions.
 - The existing core games, random game pool, adaptive/network runtime and shared graphics modules are not modified by this editor enhancement.
 - This remains a browser-only editor; device-specific interaction and large-image QA are still required.
+
+
+## Generation 1.11 — HP capsules, wallet and player identity
+
+- HP capsule use is always visible in the HP HUD; when unavailable, tapping it explains whether inventory is empty or HP is already 10/10.
+- Successful HP capsule consumption removes exactly one item and restores actual HP up to 10, capped at 10.
+- Store purchase debits exactly 10 XP and credits one HP capsule. Success feedback is emitted only after the local save succeeds.
+- Floating gain/spend notices and a bounded local transaction history report capsule purchase/consumption and supported game rewards/spending.
+- Wallet balances come from `nu-world-save-v1`; X Credits and N Credits are marked inactive because no Gen1 earning/spending path exists.
+- Player ID Card shows a generated local ID, optional fictional alias, level, XP progress, HP, Mana and capsule counts. It does not collect real name, age, family name, or contact details.
+- This remains a browser-local prototype. No server-authoritative wallet, cloud identity, or Generation 2 integration is provided.

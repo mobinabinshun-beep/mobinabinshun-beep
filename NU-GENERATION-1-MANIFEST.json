@@ -3,7 +3,7 @@
   "generation": 1,
   "runtime": "N.U Adaptive Runtime",
   "runtimeVersion": "0.1-prototype",
-  "packageVersion": "0.3.2-adaptive-pixel-workspace",
+  "packageVersion": "0.3.3-gen1-local-wallet",
   "entry": "index.html",
   "modules": [
     "index.html",
@@ -15,6 +15,7 @@
     "nu-dynamic-layers.js",
     "nu-game-render-adapter.js",
     "nu-graphics-runtime.js",
+    "nu-wallet.js",
     "nu-games.js",
     "pixel-art-studio.html",
     "nu-pixel-art-studio.js",
@@ -36,6 +37,7 @@
     "native": "future adapter required"
   },
   "notes": [
+    "Generation 1.11: added a browser-local wallet, HP capsule purchase/consumption transactions, floating feedback, local player ID card and alias; X/N Credits remain inactive; no server authority or Generation 2 integration.",
     "Generation 1.10: Pixel Art Studio now uses N.U graphics capability budgets, independent resizable workspace frame, zoom control, rectangular pixel-art dimensions, aspect-ratio lock, nearest-neighbor artwork resizing, and adaptive editable-pixel limits. Original source files remain untouched; only local working copies are resampled.",
     "Generation 1.9 candidate: added N.U Pixel Art Studio as a separate creative tool in the main library; it is deliberately excluded from the three-game random gameplay pool.",
     "Generation 1.8 development: repaired literal newline escaping in the store/game script so the JavaScript parses as source text.",
@@ -132,5 +134,31 @@
       "purpose": "Local image import, pixel-grid editing, palette tools, SVG and PNG export",
       "inRandomPool": false
     }
-  ]
+  ],
+  "economy": {
+    "scope": "Generation 1 local browser prototype",
+    "provider": "localStorage",
+    "key": "nu-world-save-v1",
+    "implementedAssets": [
+      "XP",
+      "Mana",
+      "HP",
+      "HP capsules",
+      "Mana capsules",
+      "Player level"
+    ],
+    "inactiveAssets": [
+      "X Credits",
+      "N Credits"
+    ],
+    "serverAuthoritative": false,
+    "transactionHistoryLimit": 30
+  },
+  "playerIdentity": {
+    "scope": "Local browser save only",
+    "generatedIdPrefix": "NU-G1-",
+    "aliasMaxLength": 24,
+    "realWorldPersonalData": false,
+    "onlineAccount": false
+  }
 }
