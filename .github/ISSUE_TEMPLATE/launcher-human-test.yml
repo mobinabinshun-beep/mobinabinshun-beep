@@ -1,0 +1,88 @@
+name: N.U Launcher human test report
+description: Share startup, calibration, performance and usability feedback for the N.U Launcher preview.
+title: "[Launcher test] "
+labels: ["launcher", "human-testing"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for testing N.U Launcher. Do not include your name, email, account IDs, precise location, device serial number, or other personal/sensitive information.
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - Android
+        - iOS
+        - Other browser platform
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and version
+      placeholder: e.g. Chrome 130 / Safari 18
+    validations:
+      required: false
+  - type: input
+    id: device_class
+    attributes:
+      label: General device class (no identifying details)
+      placeholder: e.g. mid-range Android phone / desktop PC
+    validations:
+      required: false
+  - type: dropdown
+    id: startup
+    attributes:
+      label: Did the launcher wait before opening the demo?
+      options:
+        - Yes, as expected
+        - It opened too early
+        - Calibration stayed loading / did not finish
+        - Not sure
+    validations:
+      required: true
+  - type: dropdown
+    id: level
+    attributes:
+      label: Selected performance level
+      options:
+        - 1–2
+        - 3–4
+        - 5–6
+        - 7–8
+        - 9–10
+        - Did not reach level selection
+    validations:
+      required: true
+  - type: dropdown
+    id: smoothness
+    attributes:
+      label: How did the demo feel?
+      options:
+        - Smooth
+        - Mostly smooth
+        - Noticeable lag
+        - Severe lag / freeze
+        - Could not launch
+    validations:
+      required: true
+  - type: textarea
+    id: experience
+    attributes:
+      label: What happened? What felt clear, confusing, slow, or uncomfortable?
+      description: Include steps to reproduce problems. Do not include personal information.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: report
+    attributes:
+      label: Optional exported JSON report
+      description: You may paste the exported report JSON here. Review it first and remove any information you do not want to share.
+      render: json
+    validations:
+      required: false
