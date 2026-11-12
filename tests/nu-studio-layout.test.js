@@ -19,6 +19,9 @@ test("zoom creates overflow only inside the workspace frame",()=>{
  assert.ok(r.width>472&&r.height>372);
  assert.equal(r.overflowX,true);assert.equal(r.overflowY,true);
 });
+test("collapsed workspace waits safely for ResizeObserver instead of breaking the editor",()=>{
+ const r=fit(256,128,0,0,100);assert.equal(r.width,1);assert.equal(r.height,1);assert.equal(r.scale,0);
+});
 test("pixel mapping maps all four canvas corners to valid pixels",()=>{
  const rect={left:10,top:20,width:200,height:100};
  assert.deepEqual(pixelAt(10,20,rect,32,16),{x:0,y:0});
