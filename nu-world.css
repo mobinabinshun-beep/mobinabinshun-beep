@@ -210,6 +210,11 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 /* N.U Generation 1 transaction feedback: compact, accessible, non-blocking. */
 .transaction-toast{position:fixed;left:50%;bottom:22px;z-index:1200;max-width:min(92vw,520px);padding:10px 16px;border:1px solid rgba(245,202,105,.45);border-radius:10px;background:rgba(8,15,24,.96);color:#ffe8ae;font:700 12px/1.45 ui-monospace,monospace;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.4);opacity:0;transform:translate(-50%,12px);pointer-events:none;transition:opacity .18s ease,transform .18s ease}.transaction-toast.visible{opacity:1;transform:translate(-50%,0)}.transaction-toast.success{border-color:rgba(143,224,133,.55);color:#caffbd}.transaction-toast.warning{border-color:rgba(255,190,90,.55);color:#ffd28a}.hp-pill-use img{width:28px;height:28px;image-rendering:pixelated;object-fit:contain}.hp-pill-icon{image-rendering:pixelated}
 
+/* HP capsule HUD interaction: keep the capsule as the only pointer target in the HP rail. */
+.hp-bar{pointer-events:none}
+.hp-bar #hp-pill-use{pointer-events:auto;position:relative;z-index:20;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.hp-bar #hp-pill-use[hidden]{display:none!important}
+
 /* N.U Gen1 wallet, transaction floats and player identity card. */
 .hp-pill-use.unavailable{opacity:.62;border-style:dashed}
 .hp-pill-use.unavailable:focus-visible{opacity:1}
