@@ -13,11 +13,11 @@ test("produces a machine-readable palette-indexed graphic representation",()=>{
   assert.equal(result.instructions[0].op,"set-palette");
 });
 test("extracts run-length spans, tiles and connected regions",()=>{
-  const result=analyze(["#000000","#000000",null,"#000000","#000000",null],3,2);
+  const result=analyze(["#000000","#000000",null,null,null,"#000000"],3,2);
   assert.equal(result.rowRuns.length,2);
   assert.equal(result.tiles.length,1);
   assert.equal(result.regions.length,2);
-  assert.deepEqual(result.regions[0].bounds,{x:0,y:0,width:2,height:2});
+  assert.deepEqual(result.regions[0].bounds,{x:0,y:0,width:2,height:1});
 });
 test("marks edge pixels and rejects invalid input",()=>{
   const result=analyze(["#ffffff"],1,1);
