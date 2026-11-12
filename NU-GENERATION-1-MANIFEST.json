@@ -3,7 +3,7 @@
   "generation": 1,
   "runtime": "N.U Adaptive Runtime",
   "runtimeVersion": "0.1-prototype",
-  "packageVersion": "0.3.3-player-wallet-profile",
+  "packageVersion": "0.4.0-professional-svg-studio",
   "entry": "index.html",
   "modules": [
     "index.html",
@@ -17,6 +17,7 @@
     "nu-graphics-runtime.js",
     "nu-games.js",
     "pixel-art-studio.html",
+    "nu-svg-vectorizer.js",
     "nu-pixel-art-studio.js",
     "nu-wallet.js",
     "nu-player-ui.js"
@@ -37,6 +38,7 @@
     "native": "future adapter required"
   },
   "notes": [
+    "Generation 1.12 candidate: Pixel Art Studio adds local high-detail aspect-preserving image import, weighted median-cut palette reduction, alpha cutoff, contour-based closed SVG paths with transparent-hole preservation, and pixel-run export. Source images remain local; no upload or server processing.",
     "Generation 1.11 candidate: adds a local, testable wallet transaction boundary, HP capsule purchase/consumption feedback, owned-asset wallet view and local player identity card; no server account or real-money economy.",
     "Generation 1.10: Pixel Art Studio now uses N.U graphics capability budgets, independent resizable workspace frame, zoom control, rectangular pixel-art dimensions, aspect-ratio lock, nearest-neighbor artwork resizing, and adaptive editable-pixel limits. Original source files remain untouched; only local working copies are resampled.",
     "Generation 1.9 candidate: added N.U Pixel Art Studio as a separate creative tool in the main library; it is deliberately excluded from the three-game random gameplay pool.",
