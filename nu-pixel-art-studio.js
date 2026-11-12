@@ -14,7 +14,7 @@ function historyButtons(){$("undo").disabled=!undoStack.length;$("redo").disable
 function cellLimit(){const b=qualityProfile&&qualityProfile.budget;return b?Math.max(65536,Math.floor(b.maxCanvasPixels)):262144;}
 function updateCounters(){const count=pixels.reduce((n,p)=>n+(p?1:0),0);$("canvas-size").textContent=width+" × "+height+" px";$("pixel-count").textContent=count+" painted pixels";$("zoom-note").textContent=workspace.zoom+"% view · "+(qualityProfile?qualityProfile.tier:"balanced");}
 function updateCanvasDisplay(){
- canvas.width=width;canvas.height=height;
+ if(canvas.width!==width)canvas.width=width;if(canvas.height!==height)canvas.height=height;
  const frame=$("workspace-frame"),availableWidth=Math.max(1,frame.clientWidth-28),availableHeight=Math.max(1,frame.clientHeight-28);
  const fitScale=Math.min(availableWidth/width,availableHeight/height),scale=Math.max(.01,fitScale*workspace.zoom/100);
  canvas.style.width=Math.max(1,Math.floor(width*scale))+"px";
@@ -176,9 +176,9 @@ function svgSource(){if(!window.NUSVGVectorizer)throw new Error("SVG vector engi
 function filename(ext){let n=$("export-name").value.trim().replace(/[^a-z0-9-_]+/gi,"-").replace(/^-+|-+$/g,"").slice(0,48)||"nu-pixel-art";return n+"."+ext;}
 function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);return true;}
 $("export-svg").addEventListener("click",()=>{try{const result=svgSource(),analysis=analyzeArtwork();if(download(new Blob([result.source],{type:"image/svg+xml;charset=utf-8"}),filename("svg")))reportDownloadedOutput(analysis,result.pathCount);}catch(err){announce("SVG export failed: "+err.message);}});
-$("export-ir").addEventListener("click",()=>{try{const analysis=analyzeArtwork(),vector=svgSource(),source=JSON.stringify(analysis,null,2);if(download(new Blob([source],{type:"application/vnd.nu-gfx+json;charset=utf-8"}),filename("nu-gfx.json")))reportDownloadedOutput(analysis,vector.pathCount);}catch(err){announce("Graphics IR export failed: "+err.message);}});
+$("export-ir").addEventListener("click",()=>{try{const analysis=analyzeArtwork(),source=JSON.stringify(analysis,null,2);if(download(new Blob([source],{type:"application/vnd.nu-gfx+json;charset=utf-8"}),filename("nu-gfx.json")))reportDownloadedOutput(analysis,analysis.metrics.regionCount);}catch(err){announce("Graphics IR export failed: "+err.message);}});
 $("export-svg-copy").addEventListener("click",async()=>{try{const result=svgSource();await navigator.clipboard.writeText(result.source);announce("SVG source copied · "+result.pathCount+" paths · "+result.colorCount+" colors.");}catch(err){announce("Clipboard unavailable: "+err.message+" · use Download SVG.");}});
-$("export-png").addEventListener("click",()=>{try{const out=document.createElement("canvas");out.width=width*16;out.height=height*16;const o=out.getContext("2d");o.imageSmoothingEnabled=false;pixels.forEach((c,i)=>{if(!c)return;o.fillStyle=c;o.fillRect((i%width)*16,Math.floor(i/width)*16,16,16);});const analysis=analyzeArtwork(),vector=svgSource();out.toBlob(blob=>{if(blob&&download(blob,filename("png")))reportDownloadedOutput(analysis,vector.pathCount);else announce("PNG export could not create a file.");},"image/png");}catch(err){announce("PNG export failed: "+err.message);}});
+$("export-png").addEventListener("click",()=>{try{const out=document.createElement("canvas");out.width=width*16;out.height=height*16;const o=out.getContext("2d");o.imageSmoothingEnabled=false;pixels.forEach((c,i)=>{if(!c)return;o.fillStyle=c;o.fillRect((i%width)*16,Math.floor(i/width)*16,16,16);});const analysis=analyzeArtwork();out.toBlob(blob=>{if(blob&&download(blob,filename("png")))reportDownloadedOutput(analysis,analysis.metrics.regionCount);else announce("PNG export could not create a file.");},"image/png");}catch(err){announce("PNG export failed: "+err.message);}});
 $("show-grid")?.addEventListener("change",render);
 renderPalette();updateCanvasDisplay();render();setTool("pencil");historyButtons();initAdaptive();
 })();
