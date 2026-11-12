@@ -112,24 +112,6 @@ function quantize(v){return Math.round(v/17)*17;}
 function hex(r,g,b){return "#"+[r,g,b].map(v=>v.toString(16).padStart(2,"0")).join("");}
 function nearest(rgb,colors){let best=colors[0],dist=Infinity;for(const c of colors){const n=[parseInt(c.slice(1,3),16),parseInt(c.slice(3,5),16),parseInt(c.slice(5,7),16)],d=(rgb[0]-n[0])**2+(rgb[1]-n[1])**2+(rgb[2]-n[2])**2;if(d<dist){dist=d;best=c;}}return best;}
 async function decodeImage(file){if(typeof createImageBitmap==="function"){try{return await createImageBitmap(file);}catch(_){}}return new Promise((resolve,reject)=>{const url=URL.createObjectURL(file),img=new Image();img.onload=()=>{URL.revokeObjectURL(url);resolve(img);};img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error("This image format could not be decoded."));};img.src=url;});}
-function mapImagePixels(data,w,h,colors,alphaCutoff,dither){
- const output=Array(w*h).fill(null),errors=dither?new Float32Array(w*h*3):null;
- const addError=(index,r,g,b,factor)=>{
-  if(index<0||index>=w*h||data[index*4+3]<=alphaCutoff)return;
-  errors[index*3]+=r*factor;errors[index*3+1]+=g*factor;errors[index*3+2]+=b*factor;
- };
- for(let y=0;y<h;y++)for(let x=0;x<w;x++){
-  const i=y*w+x,at=i*4;if(data[at+3]<=alphaCutoff)continue;
-  const rgb=[0,1,2].map(k=>clamp(data[at+k]+(errors?errors[i*3+k]:0),0,255));
-  const picked=nearest(rgb,colors);output[i]=picked;
-  if(!errors)continue;
-  const q=[parseInt(picked.slice(1,3),16),parseInt(picked.slice(3,5),16),parseInt(picked.slice(5,7),16)];
-  const er=rgb[0]-q[0],eg=rgb[1]-q[1],eb=rgb[2]-q[2];
-  if(x+1<w)addError(i+1,er,eg,eb,7/16);
-  if(y+1<h){if(x>0)addError(i+w-1,er,eg,eb,3/16);addError(i+w,er,eg,eb,5/16);if(x+1<w)addError(i+w+1,er,eg,eb,1/16);}
- }
- return output;
-}
 function imagePalette(data,limit,alphaCutoff){
  const hist=new Map();
  for(let i=0;i<data.length;i+=4){if(data[i+3]<=alphaCutoff)continue;const r=Math.min(255,Math.round(data[i]/8)*8),g=Math.min(255,Math.round(data[i+1]/8)*8),b=Math.min(255,Math.round(data[i+2]/8)*8),c=hex(r,g,b),entry=hist.get(c)||{r,g,b,count:0};entry.count++;hist.set(c,entry);}
@@ -164,7 +146,8 @@ $("image-file").addEventListener("change",async e=>{
   const alphaCutoff=Number($("alpha-cutoff").value)||0;
   const extracted=imagePalette(data,Number($("palette-limit").value)||32,alphaCutoff);
   if(!extracted.length)throw new Error("No visible pixels remain above the transparency cutoff.");
-  const mapped=mapImagePixels(data,nextW,nextH,extracted,alphaCutoff,$("dither-image").checked);
+  if(!window.NURasterImport)throw new Error("Raster import module did not load.");
+  const mapped=window.NURasterImport.mapPixels(data,nextW,nextH,extracted,alphaCutoff,$("dither-image").checked);
   const before=snapshot();width=nextW;height=nextH;pixels=mapped;palette=extracted;
   commitHistory(before);imageImported=true;workspace.zoom=100;
   $("image-width").value=width;$("image-height").value=height;
