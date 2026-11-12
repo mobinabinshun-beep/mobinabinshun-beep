@@ -209,3 +209,41 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 
 /* N.U Generation 1 transaction feedback: compact, accessible, non-blocking. */
 .transaction-toast{position:fixed;left:50%;bottom:22px;z-index:1200;max-width:min(92vw,520px);padding:10px 16px;border:1px solid rgba(245,202,105,.45);border-radius:10px;background:rgba(8,15,24,.96);color:#ffe8ae;font:700 12px/1.45 ui-monospace,monospace;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.4);opacity:0;transform:translate(-50%,12px);pointer-events:none;transition:opacity .18s ease,transform .18s ease}.transaction-toast.visible{opacity:1;transform:translate(-50%,0)}.transaction-toast.success{border-color:rgba(143,224,133,.55);color:#caffbd}.transaction-toast.warning{border-color:rgba(255,190,90,.55);color:#ffd28a}.hp-pill-use img{width:28px;height:28px;image-rendering:pixelated;object-fit:contain}.hp-pill-icon{image-rendering:pixelated}
+
+/* N.U Gen1 wallet, transaction floats and player identity card. */
+.hp-pill-use.unavailable{opacity:.62;border-style:dashed}
+.hp-pill-use.unavailable:focus-visible{opacity:1}
+.floating-notifications{position:fixed;top:18%;right:clamp(12px,4vw,42px);z-index:1300;display:grid;gap:8px;pointer-events:none;justify-items:end}
+.floating-change{min-width:112px;padding:10px 15px;border:1px solid currentColor;border-radius:12px;background:rgba(7,13,22,.92);font:900 14px/1 ui-monospace,monospace;letter-spacing:.04em;text-align:center;text-shadow:0 0 10px currentColor;box-shadow:0 8px 28px #0008;animation:nu-floating-change 1.75s cubic-bezier(.2,.8,.25,1) forwards}
+.floating-change.gain{color:#a9ff88;border-color:#a9ff8880}
+.floating-change.loss{color:#ffca79;border-color:#ffca7980}
+.floating-change.hp{color:#91ff82;border-color:#91ff8280;font-size:17px}
+@keyframes nu-floating-change{0%{opacity:0;transform:translateY(18px) scale(.82)}14%{opacity:1;transform:translateY(0) scale(1.04)}28%{transform:translateY(0) scale(1)}82%{opacity:1}100%{opacity:0;transform:translateY(-22px) scale(.96)}}
+.wallet-panel,.player-id-card{max-width:760px;margin:18px auto;padding:22px;background:rgba(7,16,27,.88)}
+.wallet-assets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:18px 0 26px}
+.wallet-asset{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border:1px solid rgba(211,177,111,.25);border-radius:11px;background:rgba(17,29,42,.78)}
+.wallet-asset span{color:#c2cbd4;font-size:12px}.wallet-asset strong{color:#ffe2a0;font:800 16px ui-monospace,monospace}
+.wallet-muted{color:#9fb1bf;font-size:11px;line-height:1.7}
+.wallet-history-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #d5b36b33;padding-bottom:8px}
+.wallet-history-head h3{margin:0;color:#f3d99e;font-size:14px}.wallet-history-head span{font:9px ui-monospace,monospace;color:#8ea5b5;letter-spacing:.12em}
+.wallet-transactions{display:grid;gap:8px;margin-top:12px}
+.wallet-transaction{display:flex;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:8px;background:#0c1a28;border:1px solid #89a8bd20}
+.wallet-transaction span{font-size:12px;color:#e6edf2}.wallet-transaction small{font:10px ui-monospace,monospace;color:#c5dc9c;text-align:right}
+.player-id-card{border:1px solid rgba(226,190,112,.35);box-shadow:0 18px 50px #0008;background:linear-gradient(145deg,rgba(23,31,42,.96),rgba(7,15,25,.96))}
+.player-card-top{display:flex;align-items:center;gap:18px;padding-bottom:18px;border-bottom:1px solid #e2c07840}
+.player-emblem{width:66px;height:66px;display:grid;place-items:center;border:1px solid #e5c47b;border-radius:16px;background:linear-gradient(145deg,#4a3924,#101923);color:#ffe5a0;font:900 20px Georgia,serif;box-shadow:0 0 22px #d4a85a25}
+.player-card-top h3{margin:4px 0;color:#ffe6ae;font:700 22px Georgia,serif}.player-callsign{margin:0;color:#a9bac8;font-size:12px}
+.player-id-number{display:flex;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid #e2c07830}
+.player-id-number span,.player-stats span{color:#91a4b2;font:9px ui-monospace,monospace;letter-spacing:.15em}
+.player-id-number strong{color:#f1d18b;font:800 12px ui-monospace,monospace;letter-spacing:.12em}
+.player-stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:18px 0}
+.player-stats>div{display:grid;gap:8px;padding:12px 8px;border:1px solid #d8b66b26;border-radius:9px;background:#101d2a;text-align:center}
+.player-stats strong{color:#f5e1b4;font:800 16px ui-monospace,monospace}
+.player-xp-track{height:8px;overflow:hidden;border-radius:8px;background:#29323d;border:1px solid #e0c17a45}
+.player-xp-track>div{height:100%;width:0;background:linear-gradient(90deg,#b88742,#ffe39a);box-shadow:0 0 12px #f0c87588;transition:width .2s}
+.player-edit{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin-top:22px}
+.player-edit label{grid-column:span 2;color:#b9c8d4;font:9px ui-monospace,monospace;letter-spacing:.14em}
+.player-edit input{grid-column:span 2;width:100%;min-width:0;padding:11px 12px;border:1px solid #8296a944;border-radius:9px;background:#07121e;color:#edf4fa}
+.player-edit-actions{grid-column:span 2;display:flex;gap:9px;flex-wrap:wrap;margin-top:5px}
+@media(max-width:620px){.wallet-assets{grid-template-columns:1fr}.player-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.player-stats>div:last-child{grid-column:span 2}.floating-notifications{top:14%;right:10px}.wallet-transaction{flex-direction:column}.wallet-transaction small{text-align:left}}
+@media(prefers-reduced-motion:reduce){.floating-change{animation:none;opacity:1}.player-xp-track>div{transition:none}}
