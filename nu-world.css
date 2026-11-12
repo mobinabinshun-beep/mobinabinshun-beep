@@ -267,3 +267,5 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 .shop-use-item [data-use-hp-pill]{display:inline-flex;align-items:center;gap:7px}
 .shop-use-item [data-use-hp-pill]:disabled{opacity:.45;cursor:not-allowed}
 @media(max-width:600px){#game-asset-profile{top:100px}}
+
+#game-asset-profile>small{display:block;color:#8ea8ba;font-size:9px;letter-spacing:.08em;margin:-4px 0 8px}
