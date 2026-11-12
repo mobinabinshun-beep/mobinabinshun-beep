@@ -57,8 +57,8 @@ jobs:
           scripts = []
           for page in pages:
               html = Path(page).read_text()
-                        scripts.extend(re.findall(r'<script src="./([^"?]+)(?:\?[^\"]*)?"', html))
-          scripts.extend(re.findall(r'<link rel="stylesheet" href="./([^"?]+)(?:\?[^\"]*)?"', html))
+              scripts.extend(re.findall(r'<script src="./([^"?]+)(?:\?[^"]*)?"', html))
+              scripts.extend(re.findall(r'<link rel="stylesheet" href="./([^"?]+)(?:\?[^"]*)?"', html))
           missing = [name for name in scripts if not Path(name).is_file()]
           if missing:
               raise SystemExit("Missing script files: " + ", ".join(missing))
