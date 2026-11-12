@@ -12,7 +12,7 @@
   };
   function normalizeSave(raw){
     const source=raw&&typeof raw==="object"?raw:{};
-    const next=Object.assign({xp:0,level:1,mana:0,xCredits:0,nCredits:0,upgrade:0,hp:10,hpPills:0,manaCapsules:1,transactions:[]},source);
+    const next=Object.assign({xp:0,level:1,mana:0,xCredits:0,nCredits:0,upgrade:0,hp:10,hpPills:0,manaCapsules:1,transactions:[],rewardIds:[]},source);
     next.xp=number(next.xp,0);
     next.level=number(next.level,1,1);
     next.manaCapsules=number(next.manaCapsules,1,1,10);
@@ -23,6 +23,7 @@
     next.nCredits=number(next.nCredits,0);
     next.upgrade=number(next.upgrade,0,0,9);
     next.transactions=Array.isArray(next.transactions)?next.transactions.slice(-MAX_TRANSACTIONS):[];
+    next.rewardIds=Array.isArray(next.rewardIds)?next.rewardIds.filter(v=>typeof v==="string").slice(-500):[];
     return next;
   }
   function transaction(next,kind,title,deltas,meta){
@@ -49,6 +50,27 @@
     const entry=transaction(next,"consumption","HP Capsule used",{hp:restored,hpPills:-1},meta);
     return {ok:true,state:next,restored,transaction:entry};
   }
+  function grantXP(raw,amount,meta){
+    const next=normalizeSave(raw),details=meta||{},rewardId=String(details.id||"");
+    if(rewardId&&next.rewardIds.includes(rewardId))return {ok:false,reason:"DUPLICATE_REWARD",state:next};
+    const qty=number(amount,0,0,1000000);
+    if(qty<1)return {ok:false,reason:"INVALID_REWARD",state:next};
+    const before=Math.floor(next.xp/100);
+    next.xp+=qty;
+    next.level+=Math.floor(next.xp/100)-before;
+    if(rewardId)next.rewardIds=next.rewardIds.concat(rewardId).slice(-500);
+    const entry=transaction(next,"reward",String(details.title||"XP earned"),{xp:qty},details);
+    return {ok:true,state:next,amount:qty,transaction:entry};
+  }
+  function gameAssetRows(raw,gameId){
+    const rows=assetRows(raw),shared={hp:true},profiles={
+      bubble:{xp:true,hp:true,hpPills:true},
+      mana:{mana:true,manaCapsules:true,hp:true},
+      chaos:{hp:true,mana:true,xp:true,hpPills:true,manaCapsules:true}
+    };
+    const selected=profiles[String(gameId||"").toLowerCase()]||shared;
+    return rows.filter(row=>selected[row.key]);
+  }
   function assetRows(raw){
     const s=normalizeSave(raw);
     return [
@@ -59,5 +81,5 @@
       {key:"manaCapsules",label:"Mana Capsules",value:s.manaCapsules,unit:""},
     ];
   }
-  return {MAX_HP,HP_PILL_COST,MAX_TRANSACTIONS,normalizeSave,buyHpPill,useHpPill,assetRows};
+  return {MAX_HP,HP_PILL_COST,MAX_TRANSACTIONS,normalizeSave,buyHpPill,useHpPill,grantXP,assetRows,gameAssetRows};
 });
