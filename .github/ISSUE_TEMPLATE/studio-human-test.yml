@@ -1,0 +1,129 @@
+name: N.U Creative Studio human test report
+description: Report image import, pixel mapping, viewport, checkerboard, tool or SVG export behavior.
+title: "[Studio test] "
+labels: ["creative-studio", "human-testing"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please do not include your name, email, account IDs, precise location, device serial number, private artwork, or other sensitive information. If an image is copyrighted or private, describe the issue instead of uploading it.
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - Android
+        - iOS / iPadOS
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and version
+      placeholder: e.g. Firefox 132 / Chrome 130 / Safari 18
+    validations:
+      required: false
+  - type: input
+    id: device_class
+    attributes:
+      label: General device class
+      placeholder: e.g. mid-range Android phone / laptop
+    validations:
+      required: false
+  - type: dropdown
+    id: image_type
+    attributes:
+      label: Image type tested
+      options:
+        - PNG with transparency
+        - PNG without transparency
+        - JPEG / photograph
+        - WebP
+        - GIF
+        - Pixel art / sprite
+        - Logo / icon / flat illustration
+        - Other / no image imported
+    validations:
+      required: true
+  - type: dropdown
+    id: import_result
+    attributes:
+      label: What happened after import?
+      options:
+        - Full image fit correctly
+        - Image jumped / clipped / left workspace
+        - Image became blank or disappeared
+        - Image colors / pixels did not match source
+        - Import failed or stayed loading
+        - Not tested
+    validations:
+      required: true
+  - type: dropdown
+    id: checkerboard
+    attributes:
+      label: Did the checkerboard and pixel grid look correct?
+      options:
+        - Yes, one checker cell per logical image pixel
+        - Checker cells were too large / too small
+        - Grid did not align with pixels
+        - Checkerboard was missing
+        - Not sure / not tested
+    validations:
+      required: true
+  - type: dropdown
+    id: viewport
+    attributes:
+      label: Initial view and scrolling
+      options:
+        - Entire image visible; zoom and scroll stayed inside workspace
+        - Image was not fitted initially
+        - Page scrolled instead of the canvas workspace
+        - Nested / unclear scrollbars
+        - Zoom caused the image to jump
+        - Not tested
+    validations:
+      required: true
+  - type: dropdown
+    id: tools
+    attributes:
+      label: Tool organization and usability
+      options:
+        - Familiar and clear
+        - Icons or tool names unclear
+        - Tool groups hard to find
+        - Tool behavior inconsistent
+        - Missing tools prevented the task
+        - Not tested
+    validations:
+      required: true
+  - type: dropdown
+    id: svg_result
+    attributes:
+      label: SVG export result
+      options:
+        - Exported and opened correctly
+        - Exported but paths / colors / transparency were wrong
+        - Export failed
+        - Not tested
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce and expected vs actual behavior
+      description: Include approximate image dimensions, selected import detail, palette size, resampling and dithering settings when relevant. Do not attach private artwork.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: additional
+    attributes:
+      label: Optional additional observations
+      description: Performance, touch behavior, undo/redo, brush alignment, export quality or other notes.
+      render: text
+    validations:
+      required: false
