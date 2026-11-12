@@ -12,6 +12,7 @@ on:
       - feature/gen1-studio-viewport-input-repair-2026-11-12
       - feature/gen1-studio-viewport-input-repair-v2-2026-11-12
       - feat/gen1-creative-studio-layered-toolkit-2026-11-12
+      - feat/studio-compact-workspace-ux-2026-11-12
       - Official-public-information-and-discovery-hub-for-N.U-(Niroo-Universe),-its-publishing-network,-projects,-publications-and-related-creative-works
   pull_request:
     branches:
