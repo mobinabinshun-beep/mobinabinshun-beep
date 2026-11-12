@@ -183,3 +183,18 @@ N.U Pixel Art Studio now uses the existing `nu-graphics-core.js` capability prof
 - The original imported file is never overwritten. Resizing affects only the in-memory working copy; SVG/PNG exports use the current working dimensions.
 - The existing core games, random game pool, adaptive/network runtime and shared graphics modules are not modified by this editor enhancement.
 - This remains a browser-only editor; device-specific interaction and large-image QA are still required.
+
+
+## Generation 1.12 — professional local SVG vectorization
+
+N.U Pixel Art Studio now includes a separate vectorization engine for imported artwork:
+- Import detail can be selected from 64 to 256 pixels on the longest edge; the source aspect ratio is preserved and a device pixel budget prevents oversized work.
+- A weighted median-cut palette reducer builds a selectable 2–32 color palette from the source image.
+- An alpha cutoff controls which semi-transparent source pixels become transparent in the working image.
+- **Contour paths** traces same-color boundaries into compact closed SVG paths; transparent holes are preserved with even-odd fill rules. **Pixel runs** provides a fast block-oriented alternative.
+- SVG output is editable vector geometry grouped by color, not an embedded raster image. PNG export remains available.
+- The vectorizer is a local browser module; source images are not uploaded and no remote conversion service is used.
+
+The editor still uses a color-reduced raster working grid as its input. This is best suited to logos, icons, flat illustrations and pixel art; it is not yet a Bézier curve reconstruction engine for photographic imagery, and fine photographic detail is limited by the selected import resolution and palette size.
+- CI includes geometry regression tests for solid shapes, disconnected regions, transparent holes, compact runs and input validation.
+- Browser/device acceptance and visual comparison against a professional tracing package remain pending.
