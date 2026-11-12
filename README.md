@@ -227,3 +227,17 @@ This section supersedes the earlier Pixel Art Studio descriptions above where th
 ### Acceptance boundary
 - Automated checks cover JavaScript syntax, wallet rules, SVG contour geometry, GFX-IR structure, manifest JSON and local script references.
 - Browser/device, download, persistence, visual-fidelity and touch acceptance remain human-test tasks. This branch is a public-demo test candidate, not a final product release.
+
+
+## N.U Launcher — calibration preview (2026-11-12)
+
+- Added a separate `launcher.html` entry linked from the public demo home page.
+- The launcher stays in a lightweight loading/calibration screen before the player opens the demo.
+- Browser adapters inspect online reachability, WebGL capability, browser memory hints and a bounded CPU sample; these are heuristics, not native hardware benchmarks.
+- Ten performance levels are available. Level 10 is the estimated stable ceiling; lower levels reduce optional visual budgets.
+- Saved-profile, ask-every-launch and silent calibration preferences are stored locally. Refresh/reset and a Yes/No settings-exit confirmation are included.
+- Human-test notes can be exported as a local JSON report. There is no server-side report collector yet.
+- Per-game calibration UI preference exists, but the per-game freeze/prompt hook is not yet wired into the current game entry points.
+- Native Windows/macOS/Linux/Android/iOS installers, signed extension packages, dependency resolution, sandboxing and rollback are not implemented.
+- See `NU-LAUNCHER-ARCHITECTURE.md`, `NU-LAUNCHER-MANIFEST.json` and `NU-LAUNCHER-HUMAN-QA.md`.
+- This is a browser human-test candidate, not a production launcher release.
