@@ -3,18 +3,16 @@ name: N.U graphics preview smoke checks
 on:
   push:
     branches:
-      - feature/image-first-celestial-scene-2026-11-12
-      - feature/gen1-pixel-art-studio-audit-2026-11-12
-      - feature/gen1-adaptive-pixel-workspace-2026-11-12
-      - feature/gen1-hp-wallet-profile-2026-11-12
-      - feature/gen1-professional-svg-studio-2026-11-12
-      - feature/gen1-human-test-demo-2026-11-12
-      - feature/gen1-studio-viewport-input-repair-2026-11-12
-      - feature/gen1-studio-viewport-input-repair-v2-2026-11-12
       - Official-public-information-and-discovery-hub-for-N.U-(Niroo-Universe),-its-publishing-network,-projects,-publications-and-related-creative-works
   pull_request:
     branches:
       - "Official-public-information-and-discovery-hub-for-N.U-(Niroo-Universe),-its-publishing-network,-projects,-publications-and-related-creative-works"
+
+# Cancel superseded runs for the same PR or branch to avoid spending runner time
+# validating commits that have already been replaced.
+concurrency:
+  group: graphics-preview-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   static-validation:
