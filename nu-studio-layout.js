@@ -9,7 +9,8 @@
     for(const [name,value] of Object.entries({width,height,frameWidth,frameHeight,zoom,gutter})){
       if(!Number.isFinite(value))throw new TypeError(name+" must be finite.");
     }
-    if(width<1||height<1||frameWidth<1||frameHeight<1||zoom<1||gutter<0)throw new RangeError("Workspace and artwork dimensions must be positive.");
+    if(width<1||height<1||zoom<1||gutter<0)throw new RangeError("Artwork dimensions and zoom must be positive.");
+    if(frameWidth<=0||frameHeight<=0)return {scale:0,width:1,height:1,overflowX:false,overflowY:false};
     const availableWidth=Math.max(1,frameWidth-gutter),availableHeight=Math.max(1,frameHeight-gutter);
     const fitScale=Math.min(availableWidth/width,availableHeight/height);
     const scale=fitScale*zoom/100;
