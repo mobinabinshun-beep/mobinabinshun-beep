@@ -42,8 +42,8 @@ function render(){
  }
  updateCounters();
 }
-function resizeArtwork(nextW,nextH,method="nearest"){nextW=Math.max(1,Math.round(nextW));nextH=Math.max(1,Math.round(nextH));if(nextW*nextH>cellLimit()){announce("This device profile allows up to "+cellLimit().toLocaleString()+" editable pixels. Reduce the dimensions or choose a lighter workspace.");return false;}const before=snapshot(),next=Array(nextW*nextH).fill(null);for(let y=0;y<nextH;y++)for(let x=0;x<nextW;x++){const sx=Math.min(width-1,Math.floor((x+.5)*width/nextW)),sy=Math.min(height-1,Math.floor((y+.5)*height/nextH));next[y*nextW+x]=pixels[sy*width+sx];}width=nextW;height=nextH;pixels=next;commitHistory(before);$("image-width").value=width;$("image-height").value=height;updateCanvasDisplay();render();announce("Artwork resized to "+width+" × "+height+" px using "+method+" sampling. Original import remains unchanged outside the working copy.");return true;}
-function initAdaptive(){const fallback=()=>{qualityProfile={tier:"balanced",level:3,budget:{maxCanvasPixels:520000,dpr:1},reducedMotion:false};$("quality-profile").textContent="Balanced · fallback";};if(!window.NUGraphicsCore){fallback();return;}window.NUGraphicsCore.start().then(p=>{qualityProfile=p;$("quality-profile").textContent=p.tier+" · level "+p.level;$("quality-detail").textContent="Editable pixel budget: "+cellLimit().toLocaleString()+" cells";updateCounters();}).catch(fallback);}
+function resizeArtwork(nextW,nextH,method="nearest"){nextW=Math.max(1,Math.round(nextW));nextH=Math.max(1,Math.round(nextH));if(!Number.isSafeInteger(nextW*nextH)){announce("Canvas dimensions exceed the supported numeric range.");return false;}const before=snapshot(),next=Array(nextW*nextH).fill(null);for(let y=0;y<nextH;y++)for(let x=0;x<nextW;x++){const sx=Math.min(width-1,Math.floor((x+.5)*width/nextW)),sy=Math.min(height-1,Math.floor((y+.5)*height/nextH));next[y*nextW+x]=pixels[sy*width+sx];}width=nextW;height=nextH;pixels=next;commitHistory(before);$("image-width").value=width;$("image-height").value=height;updateCanvasDisplay();render();announce("Artwork resized to "+width+" × "+height+" px using "+method+" sampling. Original import remains unchanged outside the working copy.");return true;}
+function initAdaptive(){const fallback=()=>{qualityProfile={tier:"balanced",level:3,budget:{maxCanvasPixels:520000,dpr:1},reducedMotion:false};$("quality-profile").textContent="Balanced · fallback";};if(!window.NUGraphicsCore){fallback();return;}window.NUGraphicsCore.start().then(p=>{qualityProfile=p;$("quality-profile").textContent=p.tier+" · level "+p.level;$("quality-detail").textContent="Resource limits are managed by the host runtime.";updateCounters();}).catch(fallback);}
 function applyZoom(){workspace.zoom=clamp(Number($("workspace-zoom").value)||100,25,800);updateCanvasDisplay();updateCounters();}
 $("workspace-zoom").addEventListener("input",applyZoom);
 $("fit-canvas").addEventListener("click",()=>{workspace.zoom=100;applyZoom();$("workspace-frame").scrollTo(0,0);});
@@ -313,8 +313,8 @@ const floodAdv=flood;flood=function(x,y,next){if(adv.layers[adv.active].locked)r
 
 const resizeArtworkBase=resizeArtwork;
 resizeArtwork=function(nextW,nextH,method="nearest"){
- nextW=clamp(Math.round(nextW),1,2048);nextH=clamp(Math.round(nextH),1,2048);
- if(nextW*nextH>cellLimit()){announce("This device profile allows up to "+cellLimit().toLocaleString()+" editable pixels.");return false;}
+ nextW=Math.max(1,Math.round(nextW));nextH=Math.max(1,Math.round(nextH));
+ if(!Number.isSafeInteger(nextW*nextH)){announce("Canvas dimensions exceed the supported numeric range.");return false;}
  const before=snapshot(),oldW=width,oldH=height;
  adv.layers.forEach(l=>{const src=l.pixels,next=Array(nextW*nextH).fill(null);for(let y=0;y<nextH;y++)for(let x=0;x<nextW;x++){const sx=Math.min(oldW-1,Math.floor((x+.5)*oldW/nextW)),sy=Math.min(oldH-1,Math.floor((y+.5)*oldH/nextH));next[y*nextW+x]=src[sy*oldW+sx]||null;}l.pixels=next;});
  width=nextW;height=nextH;layerWidth=width;layerHeight=height;pixels=adv.layers[adv.active].pixels.slice();commitHistory(before);
