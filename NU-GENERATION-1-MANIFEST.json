@@ -3,7 +3,7 @@
   "generation": 1,
   "runtime": "N.U Adaptive Runtime",
   "runtimeVersion": "0.1-prototype",
-  "packageVersion": "0.5.0-gen1-human-test",
+  "packageVersion": "0.5.1-gen1-studio-ux-repair",
   "entry": "index.html",
   "modules": [
     "index.html",
@@ -19,6 +19,8 @@
     "pixel-art-studio.html",
     "nu-svg-vectorizer.js",
     "nu-graphics-analysis.js",
+    "nu-raster-import.js",
+    "nu-studio-layout.js",
     "nu-pixel-art-studio.js",
     "nu-wallet.js",
     "nu-player-ui.js"
@@ -39,6 +41,7 @@
     "native": "future adapter required"
   },
   "notes": [
+    "Generation 1.14 candidate: Studio workspace uses deterministic fit geometry and ResizeObserver sizing; pointer mapping is centralized; import shows an original-source preview, preserves a separate working copy, offers smooth/nearest resampling and optional Floyd–Steinberg dithering; import size is bounded at 25 MB. Game HUD asset-profile interactions no longer bubble into gameplay pointer handlers and the profile is positioned beside the active resource bar. Browser acceptance remains pending.",
     "Game HUD now exposes per-game asset profiles on hover/focus; each profile is a filtered projection of the global wallet, not a separate balance store. HP capsule can be purchased or used from the Store and used from the in-game HP icon.",
     "Generation 1.13 candidate: Studio fixes fit-to-view/zoom/scroll and per-pixel checkerboard; adds pencil, eraser, fill, eyedropper, line, rectangle, ellipse and brush sizing; imports up to 256px longest-edge with up to 32 colors; exports SVG, PNG and NU-GFX-IR/1; unique artwork downloads award a bounded 1–25 shared XP reward once per fingerprint to the same local Generation 1 wallet.",
     "Generation 1.12 candidate: Pixel Art Studio adds local high-detail aspect-preserving image import, weighted median-cut palette reduction, alpha cutoff, contour-based closed SVG paths with transparent-hole preservation, and pixel-run export. Source images remain local; no upload or server processing.",
