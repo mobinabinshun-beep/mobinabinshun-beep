@@ -32,7 +32,7 @@ function positionGameAssetProfile(trigger){
 }
 function showGameAssetProfile(trigger){
  const root=$("game-asset-profile");if(!root)return;
- renderGameAssetProfile();root.hidden=false;positionGameAssetProfile(trigger);
+ renderGameAssetProfile();root.hidden=false;setAssetProfileExpanded(true);positionGameAssetProfile(trigger);
 }
 function toggleGameAssetProfile(trigger){
  assetProfilePinned=!assetProfilePinned;
@@ -44,9 +44,9 @@ function bindGameAssetProfiles(){
  triggers.forEach(el=>{
   el.tabIndex=0;el.setAttribute("role","group");el.setAttribute("aria-label","Show game asset profile");el.setAttribute("aria-describedby","game-asset-profile");el.setAttribute("aria-expanded","false");
   el.addEventListener("pointerenter",()=>{if(!assetProfilePinned)showGameAssetProfile(el);});
-  el.addEventListener("pointerleave",()=>{if(!assetProfilePinned)root.hidden=true;});
+  el.addEventListener("pointerleave",()=>{if(!assetProfilePinned){root.hidden=true;setAssetProfileExpanded(false);}});
   el.addEventListener("focus",()=>showGameAssetProfile(el));
-  el.addEventListener("blur",()=>{if(!assetProfilePinned)root.hidden=true;});
+  el.addEventListener("blur",()=>{if(!assetProfilePinned){root.hidden=true;setAssetProfileExpanded(false);}});
   // Resource bars are HUD controls, never gameplay hit targets or camera gestures.
   el.addEventListener("pointerdown",e=>e.stopPropagation());
   el.addEventListener("pointerup",e=>e.stopPropagation());
