@@ -130,10 +130,10 @@
   "libraryTools": [
     {
       "id": "pixel-art-studio",
-      "name": "N.U Pixel Art Studio",
+      "name": "N.U Pixel Art & Vector Studio",
       "generation": 1,
       "entry": "pixel-art-studio.html",
-      "purpose": "Local image import, pixel-grid editing, palette tools, SVG and PNG export",
+      "purpose": "Local image import, adaptive pixel editing, palette reduction, contour-based SVG vectorization and PNG export",
       "inRandomPool": false
     }
   ]
