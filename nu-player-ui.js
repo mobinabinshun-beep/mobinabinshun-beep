@@ -4,13 +4,12 @@
   const $=id=>document.getElementById(id);
   const walletView=$("wallet-view"),profileView=$("profile-view");
   if(!window.NU||!window.NUWallet||!walletView||!profileView)return;
-  const identityKey="nu-world-player-identity-v1";
   function load(){return NUWallet.normalizeSave(NU.load());}
   function persist(save){return NU.save(save);}
   function safeText(value,fallback){return typeof value==="string"&&value.trim()?value.trim().slice(0,32):fallback;}
   function makePlayerId(){
     const bytes=new Uint8Array(6);
-    if(window.crypto&&crypto.getRandomValues)crypto.getRandomValues(bytes);
+    if(window.crypto&&window.crypto.getRandomValues)window.crypto.getRandomValues(bytes);
     else for(let i=0;i<bytes.length;i++)bytes[i]=Math.floor(Math.random()*256);
     return "NU-"+Array.from(bytes,b=>b.toString(16).padStart(2,"0")).join("").toUpperCase();
   }
@@ -23,14 +22,18 @@
     const s=load(),root=$("wallet-assets"),history=$("wallet-transactions");
     if(!root||!history)return;
     root.innerHTML=NUWallet.assetRows(s).map(row=>'<div class="wallet-asset"><span>'+row.label+'</span><strong>'+row.value+row.unit+'</strong></div>').join("");
+    history.replaceChildren();
     const tx=s.transactions.slice().reverse();
-    history.innerHTML=tx.length?tx.map(item=>{
-      const deltas=Object.entries(item.deltas||{}).map(([key,value])=>{
+    if(!tx.length){const empty=document.createElement("p");empty.className="wallet-muted";empty.textContent="No recorded wallet transactions yet.";history.appendChild(empty);return;}
+    tx.forEach(item=>{
+      const row=document.createElement("div"),title=document.createElement("span"),detail=document.createElement("small");
+      row.className="wallet-transaction";title.textContent=String(item.title||"Wallet transaction");
+      detail.textContent=Object.entries(item.deltas||{}).map(([key,value])=>{
         const label=key==="hpPills"?"HP Capsule":key==="hp"?"HP":key==="xp"?"XP":key;
-        return (value>0?"+":"")+value+" "+label;
+        return (Number(value)>0?"+":"")+Number(value)+" "+label;
       }).join(" · ");
-      return '<div class="wallet-transaction"><span>'+item.title+'</span><small>'+deltas+'</small></div>';
-    }).join(""):'<p class="wallet-muted">No recorded wallet transactions yet.</p>';
+      row.append(title,detail);history.appendChild(row);
+    });
   }
   function renderProfile(){
     const s=ensureIdentity(),name=safeText(s.displayName,"N.U Explorer"),callsign=safeText(s.callsign,"Unassigned");
@@ -46,14 +49,17 @@
     $("player-name-input").value=s.displayName||"";
     $("player-callsign-input").value=s.callsign||"";
   }
+  let previousView=null;
   function open(view){
+    previousView=document.querySelector(".view.active");
+    window.dispatchEvent(new Event("nu:player-overlay-open"));
     document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));
     view.classList.add("active");
     document.body.classList.remove("article-mode");
     if(view===walletView)renderWallet();else renderProfile();
     const menu=$("menu");if(menu)menu.classList.remove("open");
   }
-  function close(){document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));$("home-view").classList.add("active");}
+  function close(){document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));(previousView&&previousView!==walletView&&previousView!==profileView?previousView:$("home-view")).classList.add("active");previousView=null;window.dispatchEvent(new Event("nu:player-overlay-close"));}
   $("wallet-back").addEventListener("click",close);
   $("profile-back").addEventListener("click",close);
   $("menu-wallet").addEventListener("click",()=>open(walletView));
@@ -64,12 +70,14 @@
     s.callsign=safeText($("player-callsign-input").value,"");
     if(!persist(s)){ $("player-save-status").textContent="Could not save this profile in local browser storage.";return; }
     $("player-save-status").textContent="Player identity saved on this device.";
+    window.dispatchEvent(new CustomEvent("nu:save-updated"));
     renderProfile();
   });
   $("player-identity-reset").addEventListener("click",()=>{
     const s=ensureIdentity();s.displayName="";s.callsign="";
     if(!persist(s)){$("player-save-status").textContent="Could not save this change.";return;}
     $("player-save-status").textContent="Display name and callsign reset.";
+    window.dispatchEvent(new CustomEvent("nu:save-updated"));
     renderProfile();
   });
   window.addEventListener("nu:save-updated",()=>{if(walletView.classList.contains("active"))renderWallet();if(profileView.classList.contains("active"))renderProfile();});
