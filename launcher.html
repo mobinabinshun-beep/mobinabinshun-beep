@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#071018">
+<title>N.U Launcher — System Calibration</title>
+<link rel="stylesheet" href="./nu-launcher.css">
+</head>
+<body>
+<main class="launcher">
+<header class="top"><a href="./index.html" class="brand">N.U <span>NIROO UNIVERSE · LAUNCHER PREVIEW</span></a><span class="safe"><i></i> LOCAL DEVICE CHECK</span></header>
+<section class="intro">
+<p class="eyebrow">A CALM START · ONE SHARED CORE</p>
+<h1>Prepare your<br><em>play space.</em></h1>
+<p class="lead">The launcher checks what this browser can safely report, chooses a conservative performance limit, and keeps the game paused until setup is complete.</p>
+</section>
+<section class="panel status-panel" aria-live="polite">
+<div class="panel-head"><div><span class="eyebrow">STARTUP CALIBRATION</span><h2 id="phase-title">Checking browser capabilities</h2></div><span class="state" id="phase-state">IN PROGRESS</span></div>
+<div class="progress"><span id="progress-fill"></span></div>
+<p id="phase-copy" class="muted">A few lightweight checks are running. No game, plug-in, or heavy scene is being started.</p>
+<div class="metrics">
+<div><span>ONLINE</span><strong id="online-state">—</strong><small id="online-detail">Browser network hints</small></div>
+<div><span>GRAPHICS</span><strong id="gpu-state">—</strong><small id="gpu-detail">WebGL capability</small></div>
+<div><span>MEMORY</span><strong id="ram-state">—</strong><small id="ram-detail">Browser memory hint</small></div>
+<div><span>CPU</span><strong id="cpu-state">—</strong><small id="cpu-detail">Logical cores / short sample</small></div>
+</div>
+<div class="notice" id="confidence-note">Browser hardware information is approximate. Missing data is treated conservatively, not as a failure.</div>
+</section>
+<section class="panel levels" id="level-panel" hidden>
+<div class="panel-head"><div><span class="eyebrow">YOUR PERFORMANCE LIMIT</span><h2>Choose a comfortable level</h2></div><span class="state stable" id="stable-label">LEVEL 10 · STABLE</span></div>
+<p class="muted">Level 10 is the recommended stable ceiling from this calibration. Lower levels reduce optional visual and runtime budgets in measured steps. They do not unlock extra power beyond the stable ceiling.</p>
+<div class="level-grid" id="level-grid"></div>
+<div class="selected"><div><span class="eyebrow">SELECTED PROFILE</span><strong id="selected-title">Level 10 · Stable</strong><p id="selected-copy">Recommended balanced limit for this device.</p></div><button class="primary" id="apply-profile">Apply and continue</button></div>
+</section>
+<section class="panel settings" id="settings-panel">
+<div class="panel-head"><div><span class="eyebrow">LAUNCHER PREFERENCES</span><h2>How should setup behave?</h2></div><span class="state">CHANGE ANYTIME</span></div>
+<p class="muted">These controls only change when calibration runs and whether the choice screen appears. They never remove access to Settings.</p>
+<label class="choice"><input type="checkbox" id="hide-chooser"><span><b>Remember my choice and hide this screen</b><small>Use the saved behavior next time. Reopen it from Launcher Settings → Calibration.</small></span></label>
+<label class="choice"><input type="checkbox" id="per-game"><span><b>Calibrate separately for each game</b><small>Keep the game paused while its own lightweight check and profile choice are prepared.</small></span></label>
+<label class="choice"><input type="checkbox" id="ask-every"><span><b>Ask me every time the launcher opens</b><small>Show the level choices on each new launcher session.</small></span></label>
+<div class="mode-title">Quick start behavior</div>
+<label class="choice"><input type="radio" name="mode" value="reuse" checked><span><b>Use my saved profile</b><small>Fastest start. No new calibration unless I refresh it in Settings.</small></span></label>
+<label class="choice"><input type="radio" name="mode" value="silent"><span><b>Calibrate quietly on launcher start</b><small>Refresh the stable limit in the background without showing level choices.</small></span></label>
+<label class="choice"><input type="radio" name="mode" value="automatic"><span><b>Automatic adaptive mode</b><small>Calibrate at launcher start and apply the stable limit automatically; optionally repeat per game.</small></span></label>
+<div class="settings-path" id="settings-path">You can change this later in <b>Launcher → Settings → Calibration</b>. Choose <b>Refresh calibration</b> to repeat the check, or <b>Reset calibration</b> to clear the saved profile.</div>
+</section>
+<section class="panel demo" id="demo-panel" hidden>
+<div class="panel-head"><div><span class="eyebrow">PUBLIC DEMO</span><h2>Ready for the N.U world</h2></div><span class="state stable">SETUP COMPLETE</span></div>
+<p class="muted">The demo opens separately. Its game logic stays idle until you choose a game. This preview passes a performance budget to the demo page; it does not yet install downloadable game packages or native plug-ins.</p>
+<div class="demo-actions"><a class="primary" href="./index.html">Open N.U Demo</a><button id="open-settings">Launcher Settings</button></div>
+</section>
+<section class="panel feedback">
+<div class="panel-head"><div><span class="eyebrow">HUMAN TEST NOTES</span><h2>Tell us how it felt</h2></div><span class="state">OPTIONAL</span></div>
+<p class="muted">This preview does not have a feedback server yet. Your note stays in this browser until you export it; do not include personal or sensitive information.</p>
+<label class="field">Device / browser (optional)<input id="device-note" maxlength="120" placeholder="e.g. Android phone · Chrome"></label>
+<label class="field">What did you notice?<textarea id="feedback-note" maxlength="1200" rows="4" placeholder="Startup smoothness, loading wait, visual comfort, lag, touch or layout issues…"></textarea></label>
+<div class="demo-actions"><button id="export-report" class="primary">Export test report</button><span id="report-status" class="muted" role="status"></span></div>
+</section>
+<footer> N.U — NIROO UNIVERSE · LAUNCHER CALIBRATION PREVIEW · NOT A NATIVE INSTALLER </footer>
+</main>
+<script src="./nu-launcher.js"></script>
+</body></html>
