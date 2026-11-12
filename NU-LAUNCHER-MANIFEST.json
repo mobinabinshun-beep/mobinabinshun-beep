@@ -1,0 +1,39 @@
+{
+  "product": "N.U Launcher",
+  "version": "0.1.0-preview",
+  "status": "browser-human-test-candidate",
+  "entry": "launcher.html",
+  "modules": ["launcher.html", "nu-launcher.css", "nu-launcher.js"],
+  "calibration": {
+    "adapters": ["online-browser-hints", "webgl-capability", "device-memory-hint", "bounded-cpu-sample"],
+    "levels": 10,
+    "level10": "calibrated-stable-ceiling",
+    "gameExecutionBeforeCalibration": false,
+    "continuousBenchmark": false,
+    "profileStorage": "localStorage",
+    "reportExport": "local-json"
+  },
+  "preferences": ["remember-hide-chooser", "per-game-calibration-pending", "ask-every-launch", "reuse-saved-profile", "silent-launch-calibration", "automatic-adaptive-pending-game-hook"],
+  "packageModel": {
+    "signedManifests": "required-before-production",
+    "contentHashes": "required-before-production",
+    "permissionDeclarations": "required-before-production",
+    "dependencyResolution": "not-implemented",
+    "sandbox": "not-implemented",
+    "rollback": "not-implemented"
+  },
+  "platforms": {
+    "browserPreview": true,
+    "windows": false,
+    "macos": false,
+    "linux": false,
+    "android": false,
+    "ios": false
+  },
+  "limitations": [
+    "Browser hardware signals are approximate and privacy-limited.",
+    "Network check measures same-origin reachability/round-trip only, not throughput or packet loss.",
+    "Per-game calibration integration is pending.",
+    "Human-test reports are exported locally; no server collector exists."
+  ]
+}
