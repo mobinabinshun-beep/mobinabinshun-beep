@@ -247,3 +247,8 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 .player-edit-actions{grid-column:span 2;display:flex;gap:9px;flex-wrap:wrap;margin-top:5px}
 @media(max-width:620px){.wallet-assets{grid-template-columns:1fr}.player-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.player-stats>div:last-child{grid-column:span 2}.floating-notifications{top:14%;right:10px}.wallet-transaction{flex-direction:column}.wallet-transaction small{text-align:left}}
 @media(prefers-reduced-motion:reduce){.floating-change{animation:none;opacity:1}.player-xp-track>div{transition:none}}
+
+/* N.U HP capsule use: red HP-bar pulse plus green restoration cue. */
+.hp-track.hp-restored{animation:nu-hp-track-pulse .52s ease-out 2}
+@keyframes nu-hp-track-pulse{0%,100%{box-shadow:0 0 0 rgba(255,60,90,0)}35%{box-shadow:0 0 16px rgba(255,60,90,.9);border-color:#ff6680}}
+@media(prefers-reduced-motion:reduce){.hp-track.hp-restored{animation:none;box-shadow:0 0 8px rgba(255,60,90,.6)}}
