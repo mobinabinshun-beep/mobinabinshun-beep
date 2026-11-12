@@ -20,7 +20,7 @@ function renderGameAssetProfile(){
 function bindGameAssetProfiles(){
  const triggers=[...document.querySelectorAll(".bar-wrap"),$("hp-bar")].filter(Boolean);
  triggers.forEach(el=>{
-  el.tabIndex=0;el.setAttribute("role","button");el.setAttribute("aria-label","Show "+(state.game||"game")+" asset profile");
+  el.tabIndex=0;el.setAttribute("role","group");el.setAttribute("aria-label","Show "+(state.game||"game")+" asset profile");el.setAttribute("aria-describedby","game-asset-profile");
   el.addEventListener("pointerenter",()=>{renderGameAssetProfile();$("game-asset-profile").hidden=false;});
   el.addEventListener("pointerleave",()=>{$("game-asset-profile").hidden=true;});
   el.addEventListener("focus",()=>{renderGameAssetProfile();$("game-asset-profile").hidden=false;});
