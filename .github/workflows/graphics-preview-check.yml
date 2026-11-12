@@ -44,6 +44,8 @@ jobs:
         run: node --test tests/nu-raster-import.test.js
       - name: Test advanced Studio tools and layers
         run: node --test tests/nu-studio-advanced-tools.test.js
+      - name: Test compact Studio workspace UX
+        run: node --test tests/nu-studio-compact-ux.test.js
       - name: Validate manifest JSON
         run: python -m json.tool NU-GENERATION-1-MANIFEST.json >/dev/null
       - name: Check public runtime artwork copy
