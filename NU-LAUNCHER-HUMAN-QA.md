@@ -29,7 +29,7 @@
 - [ ] Check whether the loading wait feels calm and understandable.
 - [ ] Check contrast, font scaling, keyboard navigation, touch target sizes and mobile layout.
 - [ ] Check that no scary failure language appears for unavailable browser signals.
-- [ ] Export the JSON report and verify it contains no personal identifiers.
+- [ ] Export the JSON report and verify it contains no personal identifiers.\n- [ ] Submit a test through the GitHub human-test issue form; optionally attach/paste the reviewed JSON report.
 
 ## Known gaps to report, not silently pass
 - Per-game calibration preference is visible but not yet connected to the existing game entry points.
