@@ -8,7 +8,9 @@ let width=32,height=32,pixels=Array(width*height).fill(null),palette=defaults.sl
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function announce(msg){$("studio-status").textContent=msg;}
 function snapshot(){return {width,height,pixels:pixels.slice()};}
-function commitHistory(before){if(!before)return;undoStack.push(before);const historyLimit=Math.max(1,Math.min(60,Math.floor(2000000/Math.max(1,before.pixels.length))));while(undoStack.length>historyLimit)undoStack.shift();redoStack=[];historyButtons();}
+function historyLimitFor(state){return Math.max(1,Math.min(60,Math.floor(2000000/Math.max(1,state.pixels.length))));}
+function trimHistory(stack,state){const limit=historyLimitFor(state);while(stack.length>limit)stack.shift();}
+function commitHistory(before){if(!before)return;undoStack.push(before);trimHistory(undoStack,before);redoStack=[];historyButtons();}
 function restore(s){width=s.width;height=s.height;pixels=s.pixels.slice();$("image-width").value=width;$("image-height").value=height;updateCanvasDisplay();render();}
 function historyButtons(){$("undo").disabled=!undoStack.length;$("redo").disabled=!redoStack.length;}
 function cellLimit(){const b=qualityProfile&&qualityProfile.budget;return b?Math.min(3000000,Math.max(4096,Math.floor(b.maxCanvasPixels||520000))):520000;}
@@ -104,8 +106,8 @@ function resetGrid(next){width=next;height=next;pixels=Array(width*height).fill(
 $("grid-size").addEventListener("change",e=>resetGrid(Number(e.target.value)));
 $("new-canvas").addEventListener("click",()=>resetGrid(width));
 $("clear-canvas").addEventListener("click",()=>{const before=snapshot();pixels.fill(null);commitHistory(before);render();announce("Canvas cleared.");});
-$("undo").addEventListener("click",()=>{if(!undoStack.length)return;redoStack.push(snapshot());restore(undoStack.pop());historyButtons();});
-$("redo").addEventListener("click",()=>{if(!redoStack.length)return;undoStack.push(snapshot());restore(redoStack.pop());historyButtons();});
+$("undo").addEventListener("click",()=>{if(!undoStack.length)return;const current=snapshot();redoStack.push(current);trimHistory(redoStack,current);restore(undoStack.pop());historyButtons();});
+$("redo").addEventListener("click",()=>{if(!redoStack.length)return;const current=snapshot();undoStack.push(current);trimHistory(undoStack,current);restore(redoStack.pop());historyButtons();});
 function quantize(v){return Math.round(v/17)*17;}
 function hex(r,g,b){return "#"+[r,g,b].map(v=>v.toString(16).padStart(2,"0")).join("");}
 function nearest(rgb,colors){let best=colors[0],dist=Infinity;for(const c of colors){const n=[parseInt(c.slice(1,3),16),parseInt(c.slice(3,5),16),parseInt(c.slice(5,7),16)],d=(rgb[0]-n[0])**2+(rgb[1]-n[1])**2+(rgb[2]-n[2])**2;if(d<dist){dist=d;best=c;}}return best;}
