@@ -49,8 +49,8 @@ $("workspace-zoom").addEventListener("input",applyZoom);
 $("fit-canvas").addEventListener("click",()=>{workspace.zoom=100;applyZoom();$("workspace-frame").scrollTo(0,0);});
 let workspaceObserver=null;
 function observeWorkspace(){
- const stage=$(".stage"),frame=$("workspace-frame");
- if(typeof ResizeObserver!=="undefined"){
+ const stage=document.querySelector(".stage"),frame=$("workspace-frame");
+ if(typeof ResizeObserver!=="undefined"&&stage&&frame){
   workspaceObserver=new ResizeObserver(()=>{updateCanvasDisplay();});
   workspaceObserver.observe(stage);workspaceObserver.observe(frame);
  }
