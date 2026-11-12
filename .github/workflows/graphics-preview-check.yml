@@ -37,6 +37,8 @@ jobs:
         run: node --test tests/nu-graphics-analysis.test.js
       - name: Test Studio viewport and pixel mapping
         run: node --test tests/nu-studio-layout.test.js
+      - name: Test Studio bootstrap regression
+        run: node --test tests/nu-studio-bootstrap.test.js
       - name: Test raster image palette matching
         run: node --test tests/nu-raster-import.test.js
       - name: Validate manifest JSON
