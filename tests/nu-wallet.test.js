@@ -61,14 +61,14 @@ test("transaction history remains bounded",()=>{
   assert.equal(s.transactions[0].id,"10");
 });
 test("studio XP reward increments shared XP and level with an auditable transaction",()=>{
-  const result=wallet.grantXP({xp:98,level:1},{id:"studio-art-1",title:"Studio export"},5);
+  const result=wallet.grantXP({xp:98,level:1},5,{id:"studio-art-1",title:"Studio export"});
   assert.equal(result.ok,true);
   assert.equal(result.state.xp,103);
   assert.equal(result.state.level,2);
   assert.deepEqual(result.transaction.deltas,{xp:5});
 });
 test("the same studio export reward cannot be claimed twice",()=>{
-  const first=wallet.grantXP({xp:10},{id:"studio-fingerprint"});
+  const first=wallet.grantXP({xp:10},7,{id:"studio-fingerprint"});
   const second=wallet.grantXP(first.state,7,{id:"studio-fingerprint"});
   assert.equal(first.ok,true);
   assert.equal(second.ok,false);
