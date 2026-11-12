@@ -214,8 +214,8 @@ This section supersedes the earlier Pixel Art Studio descriptions above where th
 
 ### Studio XP and Generation 1 games
 - A successful PNG, SVG or Graphic IR download can grant a local XP reward based on painted pixels, connected regions, vector complexity and palette size.
-- Current provisional reward formula: clamp(1, 25, floor(paintedPixels/256) + floor(regions/8) + floor(paths/24) + floor(colors/8)); artwork below 16 painted pixels earns no XP.
-- The same artwork fingerprint can claim the Studio reward only once in the local save. The reward is written to the existing shared Generation 1 XP balance, so it is available in Bubble Hunt, Mana Collector and Chaos Attack without a separate currency exchange.
+- Current provisional reward formula: clamp(1, 25, floor(paintedPixels/256) + floor(regions/8) + floor(complexityUnits/24) + floor(colors/8)); artwork below 16 painted pixels earns no XP. complexityUnits uses traced SVG path count for SVG export and connected-region count for PNG/Graphic IR export.
+- The same artwork fingerprint can claim the Studio reward only once in the local save, across formats. The reward is triggered when the browser download is initiated; the browser does not expose a reliable signal that the file was ultimately saved to disk. The reward is written to the existing shared Generation 1 XP balance, so it is available in Bubble Hunt, Mana Collector and Chaos Attack without a separate currency exchange.
 - This is local browser progression, not server-authoritative or cheat-resistant economy. The reward formula is provisional and should be tuned from human test feedback.
 
 ### Game-specific asset profiles and HP capsule use
