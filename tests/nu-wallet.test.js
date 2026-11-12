@@ -12,3 +12,6 @@ test("Mana collection and spending respect capacity and balance",()=>{assert.equ
 test("HP changes clamp to 0..10",()=>{assert.equal(Wallet.changeHP(base({hp:9}),10).save.hp,10);assert.equal(Wallet.changeHP(base({hp:1}),-5).save.hp,0);});
 test("transaction history is bounded and player ID is local Gen1 format",()=>{let s=base();for(let i=0;i<35;i++)s=Wallet.recordTransaction(s,"test",[{asset:"XP",delta:1}]);assert.equal(s.transactions.length,30);assert.match(Wallet.createPlayerId(),/^NU-G1-[A-Z0-9]{7}$/);});
 test("wallet lists only implemented Gen1 balances",()=>{assert.deepEqual(Wallet.getAssets(base()).map(x=>x.key),["xp","mana","manaCapsules","hp","hpPills","level"]);});
+
+test("N-BI shot settles Mana cost and XP reward atomically",()=>{const r=Wallet.fireNBI(base({mana:10,xp:99,level:1}),10,3);assert.equal(r.ok,true);assert.equal(r.save.mana,0);assert.equal(r.save.xp,102);assert.equal(r.save.level,2);assert.deepEqual(r.save.transactions[0].changes,[{asset:"Mana",delta:-10},{asset:"XP",delta:3}]);});
+test("N-BI shot with insufficient Mana does not mutate save",()=>{const b=base({mana:9,xp:20}),r=Wallet.fireNBI(b,10,3);assert.equal(r.ok,false);assert.equal(r.reason,"INSUFFICIENT_MANA");assert.equal(b.mana,9);assert.equal(b.xp,20);});
