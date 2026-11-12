@@ -57,9 +57,6 @@
       {key:"hp",label:"HP",value:s.hp,unit:"/ 10"},
       {key:"hpPills",label:"HP Capsules",value:s.hpPills,unit:""},
       {key:"manaCapsules",label:"Mana Capsules",value:s.manaCapsules,unit:""},
-      {key:"xCredits",label:"X Credits",value:s.xCredits,unit:""},
-      {key:"nCredits",label:"N Credits",value:s.nCredits,unit:""},
-      {key:"upgrade",label:"N-BI Upgrade",value:s.upgrade,unit:"/ 9"}
     ];
   }
   return {MAX_HP,HP_PILL_COST,MAX_TRANSACTIONS,normalizeSave,buyHpPill,useHpPill,assetRows};
