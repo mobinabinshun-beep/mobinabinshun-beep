@@ -15,7 +15,7 @@
   }
   function ensureIdentity(){
     const s=load();
-    if(!s.playerId){s.playerId=makePlayerId();s.displayName="";s.callsign="";persist(s);}
+    if(!s.playerId){s.playerId=makePlayerId();s.displayName="";s.callsign="";if(persist(s))window.dispatchEvent(new CustomEvent("nu:identity-updated",{detail:{playerId:s.playerId,displayName:s.displayName,callsign:s.callsign}}));}
     return s;
   }
   function renderWallet(){
@@ -45,7 +45,6 @@
     $("player-xp-progress").style.width=(s.xp%100)+"%";
     $("player-hp").textContent=s.hp+"/10";
     $("player-mana").textContent=s.mana+"";
-    $("player-upgrade").textContent=s.upgrade+"/9";
     $("player-name-input").value=s.displayName||"";
     $("player-callsign-input").value=s.callsign||"";
   }
@@ -69,6 +68,7 @@
     s.displayName=safeText($("player-name-input").value,"");
     s.callsign=safeText($("player-callsign-input").value,"");
     if(!persist(s)){ $("player-save-status").textContent="Could not save this profile in local browser storage.";return; }
+    window.dispatchEvent(new CustomEvent("nu:identity-updated",{detail:{playerId:s.playerId,displayName:s.displayName,callsign:s.callsign}}));
     $("player-save-status").textContent="Player identity saved on this device.";
     window.dispatchEvent(new CustomEvent("nu:save-updated"));
     renderProfile();
@@ -76,6 +76,7 @@
   $("player-identity-reset").addEventListener("click",()=>{
     const s=ensureIdentity();s.displayName="";s.callsign="";
     if(!persist(s)){$("player-save-status").textContent="Could not save this change.";return;}
+    window.dispatchEvent(new CustomEvent("nu:identity-updated",{detail:{playerId:s.playerId,displayName:s.displayName,callsign:s.callsign}}));
     $("player-save-status").textContent="Display name and callsign reset.";
     window.dispatchEvent(new CustomEvent("nu:save-updated"));
     renderProfile();
