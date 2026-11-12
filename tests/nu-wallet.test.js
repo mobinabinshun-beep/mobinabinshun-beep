@@ -53,8 +53,7 @@ test("normalization clamps HP, Mana and upgrade to their supported ranges",()=>{
 test("wallet lists only implemented assets and excludes undefined Lore",()=>{
   const rows=wallet.assetRows({xp:14,level:2,mana:3,hp:6,hpPills:1,manaCapsules:2,xCredits:0,nCredits:0,upgrade:0});
   assert.ok(rows.some(row=>row.key==="hpPills"&&row.value===1));
-  assert.ok(rows.some(row=>row.key==="xCredits"&&row.value===0));
-  assert.ok(!rows.some(row=>row.key==="lore"));
+  assert.ok(!rows.some(row=>["xCredits","nCredits","upgrade","lore"].includes(row.key)));
 });
 test("transaction history remains bounded",()=>{
   const s=wallet.normalizeSave({transactions:Array.from({length:50},(_,i)=>({id:String(i)}))});
