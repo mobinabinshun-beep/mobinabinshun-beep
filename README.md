@@ -229,6 +229,11 @@ This section supersedes the earlier Pixel Art Studio descriptions above where th
 - Browser/device, download, persistence, visual-fidelity and touch acceptance remain human-test tasks. This branch is a public-demo test candidate, not a final product release.
 
 
+## N.U Launcher — calibration preview
+
+A separate browser-only launcher preview is available at [launcher.html](./launcher.html). It performs bounded browser capability checks before the player enters the demo, offers ten performance levels, saves a local profile, and provides refresh/reset settings plus local JSON export for human-test notes.
+
+This is not yet a native multi-platform installer. Browser CPU/GPU/RAM signals are approximate; the network check measures same-origin reachability/round-trip only. The selected budget is currently stored as a local profile but is not yet consumed by the Generation 1 render/game loops; per-game calibration hooks, native installers, signed extension packages, sandboxing, dependency resolution and rollback remain future work. Human-test reports can be exported locally or submitted through the GitHub issue form. See the `NU-LAUNCHER-*` documents for architecture and acceptance boundaries.
 
 ## Generation 1.14 — Studio viewport and import repair candidate (2026-11-12)
 
