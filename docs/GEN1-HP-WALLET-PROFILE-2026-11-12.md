@@ -9,7 +9,7 @@ Network diagnostics remain inside the same frozen file. Generation 2 remains qua
 ## Implemented
 - Added `nu-wallet.js`, a Generation 1-only local wallet adapter with explicit HP capsule purchase/use, Mana collection/spend, HP changes, XP progression and bounded transaction history.
 - HP HUD action remains visible at all times. When unavailable, a tap explains either no capsule inventory or full HP.
-- HP capsule purchase costs 10 XP and adds exactly one HP capsule. Use consumes one capsule and restores actual HP up to the 10 HP cap.
+- HP capsule purchase costs 10 XP and adds exactly one HP capsule. Use consumes one capsule and restores actual HP up to the 10 HP cap.\n- Bubble rewards, Mana collection and N-BI Mana/XP settlement commit before the target is consumed; an unsuccessful local save does not consume the interaction. N-BI cost and reward are one atomic wallet transaction.
 - Added floating gain/spend/warning notices.
 - Added Wallet view with real Gen1 balances and recent local transactions. X/N Credits are marked inactive, not presented as balances.
 - Replaced the temporary personal-data profile form with a local Player ID Card and optional fictional alias.
