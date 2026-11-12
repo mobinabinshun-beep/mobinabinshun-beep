@@ -42,7 +42,7 @@
 <label class="choice"><input type="radio" name="mode" value="reuse" checked><span><b>Use my saved profile</b><small>Fastest start. No new calibration unless I refresh it in Settings.</small></span></label>
 <label class="choice"><input type="radio" name="mode" value="silent"><span><b>Calibrate quietly on launcher start</b><small>Refresh the stable limit in the background without showing level choices.</small></span></label>
 <label class="choice"><input type="radio" name="mode" value="automatic"><span><b>Automatic adaptive mode</b><small>Calibrate at launcher start and apply the stable limit automatically; optionally repeat per game.</small></span></label>
-<div class="settings-path" id="settings-path">You can change this later in <b>Launcher → Settings → Calibration</b>. Choose <b>Refresh calibration</b> to repeat the check, or <b>Reset calibration</b> to clear the saved profile.</div>
+<div class="setting-actions"><button id="refresh-calibration">Refresh &amp; optimize</button><button id="reset-calibration">Reset calibration</button><button id="close-settings">× Close settings</button></div><div class="settings-path" id="settings-path">You can change this later in <b>Launcher → Settings → Calibration</b>. Choose <b>Refresh calibration</b> to repeat the check, or <b>Reset calibration</b> to clear the saved profile.</div>
 </section>
 <section class="panel demo" id="demo-panel" hidden>
 <div class="panel-head"><div><span class="eyebrow">PUBLIC DEMO</span><h2>Ready for the N.U world</h2></div><span class="state stable">SETUP COMPLETE</span></div>
@@ -56,7 +56,7 @@
 <label class="field">What did you notice?<textarea id="feedback-note" maxlength="1200" rows="4" placeholder="Startup smoothness, loading wait, visual comfort, lag, touch or layout issues…"></textarea></label>
 <div class="demo-actions"><button id="export-report" class="primary">Export test report</button><span id="report-status" class="muted" role="status"></span></div>
 </section>
-<footer> N.U — NIROO UNIVERSE · LAUNCHER CALIBRATION PREVIEW · NOT A NATIVE INSTALLER </footer>
+<div class="confirm-backdrop" id="confirm-backdrop" hidden><section class="confirm-box" role="dialog" aria-modal="true" aria-labelledby="confirm-title"><p class="eyebrow">LEAVE SETTINGS</p><h2 id="confirm-title">Apply these settings and return to the demo?</h2><p class="muted">Your choices are saved automatically. You can reopen Launcher → Settings → Calibration at any time.</p><div class="demo-actions"><button class="primary" id="confirm-yes">Yes, apply and return</button><button id="confirm-no">No, stay in settings</button></div></section></div><footer> N.U — NIROO UNIVERSE · LAUNCHER CALIBRATION PREVIEW · NOT A NATIVE INSTALLER </footer>
 </main>
 <script src="./nu-launcher.js"></script>
 </body></html>
