@@ -15,6 +15,7 @@ on:
       - feat/studio-compact-workspace-ux-2026-11-12
       - fix/studio-compact-dock-cache-version-2026-11-12
       - feat/studio-persian-plain-labels-2026-11-12
+      - feat/studio-native-dimension-import-2026-11-12
       - Official-public-information-and-discovery-hub-for-N.U-(Niroo-Universe),-its-publishing-network,-projects,-publications-and-related-creative-works
   pull_request:
     branches:
@@ -49,6 +50,8 @@ jobs:
         run: node --test tests/nu-studio-advanced-tools.test.js
       - name: Test compact Studio workspace UX
         run: node --test tests/nu-studio-compact-ux.test.js
+      - name: Test original-dimension Studio image import
+        run: node --test tests/nu-studio-native-dimension-import.test.js
       - name: Validate manifest JSON
         run: python -m json.tool NU-GENERATION-1-MANIFEST.json >/dev/null
       - name: Check public runtime artwork copy

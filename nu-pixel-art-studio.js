@@ -8,10 +8,12 @@ let width=32,height=32,pixels=Array(width*height).fill(null),palette=defaults.sl
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function announce(msg){$("studio-status").textContent=msg;}
 function snapshot(){return {width,height,pixels:pixels.slice()};}
-function commitHistory(before){if(!before)return;undoStack.push(before);if(undoStack.length>60)undoStack.shift();redoStack=[];historyButtons();}
+function historyLimitFor(state){return Math.max(1,Math.min(60,Math.floor(2000000/Math.max(1,state.pixels.length))));}
+function trimHistory(stack,state){const limit=historyLimitFor(state);while(stack.length>limit)stack.shift();}
+function commitHistory(before){if(!before)return;undoStack.push(before);trimHistory(undoStack,before);redoStack=[];historyButtons();}
 function restore(s){width=s.width;height=s.height;pixels=s.pixels.slice();$("image-width").value=width;$("image-height").value=height;updateCanvasDisplay();render();}
 function historyButtons(){$("undo").disabled=!undoStack.length;$("redo").disabled=!redoStack.length;}
-function cellLimit(){const b=qualityProfile&&qualityProfile.budget;return b?Math.min(262144,Math.max(4096,Math.floor(b.maxCanvasPixels||65536))):262144;}
+function cellLimit(){const b=qualityProfile&&qualityProfile.budget;return b?Math.min(3000000,Math.max(4096,Math.floor(b.maxCanvasPixels||520000))):520000;}
 function updateCounters(){const count=pixels.reduce((n,p)=>n+(p?1:0),0);$("canvas-size").textContent=width+" × "+height+" px";$("pixel-count").textContent=count+" painted pixels";$("zoom-note").textContent=workspace.zoom+"% view · "+(qualityProfile?qualityProfile.tier:"balanced");}
 function updateCanvasDisplay(){
  if(canvas.width!==width)canvas.width=width;if(canvas.height!==height)canvas.height=height;
@@ -23,15 +25,13 @@ function updateCanvasDisplay(){
  frame.style.justifyContent=workspace.zoom>100?"flex-start":"center";
  $("workspace-zoom").value=workspace.zoom;$("workspace-zoom-value").textContent=workspace.zoom+"%";
 }
+const renderColorCache=new Map();
+function rgbaFor(hexColor){let value=renderColorCache.get(hexColor);if(!value){value=[parseInt(hexColor.slice(1,3),16),parseInt(hexColor.slice(3,5),16),parseInt(hexColor.slice(5,7),16),255];renderColorCache.set(hexColor,value);}return value;}
 function render(){
  if(canvas.width!==width||canvas.height!==height){canvas.width=width;canvas.height=height;}
- ctx.clearRect(0,0,width,height);
- for(let y=0;y<height;y++)for(let x=0;x<width;x++){
-  const i=y*width+x;
-  if(pixels[i])ctx.fillStyle=pixels[i];
-  else ctx.fillStyle=((x+y)&1)?"#142538":"#0b1724";
-  ctx.fillRect(x,y,1,1);
- }
+ const frame=ctx.createImageData(width,height),data=frame.data,clearA=rgbaFor("#142538"),clearB=rgbaFor("#0b1724");
+ for(let y=0;y<height;y++)for(let x=0;x<width;x++){const i=y*width+x,rgba=pixels[i]?rgbaFor(pixels[i]):(((x+y)&1)?clearA:clearB),o=i*4;data[o]=rgba[0];data[o+1]=rgba[1];data[o+2]=rgba[2];data[o+3]=rgba[3];}
+ ctx.putImageData(frame,0,0);
  if($("show-grid")?.checked!==false&&Math.max(width,height)<=512){
   ctx.strokeStyle="rgba(150,180,205,.48)";
   ctx.lineWidth=Math.min(.24,Math.max(.06,Math.min(width,height)*.001));
@@ -42,8 +42,8 @@ function render(){
  }
  updateCounters();
 }
-function resizeArtwork(nextW,nextH,method="nearest"){nextW=clamp(Math.round(nextW),1,2048);nextH=clamp(Math.round(nextH),1,2048);if(nextW*nextH>cellLimit()){announce("This device profile allows up to "+cellLimit().toLocaleString()+" editable pixels. Reduce the dimensions or choose a lighter workspace.");return false;}const before=snapshot(),next=Array(nextW*nextH).fill(null);for(let y=0;y<nextH;y++)for(let x=0;x<nextW;x++){const sx=Math.min(width-1,Math.floor((x+.5)*width/nextW)),sy=Math.min(height-1,Math.floor((y+.5)*height/nextH));next[y*nextW+x]=pixels[sy*width+sx];}width=nextW;height=nextH;pixels=next;commitHistory(before);$("image-width").value=width;$("image-height").value=height;updateCanvasDisplay();render();announce("Artwork resized to "+width+" × "+height+" px using "+method+" sampling. Original import remains unchanged outside the working copy.");return true;}
-function initAdaptive(){const fallback=()=>{qualityProfile={tier:"balanced",level:3,budget:{maxCanvasPixels:262144,dpr:1},reducedMotion:false};$("quality-profile").textContent="Balanced · fallback";};if(!window.NUGraphicsCore){fallback();return;}window.NUGraphicsCore.start().then(p=>{qualityProfile=p;$("quality-profile").textContent=p.tier+" · level "+p.level;$("quality-detail").textContent="Editable pixel budget: "+cellLimit().toLocaleString()+" cells";updateCounters();}).catch(fallback);}
+function resizeArtwork(nextW,nextH,method="nearest"){nextW=clamp(Math.round(nextW),1,16384);nextH=clamp(Math.round(nextH),1,16384);if(nextW*nextH>cellLimit()){announce("This device profile allows up to "+cellLimit().toLocaleString()+" editable pixels. Reduce the dimensions or choose a lighter workspace.");return false;}const before=snapshot(),next=Array(nextW*nextH).fill(null);for(let y=0;y<nextH;y++)for(let x=0;x<nextW;x++){const sx=Math.min(width-1,Math.floor((x+.5)*width/nextW)),sy=Math.min(height-1,Math.floor((y+.5)*height/nextH));next[y*nextW+x]=pixels[sy*width+sx];}width=nextW;height=nextH;pixels=next;commitHistory(before);$("image-width").value=width;$("image-height").value=height;updateCanvasDisplay();render();announce("Artwork resized to "+width+" × "+height+" px using "+method+" sampling. Original import remains unchanged outside the working copy.");return true;}
+function initAdaptive(){const fallback=()=>{qualityProfile={tier:"balanced",level:3,budget:{maxCanvasPixels:520000,dpr:1},reducedMotion:false};$("quality-profile").textContent="Balanced · fallback";};if(!window.NUGraphicsCore){fallback();return;}window.NUGraphicsCore.start().then(p=>{qualityProfile=p;$("quality-profile").textContent=p.tier+" · level "+p.level;$("quality-detail").textContent="Editable pixel budget: "+cellLimit().toLocaleString()+" cells";updateCounters();}).catch(fallback);}
 function applyZoom(){workspace.zoom=clamp(Number($("workspace-zoom").value)||100,25,800);updateCanvasDisplay();updateCounters();}
 $("workspace-zoom").addEventListener("input",applyZoom);
 $("fit-canvas").addEventListener("click",()=>{workspace.zoom=100;applyZoom();$("workspace-frame").scrollTo(0,0);});
@@ -106,8 +106,8 @@ function resetGrid(next){width=next;height=next;pixels=Array(width*height).fill(
 $("grid-size").addEventListener("change",e=>resetGrid(Number(e.target.value)));
 $("new-canvas").addEventListener("click",()=>resetGrid(width));
 $("clear-canvas").addEventListener("click",()=>{const before=snapshot();pixels.fill(null);commitHistory(before);render();announce("Canvas cleared.");});
-$("undo").addEventListener("click",()=>{if(!undoStack.length)return;redoStack.push(snapshot());restore(undoStack.pop());historyButtons();});
-$("redo").addEventListener("click",()=>{if(!redoStack.length)return;undoStack.push(snapshot());restore(redoStack.pop());historyButtons();});
+$("undo").addEventListener("click",()=>{if(!undoStack.length)return;const current=snapshot();redoStack.push(current);trimHistory(redoStack,current);restore(undoStack.pop());historyButtons();});
+$("redo").addEventListener("click",()=>{if(!redoStack.length)return;const current=snapshot();undoStack.push(current);trimHistory(undoStack,current);restore(redoStack.pop());historyButtons();});
 function quantize(v){return Math.round(v/17)*17;}
 function hex(r,g,b){return "#"+[r,g,b].map(v=>v.toString(16).padStart(2,"0")).join("");}
 function nearest(rgb,colors){let best=colors[0],dist=Infinity;for(const c of colors){const n=[parseInt(c.slice(1,3),16),parseInt(c.slice(3,5),16),parseInt(c.slice(5,7),16)],d=(rgb[0]-n[0])**2+(rgb[1]-n[1])**2+(rgb[2]-n[2])**2;if(d<dist){dist=d;best=c;}}return best;}
@@ -126,39 +126,39 @@ $("palette-limit").addEventListener("input",e=>$("palette-limit-value").textCont
 $("alpha-cutoff").addEventListener("input",e=>$("alpha-cutoff-value").textContent=e.target.value);
 $("image-file").addEventListener("change",async e=>{
  const file=e.target.files&&e.target.files[0];if(!file)return;
- if(!file.type.startsWith("image/")){announce("Choose a PNG, JPEG, WebP or GIF image.");e.target.value="";return;}
- if(file.size>25*1024*1024){announce("Image is larger than the 25 MB browser import limit.");e.target.value="";return;}
+ if(!file.type.startsWith("image/")){announce("Choose a supported image file (PNG, JPEG, WebP, GIF or SVG).");e.target.value="";return;}
+ if(file.size>25*1024*1024){announce("Image is larger than the 25 MB browser import limit. The original file was not changed.");e.target.value="";return;}
  let bitmap=null;
  try{
-  originalImportFile=file;
-  announce("Reading source image and preparing the working copy…");
+  announce("Reading image dimensions and preparing an editable working copy…");
   bitmap=await decodeImage(file);
-  const sourceWidth=bitmap.width,sourceHeight=bitmap.height,maxSide=Number($("import-resolution").value)||256;
+  const sourceWidth=bitmap.width,sourceHeight=bitmap.height;
+  if(!sourceWidth||!sourceHeight||Math.max(sourceWidth,sourceHeight)>16384)throw new Error("This image exceeds the safe browser canvas dimension (16,384 px per edge). The source file is unchanged.");
+  const requested=String($("import-resolution").value||"original");
+  const maxSide=requested==="original"?Math.max(sourceWidth,sourceHeight):Math.max(1,Number(requested)||256);
   const scale=Math.min(1,maxSide/Math.max(sourceWidth,sourceHeight));
-  let nextW=Math.max(1,Math.round(sourceWidth*scale)),nextH=Math.max(1,Math.round(sourceHeight*scale));
-  const budgetScale=Math.min(1,Math.sqrt(cellLimit()/(nextW*nextH)));
-  nextW=Math.max(1,Math.floor(nextW*budgetScale));nextH=Math.max(1,Math.floor(nextH*budgetScale));
+  const nextW=Math.max(1,Math.round(sourceWidth*scale)),nextH=Math.max(1,Math.round(sourceHeight*scale));
+  const safeCells=cellLimit(),requestedCells=nextW*nextH;
+  if(requestedCells>safeCells)throw new Error("Original working size is "+sourceWidth+" × "+sourceHeight+" ("+requestedCells.toLocaleString()+" pixels), above this device's safe editing budget of "+safeCells.toLocaleString()+" pixels. Choose a smaller import detail explicitly, or use a device with a higher graphics profile. The source file remains unchanged.");
   const temp=document.createElement("canvas");temp.width=nextW;temp.height=nextH;
   const t=temp.getContext("2d",{willReadFrequently:true});if(!t)throw new Error("This browser could not create an image processing canvas.");
-  t.imageSmoothingEnabled=$("import-resampling").value!=="nearest";
-  if(t.imageSmoothingEnabled)t.imageSmoothingQuality="high";
+  t.imageSmoothingEnabled=$("import-resampling").value!=="nearest";if(t.imageSmoothingEnabled)t.imageSmoothingQuality="high";
   t.drawImage(bitmap,0,0,nextW,nextH);
-  const data=t.getImageData(0,0,nextW,nextH).data;
-  const alphaCutoff=Number($("alpha-cutoff").value)||0;
+  const data=t.getImageData(0,0,nextW,nextH).data,alphaCutoff=Number($("alpha-cutoff").value)||0;
   const extracted=imagePalette(data,Number($("palette-limit").value)||32,alphaCutoff);
   if(!extracted.length)throw new Error("No visible pixels remain above the transparency cutoff.");
   if(!window.NURasterImport)throw new Error("Raster import module did not load.");
   const mapped=window.NURasterImport.mapPixels(data,nextW,nextH,extracted,alphaCutoff,$("dither-image").checked);
   const before=snapshot();width=nextW;height=nextH;pixels=mapped;palette=extracted;
-  commitHistory(before);imageImported=true;workspace.zoom=100;
+  commitHistory(before);imageImported=true;workspace.zoom=100;originalImportFile=file;
   $("image-width").value=width;$("image-height").value=height;
   if(sourcePreviewUrl)URL.revokeObjectURL(sourcePreviewUrl);
-  sourcePreviewUrl=URL.createObjectURL(file);$("source-preview").src=sourcePreviewUrl;
-  $("source-preview-panel").hidden=false;
-  $("source-info").textContent=sourceWidth+" × "+sourceHeight+" source → "+width+" × "+height+" working pixels · "+palette.length+" colors · "+( $("dither-image").checked?"dithered":"direct palette match");
+  sourcePreviewUrl=URL.createObjectURL(file);$("source-preview").src=sourcePreviewUrl;$("source-preview-panel").hidden=false;
+  const sizing=requested==="original"?"original dimensions preserved":"working copy resized by your selected detail";
+  $("source-info").textContent=sourceWidth+" × "+sourceHeight+" source → "+width+" × "+height+" editable pixels · "+palette.length+" colors · "+sizing;
   updateCanvasDisplay();requestAnimationFrame(()=>{updateCanvasDisplay();$("workspace-frame").scrollTo(0,0);});
   renderPalette();render();
-  announce("Imported · "+file.name+" · "+sourceWidth+" × "+sourceHeight+" → "+width+" × "+height+" px · "+palette.length+" colors. Original source preserved.");
+  announce("Imported · "+file.name+" · "+sourceWidth+" × "+sourceHeight+" source → "+width+" × "+height+" editable pixels. "+(requested==="original"?"Original dimensions preserved.":"Explicit reduced-detail working copy created.")+" Source file preserved.");
  }catch(err){announce("Image import failed: "+(err&&err.message?err.message:"unsupported image"));}
  finally{if(bitmap&&typeof bitmap.close==="function")bitmap.close();e.target.value="";}
 });
