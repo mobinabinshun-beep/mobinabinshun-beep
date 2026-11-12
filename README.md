@@ -263,4 +263,13 @@ The checkerboard remains a per-logical-pixel transparency visualization, while o
 - True vector tracing infers paths from visible raster boundaries. It cannot recover original hidden layers, source Bézier curves or detail absent from the source image. Bézier fitting, segmentation confidence, layer inference and photo-specific reconstruction remain future stages.
 - Studio XP is local-browser prototype progression. A download initiation can award once per local fingerprint; it is not proof that a file was saved, and localStorage reward controls are not server-authoritative anti-cheat.
 
-The candidate is developed on feature/gen1-studio-viewport-input-repair-2026-11-12, based on the current public human-test head. No merge or new deployment is claimed by this documentation entry.
+The repair was developed on feature/gen1-studio-viewport-input-repair-v2-2026-11-12 and merged to the public default through PR #18 (squash commit 9f64a0138e79fc77636f5305eb2fce26c02c965d). Exact-head CI run #134 passed all validation steps. The source merge is confirmed; Pages deployment/live URL verification and owner browser/device acceptance remain pending.
+
+
+### Generation 1.14 status — public human-test handoff
+
+- Public Studio URL: https://mobinabinshun-beep.github.io/mobinabinshun-beep/pixel-art-studio.html
+- The Studio report form is available through the REPORT STUDIO TEST link or .github/ISSUE_TEMPLATE/studio-human-test.yml.
+- The merged repair uses versioned local script/style URLs to avoid stale static assets on subsequent loads. It does not clear browser caches or local player saves.
+- Owner browser/device acceptance is the next gate. Report the image class/dimensions, browser and general device class, selected import detail, palette, resampling and dithering settings, and steps to reproduce. Do not upload private or copyrighted source artwork.
+- The public runtime still has no server-side report collector; the GitHub issue form is the explicit feedback intake path.
