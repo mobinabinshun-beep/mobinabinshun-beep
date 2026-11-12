@@ -20,7 +20,9 @@ test("reduced import detail is an explicit user choice and source preview remain
 });
 test("high-resolution rendering uses ImageData and history is bounded by image size",()=>{
  assert.match(js,/ctx\.createImageData\(width,height\)/);
- assert.match(js,/function historyLimitFor\(state\)/);\n assert.match(js,/trimHistory\(redoStack,current\)/);\n assert.match(js,/trimHistory\(undoStack,current\)/);
+ assert.match(js,/function historyLimitFor\(state\)/);
+ assert.match(js,/trimHistory\(redoStack,current\)/);
+ assert.match(js,/trimHistory\(undoStack,current\)/);
  assert.match(js,/maxCanvasPixels\|\|520000/);
 });
 test("dimension inputs and image decoder guard share a clear browser canvas limit",()=>{
