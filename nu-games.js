@@ -15,7 +15,7 @@ function renderGameAssetProfile(){
  const root=$("game-asset-profile");if(!root||!state.game)return;
  const names={bubble:"BUBBLE HUNT · ASSET PROFILE",mana:"MANA COLLECTOR · ASSET PROFILE",chaos:"CHAOS ATTACK · ASSET PROFILE"};
  const rows=NUWallet.gameAssetRows(state.save,state.game);
- root.innerHTML='<strong>'+names[state.game]+'</strong><div class="game-asset-rows">'+rows.map(row=>'<span>'+row.label+'</span><b>'+row.value+row.unit+'</b>').join("")+'</div>';
+ root.innerHTML='<strong>'+names[state.game]+'</strong><small>SHARED WALLET · GAME-SCOPED VIEW</small><div class="game-asset-rows">'+rows.map(row=>'<span>'+row.label+'</span><b>'+row.value+row.unit+'</b>').join("")+'</div>';
 }
 function bindGameAssetProfiles(){
  const triggers=[...document.querySelectorAll(".bar-wrap"),$("hp-bar")].filter(Boolean);
@@ -81,6 +81,8 @@ function mouseCameraBootstrap(e){if(e.pointerType!=="mouse")return;mouseCameraRe
 window.addEventListener("pointermove",mouseCameraBootstrap,{passive:true});window.addEventListener("pointerdown",e=>{if(e.pointerType==="touch")touchDown(e);},{passive:true});
 document.addEventListener("visibilitychange",()=>{if(document.hidden){if(state.raf)cancelAnimationFrame(state.raf);if(state.engine)state.engine.pause();}else{if(state.engine)state.engine.resume();if(state.active&&!state.paused)state.raf=requestAnimationFrame(animateGame);}});
 window.addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse"||e.target.closest("button,a,input,textarea,select,[role=button]"))return;if(state.active&&!state.paused)interact(e);},{passive:true});window.addEventListener("pointerup",e=>{if(e.pointerType!=="touch"||touchMoved||(window.NUPixelWorld&&window.NUPixelWorld.lastTouchWasDrag)){if(window.NUPixelWorld)window.NUPixelWorld.lastTouchWasDrag=false;return;}if(e.target.closest("button,a,input,textarea,select,[role=button]"))return;if(state.active&&!state.paused)interact(e);},{passive:true});window.addEventListener("resize",()=>{if($("game-view").classList.contains("active")){resize();initTargets();drawGame();}});
+window.addEventListener("pageshow",()=>{state.save=NUWallet.normalizeSave(NU.load());renderWallet();});
+window.addEventListener("storage",e=>{if(e.key==="nu-world-save-v1"){state.save=NUWallet.normalizeSave(NU.load());renderWallet();}});
 window.addEventListener("nu:identity-updated",e=>{const detail=e.detail||{};state.save.playerId=detail.playerId||state.save.playerId;state.save.displayName=detail.displayName||"";state.save.callsign=detail.callsign||"";});
 let playerOverlayPaused=false;window.addEventListener("nu:player-overlay-open",()=>{if(state.active){state.active=false;state.paused=true;playerOverlayPaused=true;cancelAnimationFrame(state.raf);$("finish-round").textContent="RESUME ROUND";}});window.addEventListener("nu:player-overlay-close",()=>{if(playerOverlayPaused&&state.paused&&state.turn<10){playerOverlayPaused=false;state.active=true;state.paused=false;$("finish-round").textContent="PAUSE ROUND";state.raf=requestAnimationFrame(animateGame);}});
 function openArticle(title,url){$("article-title").textContent=title;$("article-frame-link").href=url;chooseGame();if(window.NUPixelWorld)window.NUPixelWorld.setWeatherMode("study");$("game-view").classList.add("active");$("article-view").classList.add("active");document.body.classList.add("article-mode");resize();initTargets();drawGame();$("game-info").textContent="Background encounter active outside the reading column."; }
