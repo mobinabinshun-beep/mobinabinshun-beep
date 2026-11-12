@@ -14,12 +14,12 @@ test("bucket exposes contiguous, similar RGB and global exact-match modes",()=>{
  assert.match(js,/value="contiguous"/);
  assert.match(js,/value="similar"/);
  assert.match(js,/value="global"/);
- assert.match(js,/distance\(pixels\[i\],start\)>adv\.tol/);
+ assert.match(js,/dist\\(pixels\\[i\\],start\\)>adv\\.tol/);
 });
 test("source original and generated edited SVG have separate export actions",()=>{
  assert.match(js,/originalImportFile=file/);
- assert.match(js,/id="a-original"/);
- assert.match(js,/id="a-svg"/);
+ assert.match(js,/id="adv-original"/);
+ assert.match(js,/id="adv-svg"/);
  assert.match(html,/image\/svg\+xml/);
 });
 test("advanced editing includes transforms, tone, RGB, overlay, chroma key and text",()=>{
