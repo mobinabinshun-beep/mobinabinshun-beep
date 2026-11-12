@@ -6,6 +6,9 @@ on:
       - feature/image-first-celestial-scene-2026-11-12
       - feature/gen1-pixel-art-studio-audit-2026-11-12
       - feature/gen1-adaptive-pixel-workspace-2026-11-12
+      - feature/gen1-hp-wallet-profile-2026-11-12
+      - feature/gen1-professional-svg-studio-2026-11-12
+      - feature/gen1-human-test-demo-2026-11-12
       - Official-public-information-and-discovery-hub-for-N.U-(Niroo-Universe),-its-publishing-network,-projects,-publications-and-related-creative-works
   pull_request:
     branches:
@@ -21,9 +24,15 @@ jobs:
           node-version: 20
       - name: Check JavaScript syntax
         run: |
-          for file in nu-engine.js nu-pixel-world.js nu-graphics-core.js nu-background-engine.js nu-dynamic-layers.js nu-game-render-adapter.js nu-graphics-runtime.js nu-games.js nu-pixel-art-studio.js; do
+          for file in nu-engine.js nu-pixel-world.js nu-graphics-core.js nu-background-engine.js nu-dynamic-layers.js nu-game-render-adapter.js nu-graphics-runtime.js nu-games.js nu-svg-vectorizer.js nu-graphics-analysis.js nu-pixel-art-studio.js nu-wallet.js nu-player-ui.js; do
             node --check "$file"
           done
+      - name: Test wallet and HP capsule rules
+        run: node --test tests/nu-wallet.test.js
+      - name: Test SVG contour vectorizer
+        run: node --test tests/nu-svg-vectorizer.test.js
+      - name: Test graphics analysis and machine-readable IR
+        run: node --test tests/nu-graphics-analysis.test.js
       - name: Validate manifest JSON
         run: python -m json.tool NU-GENERATION-1-MANIFEST.json >/dev/null
       - name: Check public runtime artwork copy

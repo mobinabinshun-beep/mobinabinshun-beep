@@ -3,7 +3,7 @@
   "generation": 1,
   "runtime": "N.U Adaptive Runtime",
   "runtimeVersion": "0.1-prototype",
-  "packageVersion": "0.3.2-adaptive-pixel-workspace",
+  "packageVersion": "0.5.0-gen1-human-test",
   "entry": "index.html",
   "modules": [
     "index.html",
@@ -17,8 +17,11 @@
     "nu-graphics-runtime.js",
     "nu-games.js",
     "pixel-art-studio.html",
+    "nu-svg-vectorizer.js",
+    "nu-graphics-analysis.js",
     "nu-pixel-art-studio.js",
-    "nu-graphics-core.js"
+    "nu-wallet.js",
+    "nu-player-ui.js"
   ],
   "randomPool": [
     "bubble",
@@ -36,6 +39,10 @@
     "native": "future adapter required"
   },
   "notes": [
+    "Game HUD now exposes per-game asset profiles on hover/focus; each profile is a filtered projection of the global wallet, not a separate balance store. HP capsule can be purchased or used from the Store and used from the in-game HP icon.",
+    "Generation 1.13 candidate: Studio fixes fit-to-view/zoom/scroll and per-pixel checkerboard; adds pencil, eraser, fill, eyedropper, line, rectangle, ellipse and brush sizing; imports up to 256px longest-edge with up to 32 colors; exports SVG, PNG and NU-GFX-IR/1; unique artwork downloads award a bounded 1–25 shared XP reward once per fingerprint to the same local Generation 1 wallet.",
+    "Generation 1.12 candidate: Pixel Art Studio adds local high-detail aspect-preserving image import, weighted median-cut palette reduction, alpha cutoff, contour-based closed SVG paths with transparent-hole preservation, and pixel-run export. Source images remain local; no upload or server processing.",
+    "Generation 1.11 candidate: adds a local, testable wallet transaction boundary, HP capsule purchase/consumption feedback, owned-asset wallet view and local player identity card; no server account or real-money economy.",
     "Generation 1.10: Pixel Art Studio now uses N.U graphics capability budgets, independent resizable workspace frame, zoom control, rectangular pixel-art dimensions, aspect-ratio lock, nearest-neighbor artwork resizing, and adaptive editable-pixel limits. Original source files remain untouched; only local working copies are resampled.",
     "Generation 1.9 candidate: added N.U Pixel Art Studio as a separate creative tool in the main library; it is deliberately excluded from the three-game random gameplay pool.",
     "Generation 1.8 development: repaired literal newline escaping in the store/game script so the JavaScript parses as source text.",
@@ -126,10 +133,10 @@
   "libraryTools": [
     {
       "id": "pixel-art-studio",
-      "name": "N.U Pixel Art Studio",
+      "name": "N.U Creative Studio — Pixel Art & Vector Lab",
       "generation": 1,
       "entry": "pixel-art-studio.html",
-      "purpose": "Local image import, pixel-grid editing, palette tools, SVG and PNG export",
+      "purpose": "Local raster analysis, non-destructive pixel editing, contour SVG, palette-indexed tiles, run-length spans, edge/region maps and machine-readable N.U graphics instructions",
       "inRandomPool": false
     }
   ]
