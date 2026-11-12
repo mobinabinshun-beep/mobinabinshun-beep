@@ -172,3 +172,14 @@ This is still a browser-rendered preview. Native Android/iOS engines, offline la
 - Provides pencil, eraser, flood fill, color picker, undo/redo and palette extraction.
 - Exports clean SVG vector rectangles with transparent background, plus a PNG preview.
 - It is a creative tool, not a fourth random gameplay prototype.
+
+
+## Generation 1.10 — adaptive Pixel Art workspace
+
+N.U Pixel Art Studio now uses the existing `nu-graphics-core.js` capability profile without changing the shared graphics engine:
+- The editing workspace frame can be resized independently from the artwork; width, height and zoom controls are provided.
+- Artwork dimensions can be rectangular and resized independently, with an optional aspect-ratio lock and nearest-neighbor sampling for crisp pixel edges.
+- The selected capability tier sets a conservative editable-pixel budget; oversized operations are refused with a clear explanation rather than risking a browser freeze.
+- The original imported file is never overwritten. Resizing affects only the in-memory working copy; SVG/PNG exports use the current working dimensions.
+- The existing core games, random game pool, adaptive/network runtime and shared graphics modules are not modified by this editor enhancement.
+- This remains a browser-only editor; device-specific interaction and large-image QA are still required.
