@@ -135,12 +135,50 @@ $("image-file").addEventListener("change",async e=>{
  finally{e.target.value="";}
 });
 $("extract-palette").addEventListener("click",()=>{if(!imageImported){announce("Import an image first to extract its palette.");return;}const counts=new Map();pixels.filter(Boolean).forEach(c=>counts.set(c,(counts.get(c)||0)+1));palette=[...counts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,16).map(x=>x[0]);if(!palette.length)palette=defaults.slice();renderPalette();announce("Palette extracted from current artwork.");});
+function analyzeArtwork(){
+ if(!window.NUGraphicsAnalysis)throw new Error("Graphics analysis engine did not load.");
+ return window.NUGraphicsAnalysis.analyze(pixels,width,height,{tileSize:8});
+}
+function artworkFingerprint(){
+ const source=width+"x"+height+"|"+pixels.map(p=>p||"_").join(",");
+ let a=2166136261,b=2246822519;
+ for(let i=0;i<source.length;i++){const c=source.charCodeAt(i);a=Math.imul(a^c,16777619);b=Math.imul(b^c,3266489917);}
+ return (a>>>0).toString(16).padStart(8,"0")+(b>>>0).toString(16).padStart(8,"0");
+}
+function calculateStudioXP(metrics,pathCount){
+ if(metrics.paintedPixels<16)return 0;
+ const score=Math.floor(metrics.paintedPixels/256)+Math.floor(metrics.regionCount/8)+Math.floor(pathCount/24)+Math.floor(metrics.colorCount/8);
+ return Math.max(1,Math.min(25,score));
+}
+function grantStudioXP(metrics,pathCount){
+ const amount=calculateStudioXP(metrics,pathCount);
+ if(!amount)return {ok:false,reason:"ARTWORK_TOO_SMALL",amount:0};
+ if(!window.NU||!window.NUWallet)return {ok:false,reason:"SHARED_WALLET_UNAVAILABLE",amount};
+ const save=NUWallet.normalizeSave(NU.load()),result=NUWallet.grantXP(save,amount,{id:"studio-export-"+artworkFingerprint(),title:"Creative Studio export"});
+ if(!result.ok)return {ok:false,reason:result.reason,amount};
+ if(!NU.save(result.state))return {ok:false,reason:"SAVE_FAILED",amount};
+ window.dispatchEvent(new CustomEvent("nu:save-updated"));
+ return {ok:true,amount};
+}
+function showAnalysisSummary(analysis,pathCount){
+ const m=analysis.metrics;
+ $("analysis-summary").textContent="ANALYSIS · "+m.paintedPixels.toLocaleString()+" pixels · "+m.colorCount+" colors · "+m.regionCount+" regions · "+m.edgePixels.toLocaleString()+" edge pixels · "+m.tileCount+" tiles · "+m.runCount+" runs · "+pathCount+" SVG paths";
+}
+function reportDownloadedOutput(analysis,pathCount){
+ showAnalysisSummary(analysis,pathCount);
+ const reward=grantStudioXP(analysis.metrics,pathCount);
+ if(reward.ok)announce("Download started · +"+reward.amount+" shared XP added to all three Generation 1 games. This artwork earns XP once.");
+ else if(reward.reason==="DUPLICATE_REWARD")announce("Download started · this artwork has already claimed its Studio XP reward.");
+ else if(reward.reason==="ARTWORK_TOO_SMALL")announce("Download started · artwork is too small for an XP reward (minimum 16 painted pixels).");
+ else announce("Download started · XP reward not saved: "+reward.reason+".");
+}
 function svgSource(){if(!window.NUSVGVectorizer)throw new Error("SVG vector engine did not load. Refresh the studio and try again.");return window.NUSVGVectorizer.vectorize(pixels,width,height,{mode:$("vector-mode").value});}
 function filename(ext){let n=$("export-name").value.trim().replace(/[^a-z0-9-_]+/gi,"-").replace(/^-+|-+$/g,"").slice(0,48)||"nu-pixel-art";return n+"."+ext;}
-function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
-$("export-svg").addEventListener("click",()=>{try{const result=svgSource();download(new Blob([result.source],{type:"image/svg+xml;charset=utf-8"}),filename("svg"));announce("SVG exported · "+result.pathCount+" vector paths · "+result.colorCount+" colors · transparent background.");}catch(err){announce("SVG export failed: "+err.message);}});
+function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);return true;}
+$("export-svg").addEventListener("click",()=>{try{const result=svgSource(),analysis=analyzeArtwork();if(download(new Blob([result.source],{type:"image/svg+xml;charset=utf-8"}),filename("svg")))reportDownloadedOutput(analysis,result.pathCount);}catch(err){announce("SVG export failed: "+err.message);}});
+$("export-ir").addEventListener("click",()=>{try{const analysis=analyzeArtwork(),vector=svgSource(),source=JSON.stringify(analysis,null,2);if(download(new Blob([source],{type:"application/vnd.nu-gfx+json;charset=utf-8"}),filename("nu-gfx.json")))reportDownloadedOutput(analysis,vector.pathCount);}catch(err){announce("Graphics IR export failed: "+err.message);}});
 $("export-svg-copy").addEventListener("click",async()=>{try{const result=svgSource();await navigator.clipboard.writeText(result.source);announce("SVG source copied · "+result.pathCount+" paths · "+result.colorCount+" colors.");}catch(err){announce("Clipboard unavailable: "+err.message+" · use Download SVG.");}});
-$("export-png").addEventListener("click",()=>{const out=document.createElement("canvas");out.width=width*16;out.height=height*16;const o=out.getContext("2d");o.imageSmoothingEnabled=false;pixels.forEach((c,i)=>{if(!c)return;o.fillStyle=c;o.fillRect((i%width)*16,Math.floor(i/width)*16,16,16);});out.toBlob(blob=>{if(blob)download(blob,filename("png"));},"image/png");});
+$("export-png").addEventListener("click",()=>{try{const out=document.createElement("canvas");out.width=width*16;out.height=height*16;const o=out.getContext("2d");o.imageSmoothingEnabled=false;pixels.forEach((c,i)=>{if(!c)return;o.fillStyle=c;o.fillRect((i%width)*16,Math.floor(i/width)*16,16,16);});const analysis=analyzeArtwork(),vector=svgSource();out.toBlob(blob=>{if(blob&&download(blob,filename("png")))reportDownloadedOutput(analysis,vector.pathCount);else announce("PNG export could not create a file.");},"image/png");}catch(err){announce("PNG export failed: "+err.message);}});
 $("show-grid")?.addEventListener("change",render);
 renderPalette();updateCanvasDisplay();render();setTool("pencil");historyButtons();initAdaptive();
 })();
