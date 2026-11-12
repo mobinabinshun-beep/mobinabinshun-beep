@@ -162,7 +162,7 @@ function grantStudioXP(metrics,pathCount){
 }
 function showAnalysisSummary(analysis,pathCount){
  const m=analysis.metrics;
- $("analysis-summary").textContent="ANALYSIS · "+m.paintedPixels.toLocaleString()+" pixels · "+m.colorCount+" colors · "+m.regionCount+" regions · "+m.edgePixels.toLocaleString()+" edge pixels · "+m.tileCount+" tiles · "+m.runCount+" runs · "+pathCount+" SVG paths";
+ $("analysis-summary").textContent="ANALYSIS · "+m.paintedPixels.toLocaleString()+" pixels · "+m.colorCount+" colors · "+m.regionCount+" regions · "+m.edgePixels.toLocaleString()+" edge pixels · "+m.tileCount+" tiles · "+m.runCount+" runs · "+pathCount+" geometry units";
 }
 function reportDownloadedOutput(analysis,pathCount){
  showAnalysisSummary(analysis,pathCount);
