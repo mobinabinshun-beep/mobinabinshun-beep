@@ -11,6 +11,7 @@ on:
       - feature/gen1-human-test-demo-2026-11-12
       - feature/gen1-studio-viewport-input-repair-2026-11-12
       - feature/gen1-studio-viewport-input-repair-v2-2026-11-12
+      - feat/gen1-creative-studio-layered-toolkit-2026-11-12
       - Official-public-information-and-discovery-hub-for-N.U-(Niroo-Universe),-its-publishing-network,-projects,-publications-and-related-creative-works
   pull_request:
     branches:
@@ -41,6 +42,8 @@ jobs:
         run: node --test tests/nu-studio-bootstrap.test.js
       - name: Test raster image palette matching
         run: node --test tests/nu-raster-import.test.js
+      - name: Test advanced Studio tools and layers
+        run: node --test tests/nu-studio-advanced-tools.test.js
       - name: Validate manifest JSON
         run: python -m json.tool NU-GENERATION-1-MANIFEST.json >/dev/null
       - name: Check public runtime artwork copy
