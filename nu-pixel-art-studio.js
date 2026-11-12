@@ -13,7 +13,7 @@ function trimHistory(stack,state){const limit=historyLimitFor(state);while(stack
 function commitHistory(before){if(!before)return;undoStack.push(before);trimHistory(undoStack,before);redoStack=[];historyButtons();}
 function restore(s){width=s.width;height=s.height;pixels=s.pixels.slice();$("image-width").value=width;$("image-height").value=height;updateCanvasDisplay();render();}
 function historyButtons(){$("undo").disabled=!undoStack.length;$("redo").disabled=!redoStack.length;}
-function cellLimit(){const b=qualityProfile&&qualityProfile.budget;return b?Math.min(3000000,Math.max(4096,Math.floor(b.maxCanvasPixels||520000))):520000;}
+function cellLimit(){return Infinity;}
 function updateCounters(){const count=pixels.reduce((n,p)=>n+(p?1:0),0);$("canvas-size").textContent=width+" × "+height+" px";$("pixel-count").textContent=count+" painted pixels";$("zoom-note").textContent=workspace.zoom+"% view · "+(qualityProfile?qualityProfile.tier:"balanced");}
 function updateCanvasDisplay(){
  if(canvas.width!==width)canvas.width=width;if(canvas.height!==height)canvas.height=height;
@@ -42,7 +42,7 @@ function render(){
  }
  updateCounters();
 }
-function resizeArtwork(nextW,nextH,method="nearest"){nextW=clamp(Math.round(nextW),1,16384);nextH=clamp(Math.round(nextH),1,16384);if(nextW*nextH>cellLimit()){announce("This device profile allows up to "+cellLimit().toLocaleString()+" editable pixels. Reduce the dimensions or choose a lighter workspace.");return false;}const before=snapshot(),next=Array(nextW*nextH).fill(null);for(let y=0;y<nextH;y++)for(let x=0;x<nextW;x++){const sx=Math.min(width-1,Math.floor((x+.5)*width/nextW)),sy=Math.min(height-1,Math.floor((y+.5)*height/nextH));next[y*nextW+x]=pixels[sy*width+sx];}width=nextW;height=nextH;pixels=next;commitHistory(before);$("image-width").value=width;$("image-height").value=height;updateCanvasDisplay();render();announce("Artwork resized to "+width+" × "+height+" px using "+method+" sampling. Original import remains unchanged outside the working copy.");return true;}
+function resizeArtwork(nextW,nextH,method="nearest"){nextW=Math.max(1,Math.round(nextW));nextH=Math.max(1,Math.round(nextH));if(nextW*nextH>cellLimit()){announce("This device profile allows up to "+cellLimit().toLocaleString()+" editable pixels. Reduce the dimensions or choose a lighter workspace.");return false;}const before=snapshot(),next=Array(nextW*nextH).fill(null);for(let y=0;y<nextH;y++)for(let x=0;x<nextW;x++){const sx=Math.min(width-1,Math.floor((x+.5)*width/nextW)),sy=Math.min(height-1,Math.floor((y+.5)*height/nextH));next[y*nextW+x]=pixels[sy*width+sx];}width=nextW;height=nextH;pixels=next;commitHistory(before);$("image-width").value=width;$("image-height").value=height;updateCanvasDisplay();render();announce("Artwork resized to "+width+" × "+height+" px using "+method+" sampling. Original import remains unchanged outside the working copy.");return true;}
 function initAdaptive(){const fallback=()=>{qualityProfile={tier:"balanced",level:3,budget:{maxCanvasPixels:520000,dpr:1},reducedMotion:false};$("quality-profile").textContent="Balanced · fallback";};if(!window.NUGraphicsCore){fallback();return;}window.NUGraphicsCore.start().then(p=>{qualityProfile=p;$("quality-profile").textContent=p.tier+" · level "+p.level;$("quality-detail").textContent="Editable pixel budget: "+cellLimit().toLocaleString()+" cells";updateCounters();}).catch(fallback);}
 function applyZoom(){workspace.zoom=clamp(Number($("workspace-zoom").value)||100,25,800);updateCanvasDisplay();updateCounters();}
 $("workspace-zoom").addEventListener("input",applyZoom);
@@ -58,7 +58,7 @@ function observeWorkspace(){
 }
 observeWorkspace();
 $("image-lock").addEventListener("change",e=>{resizeLock=e.target.checked;});
-$("image-width").addEventListener("input",()=>{lastDimension="width";});$("image-height").addEventListener("input",()=>{lastDimension="height";});$("apply-image-size").addEventListener("click",()=>{let w=clamp(Number($("image-width").value)||width,1,2048),h=clamp(Number($("image-height").value)||height,1,2048);if(resizeLock){const ratio=width/height;if(lastDimension==="width")h=Math.max(1,Math.round(w/ratio));else w=Math.max(1,Math.round(h*ratio));}$("image-width").value=w;$("image-height").value=h;resizeArtwork(w,h,"nearest-neighbor");});
+$("image-width").addEventListener("input",()=>{lastDimension="width";});$("image-height").addEventListener("input",()=>{lastDimension="height";});$("apply-image-size").addEventListener("click",()=>{let w=Math.max(1,Math.round(Number($("image-width").value)||width)),h=Math.max(1,Math.round(Number($("image-height").value)||height));if(resizeLock){const ratio=width/height;if(lastDimension==="width")h=Math.max(1,Math.round(w/ratio));else w=Math.max(1,Math.round(h*ratio));}$("image-width").value=w;$("image-height").value=h;resizeArtwork(w,h,"nearest-neighbor");});
 function renderPalette(){const root=$("palette");root.innerHTML="";palette.forEach((c,i)=>{const b=document.createElement("button");b.type="button";b.className="swatch";b.style.background=c;b.title=c;b.setAttribute("aria-label","Palette color "+c);b.setAttribute("aria-pressed",String(c.toLowerCase()===color.toLowerCase()));b.addEventListener("click",()=>{color=c;$("custom-color").value=c;renderPalette();});root.appendChild(b);});const transparent=document.createElement("button");transparent.type="button";transparent.className="swatch";transparent.setAttribute("aria-label","Transparent");transparent.title="Transparent / eraser";transparent.addEventListener("click",()=>setTool("eraser"));root.appendChild(transparent);}
 function setTool(next){tool=next;document.querySelectorAll("[data-tool]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tool===tool)));canvas.style.cursor=tool==="picker"?"copy":tool==="eraser"?"cell":tool==="fill"?"copy":"crosshair";}
 function coords(e){const r=canvas.getBoundingClientRect();return window.NUStudioLayout.pixelAt(e.clientX,e.clientY,r,width,height);}
@@ -127,19 +127,18 @@ $("alpha-cutoff").addEventListener("input",e=>$("alpha-cutoff-value").textConten
 $("image-file").addEventListener("change",async e=>{
  const file=e.target.files&&e.target.files[0];if(!file)return;
  if(!file.type.startsWith("image/")){announce("Choose a supported image file (PNG, JPEG, WebP, GIF or SVG).");e.target.value="";return;}
- if(file.size>25*1024*1024){announce("Image is larger than the 25 MB browser import limit. The original file was not changed.");e.target.value="";return;}
+ 
  let bitmap=null;
  try{
   announce("Reading image dimensions and preparing an editable working copy…");
   bitmap=await decodeImage(file);
   const sourceWidth=bitmap.width,sourceHeight=bitmap.height;
-  if(!sourceWidth||!sourceHeight||Math.max(sourceWidth,sourceHeight)>16384)throw new Error("This image exceeds the safe browser canvas dimension (16,384 px per edge). The source file is unchanged.");
+  if(!sourceWidth||!sourceHeight)throw new Error("The image decoder returned invalid dimensions.");
   const requested=String($("import-resolution").value||"original");
   const maxSide=requested==="original"?Math.max(sourceWidth,sourceHeight):Math.max(1,Number(requested)||256);
   const scale=Math.min(1,maxSide/Math.max(sourceWidth,sourceHeight));
   const nextW=Math.max(1,Math.round(sourceWidth*scale)),nextH=Math.max(1,Math.round(sourceHeight*scale));
-  const safeCells=cellLimit(),requestedCells=nextW*nextH;
-  if(requestedCells>safeCells)throw new Error("Original working size is "+sourceWidth+" × "+sourceHeight+" ("+requestedCells.toLocaleString()+" pixels), above this device's safe editing budget of "+safeCells.toLocaleString()+" pixels. Choose a smaller import detail explicitly, or use a device with a higher graphics profile. The source file remains unchanged.");
+  const requestedCells=nextW*nextH;if(!Number.isSafeInteger(requestedCells))throw new Error("Image dimensions exceed the numeric range supported by this browser.");
   const temp=document.createElement("canvas");temp.width=nextW;temp.height=nextH;
   const t=temp.getContext("2d",{willReadFrequently:true});if(!t)throw new Error("This browser could not create an image processing canvas.");
   t.imageSmoothingEnabled=$("import-resampling").value!=="nearest";if(t.imageSmoothingEnabled)t.imageSmoothingQuality="high";
