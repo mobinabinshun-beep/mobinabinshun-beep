@@ -273,3 +273,16 @@ The repair was developed on feature/gen1-studio-viewport-input-repair-v2-2026-11
 - The merged repair uses versioned local script/style URLs to avoid stale static assets on subsequent loads. It does not clear browser caches or local player saves.
 - Owner browser/device acceptance is the next gate. Report the image class/dimensions, browser and general device class, selected import detail, palette, resampling and dithering settings, and steps to reproduce. Do not upload private or copyrighted source artwork.
 - The public runtime still has no server-side report collector; the GitHub issue form is the explicit feedback intake path.
+
+
+## Generation 1.15 — human image report and composite export repair (2026-11-13)
+
+The Creative Studio now exports a readable image report alongside PNG, SVG and Graphic IR downloads:
+- The report includes dimensions, painted/transparent pixel counts, colors, connected regions, palette values, largest-region bounds and plain-language notes in English and Persian.
+- SVG files embed the report as metadata; Graphic IR JSON includes a `humanReport` field.
+- PNG, SVG and Graphic IR downloads also initiate a companion `.human-report.md` download. The report can be downloaded directly from the EXPORT panel or the advanced Files dock.
+- Analysis and PNG/SVG export now use the visible four-layer composite rather than only the active layer. Hidden layers are excluded and visible layer opacity is respected.
+- The human report is generated locally in the browser; no image is uploaded.
+- Regression tests cover report content, Markdown formatting, report attachment and composite export paths.
+
+Package version: `0.5.2-gen1-human-image-report`. The previously working Studio import/edit baseline is preserved at `freeze/studio-known-good-2026-11-13`; see `STUDIO-KNOWN-GOOD-LOCK.md`.
