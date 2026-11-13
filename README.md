@@ -295,3 +295,11 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 - The new `nu-materials.js` module loads the five local SVGs, preserves crisp pixel edges, and degrades safely if an asset cannot load. Bubble Hunt, Chaos Attack, wallet rules, XP/Mana values, and the adaptive runtime are unchanged.
 - Human acceptance is still required for desktop/mobile rendering, tap accuracy, scaling, reduced-motion expectations and visual clarity. Submit findings with the **Mana Material Human Test** issue form.
 - Public test URL: https://mobinabinshun-beep.github.io/mobinabinshun-beep/
+
+
+## Generation 1.17 — Bubble Hunt circular targets (2026-11-13)
+
+- Bubble Hunt targets are now true circles, not vertically stretched ellipses. The glass highlight follows a circular arc.
+- Bubble hit-testing remains radial and uses a 10px touch margin, so the interaction region stays centered and predictable.
+- The five original N.U Mana material SVGs remain in use for Mana Collector interactive targets; they are not repurposed as bubble textures because the archived set is Mana-specific.
+- Human QA should verify circle shape, visual/touch alignment, and rendering on desktop and mobile.
