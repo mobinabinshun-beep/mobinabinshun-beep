@@ -84,7 +84,8 @@ function animateHpPillTravel(direction){
  const barRect=bar.getBoundingClientRect();
  // The visual starts just inside the right frame edge and docks in the reserved capsule slot.
  const corner={x:barRect.width-4,y:barRect.height/2};
- const dock={x:barRect.width-30,y:barRect.height/2};
+ const mobileDock=window.matchMedia&&window.matchMedia("(max-width:520px)").matches;
+ const dock=mobileDock?{x:barRect.width/2,y:barRect.height-21}:{x:barRect.width-30,y:barRect.height/2};
  const from=direction==="in"?corner:dock,to=direction==="in"?dock:corner;
  const layer=document.createElement("span");layer.className="hp-pill-travel-layer";layer.setAttribute("aria-hidden","true");
  const ghost=document.createElement("img");ghost.className="hp-pill-travel-ghost";ghost.src=source.src;ghost.alt="";
