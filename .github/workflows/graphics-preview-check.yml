@@ -20,6 +20,7 @@ on:
       - fix/gen1-hp-pill-click-feedback-2026-11-13
       - fix/gen1-hp-pill-event-delegation-overlay-2026-11-13
       - fix/gen1-hp-pill-direct-click-2026-11-13
+      - feat/gen1-hex-gateway-public-demo-2026-11-13
   pull_request:
     branches:
       - "Official-public-information-and-discovery-hub-for-N.U-(Niroo-Universe),-its-publishing-network,-projects,-publications-and-related-creative-works"
