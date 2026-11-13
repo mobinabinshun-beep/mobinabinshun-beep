@@ -33,5 +33,5 @@ body.nu-gateway-enabled #menu-open,body.nu-gateway-enabled #back-home,body.nu-ga
 @media(prefers-reduced-motion:reduce){#nu-hex-gateway *,#nu-hex-gateway *::before,#nu-hex-gateway *::after,.nu-gateway-scrim{animation:none!important;transition-duration:.01ms!important}}
 
 
-/* N.U Gateway freeze — hidden across the main menu, game tools, Creative Studio and Casino until explicit owner approval. */
+/* N.U Gateway freeze — hidden on all internal pages until explicit owner approval. */
 #nu-hex-gateway,.nu-gateway-scrim{display:none!important}
