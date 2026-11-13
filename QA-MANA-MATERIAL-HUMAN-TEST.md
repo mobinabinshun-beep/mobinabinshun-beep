@@ -110,19 +110,17 @@ Validate the five archived N.U Mana SVG materials when used on interactive Mana 
 - Result: PASS / PASS WITH LIMITATIONS / FAIL
 - Notes:
 
-## HP capsule conditional arrival / return motion — Generation 1.24
+## HP capsule internal arrival / return motion — Generation 1.25
 
-- [ ] Begin a game with HP at 10/10 and confirm NO capsule icon or count is visible anywhere in the HP HUD.
-- [ ] In Chaos Attack, allow one breach to reduce HP below 10.
-- [ ] Confirm the real capsule button remains completely hidden while the animated golden capsule travels from the HP rail's left corner to its dock just outside the rail's right edge; only after arrival does the clickable icon appear.
-- [ ] Confirm the real capsule button becomes usable only after arrival; animation itself does not consume a capsule.
-- [ ] Take additional damage while HP is already below 10; confirm the docked icon does not replay or duplicate.
-- [ ] Restore HP gradually; confirm the capsule stays docked until HP reaches 10/10.
-- [ ] On reaching full HP (through a successful capsule use or round-completion heal), confirm the real icon disappears immediately and a separate visual capsule travels back along the reverse path to the rail corner and fades out; after that, no icon/count remains visible.
-- [ ] Confirm no capsule inventory is consumed by either travel animation; only an intentional click/tap/Enter/Space on the capsule button consumes one.
-- [ ] Verify portrait/landscape, desktop/mobile, all three games, and reduced-motion mode.
-- Expected: no visible capsule at 10/10; exactly one arrival and then one docked clickable icon when HP drops below 10; exactly one reverse/fade and no remaining icon at 10/10. No duplicate icons, clipped animation or wallet changes.
+- [ ] Start at 10/10 HP and confirm the HP HUD frame contains no capsule icon or count.
+- [ ] Allow HP to drop below 10; confirm the frame widens and the golden capsule appears at its right inner edge, travels left into the reserved slot, and settles beside the HP bar inside the same frame.
+- [ ] Confirm the capsule becomes clickable only after arrival; travel itself does not consume inventory.
+- [ ] Take additional damage while HP is already below 10; confirm there is no duplicate arrival and the docked capsule remains in place.
+- [ ] Restore HP but keep it below 10; confirm the capsule remains docked.
+- [ ] When HP reaches 10/10, confirm the capsule travels back along the exact reverse path toward the right inner corner, fades out, and leaves no visible icon or count.
+- [ ] Confirm the real button is hidden during both travel animations and no icon is visible outside the HP frame.
+- [ ] Test mouse, touch, Enter/Space, portrait/landscape, desktop/mobile, all three games, and reduced-motion mode.
+- Expected: the wider frame contains the capsule dock; capsule visibility is strictly conditional on HP < 10; arrival and return use opposite directions; no duplicates, clipping, inventory changes or wallet-rule changes.
 - Actual / browser / device / orientation:
 - Result: PASS / PASS WITH LIMITATIONS / FAIL
 - Notes:
-
