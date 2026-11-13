@@ -159,3 +159,18 @@ Validate the five archived N.U Mana SVG materials when used on interactive Mana 
 - Actual / browser / device / orientation:
 - Result: PASS / PASS WITH LIMITATIONS / FAIL
 - Notes:
+
+
+## Compact mobile HP HUD — Generation 1.28
+
+- [ ] Open any Generation 1 game on a phone in portrait orientation and compare the HP frame with the previous layout; confirm it is visibly narrower and shorter without clipping the label, HP value or bar.
+- [ ] Confirm the frame remains centered/within the viewport with comfortable side margins on narrow screens (including 320 CSS-pixel width).
+- [ ] When HP drops below 10, confirm the capsule dock remains fully inside the smaller frame and the icon is still tappable.
+- [ ] Confirm capsule arrival/reverse-exit motion still fits inside the frame and does not overlap the HP label/value.
+- [ ] Rotate to landscape and verify the HP frame remains compact but legible and does not collide with game controls.
+- [ ] Verify tablet/desktop sizing remains unchanged.
+- [ ] Test all three games, reduced-motion mode, and touch interaction; confirm HP/capsule wallet rules are unchanged.
+- Expected: phone HP frame is smaller, all contents remain readable and interactive, no clipping/overlap, and non-phone layout is unchanged.
+- Actual / browser / device / viewport width / orientation:
+- Result: PASS / PASS WITH LIMITATIONS / FAIL
+- Notes:

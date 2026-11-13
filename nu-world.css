@@ -381,3 +381,21 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 .shop-hp-pill-buy{min-width:112px;justify-self:end}
 @media(max-width:520px){.shop-hp-pill-item{grid-template-columns:54px minmax(0,1fr) auto;gap:8px;padding:12px}.shop-hp-pill-use{width:52px;min-height:54px}.shop-hp-pill-use .hp-pill-icon{width:32px;height:32px}.shop-hp-pill-buy{min-width:82px;padding:9px 8px;font-size:10px}}
 @media(prefers-reduced-motion:reduce){.shop-hp-pill-use .hp-pill-icon{transition:none}}
+
+
+/* Generation 1.28 — compact HP HUD frame on phones. */
+@media(max-width:520px){
+ #game-view.active .hp-bar{
+  width:min(286px,calc(100vw - 28px));
+  min-width:0;
+  min-height:44px;
+  padding:5px 46px 5px 8px;
+  gap:5px;
+ }
+ #game-view.active .hp-bar>span:first-child{font-size:9px;letter-spacing:-.025em}
+ #game-view.active .hp-bar #hp-value{font-size:10px}
+ #game-view.active .hp-bar .hp-track{min-width:44px;max-width:none}
+ #game-view.active .hp-bar #hp-pill-use{right:5px;width:34px;height:34px;min-width:34px;min-height:34px}
+ #game-view.active .hp-bar #hp-pill-use img{width:24px;height:24px}
+ .hp-pill-travel-ghost{width:28px;height:28px}
+}
