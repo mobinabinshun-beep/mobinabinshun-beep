@@ -16,7 +16,7 @@ test("gateway is mounted as a persistent navigation control on every internal pa
   }
 });
 
-test("gateway exposes the eight requested destinations", () => {
+test("gateway exposes eight destinations including return to game", () => {
   for (const action of ["back", "library", "store", "wallet", "profile", "launcher", "studio", "resume"]) {
     assert.match(html, new RegExp('data-action="' + action + '"'));
     assert.match(js, new RegExp(action + ":"));
@@ -30,7 +30,7 @@ test("gateway supports hover, two-step click, keyboard escape and 10px outside e
   assert.match(js, /event\.key === "Escape"/);
   assert.match(js, /tolerance = 10/);
   assert.match(js, /is-confirming/);
-  assert.match(js, /clickArmed === item/);\n  assert.match(js, /actionKey === "resume"/);
+  assert.match(js, /clickArmed === item/);
   assert.match(js, /item\.tabIndex = open \? 0 : -1/);
 });
 
@@ -39,6 +39,7 @@ test("launcher and studio destinations can route back into main views", () => {
   assert.match(js, /window\.location\.href = "\.\/index\.html\?view="/);
   assert.match(js, /openMainView\("wallet"\)/);
   assert.match(js, /openMainView\("profile"\)/);
+  assert.match(js, /actionKey === "resume"/);
 });
 
 test("opening the gateway pauses an active round and restores it on dismissal", () => {
