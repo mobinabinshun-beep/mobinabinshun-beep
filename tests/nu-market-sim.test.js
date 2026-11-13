@@ -41,3 +41,11 @@ test("same-hour activity is aggregated into OHLC candle",()=>{
  assert.ok(result.candles[0].high>=result.candles[0].open);
  assert.ok(result.candles[0].low<=result.candles[0].close);
 });
+
+test("market simulator retains only the latest 24 activity steps",()=>{
+ const transactions=Array.from({length:30},(_,i)=>({at:new Date(Date.UTC(2026,10,1,i)).toISOString(),deltas:{xp:i%2? -1:1}}));
+ const result=market.build({transactions},"xp");
+ assert.equal(result.events,24);
+ assert.ok(result.candles.length<=24);
+ assert.equal(market.MAX_CANDLES,24);
+});
