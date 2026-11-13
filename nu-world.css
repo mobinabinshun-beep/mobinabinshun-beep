@@ -476,3 +476,15 @@ body.nu-game-active #game-view.active .mana-capsules{display:none}
  .nbi-shield-bar{top:62px;width:174px}
 }
 @media(prefers-reduced-motion:reduce){#game-view.active .hp-bar,.nbi-shield-bar,#nbi-shield-fill{transition:none!important}#game-view.active .hp-bar.has-pill #hp-pill-use:not([hidden]){animation:none}}
+
+/* N.U visual quarantine v1: canonical Material/Background.svg is the sole world-art base.
+   Archived renderers remain in archive/visual-layers; HUD and game canvases are unaffected. */
+.world{background:transparent!important}
+.world>.sky,.world>#world-canvas,.world>#pixel-world,.world>.horizon,#nu-dynamic-layers{display:none!important;visibility:hidden!important;opacity:0!important}
+#nu-background-image{display:block!important;visibility:visible!important;opacity:1!important;z-index:-3!important}
+#nu-background-image img{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
+.world>.shell{position:relative;z-index:1}
+body{background:#071018}
+.world.nu-image-scene-active{background:transparent}
+.world:not(.nu-image-scene-active){background:#071018}
+@media(prefers-reduced-motion:reduce){#nu-background-image img{transition:none!important}}
