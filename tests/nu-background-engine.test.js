@@ -32,6 +32,9 @@ test("demo page loads the image-first engine and the engine points to the local 
   assert.match(engine, /img\.onload=/);
   assert.match(engine, /nu-image-scene-active/);
   assert.match(engine, /img\.onerror=/);
+  assert.match(engine, /world\.classList\.add\("calibrated"\)/);
+  assert.match(css, /\.world\{opacity:0/);
+  assert.match(css, /\.world\.calibrated\{opacity:1/);
 });
 
 test("background image paints above the decorative sky but below foreground content", () => {
