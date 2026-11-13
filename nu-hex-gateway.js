@@ -141,12 +141,16 @@
       hoverTimer = window.setTimeout(() => activate(item), 320);
     });
 
-    item.addEventListener("pointerleave", () => {
+    item.addEventListener("pointerleave", event => {
       clearTimeout(hoverTimer);
       clearTimeout(activationTimer);
+      if (event.pointerType === "mouse" && clickArmed === item) clickArmed = null;
     });
 
-    item.addEventListener("focus", () => select(item));
+    item.addEventListener("focus", () => {
+      select(item);
+      if (clickArmed !== item) clickArmed = null;
+    });
 
     item.addEventListener("click", event => {
       event.preventDefault();
