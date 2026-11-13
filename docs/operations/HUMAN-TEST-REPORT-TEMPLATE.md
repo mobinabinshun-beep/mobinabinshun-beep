@@ -47,3 +47,22 @@ For each scenario, record expected and actual behavior, pass/fail, and reproduci
 Mark one: HUMAN-QA-PENDING / HUMAN-QA-PASSED
 
 A test report is HUMAN-QA-PASSED only when device, OS, browser, viewport, input mode and scenario outcomes are recorded.
+
+
+## Generation 1 Exchange — asset history chart
+
+| Scenario | Expected result | Actual result | Pass / Fail | Reproducible? |
+|---|---|---|---|---|
+| Open Exchange | Exchange opens from the main N.U menu and returns to the world | | | |
+| Asset selector | Lists only implemented Generation 1 assets, including Casino Credits | | | |
+| Balance summary | Matches the selected asset in the local wallet | | | |
+| History chart | Shows balance changes derived from saved transaction deltas only | | | |
+| Transaction ledger | Signed delta, timestamp and reconstructed balance agree with wallet activity | | | |
+| Casino history | A Coin Flip, Lucky Dice or Mini Slots round updates Casino Credits history only | | | |
+| Store history | Buying/using an HP Capsule updates the appropriate XP / capsule / HP history | | | |
+| Empty history | Clearly states there are no recorded changes; does not invent data | | | |
+| Conversion guard | Swap remains disabled while pairs, rates, fees and limits are unapproved | | | |
+| Refresh / local save | Recorded history persists in the same browser profile | | | |
+| Mobile / accessibility | Chart remains legible; selector and links work with touch and keyboard | | | |
+
+**Exchange chart interpretation:** this candidate plots local asset-balance history, not market prices or exchange rates. Do not report the line as a market valuation or profit/loss curve. The current ledger retains at most 40 transactions, and balances are browser-local.
