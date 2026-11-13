@@ -278,3 +278,9 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 /* Studio/HUD repair: clear focus and hover states for keyboard and pointer users. */
 #game-view.active .bar-wrap:focus-visible,#game-view.active .hp-bar:focus-visible{outline:2px solid #ffd78a;outline-offset:4px}
 #game-asset-profile{max-height:min(42vh,260px);overflow:auto;contain:layout paint}
+
+
+/* N.U Gen1.18 — HP capsule HUD click feedback, anchored to the pressed icon. */
+.hp-pill-hit-progress{z-index:30;color:#caff9f;font-size:13px;font-weight:900;text-shadow:0 0 7px #8dff62,0 1px 4px #06110a;animation:nu-hp-pill-hit .95s cubic-bezier(.2,.8,.25,1) forwards}
+@keyframes nu-hp-pill-hit{0%{opacity:0;scale:.55;filter:drop-shadow(0 0 0 #a8ff65)}16%{opacity:1;scale:1.35;filter:drop-shadow(0 0 12px #a8ff65)}38%{scale:1}100%{opacity:0;translate:0 -27px;scale:.92}}
+@media(prefers-reduced-motion:reduce){.hp-pill-hit-progress{animation:none;opacity:1;scale:1}}
