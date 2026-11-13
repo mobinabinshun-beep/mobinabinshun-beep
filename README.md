@@ -411,6 +411,17 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 - Responsive layout, keyboard-operable native controls, insufficient-credit guard, and human QA checklist added. Human acceptance is pending.
 
 
+
+## Generation 1.32 — universal hex gateway calibration (2026-11-13)
+
+- The compact six-sided N.U gateway is available on the main world, Casino, Launcher and Creative Studio pages, and remains available while navigating the home, library, wallet, Store, profile and article views inside the main world.
+- The gateway stays pinned near the upper-right/upper-middle frame edge. Its nine floating destinations fan out around the trigger without a full-screen menu panel; sizing and orbit radius adapt to narrow screens.
+- Opening the gateway pauses an active main-world round through the existing PAUSE/RESUME control and applies an icy translucent blur to the page. Dismissing it restores the prior round state.
+- Mouse hover selects and dwell-activates a destination; mouse click and keyboard activation use a two-step select/confirm path. Touch release activates directly and suppresses the synthetic click to prevent duplicate navigation.
+- Leaving the menu region by more than the 10px boundary tolerance dismisses the gateway. Escape, focus navigation, reduced-motion preferences and page blur are supported.
+- Gateway behavior is isolated from game rules, wallet values and local save data. This is a navigation-layer change only; human desktop/mobile acceptance remains required.
+- Pre-change source is preserved on `backup/pre-hex-gateway-touch-calibration-2026-11-13` and under `BACKUPS/HEX-GATEWAY-PRE-CALIBRATION-2026-11-13/` on the feature branch.
+
 ## Project continuity and new-chat handoff
 
 - [Project handoff and conversation archive (2026-11-13)](PROJECT-HANDOFF-AND-CONVERSATION-ARCHIVE-2026-11-13.md) — project map, interaction requirements, generation boundaries, casino record, QA references and a ready-to-paste new-chat prompt.
