@@ -68,7 +68,7 @@ test("HP capsule travel enters from the inside-right corner and returns along th
   assert.ok(games.includes("function animateHpPillTravel(direction)"));
   assert.ok(games.includes("function syncHpPillDock(hp)"));
   assert.ok(games.includes("const corner={x:barRect.width-4"));
-  assert.ok(games.includes("const dock={x:barRect.width-30"));
+  assert.ok(games.includes("const dock=mobileDock?"));
   assert.ok(games.includes("hpPillTravelAnimation.reverse()"));
   assert.ok(games.includes("ghost.animate("));
   assert.ok(css.includes(".hp-pill-travel-layer{position:absolute;inset:0"));
@@ -90,7 +90,7 @@ test("Generation 1.26 widens the HP frame and keeps the pill dock inside its rig
   assert.ok(css.includes("right:8px;"));
   assert.ok(css.includes("padding:9px 60px 9px 14px"));
   assert.ok(games.includes("const corner={x:barRect.width-4"));
-  assert.ok(games.includes("const dock={x:barRect.width-30"));
+  assert.ok(games.includes("const dock=mobileDock?"));
   assert.ok(html.includes("20261113-mobile-hp-capsule-under-rail-r1"));
 });
 
