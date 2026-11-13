@@ -28,10 +28,10 @@
   function layoutItems() {
     const compact = window.matchMedia("(max-width: 600px)").matches;
     const radius = compact ? 92 : 104;
-    const step = items.length > 1 ? 116 / (items.length - 1) : 0;
+    const step = items.length > 1 ? 37.5 : 0;
     items.forEach((item,index) => {
       item.tabIndex = open ? 0 : -1;
-      const angle = (112 + index * step) * Math.PI / 180;
+      const angle = (105 + index * step) * Math.PI / 180;
       item.style.setProperty("--gx", `${Math.cos(angle) * radius}px`);
       item.style.setProperty("--gy", `${Math.sin(angle) * radius}px`);
     });
