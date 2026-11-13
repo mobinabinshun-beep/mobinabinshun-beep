@@ -311,3 +311,12 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 - Successful use displays a short `+N HP` interaction pop anchored to the capsule icon, alongside the existing HP bar restoration and wallet transaction feedback.
 - Empty inventory and full HP continue to show a warning without consuming a capsule. Existing wallet rules and restore amounts are unchanged.
 - Automated regression checks cover click binding, event propagation isolation, successful-use feedback, and unchanged wallet consumption rules. Desktop/mobile browser acceptance remains a human-test task.
+
+
+## Generation 1.19 — HP capsule HUD event/overlay debug repair (2026-11-13)
+
+- Replaced the button-local event path with capture-phase document delegation for pointer/touch release and keyboard-generated clicks, so parent HUD profile handlers cannot swallow activation.
+- Raised the capsule hit target above HUD layers and explicitly enabled pointer events on the button.
+- Fixed the prior feedback coordinate bug: the HP bar is viewport-fixed while the game stage clips overflow, so the old stage-relative notification could be positioned outside the clipped stage. Feedback now renders in viewport coordinates on `document.body`.
+- Captures the capsule button rectangle before wallet persistence/rerender can hide the button after the final capsule is consumed.
+- Wallet rules remain unchanged; regression tests cover event delegation, pre-rerender anchoring, unclipped feedback and one-capsule consumption.
