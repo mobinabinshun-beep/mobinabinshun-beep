@@ -298,3 +298,7 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 #game-view.active .hp-bar #hp-pill-use img{pointer-events:none}
 #game-view.active .hp-bar #hp-pill-use span{pointer-events:none}
 #game-view.active .hp-bar #hp-pill-use:focus-visible{outline:2px solid #caff9f;outline-offset:3px}
+
+/* Gen1.21: keep the HP capsule control visible so empty/full states remain discoverable. */
+#game-view.active .hp-bar #hp-pill-use.unavailable{opacity:.58;filter:saturate(.55);cursor:pointer;pointer-events:auto!important}
+#game-view.active .hp-bar #hp-pill-use{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
