@@ -60,3 +60,22 @@ Validate the five archived N.U Mana SVG materials when used on interactive Mana 
 - Expected vs actual:
 - Severity: cosmetic / usability / functional / blocking
 - Notes:
+
+
+## HP capsule HUD interaction — Generation 1.19 debug retest
+- [ ] Ensure at least one HP Capsule is owned and HP is below 10.
+- [ ] Open Bubble Hunt, Mana Collector, and Chaos Attack; verify the capsule button works in each game.
+- [ ] Tap/click directly on the capsule image and count label; confirm one capsule is consumed once per activation.
+- [ ] Confirm `+N HP` appears above the capsule icon even when the final capsule is consumed and the button hides after use.
+- [ ] Confirm the animation is not clipped by the game canvas/stage and remains visible near the fixed HP bar.
+- [ ] Confirm pointer/touch activation and keyboard Enter/Space activation.
+- [ ] Confirm the HP bar profile hover/click does not swallow capsule activation.
+- [ ] Confirm HP-full and empty-inventory warnings do not consume capsules.
+- [ ] Confirm portrait/landscape mobile and desktop behavior.
+- Result: PASS / PASS WITH LIMITATIONS / FAIL
+- Device/browser/orientation:
+- Owned capsules before test:
+- HP before and after:
+- Steps to reproduce:
+- Expected vs actual:
+- Severity and notes:
