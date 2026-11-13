@@ -16,10 +16,10 @@
 
 ## Interaction contract
 - Fixed position near upper-right; trigger grows 20% while active.
-- Seven options: Back/Home, Game Library, Store, Wallet, Player Profile, Launcher Settings, Creative Studio.
+- Eight options: Back/Home, Game Library, Store, Wallet, Player Profile, Launcher Settings, Creative Studio, Return to Game.
 - Options emerge on a radial arc and remain visually borderless/transparent.
 - Opening the gateway pauses an active round and overlays a low-contrast blurred ice-glass layer.
-- Mouse hover selects and activates after a short dwell; pointer exit cancels pending activation.
+- Mouse hover selects and activates after a short dwell; pointer exit cancels pending activation. The final Return to Game option provides the requested extra downward selection to dismiss the gateway and resume a paused round.
 - Click/touch uses first activation to illuminate/select and a second activation to confirm; Enter confirms a selected option.
 - Escape, scrim click, or pointer movement beyond the 10px tolerance closes the gateway.
 - Navigation from gameplay first returns to the home view before opening other views, so wallet/profile back navigation does not restore a running game.
@@ -36,8 +36,8 @@
 - [ ] Desktop mouse: open on hover, radial layout stays within reach, hover action works, leaving the expanded bounds closes.
 - [ ] Mouse click: first click highlights, second click confirms; clicking once does not navigate.
 - [ ] Keyboard: trigger opens; Tab reaches every destination; Enter confirms; Escape closes.
-- [ ] Touch: first tap opens; first destination tap highlights; second tap confirms; tap on scrim closes.
-- [ ] Active game pauses while gateway is open and resumes only when dismissed without navigation.
+- [ ] Touch: first tap opens; first destination tap highlights; second tap confirms; Return to Game closes and resumes; tap on scrim closes.
+- [ ] Active game pauses while gateway is open and resumes only when dismissed without navigation or when Return to Game is selected.
 - [ ] Every destination exits gameplay; wallet/profile back returns to home, not a stale active game.
 - [ ] Mobile portrait/landscape and safe-area placement; no clipping or overlap with HP/HUD controls.
 - [ ] Reduced-motion mode removes pulse/transition animation.
