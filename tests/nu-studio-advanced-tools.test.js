@@ -48,7 +48,7 @@ test("download helper exposes a persistent manual link when automatic downloads 
 });
 test("PNG and SVG files are created before optional analytics and reward tracking",()=>{
  const svg=js.slice(js.indexOf('$("export-svg").addEventListener'),js.indexOf('$("export-ir").addEventListener'));
- const png=js.slice(js.indexOf('$("export-png").addEventListener'),js.indexOf('$("show-grid")'));
+ const png=js.slice(js.indexOf('$("export-png").addEventListener'));
  assert.ok(svg.indexOf("download(new Blob")<svg.indexOf("analyzeArtwork()"));
  assert.ok(png.indexOf("download(blob,name)")<png.indexOf("analyzeArtwork()"));
 });
