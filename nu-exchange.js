@@ -29,7 +29,7 @@ function render(){
  const net=history.reduce((sum,p)=>sum+p.delta,0);$("asset-change").textContent=(net>0?"+":"")+format(net);
  $("asset-change").className=net>0?"positive":net<0?"negative":"";
  $("history-count").textContent=history.length+" RECORDS";
- draw(points);
+ if(history.length){draw(points);}else{$("asset-chart").hidden=true;$("chart-empty").hidden=false;}
  const target=$("asset-transactions");
  target.innerHTML=history.slice().reverse().map(p=>'<div class="asset-row"><div><strong>'+escapeText(p.title)+'</strong><small>'+escapeText(dateLabel(p.at))+'</small></div><span class="asset-delta '+(p.delta>0?"positive":p.delta<0?"negative":"")+'">'+(p.delta>0?"+":"")+format(p.delta)+'</span><span class="asset-balance">'+format(p.balance)+'</span></div>').join("")||'<p class="panel-note">No saved transactions affect this asset yet.</p>';
 }
