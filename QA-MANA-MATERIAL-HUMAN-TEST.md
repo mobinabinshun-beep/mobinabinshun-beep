@@ -41,3 +41,22 @@ Validate the five archived N.U Mana SVG materials when used on interactive Mana 
 - [ ] Mouse/touch hit area is centered on the visible circle.
 - [ ] Touch targets remain usable on narrow mobile screens.
 - [ ] Bubble Hunt still awards exactly +1 XP for each successful hit.
+
+
+## HP Capsule HUD click and feedback check — Generation 1.18
+- [ ] Start any Generation 1 game and lower HP below 10 (e.g. allow Chaos Attack to cause damage).
+- [ ] Confirm an owned HP Capsule is visible in the HP bar.
+- [ ] Click/tap the capsule icon itself (not the HP bar background).
+- [ ] Confirm exactly one capsule is consumed and HP increases by up to 10, capped at 10/10.
+- [ ] Confirm a brief `+N HP` pop appears at the capsule icon, similar in timing/placement to target interaction feedback.
+- [ ] Confirm the existing HP bar glow and transaction notification also appear.
+- [ ] At 10/10 HP, confirm a warning appears and no capsule is consumed.
+- [ ] With zero capsules, confirm the icon is hidden and no gameplay interaction is triggered.
+- [ ] Verify mouse, touch, keyboard activation (Enter/Space), portrait and landscape layouts.
+- [ ] Verify reduced-motion mode remains readable without the pop animation.
+- Result: PASS / PASS WITH LIMITATIONS / FAIL
+- Browser/device/orientation:
+- Steps to reproduce:
+- Expected vs actual:
+- Severity: cosmetic / usability / functional / blocking
+- Notes:

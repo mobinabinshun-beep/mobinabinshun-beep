@@ -17,6 +17,7 @@ on:
       - feat/studio-persian-plain-labels-2026-11-12
       - feat/studio-native-dimension-import-2026-11-12
       - Official-public-information-and-discovery-hub-for-N.U-(Niroo-Universe),-its-publishing-network,-projects,-publications-and-related-creative-works
+      - fix/gen1-hp-pill-click-feedback-2026-11-13
   pull_request:
     branches:
       - "Official-public-information-and-discovery-hub-for-N.U-(Niroo-Universe),-its-publishing-network,-projects,-publications-and-related-creative-works"
@@ -40,6 +41,8 @@ jobs:
         run: node --test tests/nu-materials.test.js
       - name: Test Bubble Hunt circular geometry and hit radius
         run: node --test tests/nu-bubble-round.test.js
+      - name: Test HP capsule HUD click interaction and feedback
+        run: node --test tests/nu-hp-pill-interaction.test.js
       - name: Test SVG contour vectorizer
         run: node --test tests/nu-svg-vectorizer.test.js
       - name: Test graphics analysis and machine-readable IR
