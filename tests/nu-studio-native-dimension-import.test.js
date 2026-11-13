@@ -15,7 +15,7 @@ test("Studio has no product pixel, edge, file-size, or Launcher-profile import c
 test("file import delegates format validation to browser decoding and uses an explicit picker button",()=>{
  assert.match(js,/isSupportedImageFile\(file\)/);
  assert.match(html,/id="import-image" type="button"/);
- assert.ok(html.includes('accept="image/*,image/svg+xml"'));
+ assert.ok(html.includes('accept="*/*"'));
  assert.match(js,/decodeImage\(file\)/);
 });
 test("reduced import detail is an explicit user choice and source remains separate",()=>{
