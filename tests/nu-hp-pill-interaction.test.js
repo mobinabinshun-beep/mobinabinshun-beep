@@ -30,8 +30,8 @@ test("HP pill interaction pop uses viewport coordinates and cannot be clipped by
 
 test("HUD markup is a native button and uses fresh generation 1.20 assets",()=>{
   assert.match(html,/<button class="hp-pill-use" id="hp-pill-use" type="button"/);
-  assert.match(html,/nu-games\.js\?v=20261113-hp-pill-direct-click-r1/);
-  assert.match(html,/nu-world\.css\?v=20261113-hp-pill-direct-click-r1/);
+  assert.match(html,/nu-games\.js\?v=20261113-hp-pill-hud-clickable-r2/);
+  assert.match(html,/nu-world\.css\?v=20261113-hp-pill-hud-clickable-r2/);
 });
 
 test("HP capsule wallet rules consume exactly one capsule and cap healing at 10 HP",()=>{
@@ -40,4 +40,11 @@ test("HP capsule wallet rules consume exactly one capsule and cap healing at 10 
   assert.equal(result.state.hp,10);assert.equal(result.state.hpPills,1);
   const full=wallet.useHpPill({hp:10,hpPills:1},{id:"hud-full-test"});
   assert.equal(full.ok,false);assert.equal(full.reason,"HP_FULL");assert.equal(full.state.hpPills,1);
+});
+
+
+test("HP HUD capsule remains visible at zero inventory and reports unavailable state without losing clickability",()=>{
+  assert.match(games,/pill\.hidden=false/);
+  assert.match(games,/pill\.classList\.toggle\("unavailable",state\.save\.hp>=10\|\|state\.save\.hpPills<1\)/);
+  assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use\.unavailable\{[^}]*pointer-events:auto!important/);
 });
