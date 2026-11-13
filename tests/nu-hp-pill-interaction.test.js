@@ -70,7 +70,7 @@ test("HP capsule visually flies from the HP rail corner to its dock on damage an
   assert.match(games,/lastRenderedHp>=10&&next<10\)\{if\(button\)button\.hidden=true;animateHpPillTravel\("in"\);\}/);
   assert.match(games,/lastRenderedHp<10&&next>=10\)\{if\(button\)button\.hidden=true;animateHpPillTravel\("out"\);\}/);
   assert.match(games,/barRect\.left\+Math\.min\(16,barRect\.width\*\.08\)/);
-  assert.match(games,/buttonRect\.left\+buttonRect\.width\/2/);
+  assert.match(games,/barRect\.right\+25/);
   assert.match(games,/ghost\.animate\(/);
   assert.match(games,/syncHpPillDock\(state\.save\.hp\);renderGameAssetProfile\(\)/);
   assert.match(css,/\.hp-pill-travel-ghost\{position:fixed/);
