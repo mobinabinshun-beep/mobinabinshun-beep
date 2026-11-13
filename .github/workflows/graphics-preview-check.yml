@@ -19,7 +19,7 @@ on:
       - Official-public-information-and-discovery-hub-for-N.U-(Niroo-Universe),-its-publishing-network,-projects,-publications-and-related-creative-works
       - fix/gen1-hp-pill-click-feedback-2026-11-13
       - fix/gen1-hp-pill-event-delegation-overlay-2026-11-13
-      - fix/gen1-hp-pill-direct-click-2026-11-13
+      - fix/gen1-hp-pill-direct-click-2026-11-13\n      - feat/gen1-hex-gateway-navigation-2026-11-13
   pull_request:
     branches:
       - "Official-public-information-and-discovery-hub-for-N.U-(Niroo-Universe),-its-publishing-network,-projects,-publications-and-related-creative-works"
@@ -34,10 +34,10 @@ jobs:
           node-version: 20
       - name: Check JavaScript syntax
         run: |
-          for file in nu-engine.js nu-pixel-world.js nu-graphics-core.js nu-background-engine.js nu-dynamic-layers.js nu-game-render-adapter.js nu-graphics-runtime.js nu-games.js nu-svg-vectorizer.js nu-graphics-analysis.js nu-studio-layout.js nu-raster-import.js nu-pixel-art-studio.js nu-wallet.js nu-materials.js nu-player-ui.js; do
+          for file in nu-engine.js nu-pixel-world.js nu-graphics-core.js nu-background-engine.js nu-dynamic-layers.js nu-game-render-adapter.js nu-graphics-runtime.js nu-games.js nu-svg-vectorizer.js nu-graphics-analysis.js nu-studio-layout.js nu-raster-import.js nu-pixel-art-studio.js nu-wallet.js nu-materials.js nu-player-ui.js nu-hex-gateway.js; do
             node --check "$file"
           done
-      - name: Test wallet and HP capsule rules
+      - name: Test hex gateway navigation and interaction contract\n        run: node --test tests/nu-hex-gateway.test.js\n      - name: Test wallet and HP capsule rules
         run: node --test tests/nu-wallet.test.js
       - name: Test N.U material rendering and reduced-motion behavior
         run: node --test tests/nu-materials.test.js
