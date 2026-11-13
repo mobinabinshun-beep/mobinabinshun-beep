@@ -25,4 +25,4 @@ The owner clarified that the previous changes were too broad and requested resto
 - Human test template: `docs/operations/HUMAN-TEST-REPORT-TEMPLATE.md`
 
 ## Acceptance state
-Automated CI and human browser/device acceptance are pending. No production-readiness claim is made.
+CI passed: static validation 43495945494, Studio regression 43495945477, graphics integrity 43495945491. Human browser/device visual QA remains pending. The scope is a restore and a visibility freeze, not a new product redesign.
