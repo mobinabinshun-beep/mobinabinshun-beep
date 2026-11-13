@@ -3,7 +3,7 @@
   "generation": 1,
   "runtime": "N.U Adaptive Runtime",
   "runtimeVersion": "0.1-prototype",
-  "packageVersion": "0.5.6-gen1-hex-gateway-single-entrypoint",
+  "packageVersion": "0.5.7-gen1-hud-capsule-shield",
   "entry": "index.html",
   "modules": [
     "index.html",
@@ -45,6 +45,9 @@
     "native": "future adapter required"
   },
   "notes": [
+    "N-BI Arcane Shield meter is visual-only in Generation 1.33 and does not mitigate Chaos damage or change HP/gameplay balance.",
+    "Operational protocol: backup exact base → scoped candidate branch → inspect and implement → archive requirements and decisions → syntax/regression checks → PR review → merge only after CI and human acceptance → post-change archive.",
+    "Generation 1.33 candidate: home-screen gateway hidden; gameplay gateway limited to Back, Menu and Settings/Options; N.U mark, game title and LV repositioned; XP/Mana values placed inside capsule rails; HP capsule dock calibrated; N-BI visual charge indicator added. Human browser/device QA pending.",
     "Generation 1.32.1: remove duplicate legacy menu/back buttons from main-world internal views so the shared hex gateway is the single navigation entry point.",
     "Generation 1.32: calibrates the shared N.U hex gateway across all internal Generation 1 pages with responsive positioning, touch-direct activation, mouse-hover dwell, two-step click/keyboard confirmation, outside-exit tolerance and pause/blur behavior. Navigation only; game rules and wallet/save state are unchanged.",
     "Generation 1.31: adds a standalone N.U Casino with playable Coin Flip, Lucky Dice and Mini Slots. The casino uses a separate local virtual-credit balance (100 starting credits), persists in the shared browser save, and never touches XP/Mana or real money. Human browser/device acceptance remains required.",
