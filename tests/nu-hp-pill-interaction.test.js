@@ -62,3 +62,16 @@ test("successful HP capsule use emits a radial interaction burst anchored to the
   assert.match(css,/@media\(prefers-reduced-motion:reduce\)\{\.hp-pill-interaction-burst/);
   assert.match(css,/\.hp-pill-interaction-burst\{position:fixed/);
 });
+
+test("HP capsule visually flies from the HP rail corner to its dock on damage and returns when HP is full",()=>{
+  assert.match(games,/function animateHpPillTravel\(direction\)/);
+  assert.match(games,/function syncHpPillDock\(hp\)/);
+  assert.match(games,/lastRenderedHp>=10&&next<10\)animateHpPillTravel\("in"\)/);
+  assert.match(games,/lastRenderedHp<10&&next>=10\)animateHpPillTravel\("out"\)/);
+  assert.match(games,/barRect\.left\+Math\.min\(16,barRect\.width\*\.08\)/);
+  assert.match(games,/buttonRect\.left\+buttonRect\.width\/2/);
+  assert.match(games,/source\.animate\(/);
+  assert.match(games,/syncHpPillDock\(state\.save\.hp\);renderGameAssetProfile\(\)/);
+  assert.match(css,/\.hp-pill-travel-ghost\{position:fixed/);
+  assert.match(css,/@media\(prefers-reduced-motion:reduce\)\{\.hp-pill-travel-ghost/);
+});
