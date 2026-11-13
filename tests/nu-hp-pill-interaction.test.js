@@ -108,3 +108,15 @@ test("Generation 1.26 reserves a responsive HP frame and an internal 42px capsul
   assert.ok(css.includes("width:calc(100vw - 16px)"));
   assert.ok(html.includes("hp-pill-dock-motion-r2"));
 });
+
+
+test("Generation 1.27 Store has one HP capsule row with isolated icon-use and Buy actions",()=>{
+  assert.match(games,/shop-hp-pill-item/);
+  assert.match(games,/<button class="shop-hp-pill-use" type="button" data-use-hp-pill/);
+  assert.match(games,/<span class="shop-hp-pill-count" aria-live="polite">×'\+state\.save\.hpPills/);
+  assert.match(games,/<button class="btn primary shop-hp-pill-buy" data-buy-hp-pill/);
+  assert.doesNotMatch(games,/Use owned capsule<\/strong>|shop-use-item/);
+  assert.match(games,/b\.addEventListener\("click",e=>\{\s*e\.preventDefault\(\);e\.stopPropagation\(\);\s*if\(b\.disabled\)return;\s*useHpPill\(e\);/);
+  assert.match(css,/\.shop-hp-pill-use \.hp-pill-icon\.is-owned\{[^}]*filter:drop-shadow/);
+  assert.match(css,/\.shop-hp-pill-buy\{min-width:112px/);
+});
