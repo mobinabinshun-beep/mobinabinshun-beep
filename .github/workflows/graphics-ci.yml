@@ -1,0 +1,45 @@
+name: N.U graphics integrity
+on:
+  push:
+    paths:
+      - "index.html"
+      - "nu-background-engine.js"
+      - "nu-graphics-runtime.js"
+      - "nu-world.css"
+      - "archive/visual-layers/**"
+      - ".github/workflows/graphics-ci.yml"
+  pull_request:
+    paths:
+      - "index.html"
+      - "nu-background-engine.js"
+      - "nu-graphics-runtime.js"
+      - "nu-world.css"
+      - "archive/visual-layers/**"
+      - ".github/workflows/graphics-ci.yml"
+  workflow_dispatch:
+jobs:
+  graphics-integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify canonical scene wiring and quarantine
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq 'Material/Background.svg' nu-background-engine.js
+          grep -Fq 'id="nu-background-image"' nu-background-engine.js
+          grep -Fq 'z-index:-3' nu-background-engine.js
+          ! grep -Fq 'nu-pixel-world.js' index.html
+          grep -Fq 'nu-dynamic-layers' nu-world.css
+          grep -Fq 'display:none!important' nu-world.css
+          test -s archive/visual-layers/nu-pixel-world.js
+          test -s archive/visual-layers/nu-dynamic-layers.js
+          grep -Fq 'visualOverlays:"quarantined"' nu-graphics-runtime.js
+      - name: Verify canonical SVG endpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://raw.githubusercontent.com/mobinabinshun-beep/Repository/main/Material/Background.svg"
+          curl --fail --location --silent --show-error --output /tmp/nu-background.svg "$url"
+          test -s /tmp/nu-background.svg
+          grep -Eiq '<svg([[:space:]>])' /tmp/nu-background.svg
