@@ -31,7 +31,7 @@ test("HP pill interaction pop uses viewport coordinates and cannot be clipped by
 test("HUD markup is a native button and uses the current generation 1.29 assets",()=>{
   assert.match(html,/<button class="hp-pill-use" id="hp-pill-use" type="button"/);
   assert.match(html,/nu-games\.js\?v=20261113-gen1-casino-mini-games-r1/);
-  assert.match(html,/nu-world\.css\?v=20261113-gen1-casino-mini-games-r1/);
+  assert.match(html,/nu-world\.css\?v=20261113-hud-capsule-shield-r1/);
 });
 
 test("HP capsule wallet rules consume exactly one capsule and cap healing at 10 HP",()=>{
@@ -45,7 +45,7 @@ test("HP capsule wallet rules consume exactly one capsule and cap healing at 10 
 
 test("HP HUD capsule remains visible at zero inventory and reports unavailable state without losing clickability",()=>{
   assert.doesNotMatch(games,/pill\.hidden=false/);
-  assert.ok(games.includes('button.hidden=hpPillTravelAnimation&&hpPillTravelAnimation.playState==="running"?true:next>=10'));
+  assert.ok(games.includes('button.hidden=hpPillDockTimer||(hpPillTravelAnimation&&hpPillTravelAnimation.playState==="running")?true:next>=10'));
   assert.match(games,/pill\.classList\.toggle\("unavailable",state\.save\.hp>=10\|\|state\.save\.hpPills<1\)/);
   assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use\.unavailable\{[^}]*pointer-events:auto!important/);
 });
@@ -80,7 +80,7 @@ test("HP capsule is absent at full HP and remains hidden until its arrival anima
   assert.ok(games.includes("lastRenderedHp=10;"));
   assert.ok(games.includes("const finishedDirection=hpPillTravelDirection;"));
   assert.ok(games.includes('button.hidden=finishedDirection==="out"'));
-  assert.ok(games.includes('if(lastRenderedHp>=10&&next<10){if(button)button.hidden=true;animateHpPillTravel("in");}'));
+  assert.ok(games.includes('if(lastRenderedHp>=10&&next<10){if(button)button.hidden=true;clearTimeout(hpPillDockTimer);hpPillDockTimer=setTimeout(()=>{hpPillDockTimer=0;animateHpPillTravel("in");},390);}'));
   assert.ok(css.includes("#game-view.active .hp-bar #hp-pill-use[hidden]{display:none!important}"));
 });
 
@@ -97,7 +97,7 @@ test("Generation 1.26 widens the HP frame and keeps the pill dock inside its rig
 test("HP pill stays hidden during repeated damage and reverses the same in-flight animation when HP recovers",()=>{
   assert.ok(games.includes("hpPillTravelDirection=null"));
   assert.ok(games.includes("hpPillTravelAnimation.reverse()"));
-  assert.ok(games.includes('hpPillTravelAnimation.playState==="running"?true:next>=10'));
+  assert.ok(games.includes('hpPillDockTimer||(hpPillTravelAnimation&&hpPillTravelAnimation.playState==="running")?true:next>=10'));
   assert.ok(games.includes('button.hidden=finishedDirection==="out"'));
   assert.ok(games.includes("if(direction!==hpPillTravelDirection){hpPillTravelDirection=direction;hpPillTravelAnimation.reverse();}"));
 });
