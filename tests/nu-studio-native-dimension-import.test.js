@@ -36,7 +36,7 @@ test("high-resolution rendering still uses ImageData and bounded undo history",(
  assert.match(js,/trimHistory\(undoStack,current\)/);
 });
 test("UI states browser and device resource limits without claiming a product cap",()=>{
- assert.match(html,/if the browser or device cannot allocate or process them, import fails without replacing your current artwork/);
+ assert.match(html,/If the browser or device cannot allocate or process them, import fails without replacing your current artwork/);
  assert.match(html,/Canvas dimensions are limited by actual browser and device capabilities/);
  assert.doesNotMatch(html,/safe pixel budget|capped by the adaptive device budget/);
 });
