@@ -13,7 +13,7 @@ const css = read("nu-hex-gateway.css");
 test("gateway is mounted on every internal Generation 1 page", () => {
   for (const page of [html, casino, launcher, studio]) {
     assert.match(page, /id="nu-hex-gateway"/);
-    assert.match(page, /nu-hex-gateway\.css\?v=20261113-hex-gateway-calibration-r1/);
+    assert.match(page, /nu-hex-gateway\.css\?v=20261113-hex-gateway-calibration-r2/);
     assert.match(page, /nu-hex-gateway\.js\?v=20261113-hex-gateway-calibration-r1/);
     assert.match(page, /class="nu-gateway-scrim"/);
   }
