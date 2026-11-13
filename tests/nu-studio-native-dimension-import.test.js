@@ -21,7 +21,7 @@ test("picker uses an explicit user-gesture button and source stays separate",()=
  assert.match(html,/<button class="btn primary" id="import-image" type="button">IMPORT IMAGE<\/button>/);
  assert.match(js,/\$\("import-image"\)\.addEventListener\("click",\(\)=>\$\("image-file"\)\.click\(\)\)/);
  assert.match(js,/originalImportFile=file/);
- assert.match(js,/sourcePreviewUrl=URL\.createObjectURL\(file\)/);
+ assert.match(js,/nextPreviewUrl=URL\.createObjectURL\(file\)/);
 });
 test("import failure rolls back artwork, source metadata and preview before history commit",()=>{
  assert.match(js,/const before=snapshot\(\),previous=\{/);
