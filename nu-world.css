@@ -313,3 +313,9 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 @keyframes nu-hp-burst-particle{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}20%{opacity:1}100%{opacity:0;transform:translate(calc(-50% + var(--burst-x)),calc(-50% + var(--burst-y))) scale(.15)}}
 @keyframes nu-hp-burst-label{0%{opacity:0;translate:0 9px;scale:.72}16%{opacity:1;scale:1.12}34%{scale:1}100%{opacity:0;translate:0 -32px;scale:.94}}
 @media(prefers-reduced-motion:reduce){.hp-pill-interaction-burst .hp-pill-burst-ring,.hp-pill-interaction-burst .hp-pill-burst-particle,.hp-pill-interaction-burst .hp-pill-burst-label{animation:none!important;opacity:1;transform:translate(-50%,-50%)!important;translate:0 0!important;scale:1!important}.hp-pill-burst-particle{display:none}}
+
+
+/* Generation 1.23: capsule docks beside a damaged HP rail and returns when fully restored. */
+.hp-pill-travel-ghost{position:fixed;z-index:1602;width:36px;height:36px;object-fit:contain;image-rendering:pixelated;pointer-events:none;filter:drop-shadow(0 0 8px #b7ff75);will-change:transform,opacity}
+@media(max-width:520px){.hp-pill-travel-ghost{width:32px;height:32px}}
+@media(prefers-reduced-motion:reduce){.hp-pill-travel-ghost{display:none!important}}

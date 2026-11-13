@@ -109,3 +109,20 @@ Validate the five archived N.U Mana SVG materials when used on interactive Mana 
 - Actual / browser / device / screen orientation:
 - Result: PASS / PASS WITH LIMITATIONS / FAIL
 - Notes:
+
+## HP capsule arrival / return motion — Generation 1.23
+
+- [ ] Begin a game with HP at 10/10 and note the capsule icon is in its normal HUD position.
+- [ ] In Chaos Attack, allow one breach to reduce HP below 10.
+- [ ] Confirm one golden capsule image appears from the HP rail's left corner and travels to the capsule dock at the rail's right side.
+- [ ] Confirm the real capsule button remains usable after the arrival animation; animation itself does not consume a capsule.
+- [ ] Take additional damage while HP is already below 10; confirm the docked icon does not replay or duplicate.
+- [ ] Restore HP gradually; confirm the capsule stays docked until HP reaches 10/10.
+- [ ] On reaching full HP (through a successful capsule use or round-completion heal), confirm the visual capsule travels back along the reverse path to the rail corner and fades out.
+- [ ] Confirm no capsule inventory is consumed by either travel animation; only an intentional click/tap/Enter/Space on the capsule button consumes one.
+- [ ] Verify portrait/landscape, desktop/mobile, all three games, and reduced-motion mode.
+- Expected: one arrival per transition from full to damaged, one reverse/fade per transition back to full, with no duplicate icons, clipped animation or wallet changes.
+- Actual / browser / device / orientation:
+- Result: PASS / PASS WITH LIMITATIONS / FAIL
+- Notes:
+

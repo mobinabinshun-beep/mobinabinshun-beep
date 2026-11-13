@@ -30,8 +30,8 @@ test("HP pill interaction pop uses viewport coordinates and cannot be clipped by
 
 test("HUD markup is a native button and uses fresh generation 1.20 assets",()=>{
   assert.match(html,/<button class="hp-pill-use" id="hp-pill-use" type="button"/);
-  assert.match(html,/nu-games\.js\?v=20261113-hp-pill-burst-r3/);
-  assert.match(html,/nu-world\.css\?v=20261113-hp-pill-burst-r3/);
+  assert.match(html,/nu-games\.js\?v=20261113-hp-pill-arrival-r1/);
+  assert.match(html,/nu-world\.css\?v=20261113-hp-pill-arrival-r1/);
 });
 
 test("HP capsule wallet rules consume exactly one capsule and cap healing at 10 HP",()=>{
@@ -61,4 +61,17 @@ test("successful HP capsule use emits a radial interaction burst anchored to the
   assert.match(css,/@keyframes nu-hp-burst-particle/);
   assert.match(css,/@media\(prefers-reduced-motion:reduce\)\{\.hp-pill-interaction-burst/);
   assert.match(css,/\.hp-pill-interaction-burst\{position:fixed/);
+});
+
+test("HP capsule visually flies from the HP rail corner to its dock on damage and returns when HP is full",()=>{
+  assert.match(games,/function animateHpPillTravel\(direction\)/);
+  assert.match(games,/function syncHpPillDock\(hp\)/);
+  assert.match(games,/lastRenderedHp>=10&&next<10\)animateHpPillTravel\("in"\)/);
+  assert.match(games,/lastRenderedHp<10&&next>=10\)animateHpPillTravel\("out"\)/);
+  assert.match(games,/barRect\.left\+Math\.min\(16,barRect\.width\*\.08\)/);
+  assert.match(games,/buttonRect\.left\+buttonRect\.width\/2/);
+  assert.match(games,/ghost\.animate\(/);
+  assert.match(games,/syncHpPillDock\(state\.save\.hp\);renderGameAssetProfile\(\)/);
+  assert.match(css,/\.hp-pill-travel-ghost\{position:fixed/);
+  assert.match(css,/@media\(prefers-reduced-motion:reduce\)\{\.hp-pill-travel-ghost/);
 });
