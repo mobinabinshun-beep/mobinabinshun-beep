@@ -25,3 +25,14 @@ test("marks edge pixels and rejects invalid input",()=>{
   assert.throws(()=>analyze(["red"],1,1),/hexadecimal/);
   assert.throws(()=>analyze([],2,2),/length/);
 });
+
+test("creates a human-readable report with dimensions, palette and region bounds",()=>{
+  const result=analyze(["#ff0000","#ff0000",null,"#00ff00"],2,2);
+  const {createHumanReport}=require("../nu-graphics-analysis.js");
+  const report=createHumanReport(result,{name:"Test artwork"});
+  assert.match(report,/N\\.U Human Image Report/);
+  assert.match(report,/2 × 2 pixels/);
+  assert.match(report,/Transparent pixels: 1/);
+  assert.match(report,/#ff0000/);
+  assert.match(report,/bounds x=0, y=0, width=2, height=1/);
+});
