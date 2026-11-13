@@ -432,3 +432,12 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 
 - [N.U Implementation & Calibration Protocol](./docs/operations/NU-OPS-IMPLEMENT-01.md)
 - [Human-test report template](./docs/operations/HUMAN-TEST-REPORT-TEMPLATE.md)
+
+
+## Generation 1 — Exchange and asset-change chart (candidate)
+
+- The lightweight Exchange page is part of Generation 1 and uses the existing local wallet/transaction ledger.
+- The chart reconstructs asset balance changes from recorded signed transaction deltas; it is not a market-price chart.
+- Casino Credits are shown as a Generation 1 virtual asset, separate from XP, Mana and HP.
+- No conversion pairs, rates, fees, or exchange eligibility are invented. Conversion remains unavailable until the owner approves the pair/rate rules.
+- History is limited to the wallet's retained local transaction window (currently 40 entries). Local browser data is not server-authoritative and does not synchronize across devices.

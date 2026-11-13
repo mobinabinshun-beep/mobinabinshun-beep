@@ -81,3 +81,21 @@ test("game asset projections show only relevant owned assets",()=>{
   assert.deepEqual(wallet.gameAssetRows(save,"mana").map(x=>x.key),["mana","hp","manaCapsules"]);
   assert.deepEqual(wallet.gameAssetRows(save,"chaos").map(x=>x.key),["xp","mana","hp","hpPills","manaCapsules"]);
 });
+
+test("asset history reconstructs the recorded balance path from signed deltas",()=>{
+  const save={xp:18,transactions:[
+    {id:"a",at:"2026-11-13T10:00:00.000Z",title:"Reward",deltas:{xp:10}},
+    {id:"b",at:"2026-11-13T11:00:00.000Z",title:"Purchase",deltas:{xp:-2}}
+  ]};
+  const points=wallet.assetHistory(save,"xp");
+  assert.deepEqual(points.map(p=>p.balance),[10,20,18]);
+  assert.deepEqual(points.map(p=>p.delta),[0,10,-2]);
+});
+test("asset history excludes unimplemented assets and never fabricates rates",()=>{
+  assert.deepEqual(wallet.assetHistory({xp:10,transactions:[]},"xCredits"),[]);
+  assert.equal(wallet.assetHistory({xp:10,transactions:[]},"xp").at(-1).balance,10);
+});
+test("casino credits are included as an owned Generation 1 wallet asset",()=>{
+  const rows=wallet.assetRows({casinoCredits:77});
+  assert.ok(rows.some(row=>row.key==="casinoCredits"&&row.value===77));
+});

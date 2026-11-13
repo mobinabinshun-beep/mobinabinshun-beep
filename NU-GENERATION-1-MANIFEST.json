@@ -159,5 +159,14 @@
       "purpose": "Three playable browser mini-games: Coin Flip, Lucky Dice and Mini Slots. Uses a separate local virtual-credit balance; no real-money deposits, payments or cash-outs.",
       "inRandomPool": false
     }
-  ]
+  ],
+  "generation1Exchange": {
+    "status": "experimental-candidate",
+    "page": "exchange.html",
+    "script": "nu-exchange.js",
+    "stylesheet": "nu-exchange.css",
+    "chart": "local-asset-balance-history-from-wallet-transactions",
+    "conversion": "disabled-pending-owner-approved-pairs-rates-fees-and-limits",
+    "note": "No market prices, exchange rates, or history are fabricated; browser-local ledger only."
+  }
 }
