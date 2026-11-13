@@ -435,8 +435,8 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 body:not(.nu-game-active) #nu-hex-gateway,body:not(.nu-game-active) .nu-gateway-scrim{display:none!important}
 body.nu-game-active .topbar{position:fixed;z-index:8;top:8px;left:12px;width:auto;padding:0;pointer-events:none}
 body.nu-game-active .topbar .brand{display:block;max-width:230px;font-size:14px;letter-spacing:.2em;opacity:.46;text-shadow:0 1px 8px #00101a}
-body.nu-game-active .topbar .brand small{font-size:9px;letter-spacing:.18em;color:#9ac5d9}
-body.nu-game-active .topbar #quality-status,body.nu-game-active .topbar #menu-open{display:none!important}
+body.nu-game-active .topbar .brand small{font-size:9px;letter-spacing:.18em;color:#9ac5d9}\nbody.nu-game-active .topbar #quality-status{left:12px;top:42px}
+body.nu-game-active .topbar #quality-status{display:block;position:fixed;left:12px;top:42px;padding:0;border:0;background:transparent;border-radius:0;font-size:8px;letter-spacing:.08em;color:#83b8d0;opacity:.58;white-space:nowrap;text-shadow:0 1px 6px #00101a}\nbody.nu-game-active .topbar #menu-open{display:none!important}
 body.nu-game-active #game-view.active .view-head{top:8px;left:50%;right:auto;transform:translateX(-50%);justify-content:center}
 body.nu-game-active #game-view.active .view-head #back-home{display:none!important}
 body.nu-game-active #game-view.active .view-head h2{font-size:clamp(13px,2.2vw,18px);letter-spacing:.12em;text-align:center;max-width:58vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
