@@ -22,7 +22,7 @@ test("reduced import detail is an explicit user choice and source remains separa
  assert.match(html,/value="256">256 px · compact/);
  assert.match(js,/Explicit reduced-detail working copy created/);
  assert.match(js,/originalImportFile=file/);
- assert.match(js,/sourcePreviewUrl=URL\.createObjectURL\(file\)/);
+ assert.match(js,/nextPreviewUrl=URL\.createObjectURL\(file\)/);
 });
 test("high-resolution rendering and history management remain enabled",()=>{
  assert.match(js,/ctx\.createImageData\(width,height\)/);
@@ -33,4 +33,10 @@ test("high-resolution rendering and history management remain enabled",()=>{
 test("resize controls are not clamped to a fixed 2048-pixel edge",()=>{
  assert.doesNotMatch(js,/nextW=clamp\(Math\.round\(nextW\),1,2048\)/);
  assert.doesNotMatch(js,/nextH=clamp\(Math\.round\(nextH\),1,2048\)/);
+});
+
+test("failed decode, allocation, mapping, or render preserves the previous artwork transactionally",()=>{
+ assert.match(js,/Image import failed without replacing your previous artwork/);
+ assert.match(js,/try\{restore\(before\);renderPalette\(\);\}catch\(_\)\{\}/);
+ assert.ok(js.indexOf("commitHistory(before);originalImportFile=file;")>js.indexOf("renderPalette();"));
 });
