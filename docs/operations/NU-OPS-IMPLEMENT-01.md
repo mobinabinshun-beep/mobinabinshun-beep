@@ -20,7 +20,7 @@ Whenever the project owner says «اعمال کن», «پیاده کن», «فی
 7. **Document:** update README/manifest/changelog and add a dated implementation record describing request, files, decisions, tests, limitations and acceptance status.
 8. **Conversation archive:** save a concise dated record of requirements and implementation decisions in docs/operations/conversation-archive/. Never store credentials, tokens, personal secrets or unrelated private data.
 9. **Public demo & human report:** use the approved candidate/Pages process. Record device/browser, viewport, input mode, expected/actual result and evidence. CI is not proof of human QA.
-10. **Review & release:** open a PR with scope, backup ref, test evidence, limitations and manual QA checklist. Merge only after required checks and acceptance criteria pass. If human testing is pending, keep the candidate unmerged.
+10. **Review & release:** open a PR with scope, backup ref, test evidence, limitations and manual QA checklist. After backup and required CI checks pass, a clearly labeled public demo candidate may be merged/deployed specifically for human acceptance when that is the requested deliverable. Keep its status as HUMAN-QA-PENDING and do not call it production/released. A production release still requires recorded human acceptance. If deployment is not requested, keep the candidate unmerged.
 11. **Post-change archive:** record PR, commit, workflow runs, deployment status, remaining risks and rollback branch.
 
 ## 3. Minimum acceptance matrix
