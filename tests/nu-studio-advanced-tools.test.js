@@ -53,10 +53,10 @@ test("PNG and SVG files are created before optional analytics and reward trackin
  assert.ok(png.indexOf("download(blob,name)")<png.indexOf("analyzeArtwork()"));
 });
 test("Graphic IR reports analysis-limit errors without hiding the PNG and SVG alternatives",()=>{
- assert.match(js,/this format needs a successful graphics analysis/);
+ assert.match(js,/function graphicIRSource\(\)/);\n assert.doesNotMatch(js,/this format needs a successful graphics analysis/);
 });
 test("Graphic IR is clean structured analysis without a human-report attachment",()=>{
- assert.match(js,/const analysis=analyzeArtwork\(\),source=JSON\.stringify\(analysis,null,2\)/);
+ assert.match(js,/format:"NU-GFX-IR\/2"/);\n assert.match(js,/encoding:"row-major-rle"/);\n assert.match(js,/instructions:\[\{op:"set-palette"/);
  assert.doesNotMatch(js,/humanReport:/);
 });
 
