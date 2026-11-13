@@ -31,7 +31,7 @@ test("HP pill interaction pop uses viewport coordinates and cannot be clipped by
 test("HUD markup is a native button and uses the current generation 1.29 assets",()=>{
   assert.match(html,/<button class="hp-pill-use" id="hp-pill-use" type="button"/);
   assert.match(html,/nu-games\.js\?v=20261113-gen1-casino-mini-games-r1/);
-  assert.match(html,/nu-world\.css\?v=20261113-gen1-casino-mini-games-r1/);
+  assert.match(html,/nu-world\.css\?v=20261113-hud-capsule-shield-r1/);
 });
 
 test("HP capsule wallet rules consume exactly one capsule and cap healing at 10 HP",()=>{
