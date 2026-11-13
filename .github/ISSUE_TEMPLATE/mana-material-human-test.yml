@@ -1,0 +1,62 @@
+name: Mana Material Human Test
+description: Report desktop/mobile visual and interaction findings for the Generation 1 Mana material preview.
+title: "[Human QA] Mana Material — "
+labels: ["human-test", "generation-1"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Test the public Generation 1 demo, launch **Mana Collector**, and report how the five N.U Material SVG assets render and behave. Do not include personal or sensitive information.
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and version
+      placeholder: e.g. Chrome 130
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Device and operating system
+      placeholder: e.g. Android phone / Windows laptop
+    validations:
+      required: true
+  - type: dropdown
+    id: result
+    attributes:
+      label: Overall result
+      options:
+        - PASS
+        - PASS WITH LIMITATIONS
+        - FAIL
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: What did you verify?
+      options:
+        - label: Pixel-art materials are crisp and recognizable.
+        - label: Target hit area matches the visible Mana object.
+        - label: Mouse interaction works.
+        - label: Touch interaction works.
+        - label: Collection effect appears briefly.
+        - label: Missed taps do not grant Mana.
+        - label: Exactly +1 Mana is granted per successful collection.
+        - label: Bubble Hunt and Chaos Attack remain unaffected.
+        - label: Portrait and landscape layouts are usable.
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce and expected vs actual result
+      description: Include the screen size/orientation and whether reduced motion was enabled.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: severity
+    attributes:
+      label: Severity and additional notes
+      placeholder: Cosmetic / usability / functional / blocking
+    validations:
+      required: false
