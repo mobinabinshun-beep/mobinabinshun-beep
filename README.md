@@ -329,3 +329,11 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 - Click propagation is stopped at the button so the HP asset-profile click handler cannot swallow or reinterpret capsule use.
 - Existing wallet rules remain unchanged; successful use triggers the anchored `+N HP` viewport animation and HP bar feedback.
 - Automated regression checks assert the direct listener and CSS hit target. Human device/browser retest remains required.
+
+
+## Generation 1.22 — HP capsule interaction burst (2026-11-13)
+
+- Upgraded successful HP capsule feedback from a single floating text pop to a short radial burst anchored precisely to the HP HUD icon: expanding green ring, eight outward particles, and a glowing `+N HP` label.
+- The burst appears only after a capsule is successfully consumed; full-HP and empty-inventory warnings remain unchanged and do not emit a success burst.
+- The animation uses viewport coordinates so it is not clipped by the game stage, and includes a reduced-motion fallback.
+- Wallet consumption, healing cap, XP cost and capsule inventory rules are unchanged.

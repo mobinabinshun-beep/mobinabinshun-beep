@@ -30,8 +30,8 @@ test("HP pill interaction pop uses viewport coordinates and cannot be clipped by
 
 test("HUD markup is a native button and uses fresh generation 1.20 assets",()=>{
   assert.match(html,/<button class="hp-pill-use" id="hp-pill-use" type="button"/);
-  assert.match(html,/nu-games\.js\?v=20261113-hp-pill-hud-clickable-r2/);
-  assert.match(html,/nu-world\.css\?v=20261113-hp-pill-hud-clickable-r2/);
+  assert.match(html,/nu-games\.js\?v=20261113-hp-pill-burst-r3/);
+  assert.match(html,/nu-world\.css\?v=20261113-hp-pill-burst-r3/);
 });
 
 test("HP capsule wallet rules consume exactly one capsule and cap healing at 10 HP",()=>{
@@ -47,4 +47,18 @@ test("HP HUD capsule remains visible at zero inventory and reports unavailable s
   assert.match(games,/pill\.hidden=false/);
   assert.match(games,/pill\.classList\.toggle\("unavailable",state\.save\.hp>=10\|\|state\.save\.hpPills<1\)/);
   assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use\.unavailable\{[^}]*pointer-events:auto!important/);
+});
+
+
+test("successful HP capsule use emits a radial interaction burst anchored to the HUD icon",()=>{
+  assert.match(games,/function showHpPillInteraction\(anchor,amount\)\{[\s\S]*?hp-pill-interaction-burst/);
+  assert.match(games,/hp-pill-burst-ring/);
+  assert.match(games,/for\(let i=0;i<8;i\+\+\)/);
+  assert.match(games,/hp-pill-burst-particle/);
+  assert.match(games,/hp-pill-burst-label/);
+  assert.match(games,/showHpPillInteraction\(anchor,result\.restored\)/);
+  assert.match(css,/@keyframes nu-hp-burst-ring/);
+  assert.match(css,/@keyframes nu-hp-burst-particle/);
+  assert.match(css,/@media\(prefers-reduced-motion:reduce\)\{\.hp-pill-interaction-burst/);
+  assert.match(css,/\.hp-pill-interaction-burst\{position:fixed/);
 });
