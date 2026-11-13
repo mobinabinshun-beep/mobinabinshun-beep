@@ -5,12 +5,9 @@
  if(root)root.NURasterImport=api;
 })(typeof globalThis!=="undefined"?globalThis:this,function(){
  "use strict";
- const IMAGE_EXTENSION=/\.(png|jpe?g|webp|gif|svg|bmp|avif|ico|tiff?)$/i;
  function isSupportedImageFile(file){
-  if(!file)return false;
-  const type=String(file.type||"").toLowerCase();
-  if(type.startsWith("image/"))return true;
-  return IMAGE_EXTENSION.test(String(file.name||""));
+  // Browser decoding validates actual content; MIME and extension metadata are advisory only.
+  return !!file;
  }
  function nearest(rgb,colors){
   let best=colors[0],dist=Infinity;
@@ -21,10 +18,9 @@
   }
   return best;
  }
- function mapPixels(data,width,height,colors,alphaCutoff=0,dither=false,options={}){
-  const cells=width*height,maxPixels=Number(options&&options.maxPixels);
+ function mapPixels(data,width,height,colors,alphaCutoff=0,dither=false){
+  const cells=width*height;
   if(!Number.isSafeInteger(width)||!Number.isSafeInteger(height)||width<1||height<1||!Number.isSafeInteger(cells))throw new RangeError("Raster dimensions are outside the supported numeric range.");
-  if(Number.isFinite(maxPixels)&&maxPixels>0&&cells>maxPixels)throw new RangeError("Raster exceeds the current Launcher resource budget ("+maxPixels.toLocaleString()+" pixels). Choose a smaller working-copy detail.");
   if(!data||data.length!==cells*4)throw new TypeError("RGBA buffer length does not match raster dimensions.");
   if(!Array.isArray(colors)||!colors.length||colors.some(c=>typeof c!=="string"||!/^#[0-9a-f]{6}$/i.test(c)))throw new TypeError("A non-empty six-digit hexadecimal palette is required.");
   const cutoff=Math.max(0,Math.min(255,Number(alphaCutoff)||0)),output=Array(cells).fill(null),errors=dither?new Float32Array(cells*3):null;
