@@ -10,7 +10,7 @@
 ## Files added/changed
 - Added `nu-hex-gateway.css`: fixed responsive hexagonal trigger, orbiting transparent options, ice-glass scrim, reduced-motion handling.
 - Added `nu-hex-gateway.js`: independent event controller, 10px outside boundary, pause/resume bridge through existing pause control, hover dwell, two-step click/touch confirmation, keyboard Escape/Enter support.
-- Updated `index.html`: loads gateway styles/module and mounts the persistent N.U hex control.
+- Updated `index.html`, `launcher.html` and `pixel-art-studio.html`: mount the same persistent N.U hex control in every current internal page; cross-page routes can reopen Store, Wallet and Profile from the main index.
 - Added `tests/nu-hex-gateway.test.js`: static contract tests for mounting, destinations, interactions, pause/freeze integration and module isolation.
 - Updated `.github/workflows/graphics-preview-check.yml`: syntax and regression checks for the feature branch.
 
