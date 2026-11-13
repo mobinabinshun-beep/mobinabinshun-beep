@@ -3,7 +3,7 @@
   "generation": 1,
   "runtime": "N.U Adaptive Runtime",
   "runtimeVersion": "0.1-prototype",
-  "packageVersion": "0.5.1-gen1-studio-ux-repair",
+  "packageVersion": "0.5.2-gen1-human-image-report",
   "entry": "index.html",
   "modules": [
     "index.html",
@@ -41,6 +41,7 @@
     "native": "future adapter required"
   },
   "notes": [
+    "Generation 1.15: image analysis now describes the visible four-layer composite; PNG and SVG exports include a companion Markdown human report, SVG embeds the report metadata, and Graphic IR includes the report as humanReport. A direct human-report download is also available. Source image processing remains local.",
     "Generation 1.14 candidate: Studio workspace uses deterministic fit geometry and ResizeObserver sizing; pointer mapping is centralized; import shows an original-source preview, preserves a separate working copy, offers smooth/nearest resampling and optional Floyd–Steinberg dithering; import size is bounded at 25 MB. Game HUD asset-profile interactions no longer bubble into gameplay pointer handlers and the profile is positioned beside the active resource bar. Browser acceptance remains pending.",
     "Game HUD now exposes per-game asset profiles on hover/focus; each profile is a filtered projection of the global wallet, not a separate balance store. HP capsule can be purchased or used from the Store and used from the in-game HP icon.",
     "Generation 1.13 candidate: Studio fixes fit-to-view/zoom/scroll and per-pixel checkerboard; adds pencil, eraser, fill, eyedropper, line, rectangle, ellipse and brush sizing; imports up to 256px longest-edge with up to 32 colors; exports SVG, PNG and NU-GFX-IR/1; unique artwork downloads award a bounded 1–25 shared XP reward once per fingerprint to the same local Generation 1 wallet.",
@@ -139,7 +140,7 @@
       "name": "N.U Creative Studio — Pixel Art & Vector Lab",
       "generation": 1,
       "entry": "pixel-art-studio.html",
-      "purpose": "Local raster analysis, non-destructive pixel editing, contour SVG, palette-indexed tiles, run-length spans, edge/region maps and machine-readable N.U graphics instructions",
+      "purpose": "Local raster analysis, non-destructive pixel editing, contour SVG, palette-indexed tiles, run-length spans, edge/region maps and machine-readable N.U graphics instructions; downloadable human-readable image report with palette, transparency, connected-region bounds and export notes",
       "inRandomPool": false
     }
   ]
