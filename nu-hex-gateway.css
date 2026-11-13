@@ -16,7 +16,7 @@
 #nu-hex-gateway .nu-gateway-item.is-selected,#nu-hex-gateway .nu-gateway-item:hover,#nu-hex-gateway .nu-gateway-item:focus-visible{z-index:2;color:#fff;transform:translate(var(--gx),var(--gy)) scale(1.2);filter:drop-shadow(0 0 13px #6deaff);outline:none}
 #nu-hex-gateway .nu-gateway-item.is-selected::before,#nu-hex-gateway .nu-gateway-item:hover::before,#nu-hex-gateway .nu-gateway-item:focus-visible::before{background:rgba(45,147,180,.48);animation:nuHexPulse .72s ease-in-out infinite;outline-color:#a9f3ff}
 #nu-hex-gateway .nu-gateway-item.is-confirming::before{animation:nuHexConfirm .18s steps(2,end) 3}
-#nu-hex-gateway .nu-gateway-hint{position:absolute;right:68px;top:17px;width:max-content;max-width:190px;color:#bdefff;font-size:9px;letter-spacing:.12em;opacity:0;transition:opacity .2s ease;pointer-events:none;text-align:right}
+#nu-hex-gateway .nu-gateway-hint{position:absolute;right:170px;top:145px;width:max-content;max-width:190px;color:#bdefff;font-size:9px;letter-spacing:.12em;opacity:0;transition:opacity .2s ease;pointer-events:none;text-align:right}
 #nu-hex-gateway.is-open .nu-gateway-hint{opacity:.85}
 .nu-gateway-scrim{position:fixed;inset:0;z-index:110;opacity:0;visibility:hidden;pointer-events:none;background:rgba(125,195,220,.075);backdrop-filter:blur(5px) saturate(.62);-webkit-backdrop-filter:blur(5px) saturate(.62);transition:opacity .2s ease,visibility .2s ease}
 body.nu-gateway-open .nu-gateway-scrim{opacity:1;visibility:visible;pointer-events:auto}
