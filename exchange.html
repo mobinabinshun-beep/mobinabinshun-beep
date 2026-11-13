@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>N.U Exchange — Generation 1</title>
+<meta name="description" content="Generation 1 virtual asset history and exchange overview for N.U.">
+<meta name="theme-color" content="#071018">
+<link rel="stylesheet" href="./nu-exchange.css?v=20261113-gen1-asset-history-r1">
+</head>
+<body>
+<main class="exchange-shell">
+<header class="exchange-top"><a href="./index.html" class="back-link">← N.U WORLD</a><span class="eyebrow">GENERATION 01 · VIRTUAL ECONOMY</span></header>
+<section class="exchange-hero">
+<p class="eyebrow">N.U ECONOMY SYSTEM</p><h1>ASSET <em>EXCHANGE</em></h1>
+<p>Review your Generation 1 asset balances and how they have changed through recorded wallet activity.</p>
+<div class="exchange-notice">LOCAL DEMO DATA · VIRTUAL ASSETS ONLY · NO REAL-MONEY VALUE</div>
+</section>
+<section class="exchange-summary" aria-label="Selected asset summary">
+<article class="exchange-card"><span>SELECT ASSET</span><label class="sr-only" for="asset-select">Select asset</label><select id="asset-select"></select></article>
+<article class="exchange-card"><span>CURRENT BALANCE</span><strong id="asset-balance">—</strong></article>
+<article class="exchange-card"><span>NET CHANGE IN HISTORY</span><strong id="asset-change">—</strong></article>
+</section>
+<section class="exchange-panel">
+<div class="panel-heading"><div><p class="eyebrow">WALLET LEDGER · RECORDED DATA</p><h2>ASSET CHANGE CHART</h2></div><span id="history-count">0 RECORDS</span></div>
+<p class="panel-note">This chart shows reconstructed wallet balance over the retained transaction history. It is not a market-price or exchange-rate chart. No historical values are generated when the ledger has no supporting records.</p>
+<canvas id="asset-chart" role="img" aria-label="Selected asset balance history chart"></canvas>
+<div id="chart-empty" class="chart-empty" hidden>No recorded changes for this asset yet. The current balance is shown above.</div>
+</section>
+<section class="exchange-panel">
+<div class="panel-heading"><div><p class="eyebrow">AUDIT TRAIL</p><h2>RECENT ASSET MOVEMENTS</h2></div><span>LOCAL SAVE</span></div>
+<div id="asset-transactions" class="asset-transactions"></div>
+</section>
+<section class="exchange-panel conversion-panel">
+<div class="panel-heading"><div><p class="eyebrow">CONVERSION MODULE</p><h2>ASSET SWAP</h2></div><span class="pending-tag">RULES PENDING</span></div>
+<p>Conversion pairs, rates, fees, limits and eligibility have not yet been approved. Swaps are therefore disabled; no exchange rate or market price is invented. Once the owner-defined rules are recorded, this panel can show live quotes and a separate rate-history chart.</p>
+<button type="button" disabled>CONVERSION NOT YET AVAILABLE</button>
+</section>
+<footer class="exchange-footer">N.U — NIROO UNIVERSE · GENERATION 1 EXPERIMENTAL ECONOMY</footer>
+</main>
+<script src="./nu-engine.js"></script><script src="./nu-wallet.js"></script><script src="./nu-exchange.js?v=20261113-gen1-asset-history-r1"></script>
+</body></html>
