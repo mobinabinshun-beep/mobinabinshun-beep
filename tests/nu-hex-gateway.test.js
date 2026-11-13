@@ -10,16 +10,15 @@ const studio = read("pixel-art-studio.html");
 const js = read("nu-hex-gateway.js");
 const css = read("nu-hex-gateway.css");
 
-test("gateway is mounted on every internal Generation 1 page", () => {
+test("Gateway is detached from all live Generation 1 entry pages", () => {
   for (const page of [html, casino, launcher, studio]) {
-    assert.match(page, /id="nu-hex-gateway"/);
-    assert.match(page, /nu-hex-gateway\.css\?v=20261113-hex-gateway-calibration-r2/);
-    assert.match(page, /nu-hex-gateway\.js\?v=20261113-hex-gateway-calibration-r1/);
-    assert.match(page, /class="nu-gateway-scrim"/);
+    assert.doesNotMatch(page, /id="nu-hex-gateway"/);
+    assert.doesNotMatch(page, /nu-gateway-scrim/);
+    assert.doesNotMatch(page, /nu-hex-gateway\.(?:css|js)/);
   }
 });
 
-test("gateway remains available across all views in the main world", () => {
+test("archived Gateway controller retains its prior scope and observer logic", () => {
   assert.match(js, /classList\.add\("nu-gateway-enabled"\)/);
   assert.match(js, /gameView\?\.classList\.contains\("active"\)/);
   assert.match(js, /MutationObserver/);
@@ -28,7 +27,7 @@ test("gateway remains available across all views in the main world", () => {
   assert.match(css, /body\.nu-gateway-enabled #wallet-back/);
 });
 
-test("touch activates an item on release while mouse hover and click retain separate paths", () => {
+test("archived Gateway controller retains touch and mouse interaction logic", () => {
   assert.match(js, /pointerType !== "touch"/);
   assert.match(js, /suppressClickUntil/);
   assert.match(js, /pointerType === "mouse"/);
@@ -38,7 +37,7 @@ test("touch activates an item on release while mouse hover and click retain sepa
   assert.match(js, /event\.key === "Escape"/);
 });
 
-test("outside exit uses the 10px tolerance and returns gameplay to its prior state", () => {
+test("archived Gateway controller retains exit tolerance and gameplay restoration logic", () => {
   assert.match(js, /const tolerance = 10/);
   assert.match(js, /performance\.now\(\) - outsideSince > 110/);
   assert.match(js, /pauseGame\(\)/);
@@ -46,7 +45,7 @@ test("outside exit uses the 10px tolerance and returns gameplay to its prior sta
   assert.match(css, /backdrop-filter:blur\(6px\)/);
 });
 
-test("gateway is compact, fixed, responsive and does not create boxed menu cards", () => {
+test("archived Gateway styles retain responsive geometry and reduced-motion support", () => {
   assert.match(css, /position:fixed/);
   assert.match(css, /top:clamp\(118px,17vh,154px\)/);
   assert.match(css, /right:clamp\(12px,2\.4vw,28px\)/);
@@ -57,16 +56,15 @@ test("gateway is compact, fixed, responsive and does not create boxed menu cards
   assert.match(js, /window\.addEventListener\("orientationchange",layoutItems/);
 });
 
-test("gateway exposes the navigation destinations and remains isolated from game rules", () => {
+test("archived Gateway routes remain isolated from game rules", () => {
   for (const action of ["back","library","store","wallet","profile","launcher","studio","casino","resume"]) {
-    assert.match(html, new RegExp('data-action="' + action + '"'));
     assert.match(js, new RegExp(action + ":"));
   }
   assert.doesNotMatch(js, /nu-engine\.js|nu-games\.js|nu-wallet\.js/);
 });
 
 
-test("gateway is frozen and no unsupported N-BI shield meter is rendered", () => {
+test("Gateway remains visually frozen and unsupported N-BI shield UI stays absent", () => {
   assert.match(css, /#nu-hex-gateway,\.nu-gateway-scrim\{display:none!important\}/);
-  assert.doesNotMatch(html, /id="nbi-shield-bar"/);
+  for (const page of [html, casino, launcher, studio]) assert.doesNotMatch(page, /id="nbi-shield-bar"/);
 });

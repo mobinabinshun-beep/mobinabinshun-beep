@@ -441,3 +441,10 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 - Casino Credits are shown as a Generation 1 virtual asset, separate from XP, Mana and HP.
 - No conversion pairs, rates, fees, or exchange eligibility are invented. Conversion remains unavailable until the owner approves the pair/rate rules.
 - History is limited to the wallet's retained local transaction window (currently 40 entries). Local browser data is not server-authoritative and does not synchronize across devices.
+
+
+## Owner-directed change control — 2026-11-13
+
+The shared Hex Gateway is **FROZEN / OWNER-APPROVAL REQUIRED**. Its controller, stylesheet and markup history are preserved, but no live Generation 1 page imports or mounts it. Do not restore its entrypoints, expose a Gateway icon, or alter the home/menu/game/drawing/Casino navigation surfaces without explicit owner approval.
+
+Follow [CHANGE-CONTROL-AND-ARCHIVE-PROTOCOL.md](docs/operations/CHANGE-CONTROL-AND-ARCHIVE-PROTOCOL.md) for every future implementation request: inspect the baseline, create a recoverable backup, make the smallest scoped change, run available checks, record limitations and human QA, and archive the change evidence. Existing layout and gameplay must not be broadly redesigned when a focused correction is requested.
