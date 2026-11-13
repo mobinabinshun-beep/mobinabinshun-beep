@@ -415,7 +415,7 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 ## Generation 1.32 — universal hex gateway calibration (2026-11-13)
 
 - The compact six-sided N.U gateway is available on the main world, Casino, Launcher and Creative Studio pages, and remains available while navigating the home, library, wallet, Store, profile and article views inside the main world.
-- The gateway stays pinned near the upper-right/upper-middle frame edge. Its nine floating destinations fan out around the trigger without a full-screen menu panel; sizing and orbit radius adapt to narrow screens.
+- The gateway stays pinned near the upper-right/upper-middle frame edge. Its nine floating destinations fan out around the trigger without a full-screen menu panel; sizing and orbit radius adapt to narrow screens. It is the single menu/back entry point inside the main world, so legacy menu and back buttons are hidden there.
 - Opening the gateway pauses an active main-world round through the existing PAUSE/RESUME control and applies an icy translucent blur to the page. Dismissing it restores the prior round state.
 - Mouse hover selects and dwell-activates a destination; mouse click and keyboard activation use a two-step select/confirm path. Touch release activates directly and suppresses the synthetic click to prevent duplicate navigation.
 - Leaving the menu region by more than the 10px boundary tolerance dismisses the gateway. Escape, focus navigation, reduced-motion preferences and page blur are supported.
