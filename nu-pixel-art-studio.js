@@ -248,6 +248,7 @@ function download(blob,name){
  return true;
 }
 function graphicIRSource(){
+ adv.layers[adv.active].pixels=pixels.slice();
  const visible=composite(),palette=[],lookup=new Map(),runs=[];
  for(let y=0;y<height;y++){
   let x=0;
