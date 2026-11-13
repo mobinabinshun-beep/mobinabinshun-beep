@@ -430,7 +430,7 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 
 ## Generation 1.33 candidate — gameplay HUD and navigation
 
-- The shared hex gateway is hidden on the home screen and shown only during active gameplay.
+- The shared hex gateway is hidden on the main-world home screen; it remains available on active gameplay and the other internal Generation 1 pages.
 - Gameplay gateway contains only Back, Menu, and Settings / Options.
 - The N.U / NIROO UNIVERSE mark sits quietly in the upper-left background; the selected game title remains centered.
 - LV moves to the lower-left beside the XP and Mana capsule rails. XP and Mana values appear inside their respective capsules.
