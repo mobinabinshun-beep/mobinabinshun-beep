@@ -185,10 +185,9 @@ function showHome(){closeGame();$("article-view").classList.remove("active");$("
 
 function renderShop(feedback=""){
  const items=[],canBuy=state.save.xp>=NUWallet.HP_PILL_COST,owned=state.save.hpPills>0,hpFull=state.save.hp>=NUWallet.MAX_HP;
- items.push('<article class="shop-item"><img class="hp-pill-icon" src="./assets/nu-hp-pill-golden-pixel.svg" alt="Golden pixel HP capsule"><div><strong>Golden HP Capsule</strong><p>Costs 10 XP · Restores up to 10 missing HP · One use per capsule</p></div><button class="btn primary" data-buy-hp-pill '+(canBuy?'':'disabled')+'>'+(canBuy?'BUY · 10 XP':'NEED 10 XP')+'</button></article>');
- items.push('<article class="shop-item shop-use-item"><img class="hp-pill-icon" src="./assets/nu-hp-pill-golden-pixel.svg" alt="Owned HP capsule"><div><strong>Use owned capsule</strong><p>'+(owned?(hpFull?'HP is full. Your capsule remains in inventory.':'Owned: '+state.save.hpPills+' · Restores '+Math.min(10,10-state.save.hp)+' HP'):'No HP capsules currently owned.')+'</p></div><button class="btn" data-use-hp-pill '+(!owned||hpFull?'disabled':'')+'><img class="shop-use-icon" src="./assets/nu-hp-pill-golden-pixel.svg" alt=""> USE · '+state.save.hpPills+'</button></article>');
+ items.push('<article class="shop-item shop-hp-pill-item"><button class="shop-hp-pill-use" type="button" data-use-hp-pill '+(!owned||hpFull?'disabled':'')+' aria-label="Use owned HP capsule" title="'+(owned?(hpFull?'HP is full':'Use one owned HP capsule'):'No HP capsules owned')+'"><img class="hp-pill-icon '+(owned?'is-owned':'is-empty')+'" src="./assets/nu-hp-pill-golden-pixel.svg" alt=""><span class="shop-hp-pill-count" aria-live="polite">×'+state.save.hpPills+'</span></button><div class="shop-hp-pill-description"><strong>Golden HP Capsule</strong><p>Costs 10 XP · Restores up to 10 missing HP · One use per capsule</p></div><button class="btn primary shop-hp-pill-buy" data-buy-hp-pill '+(canBuy?'':'disabled')+'>'+(canBuy?'BUY · 10 XP':'NEED 10 XP')+'</button></article>');
  $("shop-items").innerHTML=items.join("");
- $("shop-status").textContent=feedback||(canBuy?"Purchase uses the shared N.U XP balance.": "Earn XP in Bubble Hunt or from eligible Studio exports to unlock a capsule.");
+ $("shop-status").textContent=feedback||(canBuy?"Click BUY to purchase with XP, or click the capsule icon to use one you own.": "Earn XP in Bubble Hunt or from eligible Studio exports to unlock a capsule.");
  $("shop-items").querySelectorAll("[data-buy-hp-pill]").forEach(b=>b.addEventListener("click",()=>{
   const result=NUWallet.buyHpPill(state.save);
   if(!result.ok){renderShop("Purchase unavailable: "+(result.reason==="INSUFFICIENT_XP"?"not enough XP.":"please try again."));announceTransaction("PURCHASE FAILED · NOT ENOUGH XP","warning");return;}
@@ -197,7 +196,11 @@ function renderShop(feedback=""){
   showFloatingChange("−10 XP","loss");showFloatingChange("+1 Capsule","gain");
   announceTransaction("PURCHASE COMPLETE · −10 XP · +1 CAPSULE","success");
  }));
- $("shop-items").querySelectorAll("[data-use-hp-pill]").forEach(b=>b.addEventListener("click",e=>useHpPill(e)));
+ $("shop-items").querySelectorAll("[data-use-hp-pill]").forEach(b=>b.addEventListener("click",e=>{
+  e.preventDefault();e.stopPropagation();
+  if(b.disabled)return;
+  useHpPill(e);
+ }));
 }function showShop(){ $("home-view").classList.remove("active");$("game-view").classList.remove("active");$("article-view").classList.remove("active");$("shop-view").classList.add("active");document.body.classList.remove("article-mode");const seen=localStorage.getItem("nu-shop-guide-seen")==="1";$("shop-quest").classList.toggle("hidden",seen);$("shop-empty").classList.toggle("hidden",!seen);renderShop();}
 function closeShop(){ $("shop-view").classList.remove("active");$("home-view").classList.add("active");}
 
