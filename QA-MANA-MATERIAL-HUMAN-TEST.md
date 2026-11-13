@@ -189,3 +189,17 @@ Validate the five archived N.U Mana SVG materials when used on interactive Mana 
 - Actual / browser / device / viewport width / orientation:
 - Result: PASS / PASS WITH LIMITATIONS / FAIL
 - Notes:
+
+
+## Shared HP Capsule inventory consumption — Generation 1.30
+
+- [ ] Buy or otherwise obtain at least two HP Capsules; note the displayed inventory count.
+- [ ] Lower HP below 10, open Store, and click the left capsule icon (not BUY). Confirm HP increases by up to 10 and the Store count immediately decreases by exactly one without closing/reopening Store.
+- [ ] Return to a Generation 1 game, lower HP below 10 again, and use the capsule icon inside the HP HUD. Confirm the HUD count immediately decreases by exactly one.
+- [ ] Reopen Store and confirm its count matches the HUD/shared wallet count.
+- [ ] Alternate Store and HUD use with multiple capsules; confirm neither route double-consumes, skips a count, or changes XP.
+- [ ] At full HP or zero inventory, confirm neither route consumes a capsule.
+- Expected: Store and HP HUD both consume from the same saved wallet inventory; each successful use decrements exactly one capsule and both views reflect the new count immediately.
+- Actual / browser / device / orientation:
+- Result: PASS / PASS WITH LIMITATIONS / FAIL
+- Notes:
