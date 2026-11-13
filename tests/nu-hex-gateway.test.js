@@ -10,22 +10,23 @@ const studio = read("pixel-art-studio.html");
 const js = read("nu-hex-gateway.js");
 const css = read("nu-hex-gateway.css");
 
-test("gateway is mounted on every internal Generation 1 page", () => {
+test("gateway is mounted on every internal Generation 1 page with the current shared assets", () => {
   for (const page of [html, casino, launcher, studio]) {
     assert.match(page, /id="nu-hex-gateway"/);
-    assert.match(page, /nu-hex-gateway\.css\?v=20261113-hex-gateway-calibration-r2/);
-    assert.match(page, /nu-hex-gateway\.js\?v=20261113-hex-gateway-calibration-r1/);
+    assert.match(page, /nu-hex-gateway\.css\?v=20261113-hud-capsule-shield-r2/);
+    assert.match(page, /nu-hex-gateway\.js\?v=20261113-hud-capsule-shield-r2/);
     assert.match(page, /class="nu-gateway-scrim"/);
   }
 });
 
-test("gateway remains available across all views in the main world", () => {
-  assert.match(js, /classList\.add\("nu-gateway-enabled"\)/);
+test("gateway is hidden only on the main-world home screen and stays available on other internal pages", () => {
+  assert.match(js, /const mainHome = Boolean\(gameView && !gameActive\)/);
+  assert.match(js, /classList\.toggle\("nu-main-home", mainHome\)/);
+  assert.match(js, /classList\.toggle\("nu-gateway-enabled", !mainHome\)/);
   assert.match(js, /gameView\?\.classList\.contains\("active"\)/);
   assert.match(js, /MutationObserver/);
   assert.match(css, /body\.nu-gateway-enabled #nu-hex-gateway/);
-  assert.match(css, /body\.nu-gateway-enabled #menu-open/);
-  assert.match(css, /body\.nu-gateway-enabled #wallet-back/);
+  assert.match(css, /body\.nu-main-home:not\(\.nu-game-active\) #nu-hex-gateway/);
 });
 
 test("touch activates an item on release while mouse hover and click retain separate paths", () => {
@@ -57,10 +58,11 @@ test("gateway is compact, fixed, responsive and does not create boxed menu cards
   assert.match(js, /window\.addEventListener\("orientationchange",layoutItems/);
 });
 
-test("gateway exposes the navigation destinations and remains isolated from game rules", () => {
-  for (const action of ["back","library","settings"]) {
-    assert.match(html, new RegExp('data-action="' + action + '"'));
-    assert.match(js, new RegExp(action + ":"));
+test("gateway exposes exactly Back, Menu and Settings on all supported pages", () => {
+  for (const page of [html, casino, launcher, studio]) {
+    const actions = [...page.matchAll(/data-action="([^"]+)"/g)].map(match => match[1]);
+    assert.deepEqual(actions, ["back", "library", "settings"]);
   }
+  for (const action of ["back", "library", "settings"]) assert.match(js, new RegExp(action + ":"));
   assert.doesNotMatch(js, /nu-engine\.js|nu-games\.js|nu-wallet\.js/);
 });
