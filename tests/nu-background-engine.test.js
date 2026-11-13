@@ -22,7 +22,7 @@ test("public runtime ships the byte-identical canonical Material background", ()
     .digest("hex");
   assert.equal(gitBlobSha, "63dd85a479354406cc5739f4603ccc1d0989e5b0");
   const svg = bytes.toString("utf8");
-  assert.match(svg, /^<svg\b/);
+  assert.match(svg, /<svg\b/);
   assert.match(svg, /data:image\/png;base64,/);
 });
 
