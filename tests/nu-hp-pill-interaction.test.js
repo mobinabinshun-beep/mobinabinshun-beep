@@ -30,8 +30,8 @@ test("HP pill interaction pop uses viewport coordinates and cannot be clipped by
 
 test("HUD markup is a native button and uses fresh generation 1.20 assets",()=>{
   assert.match(html,/<button class="hp-pill-use" id="hp-pill-use" type="button"/);
-  assert.match(html,/nu-games\.js\?v=20261113-hp-pill-arrival-r1/);
-  assert.match(html,/nu-world\.css\?v=20261113-hp-pill-arrival-r1/);
+  assert.match(html,/nu-games\.js\?v=20261113-hp-pill-conditional-r1/);
+  assert.match(html,/nu-world\.css\?v=20261113-hp-pill-conditional-r1/);
 });
 
 test("HP capsule wallet rules consume exactly one capsule and cap healing at 10 HP",()=>{
@@ -44,7 +44,8 @@ test("HP capsule wallet rules consume exactly one capsule and cap healing at 10 
 
 
 test("HP HUD capsule remains visible at zero inventory and reports unavailable state without losing clickability",()=>{
-  assert.match(games,/pill\.hidden=false/);
+  assert.doesNotMatch(games,/pill\.hidden=false/);
+  assert.match(games,/button\.hidden=next>=10/);
   assert.match(games,/pill\.classList\.toggle\("unavailable",state\.save\.hp>=10\|\|state\.save\.hpPills<1\)/);
   assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use\.unavailable\{[^}]*pointer-events:auto!important/);
 });
@@ -66,12 +67,22 @@ test("successful HP capsule use emits a radial interaction burst anchored to the
 test("HP capsule visually flies from the HP rail corner to its dock on damage and returns when HP is full",()=>{
   assert.match(games,/function animateHpPillTravel\(direction\)/);
   assert.match(games,/function syncHpPillDock\(hp\)/);
-  assert.match(games,/lastRenderedHp>=10&&next<10\)animateHpPillTravel\("in"\)/);
-  assert.match(games,/lastRenderedHp<10&&next>=10\)animateHpPillTravel\("out"\)/);
+  assert.match(games,/lastRenderedHp>=10&&next<10\)\{if\(button\)button\.hidden=true;animateHpPillTravel\("in"\);\}/);
+  assert.match(games,/lastRenderedHp<10&&next>=10\)\{if\(button\)button\.hidden=true;animateHpPillTravel\("out"\);\}/);
   assert.match(games,/barRect\.left\+Math\.min\(16,barRect\.width\*\.08\)/);
-  assert.match(games,/buttonRect\.left\+buttonRect\.width\/2/);
+  assert.match(games,/barRect\.right\+25/);
   assert.match(games,/ghost\.animate\(/);
   assert.match(games,/syncHpPillDock\(state\.save\.hp\);renderGameAssetProfile\(\)/);
   assert.match(css,/\.hp-pill-travel-ghost\{position:fixed/);
   assert.match(css,/@media\(prefers-reduced-motion:reduce\)\{\.hp-pill-travel-ghost/);
+});
+
+
+test("HP capsule is absent at full HP and only docks after the arrival animation while damaged",()=>{
+  assert.match(html,/<button class="hp-pill-use" id="hp-pill-use" type="button"[^>]*hidden/);
+  assert.match(games,/if\(lastRenderedHp===null\)\{lastRenderedHp=next;if\(button\)button\.hidden=next>=10;return;\}/);
+  assert.match(games,/animation\.onfinish=\(\)=>\{ghost\.remove\(\);button\.hidden=direction==="out";\}/);
+  assert.match(games,/if\(lastRenderedHp>=10&&next<10\)\{if\(button\)button\.hidden=true;animateHpPillTravel\("in"\);\}/);
+  assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use\[hidden\]\{display:none!important\}/);
+  assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use\{position:absolute;right:-46px/);
 });
