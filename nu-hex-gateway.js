@@ -1,4 +1,4 @@
-/* N.U Hex Gateway — isolated, reversible navigation controller */
+/* N.U Hex Gateway — shared navigation controller for all internal spaces */
 (() => {
   "use strict";
   const root = document.getElementById("nu-hex-gateway");
@@ -23,24 +23,37 @@
     item.style.setProperty("--gy", `${Math.sin(angle) * 116}px`);
   });
 
+  function goHome() {
+    const home = document.getElementById("menu-home");
+    if (home) home.click();
+    else window.location.href = "./index.html";
+  }
+
+  function openMainView(view) {
+    const home = document.getElementById("menu-home");
+    const target = document.getElementById("menu-" + view);
+    if (target) {
+      if (home) home.click();
+      target.click();
+    } else {
+      window.location.href = "./index.html?view=" + encodeURIComponent(view);
+    }
+  }
+
   const routes = {
-    back: () => document.getElementById("menu-home")?.click(),
+    back: goHome,
     library: () => {
-      document.getElementById("menu-home")?.click();
-      document.getElementById("menu-library")?.click();
+      const library = document.getElementById("menu-library");
+      if (library) {
+        goHome();
+        library.click();
+      } else {
+        window.location.href = "./index.html#library-section";
+      }
     },
-    store: () => {
-      document.getElementById("menu-home")?.click();
-      document.getElementById("menu-store")?.click();
-    },
-    wallet: () => {
-      document.getElementById("menu-home")?.click();
-      document.getElementById("menu-wallet")?.click();
-    },
-    profile: () => {
-      document.getElementById("menu-home")?.click();
-      document.getElementById("menu-profile")?.click();
-    },
+    store: () => openMainView("store"),
+    wallet: () => openMainView("wallet"),
+    profile: () => openMainView("profile"),
     launcher: () => { window.location.href = "./launcher.html"; },
     studio: () => { window.location.href = "./pixel-art-studio.html"; }
   };
@@ -174,4 +187,9 @@
   window.addEventListener("pagehide", () => {
     if (open) setOpen(false);
   });
+
+  const initialView = new URLSearchParams(window.location.search).get("view");
+  if (["store", "wallet", "profile"].includes(initialView)) {
+    document.getElementById("menu-" + initialView)?.click();
+  }
 })();
