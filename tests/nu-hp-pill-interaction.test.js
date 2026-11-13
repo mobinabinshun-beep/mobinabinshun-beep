@@ -28,7 +28,7 @@ test("HP pill interaction pop uses viewport coordinates and cannot be clipped by
   assert.match(css,/\.hp-pill-hit-progress\{position:fixed!important/);
 });
 
-test("HUD markup is a native button and uses fresh generation 1.27 assets",()=>{
+test("HUD markup is a native button and uses the current generation 1.29 assets",()=>{
   assert.match(html,/<button class="hp-pill-use" id="hp-pill-use" type="button"/);
   assert.match(html,/nu-games\.js\?v=20261113-mobile-hp-bar-compact-r1/);
   assert.match(html,/nu-world\.css\?v=20261113-mobile-hp-bar-compact-r1/);
@@ -91,7 +91,7 @@ test("Generation 1.26 widens the HP frame and keeps the pill dock inside its rig
   assert.ok(css.includes("padding:9px 60px 9px 14px"));
   assert.ok(games.includes("const corner={x:barRect.width-4"));
   assert.ok(games.includes("const dock={x:barRect.width-30"));
-  assert.ok(html.includes("hp-pill-dock-motion-r2"));
+  assert.ok(html.includes("20261113-mobile-hp-capsule-under-rail-r1"));
 });
 
 test("HP pill stays hidden during repeated damage and reverses the same in-flight animation when HP recovers",()=>{
@@ -126,7 +126,7 @@ test("Generation 1.28 makes the HP HUD frame visibly more compact on phone scree
   assert.match(css,/@media\(max-width:520px\)\{\s*#game-view\.active \.hp-bar\{\s*width:min\(286px,calc\(100vw - 28px\)\);\s*min-width:0;\s*min-height:44px;/);
   assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use\{right:5px;width:34px;height:34px/);
   assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use img\{width:24px;height:24px/);
-  assert.ok(html.includes("20261113-mobile-hp-bar-compact-r1"));
+  assert.ok(html.includes("20261113-mobile-hp-capsule-under-rail-r1"));
 });
 
 
