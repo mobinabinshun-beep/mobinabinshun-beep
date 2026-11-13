@@ -1,16 +1,19 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
-const html = fs.readFileSync("index.html", "utf8");\nconst launcher = fs.readFileSync("launcher.html", "utf8");\nconst studio = fs.readFileSync("pixel-art-studio.html", "utf8");
+const html = fs.readFileSync("index.html", "utf8");
+const launcher = fs.readFileSync("launcher.html", "utf8");
+const studio = fs.readFileSync("pixel-art-studio.html", "utf8");
 const js = fs.readFileSync("nu-hex-gateway.js", "utf8");
 const css = fs.readFileSync("nu-hex-gateway.css", "utf8");
 
-test("gateway is mounted as a persistent platform-level navigation control", () => {
-  assert.match(html, /id="nu-hex-gateway"/);
-  assert.match(html, /class="nu-gateway-trigger"/);
-  assert.match(html, /nu-hex-gateway\.css/);
-  assert.match(html, /nu-hex-gateway\.js/);
-  assert.match(html, /class="nu-gateway-scrim"/);\n  for (const page of [launcher, studio]) {\n    assert.match(page, /id="nu-hex-gateway"/);\n    assert.match(page, /nu-hex-gateway\\.css/);\n    assert.match(page, /nu-hex-gateway\\.js\\?v=20261113-hex-gateway-r2/);\n  }
+test("gateway is mounted as a persistent navigation control on every internal page", () => {
+  for (const page of [html, launcher, studio]) {
+    assert.match(page, /id="nu-hex-gateway"/);
+    assert.match(page, /nu-hex-gateway\.css/);
+    assert.match(page, /nu-hex-gateway\.js\?v=20261113-hex-gateway-r2/);
+    assert.match(page, /class="nu-gateway-scrim"/);
+  }
 });
 
 test("gateway exposes the seven requested destinations", () => {
@@ -20,15 +23,22 @@ test("gateway exposes the seven requested destinations", () => {
   }
 });
 
-test("gateway supports hover, click confirmation, keyboard escape and outside exit", () => {
+test("gateway supports hover, two-step click, keyboard escape and 10px outside exit", () => {
   assert.match(js, /pointerenter/);
   assert.match(js, /addEventListener\("click"/);
   assert.match(js, /addEventListener\("keydown"/);
   assert.match(js, /event\.key === "Escape"/);
   assert.match(js, /tolerance = 10/);
   assert.match(js, /is-confirming/);
-  assert.match(js, /clickArmed === item/);\n  assert.match(js, /new URLSearchParams/);\n  assert.match(js, /window.location.href = ".\\/index.html\\?view="/);
+  assert.match(js, /clickArmed === item/);
   assert.match(js, /item\.tabIndex = open \? 0 : -1/);
+});
+
+test("launcher and studio destinations can route back into main views", () => {
+  assert.match(js, /new URLSearchParams/);
+  assert.match(js, /window\.location\.href = "\.\/index\.html\?view="/);
+  assert.match(js, /openMainView\("wallet"\)/);
+  assert.match(js, /openMainView\("profile"\)/);
 });
 
 test("opening the gateway pauses an active round and restores it on dismissal", () => {
