@@ -12,14 +12,14 @@ The previous Generation 1.33 HUD/navigation pass changed too much. Restore the p
 
 ## Backup and candidate
 - Exact pre-change backup: `backup/pre-focused-restore-gateway-freeze-2026-11-13`
-- Baseline source snapshot: `backup/pre-hud-layout-protocol-2026-11-13`
+- Exact pre-1.33 baseline commit: `d4905e6880367c5d67674300a95e404c0fab06d4`
 - Candidate: `fix/restore-baseline-gateway-freeze-2026-11-13`
 - Previous broad merge being corrected: `1b873dcee5169354900a63362f793e03f085cd8f`
 
 ## Validation
-- Automated checks: pending for this candidate.
+- **CI-PASSED:** static validation run 43495945494; Studio export regression run 43495945477; graphics integrity run 43495945491.
 - Human browser/device QA: pending.
-- Public deployment: pending PR review and CI.
+- Public deployment: pending PR #65 merge and Pages workflow.
 
 ## Acceptance
 Only the pre-1.33 baseline restoration, the global Gateway freeze, the no-shield/no-meter rule and the documentation updates are in scope. No other HUD, menu, visual or game-rule redesign is authorized.
