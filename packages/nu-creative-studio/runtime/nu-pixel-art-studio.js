@@ -135,9 +135,7 @@ $("image-file").addEventListener("change",async e=>{
  let bitmap=null;
  importButton.disabled=true;
  try{
-  announce("Reading image dimensions and checking the active device resource budget…");
-  const profile=qualityProfile||await qualityProfileReady;
-  const maxPixels=Number(profile&&profile.budget&&profile.budget.maxCanvasPixels);
+  announce("Reading image dimensions and preparing the original-size working canvas…");
   bitmap=await decodeImage(file);
   const sourceWidth=bitmap.naturalWidth||bitmap.width,sourceHeight=bitmap.naturalHeight||bitmap.height;
   if(!sourceWidth||!sourceHeight)throw new Error("The image decoder returned invalid dimensions.");
@@ -147,9 +145,6 @@ $("image-file").addEventListener("change",async e=>{
   const nextW=Math.max(1,Math.round(sourceWidth*scale)),nextH=Math.max(1,Math.round(sourceHeight*scale));
   const requestedCells=nextW*nextH;
   if(!Number.isSafeInteger(requestedCells))throw new Error("Image dimensions exceed the numeric range supported by this browser.");
-  if(Number.isSafeInteger(maxPixels)&&maxPixels>0&&requestedCells>maxPixels){
-   throw new Error("This image exceeds the current Launcher/device budget of "+maxPixels.toLocaleString()+" working pixels. Your original file is preserved; choose a smaller Import size to create an editable copy.");
-  }
   const temp=document.createElement("canvas");temp.width=nextW;temp.height=nextH;
   const t=temp.getContext("2d",{willReadFrequently:true});if(!t)throw new Error("This browser could not create an image processing canvas.");
   t.imageSmoothingEnabled=$("import-resampling").value!=="nearest";if(t.imageSmoothingEnabled)t.imageSmoothingQuality="high";
@@ -157,7 +152,7 @@ $("image-file").addEventListener("change",async e=>{
   const data=t.getImageData(0,0,nextW,nextH).data,alphaCutoff=Number($("alpha-cutoff").value)||0;
   const extracted=imagePalette(data,Number($("palette-limit").value)||32,alphaCutoff);
   if(!extracted.length)throw new Error("No visible pixels remain above the transparency cutoff.");
-  const mapped=window.NURasterImport.mapPixels(data,nextW,nextH,extracted,alphaCutoff,$("dither-image").checked,{maxPixels});
+  const mapped=window.NURasterImport.mapPixels(data,nextW,nextH,extracted,alphaCutoff,$("dither-image").checked);
   const before=snapshot(),previous={width,height,pixels,palette,imageImported,zoom:workspace.zoom,originalImportFile};
   try{
    width=nextW;height=nextH;pixels=mapped;palette=extracted;imageImported=true;workspace.zoom=100;
