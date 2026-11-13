@@ -19,7 +19,7 @@ Home-screen gateway suppression with shared internal-page navigation, HUD hierar
 - Source replacements and required anchors checked.
 - **CI-PASSED:** JavaScript syntax, gateway contract, wallet/HP capsule, Casino, materials, geometry, Studio regressions, manifest JSON, artwork copy and local script-reference checks passed. Workflow runs: 43492347637 and 43492347753.
 - **HUMAN-QA-PENDING:** desktop/mobile/touch/keyboard and real browser visual acceptance remain outstanding.
-- Public Pages deployment: not run; candidate remains unmerged.
+- PR #64 merged as a public Generation 1.33 demo candidate; merge commit: 1b873dcee5169354900a63362f793e03f085cd8f.\n- Pages deployment was triggered by the default-branch update; its run/deployed status has not yet been independently verified.\n- **HUMAN-QA-PENDING:** public browser/device acceptance remains outstanding.
 
 ## Known limitations
 
