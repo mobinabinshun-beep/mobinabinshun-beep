@@ -36,12 +36,12 @@ jobs:
           node-version: 20
       - name: Check JavaScript syntax
         run: |
-          for file in nu-engine.js nu-pixel-world.js nu-graphics-core.js nu-background-engine.js nu-dynamic-layers.js nu-game-render-adapter.js nu-graphics-runtime.js nu-games.js nu-svg-vectorizer.js nu-graphics-analysis.js nu-studio-layout.js nu-raster-import.js nu-pixel-art-studio.js nu-wallet.js nu-materials.js nu-player-ui.js nu-casino.js nu-hex-gateway.js; do
+          for file in nu-engine.js nu-pixel-world.js nu-graphics-core.js nu-background-engine.js nu-dynamic-layers.js nu-game-render-adapter.js nu-graphics-runtime.js nu-games.js nu-svg-vectorizer.js nu-graphics-analysis.js nu-studio-layout.js nu-raster-import.js nu-pixel-art-studio.js nu-wallet.js nu-exchange.js nu-materials.js nu-player-ui.js nu-casino.js nu-hex-gateway.js; do
             node --check "$file"
           done
       - name: Test hex gateway navigation and interaction contract
         run: node --test tests/nu-hex-gateway.test.js
-      - name: Test wallet and HP capsule rules
+      - name: Test wallet, HP capsule and asset history rules
         run: node --test tests/nu-wallet.test.js
       - name: Test N.U Casino virtual-credit games
         run: node --test tests/nu-casino.test.js
@@ -81,7 +81,7 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           import re
-          pages = ["index.html", "launcher.html", "pixel-art-studio.html", "casino.html"]
+          pages = ["index.html", "launcher.html", "pixel-art-studio.html", "casino.html", "exchange.html"]
           scripts = []
           for page in pages:
               html = Path(page).read_text()
