@@ -1,27 +1,25 @@
-# Implementation Record — 2026-11-13 — Generation 1.33 Candidate
+# Implementation Record — 2026-11-13 — Minimal Restore & Gateway Freeze
 
-## Scope
+## Owner correction
+The previous Generation 1.33 HUD/navigation pass changed too much. Restore the pre-1.33 visual and interaction baseline, then make only the requested focused correction.
 
-Home-screen gateway suppression with shared internal-page navigation, HUD hierarchy, XP/Mana capsule labels, HP capsule dock layout, N-BI shield visual, and implementation protocol.
+## Exact scope
+- Restore the pre-1.33 versions of index.html, nu-world.css, nu-games.js, nu-hex-gateway.js, nu-hex-gateway.css, casino.html, launcher.html and pixel-art-studio.html.
+- Keep the prior HUD, game title, LV, XP, Mana and HP presentation. Remove the newly added N-BI meter because no authoritative shield inventory/state exists; never show a fabricated full shield.
+- Freeze the shared Gateway icon and scrim globally with a CSS visibility lock. This keeps it absent from the main menu, game/tool views, Creative Studio/drawing, Casino and Launcher until the owner explicitly approves unfreezing.
+- Restore the prior Generation 1 manifest and README content; retain only links to the operational protocol and human-test template.
+- Add a regression assertion for the Gateway freeze and absence of the unsupported shield meter.
 
-## Files
-
-- index.html: HUD markup and 3-action gateway.
-- nu-world.css: gameplay-only gateway visibility, brand/title/LV placement, in-capsule labels, HP dock states, N-BI visual meter.
-- nu-hex-gateway.js: gateway scope and three navigation actions.
-- nu-games.js: HP capsule expanded-state class and visual N-BI charge animation hook.
-- NU-GENERATION-1-MANIFEST.json and README.md: release notes and limitations.
-- docs/operations/NU-OPS-IMPLEMENT-01.md: repeatable implementation protocol.
-- docs/operations/conversation-archive/2026-11-13-hud-gateway-request.md: dated conversation archive.
+## Backup and candidate
+- Exact pre-change backup: `backup/pre-focused-restore-gateway-freeze-2026-11-13`
+- Baseline source snapshot: `backup/pre-hud-layout-protocol-2026-11-13`
+- Candidate: `fix/restore-baseline-gateway-freeze-2026-11-13`
+- Previous broad merge being corrected: `1b873dcee5169354900a63362f793e03f085cd8f`
 
 ## Validation
+- Automated checks: pending for this candidate.
+- Human browser/device QA: pending.
+- Public deployment: pending PR review and CI.
 
-- Source replacements and required anchors checked.
-- **CI-PASSED:** JavaScript syntax, gateway contract, wallet/HP capsule, Casino, materials, geometry, Studio regressions, manifest JSON, artwork copy and local script-reference checks passed. Workflow runs: 43492347637 and 43492347753.
-- **HUMAN-QA-PENDING:** desktop/mobile/touch/keyboard and real browser visual acceptance remain outstanding.
-- PR #64 merged as a public Generation 1.33 demo candidate; merge commit: 1b873dcee5169354900a63362f793e03f085cd8f.\n- Pages deployment was triggered by the default-branch update; its run/deployed status has not yet been independently verified.\n- **HUMAN-QA-PENDING:** public browser/device acceptance remains outstanding.
-
-## Known limitations
-
-- N-BI meter is visual-only; it does not mitigate damage.
-- Capsule travel reuses existing Web Animations API logic; browser/device acceptance is required.
+## Acceptance
+Only the pre-1.33 baseline restoration, the global Gateway freeze, the no-shield/no-meter rule and the documentation updates are in scope. No other HUD, menu, visual or game-rule redesign is authorized.
