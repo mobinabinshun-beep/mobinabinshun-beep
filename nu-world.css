@@ -302,3 +302,14 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 /* Gen1.21: keep the HP capsule control visible so empty/full states remain discoverable. */
 #game-view.active .hp-bar #hp-pill-use.unavailable{opacity:.58;filter:saturate(.55);cursor:pointer;pointer-events:auto!important}
 #game-view.active .hp-bar #hp-pill-use{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+
+
+/* N.U Gen1.22 — capsule-like interaction burst anchored to the HP HUD icon. */
+.hp-pill-interaction-burst{position:fixed;z-index:1601;width:1px;height:1px;pointer-events:none;contain:layout style}
+.hp-pill-burst-ring{position:absolute;left:0;top:0;width:18px;height:18px;border:2px solid #caff9f;border-radius:50%;box-shadow:0 0 8px #8dff62, inset 0 0 6px #8dff6255;transform:translate(-50%,-50%) scale(.25);animation:nu-hp-burst-ring .72s cubic-bezier(.12,.72,.2,1) forwards}
+.hp-pill-burst-particle{position:absolute;left:0;top:0;width:6px;height:6px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#f4ffd9 0 18%,#aaff6b 42%,#5de8a0 100%);box-shadow:0 0 9px #aaff6b;transform:translate(-50%,-50%);animation:nu-hp-burst-particle .72s cubic-bezier(.12,.72,.2,1) forwards}
+.hp-pill-burst-label{position:absolute;left:0;top:-8px;white-space:nowrap;color:#d8ffb8;font:900 13px/1 ui-monospace,monospace;letter-spacing:.04em;text-shadow:0 0 5px #8dff62,0 0 12px #5de8a0,0 1px 3px #06110a;transform:translate(-50%,-50%);animation:nu-hp-burst-label .95s ease-out forwards}
+@keyframes nu-hp-burst-ring{0%{opacity:0;transform:translate(-50%,-50%) scale(.2)}18%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(2.8)}}
+@keyframes nu-hp-burst-particle{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}20%{opacity:1}100%{opacity:0;transform:translate(calc(-50% + var(--burst-x)),calc(-50% + var(--burst-y))) scale(.15)}}
+@keyframes nu-hp-burst-label{0%{opacity:0;translate:0 9px;scale:.72}16%{opacity:1;scale:1.12}34%{scale:1}100%{opacity:0;translate:0 -32px;scale:.94}}
+@media(prefers-reduced-motion:reduce){.hp-pill-interaction-burst .hp-pill-burst-ring,.hp-pill-interaction-burst .hp-pill-burst-particle,.hp-pill-interaction-burst .hp-pill-burst-label{animation:none!important;opacity:1;transform:translate(-50%,-50%)!important;translate:0 0!important;scale:1!important}.hp-pill-burst-particle{display:none}}
