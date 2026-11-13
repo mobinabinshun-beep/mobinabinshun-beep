@@ -2,7 +2,7 @@
 
 ## Scope
 
-Gameplay-only hex gateway, HUD hierarchy, XP/Mana capsule labels, HP capsule dock layout, N-BI shield visual, and implementation protocol.
+Home-screen gateway suppression with shared internal-page navigation, HUD hierarchy, XP/Mana capsule labels, HP capsule dock layout, N-BI shield visual, and implementation protocol.
 
 ## Files
 
