@@ -32,5 +32,6 @@ body.nu-gateway-enabled #menu-open,body.nu-gateway-enabled #back-home,body.nu-ga
 @media(max-width:600px){#nu-hex-gateway{top:clamp(124px,17vh,148px);right:12px;width:52px;height:52px}#nu-hex-gateway .nu-gateway-trigger{width:52px;height:52px}#nu-hex-gateway .nu-gateway-item{width:52px;height:52px;font-size:8px}#nu-hex-gateway .nu-gateway-hint{right:60px;top:17px;max-width:145px;font-size:8px}}
 @media(prefers-reduced-motion:reduce){#nu-hex-gateway *,#nu-hex-gateway *::before,#nu-hex-gateway *::after,.nu-gateway-scrim{animation:none!important;transition-duration:.01ms!important}}
 
-/* Main-world home is the only page that suppresses the shared gateway. */
-body.nu-main-home:not(.nu-game-active) #nu-hex-gateway,body.nu-main-home:not(.nu-game-active) .nu-gateway-scrim{display:none!important}
+
+/* N.U Gateway freeze — hidden on all internal pages until explicit owner approval. */
+#nu-hex-gateway,.nu-gateway-scrim{display:none!important}

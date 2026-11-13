@@ -19,22 +19,19 @@
   let suppressClickUntil = 0;
 
   function syncGatewayScope() {
-    const gameActive = Boolean(gameView?.classList.contains("active"));
-    const mainHome = Boolean(gameView && !gameActive);
-    document.body.classList.toggle("nu-main-home", mainHome);
-    document.body.classList.toggle("nu-gateway-enabled", !mainHome);
-    document.body.classList.toggle("nu-game-active", gameActive);
+    document.body.classList.add("nu-gateway-enabled");
+    document.body.classList.toggle("nu-game-active", Boolean(gameView?.classList.contains("active")));
   }
   syncGatewayScope();
   if (gameView) new MutationObserver(syncGatewayScope).observe(gameView, {attributes:true,attributeFilter:["class"]});
 
   function layoutItems() {
     const compact = window.matchMedia("(max-width: 600px)").matches;
-    const radius = compact ? 92 : 104;
-    const step = items.length > 1 ? 37.5 : 0;
+    const radius = compact ? 100 : 112;
+    const step = items.length > 1 ? 144 / (items.length - 1) : 0;
     items.forEach((item,index) => {
       item.tabIndex = open ? 0 : -1;
-      const angle = (105 + index * step) * Math.PI / 180;
+      const angle = (112 + index * step) * Math.PI / 180;
       item.style.setProperty("--gx", `${Math.cos(angle) * radius}px`);
       item.style.setProperty("--gy", `${Math.sin(angle) * radius}px`);
     });
@@ -66,7 +63,12 @@
     store: () => openMainView("store"),
     wallet: () => openMainView("wallet"),
     profile: () => openMainView("profile"),
-    settings: () => { window.location.href = "./launcher.html"; }
+    launcher: () => { window.location.href = "./launcher.html"; },
+    studio: () => { window.location.href = "./pixel-art-studio.html"; },
+    casino: () => { window.location.href = "./casino.html"; },
+    resume: () => {
+      if (!gameView) window.location.href = "./index.html";
+    }
   };
 
   function pauseGame() {

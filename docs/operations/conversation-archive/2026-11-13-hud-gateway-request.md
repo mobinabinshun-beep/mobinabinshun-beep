@@ -1,37 +1,28 @@
-# Conversation Archive — 2026-11-13
+# Conversation Archive — 2026-11-13 — Minimal Restore & Freeze
 
-**Project:** N.U Interactive World  
-**Request class:** HUD redesign, navigation simplification, animation calibration, operational workflow  
-**Target:** public interactive-world repository; candidate branch only
+## Owner correction
+The owner clarified that the previous changes were too broad and requested restoration to the previous state, followed by small, focused changes only.
 
-## Owner requirements (condensed)
+## Requirements now in force
+- Restore the prior layout and behavior; avoid unrelated redesign or broad visual changes.
+- If the player does not own/have a shield, do not show a shield meter or shield status. Do not invent a default 100% shield.
+- Keep the Gateway icon absent from the main menu, game/tool views, Creative Studio/drawing and Casino. Freeze this behavior until the owner explicitly asks to unfreeze it.
+- Before changing a frozen Gateway feature in the future, ask the owner to confirm unfreezing and exact target scope.
+- Record a mandatory minimal-change, backup, test, calibration, debug, archive and rollback protocol in the repository.
 
-- Remove the hex gateway icon from the home screen.
-- In gameplay show the selected game name; keep N.U / NIROO UNIVERSE as a quiet upper-left background mark.
-- Move LV to the lower-left beside the two resource capsules.
-- Display Mana and XP text inside their own capsule bars.
-- HP frame stays centered; when the HP capsule appears, reserve a right-side dock and slide the capsule out from beneath the HP frame. On use/restoration it returns and the frame contracts.
-- Add the N-BI Arcane Shield meter under HP with the requested collapse/reposition/recharge visual.
-- Gateway actions: Back, Menu (list), and Settings / Options.
-- Establish a repeatable implementation, backup, documentation, archive, calibration, optimization, debugging and fix protocol, including public demo and human-test reporting.
+## Implementation decision
+- Restore the pre-Generation-1.33 source baseline for the affected pages, styles and runtime scripts.
+- The N-BI meter is not retained because the current game model does not expose a real shield ownership/active-state source.
+- Add one global CSS freeze rule for the shared Gateway and its scrim, ensuring they are not visible or keyboard reachable on any linked page.
+- Keep existing game mechanics, wallet/save contracts, HP pill behavior, Mana/XP and unrelated UI unchanged.
 
-## Implementation decisions
+## Refs
+- Backup: `backup/pre-focused-restore-gateway-freeze-2026-11-13`
+- Baseline snapshot: `backup/pre-hud-layout-protocol-2026-11-13`
+- Candidate: `fix/restore-baseline-gateway-freeze-2026-11-13`
+- Prior broad change: `1b873dcee5169354900a63362f793e03f085cd8f`
+- Protocol: `docs/operations/NU-OPS-IMPLEMENT-01.md`
+- Human test template: `docs/operations/HUMAN-TEST-REPORT-TEMPLATE.md`
 
-- Gateway is hidden on the main-world home screen and remains available on active gameplay and other internal Generation 1 pages.
-- Back returns to the home/library view; Menu opens the game library; Settings / Options opens Launcher Calibration.
-- Existing HP capsule state and reversible animation are reused; HP frame gets compact/expanded layout state.
-- N-BI charge meter is explicitly visual-only in this candidate; it does not absorb Chaos damage or change HP rules.
-- XP and Mana labels/values are rendered inside their capsule rails.
-- Existing wallet/save schema is not changed.
-
-## Candidate record
-
-- Candidate branch: feat/nu-game-hud-layout-capsule-shield-2026-11-13
-- Pre-change backup branch: backup/pre-hud-layout-protocol-2026-11-13
-- Base commit: d4905e6880367c5d67674300a95e404c0fab06d4
-- CI passed: static validation run 43492347637 and Studio regression run 43492347753.
-- PR #64 merged for public demo testing; merge commit 1b873dcee5169354900a63362f793e03f085cd8f.\n- Pages deployment status has not yet been independently verified.\n- Human browser/device acceptance remains pending.
-
-## Required human report
-
-Record tester, date/time, device, OS, browser/version, viewport, input mode, reduced-motion setting, scenario, expected result, actual result, pass/fail, reproducibility, and evidence. Never include personal account data or credentials.
+## Acceptance state
+CI passed: static validation 43495945494, Studio regression 43495945477, graphics integrity 43495945491. Human browser/device visual QA remains pending. The scope is a restore and a visibility freeze, not a new product redesign.

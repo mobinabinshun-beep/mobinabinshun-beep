@@ -9,26 +9,23 @@ const launcher = read("launcher.html");
 const studio = read("pixel-art-studio.html");
 const js = read("nu-hex-gateway.js");
 const css = read("nu-hex-gateway.css");
-const worldCss = read("nu-world.css");
-const games = read("nu-games.js");
 
-test("gateway is mounted on every internal Generation 1 page with the current shared assets", () => {
+test("gateway is mounted on every internal Generation 1 page", () => {
   for (const page of [html, casino, launcher, studio]) {
     assert.match(page, /id="nu-hex-gateway"/);
-    assert.match(page, /nu-hex-gateway\.css\?v=20261113-hud-capsule-shield-r2/);
-    assert.match(page, /nu-hex-gateway\.js\?v=20261113-hud-capsule-shield-r2/);
+    assert.match(page, /nu-hex-gateway\.css\?v=20261113-hex-gateway-calibration-r2/);
+    assert.match(page, /nu-hex-gateway\.js\?v=20261113-hex-gateway-calibration-r1/);
     assert.match(page, /class="nu-gateway-scrim"/);
   }
 });
 
-test("gateway is hidden only on the main-world home screen and stays available on other internal pages", () => {
-  assert.match(js, /const mainHome = Boolean\(gameView && !gameActive\)/);
-  assert.match(js, /classList\.toggle\("nu-main-home", mainHome\)/);
-  assert.match(js, /classList\.toggle\("nu-gateway-enabled", !mainHome\)/);
+test("gateway remains available across all views in the main world", () => {
+  assert.match(js, /classList\.add\("nu-gateway-enabled"\)/);
   assert.match(js, /gameView\?\.classList\.contains\("active"\)/);
   assert.match(js, /MutationObserver/);
   assert.match(css, /body\.nu-gateway-enabled #nu-hex-gateway/);
-  assert.match(css, /body\.nu-main-home:not\(\.nu-game-active\) #nu-hex-gateway/);
+  assert.match(css, /body\.nu-gateway-enabled #menu-open/);
+  assert.match(css, /body\.nu-gateway-enabled #wallet-back/);
 });
 
 test("touch activates an item on release while mouse hover and click retain separate paths", () => {
@@ -60,31 +57,16 @@ test("gateway is compact, fixed, responsive and does not create boxed menu cards
   assert.match(js, /window\.addEventListener\("orientationchange",layoutItems/);
 });
 
-test("gateway exposes exactly Back, Menu and Settings on all supported pages", () => {
-  for (const page of [html, casino, launcher, studio]) {
-    const actions = [...page.matchAll(/data-action="([^"]+)"/g)].map(match => match[1]);
-    assert.deepEqual(actions, ["back", "library", "settings"]);
+test("gateway exposes the navigation destinations and remains isolated from game rules", () => {
+  for (const action of ["back","library","store","wallet","profile","launcher","studio","casino","resume"]) {
+    assert.match(html, new RegExp('data-action="' + action + '"'));
+    assert.match(js, new RegExp(action + ":"));
   }
-  for (const action of ["back", "library", "settings"]) assert.match(js, new RegExp(action + ":"));
   assert.doesNotMatch(js, /nu-engine\.js|nu-games\.js|nu-wallet\.js/);
 });
 
-test("Generation 1.33 HUD keeps game identity, LV and resource values in their requested positions", () => {
-  assert.match(html, /id="nu-game-brand"/);
-  assert.match(html, /class="hud-chip level-chip" id="level-chip"/);
-  assert.match(html, /class="bar-label">XP<\/span>/);
-  assert.match(html, /class="bar-label">MANA<\/span>/);
-  assert.match(games, /\$\("xp-value"\)\.textContent=\(state\.save\.xp%100\)\+" \/ 100 XP"/);
-  assert.match(games, /\$\("mana-value"\)\.textContent=\(state\.save\.mana%10\)\+" \/ 10 MANA"/);
-  assert.match(worldCss, /\.level-chip\{position:fixed/);
-});
 
-test("HP capsule waits for the expanding frame; N-BI is a separate visual-only meter", () => {
-  assert.match(html, /id="hp-bar"/);
-  assert.match(html, /id="nbi-shield-bar"/);
-  assert.match(games, /hpPillDockTimer=setTimeout\(\(\)=>\{hpPillDockTimer=0;animateHpPillTravel\("in"\);\},390\)/);
-  assert.match(games, /function updateNbiShield\(amount=0\)/);
-  assert.match(games, /updateNbiShield\(25\)/);
-  assert.match(worldCss, /\.hp-bar\.has-pill\{width:252px/);
-  assert.match(worldCss, /\.nbi-shield-bar\.is-depleted/);
+test("gateway is frozen and no unsupported N-BI shield meter is rendered", () => {
+  assert.match(css, /#nu-hex-gateway,\.nu-gateway-scrim\{display:none!important\}/);
+  assert.doesNotMatch(html, /id="nbi-shield-bar"/);
 });
