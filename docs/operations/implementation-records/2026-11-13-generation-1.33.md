@@ -19,7 +19,7 @@ The previous Generation 1.33 HUD/navigation pass changed too much. Restore the p
 ## Validation
 - **CI-PASSED:** static validation run 43495945494; Studio export regression run 43495945477; graphics integrity run 43495945491.
 - Human browser/device QA: pending.
-- Public deployment: pending PR #65 merge and Pages workflow.
+- PR #65 merged successfully; merge commit: `ac731e3d8e2ad25db648d6540a9161894f10a82c`.\n- CI passed on the final PR head: static validation `43496037864`, Studio export regression `43496037920`, graphics integrity `43496038087`.\n- GitHub Pages deployment after merge has not been independently verified.
 
 ## Acceptance
 Only the pre-1.33 baseline restoration, the global Gateway freeze, the no-shield/no-meter rule and the documentation updates are in scope. No other HUD, menu, visual or game-rule redesign is authorized.
