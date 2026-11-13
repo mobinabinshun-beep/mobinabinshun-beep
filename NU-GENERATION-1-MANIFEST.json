@@ -3,7 +3,7 @@
   "generation": 1,
   "runtime": "N.U Adaptive Runtime",
   "runtimeVersion": "0.1-prototype",
-  "packageVersion": "0.5.3-gen1-mana-material-interactions",
+  "packageVersion": "0.5.4-gen1-casino-mini-games",
   "entry": "index.html",
   "modules": [
     "index.html",
@@ -24,7 +24,10 @@
     "nu-studio-layout.js",
     "nu-pixel-art-studio.js",
     "nu-wallet.js",
-    "nu-player-ui.js"
+    "nu-player-ui.js",
+    "casino.html",
+    "nu-casino.js",
+    "nu-casino.css"
   ],
   "randomPool": [
     "bubble",
@@ -42,6 +45,7 @@
     "native": "future adapter required"
   },
   "notes": [
+    "Generation 1.31: adds a standalone N.U Casino with playable Coin Flip, Lucky Dice and Mini Slots. The casino uses a separate local virtual-credit balance (100 starting credits), persists in the shared browser save, and never touches XP/Mana or real money. Human browser/device acceptance remains required.",
     "Generation 1.16: the Mana Collector uses five preserved N.U Material SVG assets as crisp pixel-art glints around interactive Mana targets and emits a short material-based collection burst. Other game mechanics and the adaptive runtime remain unchanged; human visual/touch QA is required.",
     "Generation 1.15: image analysis now describes the visible four-layer composite; PNG and SVG exports include a companion Markdown human report, SVG embeds the report metadata, and Graphic IR includes the report as humanReport. A direct human-report download is also available. Source image processing remains local.",
     "Generation 1.14 candidate: Studio workspace uses deterministic fit geometry and ResizeObserver sizing; pointer mapping is centralized; import shows an original-source preview, preserves a separate working copy, offers smooth/nearest resampling and optional Floyd–Steinberg dithering; import size is bounded at 25 MB. Game HUD asset-profile interactions no longer bubble into gameplay pointer handlers and the profile is positioned beside the active resource bar. Browser acceptance remains pending.",
@@ -143,6 +147,14 @@
       "generation": 1,
       "entry": "pixel-art-studio.html",
       "purpose": "Local raster analysis, non-destructive pixel editing, contour SVG, palette-indexed tiles, run-length spans, edge/region maps and machine-readable N.U graphics instructions; downloadable human-readable image report with palette, transparency, connected-region bounds and export notes",
+      "inRandomPool": false
+    },
+    {
+      "id": "nu-casino",
+      "name": "N.U Casino — Mini Games",
+      "generation": 1,
+      "entry": "casino.html",
+      "purpose": "Three playable browser mini-games: Coin Flip, Lucky Dice and Mini Slots. Uses a separate local virtual-credit balance; no real-money deposits, payments or cash-outs.",
       "inRandomPool": false
     }
   ]

@@ -203,3 +203,26 @@ Validate the five archived N.U Mana SVG materials when used on interactive Mana 
 - Actual / browser / device / orientation:
 - Result: PASS / PASS WITH LIMITATIONS / FAIL
 - Notes:
+
+
+## N.U Casino mini-games — Generation 1.31
+
+- [ ] Open the public Generation 1 demo and select **N.U CASINO** from the home action or navigation menu.
+- [ ] Confirm the page identifies the balance as virtual credits only and displays the initial 100-credit balance on a fresh browser save.
+- [ ] Play Coin Flip: select Heads, make a wager, flip; repeat with Tails. Confirm correct calls return 2× the wager and incorrect calls lose only the wager.
+- [ ] Play Lucky Dice: select a number from 1–6, wager, roll; confirm a matching number returns 5× the wager and a mismatch loses only the wager.
+- [ ] Play Mini Slots: spin several times; confirm three matching symbols return 8×, exactly two matching symbols return 2×, and no match returns 0.
+- [ ] Confirm each round deducts the wager once, credits the displayed payout once, and never allows a wager above the available balance.
+- [ ] Try to wager more credits than available; confirm the game blocks the round and the balance remains unchanged.
+- [ ] Reload the page and confirm the virtual-credit balance persists in the same browser.
+- [ ] Return to the main N.U world and confirm XP, Mana, HP and HP Capsule balances are unchanged by casino play.
+- [ ] Test desktop and mobile portrait/landscape, touch, keyboard focus/activation, reduced motion and browser zoom.
+- [ ] Confirm there are no deposit, payment, withdrawal or cash-out controls and no real-money references in the play flow.
+- Result: PASS / PASS WITH LIMITATIONS / FAIL
+- Browser / version / device / OS / viewport:
+- Starting credits / ending credits:
+- Game and wager tested:
+- Steps to reproduce:
+- Expected vs actual:
+- Severity: cosmetic / usability / functional / blocking
+- Notes:

@@ -12,13 +12,14 @@
   };
   function normalizeSave(raw){
     const source=raw&&typeof raw==="object"?raw:{};
-    const next=Object.assign({xp:0,level:1,mana:0,xCredits:0,nCredits:0,upgrade:0,hp:10,hpPills:0,manaCapsules:1,transactions:[],rewardIds:[]},source);
+    const next=Object.assign({xp:0,level:1,mana:0,xCredits:0,nCredits:0,upgrade:0,hp:10,hpPills:0,manaCapsules:1,casinoCredits:100,transactions:[],rewardIds:[]},source);
     next.xp=number(next.xp,0);
     next.level=number(next.level,1,1);
     next.manaCapsules=number(next.manaCapsules,1,1,10);
     next.mana=number(next.mana,0,0,next.manaCapsules*10);
     next.hp=number(next.hp,10,0,MAX_HP);
     next.hpPills=number(next.hpPills,0);
+    next.casinoCredits=number(next.casinoCredits,100,0,1000000000);
     next.xCredits=number(next.xCredits,0);
     next.nCredits=number(next.nCredits,0);
     next.upgrade=number(next.upgrade,0,0,9);
@@ -62,6 +63,15 @@
     const entry=transaction(next,"reward",String(details.title||"XP earned"),{xp:qty},details);
     return {ok:true,state:next,amount:qty,transaction:entry};
   }
+  function settleCasinoRound(raw,wager,payout,meta){
+    const next=normalizeSave(raw),rawStake=Number(wager),returned=number(payout,0,0,1000000000);
+    if(!Number.isSafeInteger(rawStake)||rawStake<1||rawStake>1000000)return {ok:false,reason:"INVALID_WAGER",state:next};
+    const stake=rawStake;
+    if(next.casinoCredits<stake)return {ok:false,reason:"INSUFFICIENT_CREDITS",state:next};
+    next.casinoCredits=next.casinoCredits-stake+returned;
+    const entry=transaction(next,"casino","N.U Casino round",{casinoCredits:returned-stake,wager:-stake,payout:returned},meta);
+    return {ok:true,state:next,wager:stake,payout:returned,net:returned-stake,transaction:entry};
+  }
   function gameAssetRows(raw,gameId){
     const rows=assetRows(raw),shared={hp:true},profiles={
       bubble:{xp:true,hp:true,hpPills:true},
@@ -81,5 +91,5 @@
       {key:"manaCapsules",label:"Mana Capsules",value:s.manaCapsules,unit:""},
     ];
   }
-  return {MAX_HP,HP_PILL_COST,MAX_TRANSACTIONS,normalizeSave,buyHpPill,useHpPill,grantXP,assetRows,gameAssetRows};
+  return {MAX_HP,HP_PILL_COST,MAX_TRANSACTIONS,normalizeSave,buyHpPill,useHpPill,grantXP,settleCasinoRound,assetRows,gameAssetRows};
 });
