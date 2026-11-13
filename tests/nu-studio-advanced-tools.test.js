@@ -39,12 +39,21 @@ test("PNG export uses a bounded scale and transparent visible composite",()=>{
 });
 
 
-test("download helper validates and retains a real file URL through the click",()=>{
- assert.match(js,/blob instanceof Blob/);
- assert.match(js,/URL\.createObjectURL\(blob\)/);
+test("download helper exposes a persistent manual link when automatic downloads are blocked",()=>{
+ assert.match(html,/id="export-download-fallback"/);
+ assert.match(js,/fallback\.replaceChildren\(a\)/);
  assert.match(js,/a\.download=name/);
  assert.match(js,/a\.click\(\)/);
- assert.match(js,/setTimeout\(\(\)=>URL\.revokeObjectURL\(url\),60000\)/);
+ assert.match(js,/setTimeout\(\(\)=>\{if\(pendingDownloadUrl===url\)/);
+});
+test("PNG and SVG files are created before optional analytics and reward tracking",()=>{
+ const svg=js.slice(js.indexOf('$("export-svg").addEventListener'),js.indexOf('$("export-ir").addEventListener'));
+ const png=js.slice(js.indexOf('$("export-png").addEventListener'),js.indexOf('$("show-grid")'));
+ assert.ok(svg.indexOf("download(new Blob")<svg.indexOf("analyzeArtwork()"));
+ assert.ok(png.indexOf("download(blob,name)")<png.indexOf("analyzeArtwork()"));
+});
+test("Graphic IR reports analysis-limit errors without hiding the PNG and SVG alternatives",()=>{
+ assert.match(js,/this format needs a successful graphics analysis/);
 });
 test("Graphic IR is clean structured analysis without a human-report attachment",()=>{
  assert.match(js,/const analysis=analyzeArtwork\(\),source=JSON\.stringify\(analysis,null,2\)/);
