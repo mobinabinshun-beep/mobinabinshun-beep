@@ -10,10 +10,10 @@
   let open = false, pausedByGateway = false, selected = null, hoverTimer = 0, outsideSince = 0;
   items.forEach((item, index) => {\n    const angle = (120 + index * 25) * Math.PI / 180;\n    item.style.setProperty("--gx", `${Math.cos(angle) * 116}px`);\n    item.style.setProperty("--gy", `${Math.sin(angle) * 116}px`);\n  });\n  const routes = {
     back: () => document.getElementById("menu-home")?.click(),
-    library: () => document.getElementById("menu-library")?.click(),
+    library: () => { document.getElementById("menu-home")?.click(); document.getElementById("menu-library")?.click(); },
     store: () => document.getElementById("menu-store")?.click(),
-    wallet: () => document.getElementById("menu-wallet")?.click(),
-    profile: () => document.getElementById("menu-profile")?.click(),
+    wallet: () => { document.getElementById("menu-home")?.click(); document.getElementById("menu-wallet")?.click(); },
+    profile: () => { document.getElementById("menu-home")?.click(); document.getElementById("menu-profile")?.click(); },
     launcher: () => { window.location.href = "./launcher.html"; },
     studio: () => { window.location.href = "./pixel-art-studio.html"; }
   };
@@ -27,7 +27,7 @@
     if (pausedByGateway && pauseButton && pauseButton.textContent.trim() === "RESUME ROUND") pauseButton.click();
     pausedByGateway = false;
   }
-  function setOpen(next) {
+  function setOpen(next, shouldResume = true) {
     if (open === next) return;
     open = next;
     root.classList.toggle("is-open", open);
@@ -35,7 +35,7 @@
     trigger.setAttribute("aria-expanded", String(open));
     trigger.setAttribute("aria-label", open ? "Close N.U navigation gateway" : "Open N.U navigation gateway");
     if (open) { pauseGame(); trigger.focus({preventScroll:true}); }
-    else { clearTimeout(hoverTimer); selected = null; items.forEach(i => i.classList.remove("is-selected","is-confirming")); resumeGame(); }
+    else { clearTimeout(hoverTimer); selected = null; items.forEach(i => i.classList.remove("is-selected","is-confirming")); if (shouldResume) resumeGame(); else pausedByGateway = false; }
   }
   function select(item) {
     if (selected && selected !== item) selected.classList.remove("is-selected");
@@ -46,7 +46,7 @@
     const action = routes[key];
     if (!action) return;
     item.classList.add("is-confirming");
-    window.setTimeout(() => { setOpen(false); action(); }, 430);
+    window.setTimeout(() => { setOpen(false, false); action(); }, 430);
   }
   function confirm(item) {
     if (selected === item) activate(item);
