@@ -383,3 +383,12 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 - Tightened the player-HP label/value and progress track spacing; the capsule dock and travel visual are also smaller on phones while remaining inside the frame.
 - Desktop/tablet sizing, HP state behavior, capsule visibility, inventory actions, healing and wallet rules are unchanged.
 - Added a regression assertion and a phone-focused human QA checklist. Real-device portrait/landscape acceptance remains required.
+
+
+## Generation 1.29 — mobile HP capsule below the HP rail (2026-11-13)
+
+- On phone-sized screens, the HP frame now wraps only the HP label, progress rail and numeric value instead of stretching horizontally across the viewport.
+- The frame extends downward to form a dedicated capsule pocket. When HP is below 10, the Golden HP Capsule is centered below the HP rail, visible and directly tappable.
+- The mobile arrival/return animation now docks at the lower centered position; desktop/tablet keeps its existing right-side internal dock.
+- HP, inventory, healing, wallet transactions and full-HP visibility rules are unchanged. Automated regression coverage and a phone-first human QA checklist were updated.
+- Real-device portrait/landscape acceptance remains pending.
