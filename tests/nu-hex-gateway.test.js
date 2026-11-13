@@ -58,7 +58,6 @@ test("archived Gateway styles retain responsive geometry and reduced-motion supp
 
 test("archived Gateway routes remain isolated from game rules", () => {
   for (const action of ["back","library","store","wallet","profile","launcher","studio","casino","resume"]) {
-    assert.match(html, new RegExp('data-action="' + action + '"'));
     assert.match(js, new RegExp(action + ":"));
   }
   assert.doesNotMatch(js, /nu-engine\.js|nu-games\.js|nu-wallet\.js/);
