@@ -43,6 +43,8 @@ jobs:
         run: node --test tests/nu-hex-gateway.test.js
       - name: Test wallet, HP capsule and asset history rules
         run: node --test tests/nu-wallet.test.js
+      - name: Test fictional activity-driven market simulator
+        run: node --test tests/nu-market-sim.test.js
       - name: Test N.U Casino virtual-credit games
         run: node --test tests/nu-casino.test.js
       - name: Test N.U material rendering and reduced-motion behavior
