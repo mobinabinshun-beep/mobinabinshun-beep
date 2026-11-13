@@ -1,0 +1,49 @@
+name: N.U Studio export regression gates
+
+on:
+  pull_request:
+    paths:
+      - "pixel-art-studio.html"
+      - "nu-pixel-art-studio.js"
+      - "nu-graphics-analysis.js"
+      - "nu-svg-vectorizer.js"
+      - "nu-studio-export.js"
+      - "nu-raster-import.js"
+      - "tests/**"
+      - ".github/workflows/studio-export-regression.yml"
+  push:
+    branches:
+      - "**"
+    paths:
+      - "pixel-art-studio.html"
+      - "nu-pixel-art-studio.js"
+      - "nu-graphics-analysis.js"
+      - "nu-svg-vectorizer.js"
+      - "nu-studio-export.js"
+      - "nu-raster-import.js"
+      - "tests/**"
+      - ".github/workflows/studio-export-regression.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  studio-export-regressions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate Studio JavaScript syntax
+        run: |
+          node --check nu-pixel-art-studio.js
+          node --check nu-graphics-analysis.js
+          node --check nu-svg-vectorizer.js
+          node --check nu-studio-export.js
+          node --check nu-raster-import.js
+      - name: Run all regression tests
+        run: node --test tests/*.test.js
