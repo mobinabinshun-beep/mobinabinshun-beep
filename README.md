@@ -400,3 +400,12 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 - The in-game HP HUD continues to update its count through the shared wallet render path. Both controls call the same wallet consumption rule and consume exactly one capsule per successful use.
 - Full HP, empty inventory, healing cap, XP and purchase behavior are unchanged.
 - Regression tests cover immediate Store refresh and the shared wallet consumption result. Human testing should alternate Store and HUD use and confirm both counts remain synchronized.
+
+
+## Generation 1.31 — N.U Casino mini-games (2026-11-13)
+
+- Added a standalone N.U Casino page linked from the Generation 1 home screen and navigation.
+- Three playable games: Coin Flip (2× return on a correct call), Lucky Dice (6-sided exact guess, 5× return), and Mini Slots (three-of-a-kind 8×, pair 2×).
+- Casino uses a separate virtual-credit wallet starting at 100 credits. Wagers and payouts are recorded in the local transaction ledger and persist in the same browser save as the Generation 1 world.
+- Casino credits are not XP, Mana, HP Capsules, cash, or redeemable value. No deposits, payments, withdrawals, or cash-out exist.
+- Responsive layout, keyboard-operable native controls, insufficient-credit guard, and human QA checklist added. Human acceptance is pending.
