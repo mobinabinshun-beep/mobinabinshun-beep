@@ -49,6 +49,9 @@ test("gateway is compact, fixed, responsive and does not create boxed menu cards
   assert.match(css, /right:clamp\(12px,2\.4vw,28px\)/);
   assert.match(css, /scale\(1\.2\)/);
   assert.match(css, /prefers-reduced-motion/);
+  assert.match(js, /function layoutItems\\(\\)/);
+  assert.match(js, /window\\.addEventListener\\("resize",layoutItems/);
+  assert.match(js, /window\\.addEventListener\\("orientationchange",layoutItems/);
 });
 
 test("gateway exposes the navigation destinations and remains isolated from game rules", () => {
