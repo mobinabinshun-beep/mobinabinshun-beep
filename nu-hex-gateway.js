@@ -1,4 +1,4 @@
-/* N.U Hex Gateway — shared navigation controller for all internal spaces */
+/* N.U Hex Gateway — shared, input-calibrated navigation controller */
 (() => {
   "use strict";
   const root = document.getElementById("nu-hex-gateway");
@@ -9,7 +9,6 @@
   const items = [...root.querySelectorAll(".nu-gateway-item")];
   const pauseButton = document.getElementById("finish-round");
   const gameView = document.getElementById("game-view");
-  const isCasinoPage = Boolean(document.querySelector(".casino-shell"));
   let open = false;
   let pausedByGateway = false;
   let selected = null;
@@ -17,24 +16,21 @@
   let hoverTimer = 0;
   let activationTimer = 0;
   let outsideSince = 0;
+  let suppressClickUntil = 0;
 
   function syncGatewayScope() {
-    const gameActive = isCasinoPage || Boolean(gameView?.classList.contains("active"));
-    document.body.classList.toggle("nu-gateway-enabled", gameActive);
+    document.body.classList.add("nu-gateway-enabled");
     document.body.classList.toggle("nu-game-active", Boolean(gameView?.classList.contains("active")));
-    if (!gameActive && open) setOpen(false, false);
   }
-
   syncGatewayScope();
-  if (gameView) {
-    new MutationObserver(syncGatewayScope).observe(gameView, { attributes: true, attributeFilter: ["class"] });
-  }
+  if (gameView) new MutationObserver(syncGatewayScope).observe(gameView, {attributes:true,attributeFilter:["class"]});
 
-  items.forEach((item, index) => {
+  items.forEach((item,index) => {
     item.tabIndex = -1;
-    const angle = (115 + index * 20) * Math.PI / 180;
-    item.style.setProperty("--gx", `${Math.cos(angle) * 116}px`);
-    item.style.setProperty("--gy", `${Math.sin(angle) * 116}px`);
+    const angle = (112 + index * 18) * Math.PI / 180;
+    const radius = window.matchMedia("(max-width: 600px)").matches ? 100 : 112;
+    item.style.setProperty("--gx", `${Math.cos(angle) * radius}px`);
+    item.style.setProperty("--gy", `${Math.sin(angle) * radius}px`);
   });
 
   function goHome() {
@@ -42,174 +38,156 @@
     if (home) home.click();
     else window.location.href = "./index.html";
   }
-
   function openMainView(view) {
-    const home = document.getElementById("menu-home");
     const target = document.getElementById("menu-" + view);
     if (target) {
-      if (home) home.click();
+      const home = document.getElementById("menu-home");
+      if (home && target !== home) home.click();
       target.click();
-    } else {
-      window.location.href = "./index.html?view=" + encodeURIComponent(view);
-    }
+    } else window.location.href = "./index.html?view=" + encodeURIComponent(view);
   }
-
   const routes = {
     back: goHome,
     library: () => {
       const library = document.getElementById("menu-library");
-      if (library) {
-        goHome();
-        library.click();
-      } else {
-        window.location.href = "./index.html#library-section";
-      }
+      if (library) { goHome(); library.click(); }
+      else window.location.href = "./index.html#library-section";
     },
     store: () => openMainView("store"),
     wallet: () => openMainView("wallet"),
     profile: () => openMainView("profile"),
     launcher: () => { window.location.href = "./launcher.html"; },
     studio: () => { window.location.href = "./pixel-art-studio.html"; },
-    resume: () => {}
+    casino: () => { window.location.href = "./casino.html"; },
+    resume: () => {
+      if (!gameView) window.location.href = "./index.html";
+    }
   };
 
   function pauseGame() {
-    const gameVisible = document.getElementById("game-view")?.classList.contains("active");
+    const gameVisible = Boolean(gameView?.classList.contains("active"));
     if (gameVisible && pauseButton && pauseButton.textContent.trim() === "PAUSE ROUND") {
       pauseButton.click();
       pausedByGateway = true;
     }
   }
-
   function resumeGame() {
-    if (pausedByGateway && pauseButton && pauseButton.textContent.trim() === "RESUME ROUND") {
-      pauseButton.click();
-    }
+    if (pausedByGateway && pauseButton && pauseButton.textContent.trim() === "RESUME ROUND") pauseButton.click();
     pausedByGateway = false;
   }
-
+  function clearPending() {
+    clearTimeout(hoverTimer);
+    clearTimeout(activationTimer);
+    hoverTimer = 0;
+    activationTimer = 0;
+  }
   function setOpen(next, shouldResume = true) {
     if (open === next) return;
     open = next;
+    outsideSince = 0;
     root.classList.toggle("is-open", open);
     document.body.classList.toggle("nu-gateway-open", open);
     trigger.setAttribute("aria-expanded", String(open));
     trigger.setAttribute("aria-label", open ? "Close N.U navigation gateway" : "Open N.U navigation gateway");
     items.forEach(item => { item.tabIndex = open ? 0 : -1; });
-
     if (open) {
       pauseGame();
-      trigger.focus({ preventScroll: true });
+      trigger.focus({preventScroll:true});
     } else {
-      clearTimeout(hoverTimer);
-      clearTimeout(activationTimer);
+      clearPending();
       selected = null;
       clickArmed = null;
-      items.forEach(item => item.classList.remove("is-selected", "is-confirming"));
+      items.forEach(item => item.classList.remove("is-selected","is-confirming"));
       if (shouldResume) resumeGame();
       else pausedByGateway = false;
     }
   }
-
   function select(item) {
-    if (selected && selected !== item) selected.classList.remove("is-selected");
+    if (selected && selected !== item) selected.classList.remove("is-selected","is-confirming");
     selected = item;
     item.classList.add("is-selected");
   }
-
   function activate(item) {
     const actionKey = item.dataset.action;
     const action = routes[actionKey];
-    if (!action) return;
-    item.classList.add("is-confirming");
-    clearTimeout(activationTimer);
+    if (!action || !open) return;
+    clearPending();
+    item.classList.add("is-selected","is-confirming");
     activationTimer = window.setTimeout(() => {
       setOpen(false, actionKey === "resume");
       action();
-    }, 430);
+    }, 420);
   }
-
   function confirm(item) {
-    if (clickArmed === item) {
-      activate(item);
-    } else {
-      select(item);
-      clickArmed = item;
-    }
+    if (clickArmed === item) activate(item);
+    else { select(item); clickArmed = item; }
   }
 
-  trigger.addEventListener("click", event => {
+  trigger.addEventListener("click",event => {
     event.preventDefault();
     setOpen(!open);
   });
-
-  trigger.addEventListener("pointerenter", event => {
+  trigger.addEventListener("pointerenter",event => {
     if (event.pointerType === "mouse") setOpen(true);
   });
 
   items.forEach(item => {
-    item.addEventListener("pointerenter", event => {
+    item.addEventListener("pointerenter",event => {
       if (event.pointerType !== "mouse" || !open) return;
       select(item);
       clearTimeout(hoverTimer);
-      hoverTimer = window.setTimeout(() => activate(item), 320);
+      hoverTimer = window.setTimeout(() => {
+        if (open && clickArmed !== item) activate(item);
+      }, 520);
     });
-
-    item.addEventListener("pointerleave", event => {
+    item.addEventListener("pointerleave",event => {
       clearTimeout(hoverTimer);
-      clearTimeout(activationTimer);
       if (event.pointerType === "mouse" && clickArmed === item) clickArmed = null;
     });
-
-    item.addEventListener("focus", () => {
-      select(item);
-      if (clickArmed !== item) clickArmed = null;
-    });
-
-    item.addEventListener("click", event => {
+    item.addEventListener("pointerup",event => {
+      if (event.pointerType !== "touch" || !open) return;
       event.preventDefault();
       event.stopPropagation();
+      suppressClickUntil = Date.now() + 900;
+      select(item);
+      activate(item);
+    });
+    item.addEventListener("focus",() => select(item));
+    item.addEventListener("click",event => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (Date.now() < suppressClickUntil) return;
       clearTimeout(hoverTimer);
       confirm(item);
     });
   });
 
-  scrim.addEventListener("click", () => setOpen(false));
-
-  document.addEventListener("pointermove", event => {
-    if (!open || event.pointerType !== "mouse") return;
+  scrim.addEventListener("click",() => setOpen(false));
+  document.addEventListener("pointermove",event => {
+    if (!open || !["mouse","touch","pen"].includes(event.pointerType)) return;
     const tolerance = 10;
-    const inside = [trigger, ...items].some(element => {
+    const inside = [trigger,...items].some(element => {
       const rect = element.getBoundingClientRect();
-      return event.clientX >= rect.left - tolerance &&
-        event.clientX <= rect.right + tolerance &&
-        event.clientY >= rect.top - tolerance &&
-        event.clientY <= rect.bottom + tolerance;
+      return event.clientX >= rect.left - tolerance && event.clientX <= rect.right + tolerance &&
+        event.clientY >= rect.top - tolerance && event.clientY <= rect.bottom + tolerance;
     });
+    if (inside) outsideSince = 0;
+    else if (!outsideSince) outsideSince = performance.now();
+    else if (performance.now() - outsideSince > 110) setOpen(false);
+  },{passive:true});
 
-    if (inside) {
-      outsideSince = 0;
-    } else if (!outsideSince) {
-      outsideSince = performance.now();
-    } else if (performance.now() - outsideSince > 90) {
-      setOpen(false);
-    }
-  }, { passive: true });
-
-  document.addEventListener("keydown", event => {
+  document.addEventListener("keydown",event => {
     if (event.key === "Escape" && open) setOpen(false);
+    if (event.key === "Tab" && open) {
+      const focusable = items.filter(item => item.tabIndex === 0);
+      if (event.shiftKey && document.activeElement === focusable[0]) {
+        event.preventDefault(); trigger.focus();
+      }
+    }
   });
-
-  window.addEventListener("blur", () => {
-    if (open) setOpen(false);
-  });
-
-  window.addEventListener("pagehide", () => {
-    if (open) setOpen(false);
-  });
+  window.addEventListener("blur",() => { if (open) setOpen(false); });
+  window.addEventListener("pagehide",() => { if (open) setOpen(false); });
 
   const initialView = new URLSearchParams(window.location.search).get("view");
-  if (["store", "wallet", "profile"].includes(initialView)) {
-    document.getElementById("menu-" + initialView)?.click();
-  }
+  if (["store","wallet","profile"].includes(initialView)) document.getElementById("menu-" + initialView)?.click();
 })();
