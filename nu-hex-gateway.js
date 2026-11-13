@@ -149,7 +149,11 @@
     });
     item.addEventListener("pointerleave",event => {
       clearTimeout(hoverTimer);
-      if (event.pointerType === "mouse" && clickArmed === item) clickArmed = null;
+      if (event.pointerType === "mouse") {
+        clearTimeout(activationTimer);
+        activationTimer = 0;
+        if (clickArmed === item) clickArmed = null;
+      }
     });
     item.addEventListener("pointerup",event => {
       if (event.pointerType !== "touch" || !open) return;
