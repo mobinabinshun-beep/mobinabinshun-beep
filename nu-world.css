@@ -284,3 +284,9 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 .hp-pill-hit-progress{z-index:30;color:#caff9f;font-size:13px;font-weight:900;text-shadow:0 0 7px #8dff62,0 1px 4px #06110a;animation:nu-hp-pill-hit .95s cubic-bezier(.2,.8,.25,1) forwards}
 @keyframes nu-hp-pill-hit{0%{opacity:0;scale:.55;filter:drop-shadow(0 0 0 #a8ff65)}16%{opacity:1;scale:1.35;filter:drop-shadow(0 0 12px #a8ff65)}38%{scale:1}100%{opacity:0;translate:0 -27px;scale:.92}}
 @media(prefers-reduced-motion:reduce){.hp-pill-hit-progress{animation:none;opacity:1;scale:1}}
+
+
+/* N.U Gen1.19 — harden HP pill hit target and render feedback in viewport space. */
+#game-view.active .hp-bar{z-index:1301;pointer-events:none}
+#game-view.active .hp-bar #hp-pill-use{position:relative;z-index:1302;pointer-events:auto!important;touch-action:manipulation;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.hp-pill-hit-progress{position:fixed!important;z-index:1600;left:0;top:0;white-space:nowrap;pointer-events:none;will-change:transform,opacity}
