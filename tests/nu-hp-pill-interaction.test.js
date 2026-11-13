@@ -81,7 +81,7 @@ test("HP capsule visually flies from the HP rail corner to its dock on damage an
 test("HP capsule is absent at full HP and only docks after the arrival animation while damaged",()=>{
   assert.match(html,/<button class="hp-pill-use" id="hp-pill-use" type="button"[^>]*hidden/);
   assert.match(games,/if\(lastRenderedHp===null\)\{lastRenderedHp=next;if\(button\)button\.hidden=next>=10;return;\}/);
-  assert.match(games,/animation\.onfinish=\(\)=>\{ghost\.remove\(\);button\.hidden=direction==="out";\}/);
+  assert.match(games,/animation\.onfinish=\(\)=>\{if\(run!==hpPillTravelRun\)return;ghost\.remove\(\);hpPillTravelGhost=null;hpPillTravelAnimation=null;button\.hidden=direction==="out";\}/);
   assert.match(games,/if\(lastRenderedHp>=10&&next<10\)\{if\(button\)button\.hidden=true;animateHpPillTravel\("in"\);\}/);
   assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use\[hidden\]\{display:none!important\}/);
   assert.match(css,/#game-view\.active \.hp-bar\{[^}]*padding-right:54px/);\n  assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use\{[^}]*right:7px/);
