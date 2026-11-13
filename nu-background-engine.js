@@ -1,6 +1,6 @@
 /* N.U Background Engine v0.4 — exact-reference-first scene.
  * Material/Background.svg is the canonical visual base on every tier.
- * Optional depth/motion is rendered separately; failure restores the Gen1 renderer.
+ * Legacy procedural depth/motion is quarantined; failure keeps a neutral fallback.
  */
 (function(g){
 "use strict";
@@ -12,7 +12,7 @@ function mount(){
  node=document.createElement("div");node.id="nu-background-image";node.dataset.mode=mode;node.style.cssText="position:fixed;inset:0;z-index:-3;overflow:hidden;pointer-events:none";node.setAttribute("aria-hidden","true");
  img=document.createElement("img");img.alt="";img.style.cssText="display:block;width:100%;height:100%;object-fit:cover;object-position:center;user-select:none";img.decoding="async";img.loading="eager";img.fetchPriority="high";img.draggable=false;
  img.onload=()=>{loaded=true;world.classList.add("nu-image-scene-active");node.classList.add("is-loaded");if(g.NUPixelWorld&&g.NUPixelWorld.setEnabled)g.NUPixelWorld.setEnabled(false);g.dispatchEvent(new Event("nu:background-ready"));};
- img.onerror=()=>{loaded=false;world.classList.remove("nu-image-scene-active");node.classList.add("asset-missing");if(g.NUPixelWorld&&g.NUPixelWorld.setEnabled)g.NUPixelWorld.setEnabled(true);g.dispatchEvent(new Event("nu:background-missing"));};
+ img.onerror=()=>{loaded=false;world.classList.remove("nu-image-scene-active");node.classList.add("asset-missing");g.dispatchEvent(new Event("nu:background-missing"));};
  img.src=ASSET;node.appendChild(img);world.insertBefore(node,world.firstChild);
  return node;
 }
