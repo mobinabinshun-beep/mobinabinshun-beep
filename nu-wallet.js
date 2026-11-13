@@ -64,8 +64,9 @@
     return {ok:true,state:next,amount:qty,transaction:entry};
   }
   function settleCasinoRound(raw,wager,payout,meta){
-    const next=normalizeSave(raw),stake=number(wager,0,1,1000000),returned=number(payout,0,0,1000000000);
-    if(stake<1)return {ok:false,reason:"INVALID_WAGER",state:next};
+    const next=normalizeSave(raw),rawStake=Number(wager),returned=number(payout,0,0,1000000000);
+    if(!Number.isSafeInteger(rawStake)||rawStake<1||rawStake>1000000)return {ok:false,reason:"INVALID_WAGER",state:next};
+    const stake=rawStake;
     if(next.casinoCredits<stake)return {ok:false,reason:"INSUFFICIENT_CREDITS",state:next};
     next.casinoCredits=next.casinoCredits-stake+returned;
     const entry=transaction(next,"casino","N.U Casino round",{casinoCredits:returned-stake,wager:-stake,payout:returned},meta);
