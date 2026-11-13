@@ -67,6 +67,6 @@ test("gateway exposes the navigation destinations and remains isolated from game
 
 
 test("gateway is frozen and no unsupported N-BI shield meter is rendered", () => {
-  assert.match(css, /#nu-hex-gateway,\\.nu-gateway-scrim\\{display:none!important\\}/);
+  assert.match(css, /#nu-hex-gateway,\.nu-gateway-scrim\{display:none!important\}/);
   assert.doesNotMatch(html, /id="nbi-shield-bar"/);
 });
