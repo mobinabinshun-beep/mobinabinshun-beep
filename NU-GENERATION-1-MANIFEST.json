@@ -27,7 +27,8 @@
     "nu-player-ui.js",
     "casino.html",
     "nu-casino.js",
-    "nu-casino.css"
+    "nu-casino.css",
+    "nu-market-sim.js"
   ],
   "randomPool": [
     "bubble",
@@ -45,6 +46,7 @@
     "native": "future adapter required"
   },
   "notes": [
+    "Generation 1.33 candidate: Exchange now includes a fictional activity-driven virtual market simulator with OHLC candles, volume, demand/supply and N.U-only index; it derives every movement from the local player transaction ledger and never uses real-world financial data.",
     "Generation 1.32.1: remove duplicate legacy menu/back buttons from main-world internal views so the shared hex gateway is the single navigation entry point.",
     "Generation 1.32: calibrates the shared N.U hex gateway across all internal Generation 1 pages with responsive positioning, touch-direct activation, mouse-hover dwell, two-step click/keyboard confirmation, outside-exit tolerance and pause/blur behavior. Navigation only; game rules and wallet/save state are unchanged.",
     "Generation 1.31: adds a standalone N.U Casino with playable Coin Flip, Lucky Dice and Mini Slots. The casino uses a separate local virtual-credit balance (100 starting credits), persists in the shared browser save, and never touches XP/Mana or real money. Human browser/device acceptance remains required.",
@@ -165,8 +167,8 @@
     "page": "exchange.html",
     "script": "nu-exchange.js",
     "stylesheet": "nu-exchange.css",
-    "chart": "local-asset-balance-history-from-wallet-transactions",
-    "conversion": "disabled-pending-owner-approved-pairs-rates-fees-and-limits",
-    "note": "No market prices, exchange rates, or history are fabricated; browser-local ledger only."
+    "chart": "activity-driven-fictional-market-index-with-hourly-OHLC-candles-and-player-derived-volume-demand-supply",
+    "conversion": "disabled-pending-owner-approved-in-game-pairs-and-settlement-rules",
+    "note": "Fictional N.U-only market simulator. Index baseline 100 is arbitrary game-only units; positive wallet deltas represent simulated supply and negative deltas represent simulated demand. No external market data, real-world price peg, real-money value or cash-out."
   }
 }
