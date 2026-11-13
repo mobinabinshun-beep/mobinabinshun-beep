@@ -3,49 +3,79 @@
   "name": "N.U Creative Studio and Graphics Platform",
   "version": "0.1.0-preview",
   "status": "offline-source-bundle-preview",
-  "generation": {"min": 1, "max": 1},
+  "generation": {
+    "min": 1,
+    "max": 1
+  },
   "runtime": {
     "hostApi": "nu.launcher.host/v1",
     "entry": "runtime/pixel-art-studio.html",
     "execution": "foreground-process",
-    "requiredFeatures": ["dom", "canvas-2d", "file-import-export"],
-    "optionalFeatures": ["webgl", "webgpu", "offscreen-canvas", "workers", "filesystem-access"]
+    "requiredFeatures": [
+      "dom",
+      "canvas-2d",
+      "file-import-export"
+    ],
+    "optionalFeatures": [
+      "webgl",
+      "webgpu",
+      "offscreen-canvas",
+      "workers",
+      "filesystem-access"
+    ]
   },
   "payload": {
     "entryFiles": [
-      "runtime/pixel-art-studio.html", "runtime/nu-engine.js",
-      "runtime/nu-wallet.js", "runtime/nu-graphics-core.js",
-      "runtime/nu-svg-vectorizer.js", "runtime/nu-graphics-analysis.js",
-      "runtime/nu-studio-layout.js", "runtime/nu-raster-import.js",
+      "runtime/pixel-art-studio.html",
+      "runtime/nu-engine.js",
+      "runtime/nu-wallet.js",
+      "runtime/nu-graphics-core.js",
+      "runtime/nu-svg-vectorizer.js",
+      "runtime/nu-graphics-analysis.js",
+      "runtime/nu-studio-layout.js",
+      "runtime/nu-raster-import.js",
       "runtime/nu-pixel-art-studio.js"
     ],
-    "assets": ["runtime/assets/"],
+    "assets": [
+      "runtime/assets/"
+    ],
     "data": []
   },
   "hostServices": {
     "capabilityProfile": "read-only",
-    "resourceBudget": "request-and-observe",
+    "resourceBudget": "host-system-capability-best-effort-no-product-pixel-ceiling",
     "storage": "package-scoped-project-library",
-    "fileImport": "explicit-user-selection",
+    "fileImport": "explicit-user-selection; MIME-independent-extension-fallback; browser-decode-validation",
     "fileExport": "explicit-user-action",
     "originalSource": "immutable-reference-preserved",
     "network": "disabled-by-default"
   },
   "resourcePolicy": {
     "profileOwner": "launcher",
-    "demoBoost": {
-      "allowed": true,
-      "scope": "browser-demo-session-only",
-      "requiresExplicitOptIn": true,
-      "requiresForegroundVisibility": true,
-      "autoStopsOn": ["opt-out", "page-hidden", "memory-pressure", "host-budget-revoked"],
-      "mayOverrideLauncherBudget": false
+    "demoExecution": {
+      "resourceOwner": "user-device-and-browser",
+      "policy": "attempt-requested-original-dimensions-without-product-defined-pixel-or-file-size-ceilings",
+      "failureBehavior": "browser-or-device-allocation-and-processing-failure; preserve-original-source-and-previous-project",
+      "mayOverrideHostLimits": false
     },
-    "offlineMode": {"allowed": true, "requiresNetwork": false, "usesSameLocalHostBudget": true},
+    "offlineMode": {
+      "allowed": true,
+      "requiresNetwork": false,
+      "usesHostSystemCapabilitiesWithoutProductDefinedPixelCeilings": true
+    },
     "processing": {
-      "preferred": ["streaming", "tiles", "worker-pool", "offscreen-canvas"],
-      "fallback": ["main-thread-chunked-processing"],
-      "never": ["unbounded-full-image-duplication"]
+      "preferred": [
+        "streaming",
+        "tiles",
+        "worker-pool",
+        "offscreen-canvas"
+      ],
+      "fallback": [
+        "main-thread-chunked-processing"
+      ],
+      "never": [
+        "unbounded-full-image-duplication"
+      ]
     }
   },
   "permissions": {
@@ -63,7 +93,8 @@
   "limitations": [
     "This is an offline source bundle, not a native installer or signed Launcher package.",
     "The browser demo boost policy is specified but not yet wired to a runtime consent control and worker scheduler.",
-    "Tile/streaming raster processing and native filesystem adapters are not implemented.",
-    "Original imported files must remain unchanged through failed or cancelled decode, processing, history and export operations."
+    "Original imported files must remain unchanged through failed or cancelled decode, processing, history and export operations.",
+    "Tile/streaming raster processing remains a follow-up; full-resolution imports are attempted without product-defined pixel ceilings and may fail naturally when browser or device resources are insufficient, without replacing the current project.",
+    "The browser demo still needs the production Launcher host adapter; this preview consumes the local graphics capability profile."
   ]
 }

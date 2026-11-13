@@ -1,7 +1,7 @@
 "use strict";
 const test=require("node:test");
 const assert=require("node:assert/strict");
-const {mapPixels}=require("../nu-raster-import.js");
+const {mapPixels,isSupportedImageFile}=require("../nu-raster-import.js");
 test("maps each opaque raster pixel to its nearest palette color",()=>{
  const rgba=new Uint8ClampedArray([250,5,5,255,5,5,250,255]);
  assert.deepEqual(mapPixels(rgba,2,1,["#ff0000","#0000ff"]),["#ff0000","#0000ff"]);
@@ -21,16 +21,20 @@ test("rejects malformed buffers and unsafe palette colors",()=>{
  assert.throws(()=>mapPixels([],1,1,["#ffffff"]),/RGBA buffer/);
  assert.throws(()=>mapPixels([0,0,0,255],1,1,["white"]),/hexadecimal palette/);
 });
-
-test("maps images above the legacy 262144-pixel ceiling within the Studio safety ceiling",()=>{
+test("maps images above the legacy 262144-pixel mapper ceiling",()=>{
  const width=513,height=512,rgba=new Uint8ClampedArray(width*height*4);
  for(let i=0;i<width*height;i++){const p=i*4;rgba[p]=255;rgba[p+3]=255;}
  const mapped=mapPixels(rgba,width,height,["#ff0000"]);
- assert.equal(mapped.length,width*height);
- assert.equal(mapped[0],"#ff0000");
- assert.equal(mapped.at(-1),"#ff0000");
+ assert.equal(mapped.length,width*height);assert.equal(mapped[0],"#ff0000");assert.equal(mapped.at(-1),"#ff0000");
 });
-test("rejects rasters above the shared absolute safety ceiling",()=>{
- const width=1733,height=1732;
- assert.throws(()=>mapPixels(new Uint8ClampedArray(0),width,height,["#ffffff"]),/3,000,000-pixel safety ceiling/);
+test("lets the browser decoder validate content regardless of MIME or extension",()=>{
+ assert.equal(isSupportedImageFile({name:"art.png",type:""}),true);
+ assert.equal(isSupportedImageFile({name:"art.heic",type:"application/octet-stream"}),true);
+ assert.equal(isSupportedImageFile({name:"image-without-extension",type:""}),true);
+ assert.equal(isSupportedImageFile({name:"renamed-file.bin",type:"application/octet-stream"}),true);
+ assert.equal(isSupportedImageFile(null),false);
+});
+test("mapper has no product or Launcher pixel ceiling; allocation determines feasibility",()=>{
+ const width=1200,height=1000,rgba=new Uint8ClampedArray(width*height*4);
+ assert.equal(mapPixels(rgba,width,height,["#ffffff"]).length,width*height);
 });

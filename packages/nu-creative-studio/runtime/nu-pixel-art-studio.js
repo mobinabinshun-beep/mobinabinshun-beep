@@ -4,7 +4,7 @@
 const $=id=>document.getElementById(id);
 const canvas=$("pixel-canvas"),ctx=canvas.getContext("2d",{willReadFrequently:true});
 const defaults=["#111827","#243447","#3e596b","#78909c","#d8e2e8","#ffffff","#a63c50","#e45b63","#f29c67","#e8b94f","#f8dc86","#76a86c","#3f795e","#4b9cba","#5577b8","#8a6bb5"];
-let width=32,height=32,pixels=Array(width*height).fill(null),palette=defaults.slice(),color="#e8b94f",tool="pencil",drawing=false,strokeSnapshot=null,undoStack=[],redoStack=[],imageImported=false,qualityProfile=null,workspace={zoom:100},resizeLock=true,lastDimension="width",brushSize=1,strokeStart=null,sourcePreviewUrl=null,originalImportFile=null;
+let width=32,height=32,pixels=Array(width*height).fill(null),palette=defaults.slice(),color="#e8b94f",tool="pencil",drawing=false,strokeSnapshot=null,undoStack=[],redoStack=[],imageImported=false,qualityProfile=null,qualityProfileReady=Promise.resolve(null),workspace={zoom:100},resizeLock=true,lastDimension="width",brushSize=1,strokeStart=null,sourcePreviewUrl=null,originalImportFile=null;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function announce(msg){$("studio-status").textContent=msg;}
 function snapshot(){return {width,height,pixels:pixels.slice()};}
@@ -43,7 +43,7 @@ function render(){
  updateCounters();
 }
 function resizeArtwork(nextW,nextH,method="nearest"){nextW=Math.max(1,Math.round(nextW));nextH=Math.max(1,Math.round(nextH));if(!Number.isSafeInteger(nextW*nextH)){announce("Canvas dimensions exceed the supported numeric range.");return false;}const before=snapshot(),next=Array(nextW*nextH).fill(null);for(let y=0;y<nextH;y++)for(let x=0;x<nextW;x++){const sx=Math.min(width-1,Math.floor((x+.5)*width/nextW)),sy=Math.min(height-1,Math.floor((y+.5)*height/nextH));next[y*nextW+x]=pixels[sy*width+sx];}width=nextW;height=nextH;pixels=next;commitHistory(before);$("image-width").value=width;$("image-height").value=height;updateCanvasDisplay();render();announce("Artwork resized to "+width+" × "+height+" px using "+method+" sampling. Original import remains unchanged outside the working copy.");return true;}
-function initAdaptive(){const fallback=()=>{qualityProfile={tier:"balanced",level:3,budget:{maxCanvasPixels:520000,dpr:1},reducedMotion:false};$("quality-profile").textContent="Balanced · fallback";};if(!window.NUGraphicsCore){fallback();return;}window.NUGraphicsCore.start().then(p=>{qualityProfile=p;$("quality-profile").textContent=p.tier+" · level "+p.level;$("quality-detail").textContent="Resource limits are managed by the host runtime.";updateCounters();}).catch(fallback);}
+function initAdaptive(){const fallback=()=>{qualityProfile={tier:"balanced",level:3,budget:{maxCanvasPixels:520000,dpr:1},reducedMotion:false,launcherProfileApplied:false};$("quality-profile").textContent="Balanced · fallback";return qualityProfile;};if(!window.NUGraphicsCore){qualityProfileReady=Promise.resolve(fallback());return;}let launcherProfile=null;try{launcherProfile=JSON.parse(localStorage.getItem("nu-launcher-calibration-v1")||"null");}catch(_){}const seed=launcherProfile&&Number.isInteger(launcherProfile.level)?{level:launcherProfile.level}:undefined;qualityProfileReady=window.NUGraphicsCore.start(seed).then(p=>{const launcherLimit=Number(launcherProfile&&launcherProfile.maxCanvasPixels),coreLimit=Number(p&&p.budget&&p.budget.maxCanvasPixels),limits=[launcherLimit,coreLimit].filter(n=>Number.isSafeInteger(n)&&n>0);const maxCanvasPixels=limits.length?Math.min(...limits):520000;qualityProfile=Object.freeze({...p,launcherProfileApplied:!!seed,budget:Object.freeze({...p.budget,maxCanvasPixels})});$("quality-profile").textContent=(seed?"Launcher":"Device")+" · level "+p.level;$("quality-detail").textContent="Image import requests the original dimensions; actual browser and device allocation determines whether processing succeeds.";updateCounters();return qualityProfile;}).catch(()=>fallback());}
 function applyZoom(){workspace.zoom=clamp(Number($("workspace-zoom").value)||100,25,800);updateCanvasDisplay();updateCounters();}
 $("workspace-zoom").addEventListener("input",applyZoom);
 $("fit-canvas").addEventListener("click",()=>{workspace.zoom=100;applyZoom();$("workspace-frame").scrollTo(0,0);});
@@ -111,7 +111,7 @@ $("redo").addEventListener("click",()=>{if(!redoStack.length)return;const curren
 function quantize(v){return Math.round(v/17)*17;}
 function hex(r,g,b){return "#"+[r,g,b].map(v=>v.toString(16).padStart(2,"0")).join("");}
 function nearest(rgb,colors){let best=colors[0],dist=Infinity;for(const c of colors){const n=[parseInt(c.slice(1,3),16),parseInt(c.slice(3,5),16),parseInt(c.slice(5,7),16)],d=(rgb[0]-n[0])**2+(rgb[1]-n[1])**2+(rgb[2]-n[2])**2;if(d<dist){dist=d;best=c;}}return best;}
-async function decodeImage(file){if(typeof createImageBitmap==="function"){try{return await createImageBitmap(file);}catch(_){}}return new Promise((resolve,reject)=>{const url=URL.createObjectURL(file),img=new Image();img.onload=()=>{URL.revokeObjectURL(url);resolve(img);};img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error("This image format could not be decoded."));};img.src=url;});}
+async function decodeImage(file){if(typeof createImageBitmap==="function"){try{const bitmap=await createImageBitmap(file);if(bitmap&&bitmap.width>0&&bitmap.height>0)return bitmap;if(bitmap&&typeof bitmap.close==="function")bitmap.close();}catch(_){}}const url=URL.createObjectURL(file),img=new Image();try{await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(new Error("The selected file is not a supported or readable image."));img.src=url;});if(!(img.naturalWidth||img.width)||!(img.naturalHeight||img.height))throw new Error("The image decoder returned invalid dimensions.");img.__nuRelease=()=>URL.revokeObjectURL(url);return img;}catch(error){URL.revokeObjectURL(url);throw error;}}
 function imagePalette(data,limit,alphaCutoff){
  const hist=new Map();
  for(let i=0;i<data.length;i+=4){if(data[i+3]<=alphaCutoff)continue;const r=Math.min(255,Math.round(data[i]/8)*8),g=Math.min(255,Math.round(data[i+1]/8)*8),b=Math.min(255,Math.round(data[i+2]/8)*8),c=hex(r,g,b),entry=hist.get(c)||{r,g,b,count:0};entry.count++;hist.set(c,entry);}
@@ -124,21 +124,27 @@ function imagePalette(data,limit,alphaCutoff){
 }
 $("palette-limit").addEventListener("input",e=>$("palette-limit-value").textContent=e.target.value);
 $("alpha-cutoff").addEventListener("input",e=>$("alpha-cutoff-value").textContent=e.target.value);
+$("import-image").addEventListener("click",()=>$("image-file").click());
 $("image-file").addEventListener("change",async e=>{
  const file=e.target.files&&e.target.files[0];if(!file)return;
- if(!file.type.startsWith("image/")){announce("Choose a supported image file (PNG, JPEG, WebP, GIF or SVG).");e.target.value="";return;}
- 
+ const importButton=$("import-image");
+ if(!window.NURasterImport||!window.NURasterImport.isSupportedImageFile(file)){
+  announce("Choose a readable image file. File type is validated by the browser image decoder; MIME and filename metadata do not block selection.");
+  e.target.value="";return;
+ }
  let bitmap=null;
+ importButton.disabled=true;
  try{
-  announce("Reading image dimensions and preparing an editable working copy…");
+  announce("Reading image dimensions and preparing the original-size working canvas…");
   bitmap=await decodeImage(file);
-  const sourceWidth=bitmap.width,sourceHeight=bitmap.height;
+  const sourceWidth=bitmap.naturalWidth||bitmap.width,sourceHeight=bitmap.naturalHeight||bitmap.height;
   if(!sourceWidth||!sourceHeight)throw new Error("The image decoder returned invalid dimensions.");
   const requested=String($("import-resolution").value||"original");
   const maxSide=requested==="original"?Math.max(sourceWidth,sourceHeight):Math.max(1,Number(requested)||256);
   const scale=Math.min(1,maxSide/Math.max(sourceWidth,sourceHeight));
   const nextW=Math.max(1,Math.round(sourceWidth*scale)),nextH=Math.max(1,Math.round(sourceHeight*scale));
-  const requestedCells=nextW*nextH;if(!Number.isSafeInteger(requestedCells))throw new Error("Image dimensions exceed the numeric range supported by this browser.");
+  const requestedCells=nextW*nextH;
+  if(!Number.isSafeInteger(requestedCells))throw new Error("Image dimensions exceed the numeric range supported by this browser.");
   const temp=document.createElement("canvas");temp.width=nextW;temp.height=nextH;
   const t=temp.getContext("2d",{willReadFrequently:true});if(!t)throw new Error("This browser could not create an image processing canvas.");
   t.imageSmoothingEnabled=$("import-resampling").value!=="nearest";if(t.imageSmoothingEnabled)t.imageSmoothingQuality="high";
@@ -146,20 +152,33 @@ $("image-file").addEventListener("change",async e=>{
   const data=t.getImageData(0,0,nextW,nextH).data,alphaCutoff=Number($("alpha-cutoff").value)||0;
   const extracted=imagePalette(data,Number($("palette-limit").value)||32,alphaCutoff);
   if(!extracted.length)throw new Error("No visible pixels remain above the transparency cutoff.");
-  if(!window.NURasterImport)throw new Error("Raster import module did not load.");
   const mapped=window.NURasterImport.mapPixels(data,nextW,nextH,extracted,alphaCutoff,$("dither-image").checked);
-  const before=snapshot();width=nextW;height=nextH;pixels=mapped;palette=extracted;
-  commitHistory(before);imageImported=true;workspace.zoom=100;originalImportFile=file;
-  $("image-width").value=width;$("image-height").value=height;
-  if(sourcePreviewUrl)URL.revokeObjectURL(sourcePreviewUrl);
-  sourcePreviewUrl=URL.createObjectURL(file);$("source-preview").src=sourcePreviewUrl;$("source-preview-panel").hidden=false;
-  const sizing=requested==="original"?"original dimensions preserved":"working copy resized by your selected detail";
-  $("source-info").textContent=sourceWidth+" × "+sourceHeight+" source → "+width+" × "+height+" editable pixels · "+palette.length+" colors · "+sizing;
-  updateCanvasDisplay();requestAnimationFrame(()=>{updateCanvasDisplay();$("workspace-frame").scrollTo(0,0);});
-  renderPalette();render();
-  announce("Imported · "+file.name+" · "+sourceWidth+" × "+sourceHeight+" source → "+width+" × "+height+" editable pixels. "+(requested==="original"?"Original dimensions preserved.":"Explicit reduced-detail working copy created.")+" Source file preserved.");
+  const before=snapshot(),previous={width,height,pixels,palette,imageImported,zoom:workspace.zoom,originalImportFile,sourceInfo:$("source-info").textContent,sourcePreviewHidden:$("source-preview-panel").hidden,sourcePreviewSrc:$("source-preview").src};
+  let nextPreviewUrl=null;
+  try{
+   nextPreviewUrl=URL.createObjectURL(file);
+   width=nextW;height=nextH;pixels=mapped;palette=extracted;imageImported=true;workspace.zoom=100;
+   updateCanvasDisplay();render();
+   $("image-width").value=width;$("image-height").value=height;
+   $("source-preview").src=nextPreviewUrl;$("source-preview-panel").hidden=false;
+   const sizing=requested==="original"?"original dimensions preserved":"working copy resized by your selected detail";
+   $("source-info").textContent=sourceWidth+" × "+sourceHeight+" source → "+width+" × "+height+" editable pixels · "+palette.length+" colors · "+sizing;
+   renderPalette();
+   requestAnimationFrame(()=>{updateCanvasDisplay();$("workspace-frame").scrollTo(0,0);});
+   announce("Imported · "+file.name+" · "+sourceWidth+" × "+sourceHeight+" source → "+width+" × "+height+" editable pixels. "+(requested==="original"?"Original dimensions preserved.":"Explicit reduced-detail working copy created.")+" Original source preserved.");
+   commitHistory(before);originalImportFile=file;
+   const previousPreviewUrl=sourcePreviewUrl;sourcePreviewUrl=nextPreviewUrl;nextPreviewUrl=null;
+   if(previousPreviewUrl)URL.revokeObjectURL(previousPreviewUrl);
+  }catch(importError){
+   if(nextPreviewUrl)URL.revokeObjectURL(nextPreviewUrl);
+   width=previous.width;height=previous.height;pixels=previous.pixels;palette=previous.palette;imageImported=previous.imageImported;workspace.zoom=previous.zoom;originalImportFile=previous.originalImportFile;
+   $("source-info").textContent=previous.sourceInfo;$("source-preview-panel").hidden=previous.sourcePreviewHidden;
+   if(previous.sourcePreviewSrc)$("source-preview").src=previous.sourcePreviewSrc;
+   try{restore(before);renderPalette();}catch(_){}
+   throw new Error("Image import failed without replacing your previous artwork. "+(importError&&importError.message?importError.message:""));
+  }
  }catch(err){announce("Image import failed: "+(err&&err.message?err.message:"unsupported image"));}
- finally{if(bitmap&&typeof bitmap.close==="function")bitmap.close();e.target.value="";}
+ finally{if(bitmap&&typeof bitmap.close==="function")bitmap.close();else if(bitmap&&typeof bitmap.__nuRelease==="function")bitmap.__nuRelease();e.target.value="";importButton.disabled=false;}
 });
 window.addEventListener("pagehide",()=>{if(sourcePreviewUrl)URL.revokeObjectURL(sourcePreviewUrl);if(workspaceObserver)workspaceObserver.disconnect();},{once:true});
 $("extract-palette").addEventListener("click",()=>{if(!imageImported){announce("Import an image first to extract its palette.");return;}const counts=new Map();pixels.filter(Boolean).forEach(c=>counts.set(c,(counts.get(c)||0)+1));palette=[...counts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,16).map(x=>x[0]);if(!palette.length)palette=defaults.slice();renderPalette();announce("Palette extracted from current artwork.");});

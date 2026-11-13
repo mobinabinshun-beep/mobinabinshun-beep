@@ -17,6 +17,7 @@ on:
       - feat/studio-persian-plain-labels-2026-11-12
       - feat/studio-native-dimension-import-2026-11-12
       - feat/nu-launcher-modular-game-studio-packages-2026-11-13
+      - fix/nu-studio-image-import-2026-11-13
       - Official-public-information-and-discovery-hub-for-N.U-(Niroo-Universe),-its-publishing-network,-projects,-publications-and-related-creative-works
   pull_request:
     branches:

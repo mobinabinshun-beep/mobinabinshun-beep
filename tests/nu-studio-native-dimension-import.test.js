@@ -6,17 +6,23 @@ test("image import defaults to exact source dimensions",()=>{
  assert.match(html,/<option value="original" selected>Original file size/);
  assert.match(js,/requested==="original"\?Math\.max\(sourceWidth,sourceHeight\)/);
 });
-test("Studio has no fixed product pixel, edge, or file-size ceiling",()=>{
+test("Studio has no product pixel, edge, file-size, or Launcher-profile import ceiling",()=>{
  assert.match(js,/function cellLimit\(\)\{return Infinity;\}/);
- assert.doesNotMatch(js,/requestedCells>safeCells|safe editing budget|25\*1024\*1024|16,384 px per edge|Math\.min\(maxSide/);
+ assert.doesNotMatch(js,/requestedCells>safeCells|requestedCells>maxPixels|safe editing budget|25\*1024\*1024|16,384 px per edge|MAX_RASTER_PIXELS|current Launcher\/device budget/);
  assert.doesNotMatch(html,/id="image-width"[^>]*max=/);
  assert.doesNotMatch(html,/id="image-height"[^>]*max=/);
+});
+test("file import delegates format validation to browser decoding and uses an explicit picker button",()=>{
+ assert.match(js,/isSupportedImageFile\(file\)/);
+ assert.match(html,/id="import-image" type="button"/);
+ assert.ok(html.includes('accept="*/*"'));
+ assert.match(js,/decodeImage\(file\)/);
 });
 test("reduced import detail is an explicit user choice and source remains separate",()=>{
  assert.match(html,/value="256">256 px · compact/);
  assert.match(js,/Explicit reduced-detail working copy created/);
  assert.match(js,/originalImportFile=file/);
- assert.match(js,/sourcePreviewUrl=URL\.createObjectURL\(file\)/);
+ assert.match(js,/nextPreviewUrl=URL\.createObjectURL\(file\)/);
 });
 test("high-resolution rendering and history management remain enabled",()=>{
  assert.match(js,/ctx\.createImageData\(width,height\)/);
@@ -27,4 +33,11 @@ test("high-resolution rendering and history management remain enabled",()=>{
 test("resize controls are not clamped to a fixed 2048-pixel edge",()=>{
  assert.doesNotMatch(js,/nextW=clamp\(Math\.round\(nextW\),1,2048\)/);
  assert.doesNotMatch(js,/nextH=clamp\(Math\.round\(nextH\),1,2048\)/);
+});
+
+test("failed decode, allocation, mapping, or render preserves the previous artwork transactionally",()=>{
+ assert.match(js,/Image import failed without replacing your previous artwork/);
+ assert.match(js,/try\{restore\(before\);renderPalette\(\);\}catch\(_\)\{\}/);
+ const block=js.slice(js.indexOf('$("image-file").addEventListener("change"'),js.indexOf('window.addEventListener("pagehide"'));
+ assert.ok(block.indexOf("commitHistory(before);originalImportFile=file;")>block.indexOf("renderPalette();"));
 });
