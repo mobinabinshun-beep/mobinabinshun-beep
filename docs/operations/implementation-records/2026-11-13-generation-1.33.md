@@ -17,9 +17,9 @@ Home-screen gateway suppression with shared internal-page navigation, HUD hierar
 ## Validation
 
 - Source replacements and required anchors checked.
-- JavaScript syntax and existing repository workflows: pending PR CI.
-- Human desktop/mobile/touch/keyboard QA: pending.
-- Public Pages deployment: pending merge.
+- **CI-PASSED:** JavaScript syntax, gateway contract, wallet/HP capsule, Casino, materials, geometry, Studio regressions, manifest JSON, artwork copy and local script-reference checks passed. Workflow runs: 43492347637 and 43492347753.
+- **HUMAN-QA-PENDING:** desktop/mobile/touch/keyboard and real browser visual acceptance remain outstanding.
+- Public Pages deployment: not run; candidate remains unmerged.
 
 ## Known limitations
 
