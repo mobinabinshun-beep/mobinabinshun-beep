@@ -222,7 +222,7 @@ function showAnalysisSummary(analysis,pathCount){
 }
 function reportDownloadedOutput(analysis,pathCount){
  showAnalysisSummary(analysis,pathCount);
- try{downloadHumanReport(analysis);}catch(err){announce("Artwork exported, but its human report could not be created: "+err.message);return;}
+ try{downloadHumanReport(analysis);}catch(err){announce("Artwork exported, but its human report could not be created: "+err.message);}
  const reward=grantStudioXP(analysis.metrics,pathCount);
  if(reward.ok)announce("Download started · +"+reward.amount+" shared XP added to all three Generation 1 games. This artwork earns XP once.");
  else if(reward.reason==="DUPLICATE_REWARD")announce("Download started · this artwork has already claimed its Studio XP reward.");
@@ -319,7 +319,7 @@ function advPanel(){
  $("adj-shine").onclick=()=>mapAdv(c=>c.map(v=>v+28));$("adj-fade").onclick=()=>mapAdv(c=>c.map(v=>v*.8+128*.2));$("adj-sharpen").onclick=sharpenAdv;
  $("adv-overlay").onchange=overlayAdv;$("adv-chroma").onclick=chromaAdv;$("adv-textadd").onclick=textAdv;
  $("adv-original").onclick=()=>{if(!originalImportFile)return announce("No original imported file.");download(new Blob([originalImportFile],{type:originalImportFile.type}),"original-"+originalImportFile.name);};
- $("adv-svg").onclick=()=>{try{const r=svgSource();download(new Blob([r.source],{type:"image/svg+xml"}),filename("edited.svg"));announce("Edited composite SVG downloaded.");}catch(e){announce(e.message);}};
+ $("adv-svg").onclick=()=>{try{const r=svgSource(),analysis=analyzeArtwork();if(download(new Blob([r.source],{type:"image/svg+xml"}),filename("edited.svg")))reportDownloadedOutput(analysis,r.pathCount);}catch(e){announce(e.message);}};
  layerUI();
 }
 function mapAdv(fn){if(adv.layers[adv.active].locked)return announce("Layer locked");const before=histAdv();pixels=pixels.map(c=>c?hexRGB(fn(rgb(c))):null);adv.layers[adv.active].pixels=pixels.slice();commitHistory(before);render();}
