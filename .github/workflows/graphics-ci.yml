@@ -6,6 +6,7 @@ on:
       - "nu-background-engine.js"
       - "nu-graphics-runtime.js"
       - "nu-world.css"
+      - "background-candidates.html"
       - "archive/visual-layers/**"
       - ".github/workflows/graphics-ci.yml"
   pull_request:
@@ -14,6 +15,7 @@ on:
       - "nu-background-engine.js"
       - "nu-graphics-runtime.js"
       - "nu-world.css"
+      - "background-candidates.html"
       - "archive/visual-layers/**"
       - ".github/workflows/graphics-ci.yml"
   workflow_dispatch:
@@ -35,11 +37,25 @@ jobs:
           test -s archive/visual-layers/nu-pixel-world.js
           test -s archive/visual-layers/nu-dynamic-layers.js
           grep -Fq 'visualOverlays:"quarantined"' nu-graphics-runtime.js
-      - name: Verify canonical SVG endpoint
+      - name: Verify unified background candidate lab
         shell: bash
         run: |
           set -euo pipefail
-          url="https://raw.githubusercontent.com/mobinabinshun-beep/Repository/main/Material/Background.svg"
-          curl --fail --location --silent --show-error --output /tmp/nu-background.svg "$url"
-          test -s /tmp/nu-background.svg
-          grep -Eiq '<svg([[:space:]>])' /tmp/nu-background.svg
+          test -s background-candidates.html
+          grep -Fq 'data-pick="svg"' background-candidates.html
+          grep -Fq 'data-pick="png"' background-candidates.html
+          grep -Fq 'data-pick="gen1"' background-candidates.html
+          grep -Fq 'data-pick="gen2"' background-candidates.html
+          grep -Fq 'data-pick="css"' background-candidates.html
+          node <<'NODE'
+          const fs = require('fs');
+          const html = fs.readFileSync('background-candidates.html', 'utf8');
+          const scripts = [...html.matchAll(/<script>([\\s\\S]*?)<\\/script>/g)].map(x => x[1]);
+          if (scripts.length !== 3) throw new Error('Expected 3 preview scripts');
+          scripts.forEach((source, i) => { new Function(source); console.log('script', i + 1, 'syntax OK'); });
+          const m = scripts[0].match(/const SVG_SOURCE=("(?:\\\\.|[^"\\\\])*");/);
+          if (!m) throw new Error('Embedded canonical SVG source missing');
+          const svg = JSON.parse(m[1]);
+          if (!/<svg\\b/.test(svg) || !/data:image\\/png;base64,/.test(svg)) throw new Error('Canonical SVG wrapper invalid');
+          console.log('embedded SVG source OK');
+          NODE
