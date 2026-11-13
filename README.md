@@ -375,3 +375,11 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 - The right-side BUY control remains a separate purchase action. Buying deducts 10 XP and adds one capsule; clicking the icon consumes one owned capsule and restores up to 10 missing HP.
 - Purchase and use hit targets are independent; existing wallet validation and transaction rules are unchanged.
 - Added responsive layout, regression assertions and a human QA checklist. Browser/device human acceptance remains pending.
+
+
+## Generation 1.28 — compact mobile HP HUD (2026-11-13)
+
+- Reduced the in-game HP frame width on phone-sized viewports to a maximum of 286 CSS pixels (while retaining a viewport-safe side margin), and reduced its height, padding and internal gaps.
+- Tightened the player-HP label/value and progress track spacing; the capsule dock and travel visual are also smaller on phones while remaining inside the frame.
+- Desktop/tablet sizing, HP state behavior, capsule visibility, inventory actions, healing and wallet rules are unchanged.
+- Added a regression assertion and a phone-focused human QA checklist. Real-device portrait/landscape acceptance remains required.
