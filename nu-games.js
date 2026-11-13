@@ -117,7 +117,7 @@ function syncHpPillDock(hp){
   lastRenderedHp=next;
   return;
  }
- if(lastRenderedHp>=10&&next<10){if(button)button.hidden=true;clearTimeout(hpPillDockTimer);hpPillDockTimer=setTimeout(()=>animateHpPillTravel("in"),390);}
+ if(lastRenderedHp>=10&&next<10){if(button)button.hidden=true;clearTimeout(hpPillDockTimer);hpPillDockTimer=setTimeout(()=>{hpPillDockTimer=0;animateHpPillTravel("in");},390);}
  else if(lastRenderedHp<10&&next>=10){if(button)button.hidden=true;clearTimeout(hpPillDockTimer);hpPillDockTimer=setTimeout(()=>{hpPillDockTimer=0;animateHpPillTravel("out");},390);}
  else if(button){
   // Keep the real control hidden until the travelling image has fully docked.
