@@ -14,11 +14,11 @@
     {key:"hpPills",label:"HP Capsules",unit:"N.U Index"},
     {key:"manaCapsules",label:"Mana Capsules",unit:"N.U Index"}
   ];
-  const BASE_INDEX=100,MAX_CANDLES=48;
+  const BASE_INDEX=100,MAX_CANDLES=24;
   const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
   function build(raw,key){
     if(!ASSETS.some(a=>a.key===key))return {asset:null,candles:[],index:BASE_INDEX,changePct:0,volume:0,demand:0,supply:0,events:0};
-    const txs=Array.isArray(raw&&raw.transactions)?raw.transactions.slice(-40):[];
+    const txs=Array.isArray(raw&&raw.transactions)?raw.transactions.slice(-24):[];
     const events=txs.map((tx,i)=>({tx,i,delta:Number(tx&&tx.deltas&&tx.deltas[key])}))
       .filter(e=>Number.isFinite(e.delta)&&e.delta!==0)
       .sort((a,b)=>String(a.tx.at||"").localeCompare(String(b.tx.at||""))||a.i-b.i);
