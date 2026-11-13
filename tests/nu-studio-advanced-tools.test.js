@@ -25,3 +25,12 @@ test("source original and generated edited SVG have separate export actions",()=
 test("advanced editing includes transforms, tone, RGB, overlay, chroma key and text",()=>{
  for(const id of ["data-x","adj-apply","rgb-apply","adv-overlay","adv-chroma","adv-textadd"])assert.ok(js.includes(id),id);
 });
+
+test("human report is available and attached to the visible composite exports",()=>{
+ assert.ok(html.includes('id="export-human-report"'));
+ assert.match(js,/createHumanReport\(analysis\)/);
+ assert.match(js,/humanReport:createHumanReport\(analysis\)/);
+ assert.match(js,/id="nu-human-report"/);
+ assert.match(js,/NUGraphicsAnalysis\.analyze\(composite\(\),width,height/);
+ assert.match(js,/composite\(\)\.forEach\(\(c,i\)=>/);
+});
