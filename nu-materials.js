@@ -16,6 +16,7 @@
     return img;
   });
   const bursts=[];
+  function prefersReducedMotion(){return typeof window.matchMedia==="function"&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;}
   function drawSprite(ctx,img,x,y,size,rotation,alpha){
     if(!img||!img.complete||!img.naturalWidth)return;
     ctx.save();
@@ -30,12 +31,14 @@
     const size=Math.max(18,Math.min(34,r*1.65));
     const orbit=r*.55;
     sprites.forEach((img,i)=>{
-      const angle=phase*.32+i*(Math.PI*2/5);
-      const pulse=.72+.22*Math.sin(phase*1.7+i*1.3);
+      const reduced=prefersReducedMotion();
+      const angle=(reduced?0:phase*.32)+i*(Math.PI*2/5);
+      const pulse=reduced?.82:.72+.22*Math.sin(phase*1.7+i*1.3);
       drawSprite(ctx,img,x+Math.cos(angle)*orbit,y+Math.sin(angle)*orbit,size,angle+Math.PI/4,pulse);
     });
   }
   function emit(x,y){
+    if(prefersReducedMotion())return;
     bursts.push({x,y,start:typeof performance!=="undefined"?performance.now():Date.now()});
     if(bursts.length>18)bursts.shift();
   }
