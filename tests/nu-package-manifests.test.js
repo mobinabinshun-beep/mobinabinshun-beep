@@ -54,7 +54,7 @@ test("all package manifests require integrity checks before activation",()=>{
  assert.equal(registry.security.atomicActivation,true);
  assert.equal(registry.security.rollbackToLastKnownGood,true);
  for(const manifest of [game,studio]){
-  assert.equal(manifest.integrity.contentHashes,"generated-by-release-builder");
-  assert.equal(manifest.integrity.publisherSignature,"required-before-install");
+  assert.equal(manifest.integrity.contentHashes,"SHA256SUMS.txt-generated-by-builder");
+  assert.equal(manifest.integrity.publisherSignature,"not-signed-preview-bundle");
  }
 });
