@@ -38,5 +38,6 @@ test("resize controls are not clamped to a fixed 2048-pixel edge",()=>{
 test("failed decode, allocation, mapping, or render preserves the previous artwork transactionally",()=>{
  assert.match(js,/Image import failed without replacing your previous artwork/);
  assert.match(js,/try\{restore\(before\);renderPalette\(\);\}catch\(_\)\{\}/);
- assert.ok(js.indexOf("commitHistory(before);originalImportFile=file;")>js.indexOf("renderPalette();"));
+ const block=js.slice(js.indexOf('$("image-file").addEventListener("change"'),js.indexOf('window.addEventListener("pagehide"'));
+ assert.ok(block.indexOf("commitHistory(before);originalImportFile=file;")>block.indexOf("renderPalette();"));
 });
