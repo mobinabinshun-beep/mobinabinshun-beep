@@ -2,35 +2,26 @@
   "id": "nu.game.generation-1",
   "name": "N.U Generation 1 Game Collection",
   "version": "0.1.0-preview",
-  "status": "development-package-contract",
-  "generation": {
-    "min": 1,
-    "max": 1
-  },
+  "status": "offline-source-bundle-preview",
+  "generation": {"min": 1, "max": 1},
   "runtime": {
     "hostApi": "nu.launcher.host/v1",
-    "entry": "index.html",
+    "entry": "runtime/index.html",
     "execution": "foreground-process",
     "requiredFeatures": ["dom", "canvas-2d"],
     "optionalFeatures": ["webgl", "webgpu", "offscreen-canvas", "workers"]
   },
   "payload": {
     "entryFiles": [
-      "index.html",
-      "nu-world.css",
-      "nu-engine.js",
-      "nu-pixel-world.js",
-      "nu-graphics-core.js",
-      "nu-background-engine.js",
-      "nu-dynamic-layers.js",
-      "nu-game-render-adapter.js",
-      "nu-graphics-runtime.js",
-      "nu-wallet.js",
-      "nu-games.js",
-      "nu-player-ui.js"
+      "runtime/index.html", "runtime/nu-world.css", "runtime/nu-engine.js",
+      "runtime/nu-pixel-world.js", "runtime/nu-graphics-core.js",
+      "runtime/nu-background-engine.js", "runtime/nu-dynamic-layers.js",
+      "runtime/nu-game-render-adapter.js", "runtime/nu-graphics-runtime.js",
+      "runtime/nu-wallet.js", "runtime/nu-games.js", "runtime/nu-player-ui.js",
+      "runtime/assets/nu-hp-pill-golden-pixel.svg"
     ],
-    "assets": ["assets/"],
-    "data": ["NU-GENERATION-1-MANIFEST.json"]
+    "assets": ["runtime/assets/"],
+    "data": []
   },
   "hostServices": {
     "capabilityProfile": "read-only",
@@ -63,14 +54,14 @@
     "backgroundExecution": "not-requested"
   },
   "integrity": {
-    "contentHashes": "generated-by-release-builder",
-    "publisherSignature": "required-before-install",
-    "signatureAlgorithm": "release-policy-defined",
-    "rollback": "last-known-good"
+    "contentHashes": "SHA256SUMS.txt-generated-by-builder",
+    "publisherSignature": "not-signed-preview-bundle",
+    "rollback": "launcher-required-not-in-this-archive"
   },
   "limitations": [
-    "This is a package manifest contract, not a signed installable artifact.",
-    "Native Launcher process isolation and platform adapters are not implemented here.",
-    "The frozen engine is referenced but must not be edited by this package work."
+    "This is an offline source bundle, not a native installer or signed Launcher package.",
+    "Native Launcher process isolation and adapters are not included.",
+    "The frozen engine is included unchanged and must remain read-only.",
+    "The page still contains optional navigation links to the public hub and Launcher preview."
   ]
 }
