@@ -26,7 +26,7 @@ body.nu-gateway-open .world,body.nu-gateway-open .casino-shell,body.nu-gateway-o
 body.nu-gateway-open .world .shell{filter:none}
 body.nu-gateway-open .casino-shell *,body.nu-gateway-open .launcher *,body.nu-gateway-open .shell *{animation-play-state:paused!important}
 body.nu-gateway-open #nu-hex-gateway{pointer-events:auto}
-body.nu-game-active #menu-open,body.nu-game-active #back-home,body.nu-game-active #finish-round{display:none!important}
+body.nu-gateway-enabled #menu-open,body.nu-gateway-enabled #back-home,body.nu-gateway-enabled #wallet-back,body.nu-gateway-enabled #profile-back,body.nu-gateway-enabled #shop-back,body.nu-gateway-enabled #article-back,body.nu-game-active #finish-round{display:none!important}
 @keyframes nuHexPulse{0%,100%{filter:brightness(1);opacity:.82}50%{filter:brightness(1.75);opacity:1}}
 @keyframes nuHexConfirm{0%,100%{opacity:.35;filter:brightness(1)}50%{opacity:1;filter:brightness(2.2)}}
 @media(max-width:600px){#nu-hex-gateway{top:clamp(124px,17vh,148px);right:12px;width:52px;height:52px}#nu-hex-gateway .nu-gateway-trigger{width:52px;height:52px}#nu-hex-gateway .nu-gateway-item{width:52px;height:52px;font-size:8px}#nu-hex-gateway .nu-gateway-hint{right:60px;top:17px;max-width:145px;font-size:8px}}
