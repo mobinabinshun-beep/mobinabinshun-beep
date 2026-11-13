@@ -33,7 +33,7 @@
     sprites.forEach((img,i)=>{
       const reduced=prefersReducedMotion();
       const angle=(reduced?0:phase*.32)+i*(Math.PI*2/5);
-      const pulse=reduced?.82:.72+.22*Math.sin(phase*1.7+i*1.3);
+      const pulse=reduced ? 0.82 : 0.72+0.22*Math.sin(phase*1.7+i*1.3);
       drawSprite(ctx,img,x+Math.cos(angle)*orbit,y+Math.sin(angle)*orbit,size,angle+Math.PI/4,pulse);
     });
   }
