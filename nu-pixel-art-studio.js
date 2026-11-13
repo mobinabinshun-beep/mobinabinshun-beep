@@ -193,87 +193,8 @@ function createHumanReport(analysis){
  return window.NUGraphicsAnalysis.createHumanReport(analysis,{name:$("export-name").value||"Untitled artwork"});
 }
 function downloadHumanReport(analysis){
- const report=createHumanReport(analysis);
- return download(new Blob([report],{type:"text/markdown;charset=utf-8"}),filename("human-report.md"));
-}
-function artworkFingerprint(){
- const source=width+"x"+height+"|"+pixels.map(p=>p||"_").join(",");
- let a=2166136261,b=2246822519;
- for(let i=0;i<source.length;i++){const c=source.charCodeAt(i);a=Math.imul(a^c,16777619);b=Math.imul(b^c,3266489917);}
- return (a>>>0).toString(16).padStart(8,"0")+(b>>>0).toString(16).padStart(8,"0");
-}
-function calculateStudioXP(metrics,pathCount){
- if(metrics.paintedPixels<16)return 0;
- const score=Math.floor(metrics.paintedPixels/256)+Math.floor(metrics.regionCount/8)+Math.floor(pathCount/24)+Math.floor(metrics.colorCount/8);
- return Math.max(1,Math.min(25,score));
-}
-function grantStudioXP(metrics,pathCount){
- const amount=calculateStudioXP(metrics,pathCount);
- if(!amount)return {ok:false,reason:"ARTWORK_TOO_SMALL",amount:0};
- if(!window.NU||!window.NUWallet)return {ok:false,reason:"SHARED_WALLET_UNAVAILABLE",amount};
- const save=NUWallet.normalizeSave(NU.load()),result=NUWallet.grantXP(save,amount,{id:"studio-export-"+artworkFingerprint(),title:"Creative Studio export"});
- if(!result.ok)return {ok:false,reason:result.reason,amount};
- if(!NU.save(result.state))return {ok:false,reason:"SAVE_FAILED",amount};
- window.dispatchEvent(new CustomEvent("nu:save-updated"));
- return {ok:true,amount};
-}
-function showAnalysisSummary(analysis,pathCount){
- const m=analysis.metrics;
- $("analysis-summary").textContent="ANALYSIS · "+m.paintedPixels.toLocaleString()+" pixels · "+m.colorCount+" colors · "+m.regionCount+" regions · "+m.edgePixels.toLocaleString()+" edge pixels · "+m.tileCount+" tiles · "+m.runCount+" runs · "+pathCount+" geometry units";
-}
-function reportDownloadedOutput(analysis,pathCount){
- showAnalysisSummary(analysis,pathCount);
- try{downloadHumanReport(analysis);}catch(err){announce("Artwork exported, but its human report could not be created: "+err.message);return;}
- const reward=grantStudioXP(analysis.metrics,pathCount);
- if(reward.ok)announce("Download started · +"+reward.amount+" shared XP added to all three Generation 1 games. This artwork earns XP once.");
- else if(reward.reason==="DUPLICATE_REWARD")announce("Download started · this artwork has already claimed its Studio XP reward.");
- else if(reward.reason==="ARTWORK_TOO_SMALL")announce("Download started · artwork is too small for an XP reward (minimum 16 painted pixels).");
- else announce("Download started · XP reward not saved: "+reward.reason+".");
-}
-function svgSource(){if(!window.NUSVGVectorizer)throw new Error("SVG vector engine did not load. Refresh the studio and try again.");return window.NUSVGVectorizer.vectorize(pixels,width,height,{mode:$("vector-mode").value});}
-function filename(ext){let n=$("export-name").value.trim().replace(/[^a-z0-9-_]+/gi,"-").replace(/^-+|-+$/g,"").slice(0,48)||"nu-pixel-art";return n+"."+ext;}
-function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);return true;}
-$("export-svg").addEventListener("click",()=>{try{const result=svgSource(),analysis=analyzeArtwork();if(download(new Blob([result.source],{type:"image/svg+xml;charset=utf-8"}),filename("svg")))reportDownloadedOutput(analysis,result.pathCount);}catch(err){announce("SVG export failed: "+err.message);}});
-$("export-ir").addEventListener("click",()=>{try{const analysis=analyzeArtwork(),source=JSON.stringify({...analysis,humanReport:createHumanReport(analysis)},null,2);if(download(new Blob([source],{type:"application/vnd.nu-gfx+json;charset=utf-8"}),filename("nu-gfx.json")))reportDownloadedOutput(analysis,analysis.metrics.regionCount);}catch(err){announce("Graphics IR export failed: "+err.message);}});
-$("export-human-report")?.addEventListener("click",()=>{try{const analysis=analyzeArtwork();if(downloadHumanReport(analysis))announce("Human-readable image report downloaded.");}catch(err){announce("Human report export failed: "+err.message);}});
-$("export-svg-copy").addEventListener("click",async()=>{try{const result=svgSource();await navigator.clipboard.writeText(result.source);announce("SVG source copied · "+result.pathCount+" paths · "+result.colorCount+" colors.");}catch(err){announce("Clipboard unavailable: "+err.message+" · use Download SVG.");}});
-$("export-png").addEventListener("click",()=>{try{const out=document.createElement("canvas");out.width=width*16;out.height=height*16;const o=out.getContext("2d");o.imageSmoothingEnabled=false;pixels.forEach((c,i)=>{if(!c)return;o.fillStyle=c;o.fillRect((i%width)*16,Math.floor(i/width)*16,16,16);});const analysis=analyzeArtwork();out.toBlob(blob=>{if(blob&&download(blob,filename("png")))reportDownloadedOutput(analysis,analysis.metrics.regionCount);else announce("PNG export could not create a file.");},"image/png");}catch(err){announce("PNG export failed: "+err.message);}});
-$("show-grid")?.addEventListener("change",render);
-renderPalette();updateCanvasDisplay();render();setTool("pencil");historyButtons();initAdaptive();
-document.addEventListener("keydown",e=>{
- const tag=(e.target&&e.target.tagName||"").toLowerCase();
- if(["input","textarea","select"].includes(tag)||e.target.isContentEditable)return;
- const key=e.key.toLowerCase(),mod=e.ctrlKey||e.metaKey;
- if(mod&&key==="z"){e.preventDefault();$(e.shiftKey?"redo":"undo").click();return;}
- if(mod&&key==="y"){e.preventDefault();$("redo").click();return;}
- if(!mod&&!e.altKey){
-  const tools={b:"pencil",e:"eraser",g:"fill",i:"picker",l:"line",r:"rect",o:"ellipse"};
-  if(tools[key]){e.preventDefault();setTool(tools[key]);}
-  else if(key==="f"){e.preventDefault();$("fit-canvas").click();}
- }
-});
-
-
-/* Advanced Studio foundation: four-layer compositor and core local editing operations. */
-const adv={layers:Array.from({length:4},(_,i)=>({name:"Layer "+(i+1),pixels:Array(width*height).fill(null),opacity:100,visible:true,locked:false})),active:0,bucket:"contiguous",tol:0};adv.layers[0].pixels=pixels.slice();
-let layerWidth=width,layerHeight=height;
-const renderBase=render,svgSourceBase=svgSource,rgb=c=>c?[1,3,5].map(i=>parseInt(c.slice(i,i+2),16)):null,hexRGB=a=>"#"+a.map(v=>clamp(Math.round(v),0,255).toString(16).padStart(2,"0")).join("");
-function mix(a,b,t){if(!a)return b;if(!b)return a;return hexRGB(rgb(a).map((v,i)=>v*(1-t)+rgb(b)[i]*t));}
-function dist(a,b){const x=rgb(a),y=rgb(b);return !x||!y?(a===b?0:999):Math.sqrt(x.reduce((n,v,i)=>n+(v-y[i])**2,0));}
-function composite(){const out=Array(width*height).fill(null);for(const l of adv.layers)if(l.visible)for(let i=0;i<out.length;i++)if(l.pixels[i])out[i]=mix(out[i],l.pixels[i],l.opacity/100);return out;}
-render=function(){
- if(width!==layerWidth||height!==layerHeight){
-  const oldW=layerWidth,oldH=layerHeight;
-  adv.layers.forEach((l,i)=>{if(i===adv.active)return;const next=Array(width*height).fill(null);for(let y=0;y<height;y++)for(let x=0;x<width;x++){const sx=Math.min(oldW-1,Math.floor((x+.5)*oldW/width)),sy=Math.min(oldH-1,Math.floor((y+.5)*oldH/height));next[y*width+x]=l.pixels[sy*oldW+sx]||null;}l.pixels=next;});
-  layerWidth=width;layerHeight=height;
- }
- adv.layers[adv.active].pixels=pixels.slice();const active=pixels;pixels=composite();renderBase();pixels=active;
-};
-svgSource=function(){
- const active=pixels;adv.layers[adv.active].pixels=active.slice();const visible=composite();pixels=visible;
- const result=svgSourceBase(),analysis=window.NUGraphicsAnalysis.analyze(visible,width,height,{tileSize:8});
- const report=createHumanReport(analysis).replace(/\\]\\]>/g,"]]]]><![CDATA[>");
- const metadata="<metadata id=\\"nu-human-report\\"><![CDATA["+report+"]]></metadata>\\n";
+ const report=createHumanReport(analysis).replace(/\]\]>/g,"]]]]><![CDATA[>");
+ const metadata='<metadata id="nu-human-report"><![CDATA['+report+']]></metadata>\n';
  result.source=result.source.replace("</svg>",metadata+"</svg>");pixels=active;return result;
 };
 const snapshotBase=snapshot,restoreBase=restore;
