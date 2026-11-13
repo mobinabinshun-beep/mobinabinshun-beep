@@ -89,7 +89,23 @@
       {key:"hp",label:"HP",value:s.hp,unit:"/ 10"},
       {key:"hpPills",label:"HP Capsules",value:s.hpPills,unit:""},
       {key:"manaCapsules",label:"Mana Capsules",value:s.manaCapsules,unit:""},
+      {key:"casinoCredits",label:"Casino Credits",value:s.casinoCredits,unit:""},
     ];
   }
-  return {MAX_HP,HP_PILL_COST,MAX_TRANSACTIONS,normalizeSave,buyHpPill,useHpPill,grantXP,settleCasinoRound,assetRows,gameAssetRows};
+  function assetHistory(raw,key){
+    const s=normalizeSave(raw),current=Number(s[key]);
+    if(!Number.isFinite(current)||!["xp","mana","hp","hpPills","manaCapsules","casinoCredits"].includes(key))return [];
+    const entries=s.transactions.filter(tx=>tx&&tx.deltas&&Number.isFinite(Number(tx.deltas[key]))).slice(-MAX_TRANSACTIONS);
+    const net=entries.reduce((sum,tx)=>sum+Number(tx.deltas[key]),0);
+    let balance=current-net;
+    const points=[{id:"start",at:entries[0]?.at||"",title:"Start of recorded history",delta:0,balance}];
+    for(const tx of entries){
+      const delta=Number(tx.deltas[key]);
+      balance+=delta;
+      points.push({id:String(tx.id||""),at:String(tx.at||""),title:String(tx.title||tx.kind||"Asset change"),delta,balance});
+    }
+    if(!entries.length)points.push({id:"current",at:"",title:"Current balance · no recorded changes",delta:0,balance:current});
+    return points;
+  }
+  return {MAX_HP,HP_PILL_COST,MAX_TRANSACTIONS,normalizeSave,buyHpPill,useHpPill,grantXP,settleCasinoRound,assetRows,gameAssetRows,assetHistory};
 });
