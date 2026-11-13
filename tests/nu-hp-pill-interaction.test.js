@@ -28,10 +28,10 @@ test("HP pill interaction pop uses viewport coordinates and cannot be clipped by
   assert.match(css,/\.hp-pill-hit-progress\{position:fixed!important/);
 });
 
-test("HUD markup is a native button and uses fresh generation 1.25 assets",()=>{
+test("HUD markup is a native button and uses fresh generation 1.27 assets",()=>{
   assert.match(html,/<button class="hp-pill-use" id="hp-pill-use" type="button"/);
-  assert.match(html,/nu-games\.js\?v=20261113-hp-pill-dock-motion-r2/);
-  assert.match(html,/nu-world\.css\?v=20261113-hp-pill-dock-motion-r2/);
+  assert.match(html,/nu-games\.js\?v=20261113-store-hp-pill-dual-action-r1/);
+  assert.match(html,/nu-world\.css\?v=20261113-store-hp-pill-dual-action-r1/);
 });
 
 test("HP capsule wallet rules consume exactly one capsule and cap healing at 10 HP",()=>{
@@ -107,4 +107,16 @@ test("Generation 1.26 reserves a responsive HP frame and an internal 42px capsul
   assert.ok(css.includes("min-width:72px"));
   assert.ok(css.includes("width:calc(100vw - 16px)"));
   assert.ok(html.includes("hp-pill-dock-motion-r2"));
+});
+
+
+test("Generation 1.27 Store has one HP capsule row with isolated icon-use and Buy actions",()=>{
+  assert.match(games,/shop-hp-pill-item/);
+  assert.match(games,/<button class="shop-hp-pill-use" type="button" data-use-hp-pill/);
+  assert.match(games,/<span class="shop-hp-pill-count" aria-live="polite">×'\+state\.save\.hpPills/);
+  assert.match(games,/<button class="btn primary shop-hp-pill-buy" data-buy-hp-pill/);
+  assert.doesNotMatch(games,/Use owned capsule<\/strong>|shop-use-item/);
+  assert.match(games,/b\.addEventListener\("click",e=>\{\s*e\.preventDefault\(\);e\.stopPropagation\(\);\s*if\(b\.disabled\)return;\s*useHpPill\(e\);/);
+  assert.match(css,/\.shop-hp-pill-use \.hp-pill-icon\.is-owned\{[^}]*filter:drop-shadow/);
+  assert.match(css,/\.shop-hp-pill-buy\{min-width:112px/);
 });

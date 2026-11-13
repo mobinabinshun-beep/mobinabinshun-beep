@@ -142,3 +142,20 @@ Validate the five archived N.U Mana SVG materials when used on interactive Mana 
 - Actual / browser / device / orientation:
 - Result: PASS / PASS WITH LIMITATIONS / FAIL
 - Notes:
+
+
+## Store HP capsule split-action row — Generation 1.27
+
+- [ ] Open N.U Store and confirm there is exactly one Golden HP Capsule purchase row; the separate "Use owned capsule" card is gone.
+- [ ] Confirm the capsule icon and owned count sit together on the far left of the row, item details are in the middle, and BUY / NEED 10 XP is a separate control on the far right.
+- [ ] With zero owned capsules, confirm the icon is visibly dimmed, count is ×0, and clicking it cannot use a capsule.
+- [ ] Buy one capsule using the right-side BUY control; confirm exactly 10 XP is deducted, inventory increases by one, and the left icon lights up with count ×1.
+- [ ] With HP below 10 and at least one owned capsule, click precisely the left capsule icon/count control; confirm exactly one capsule is consumed, HP is restored up to 10, and the count decreases by one.
+- [ ] Confirm clicking BUY never uses a capsule, and clicking the icon never purchases one.
+- [ ] With insufficient XP, confirm BUY is disabled and no wallet values change.
+- [ ] With HP at 10/10, confirm icon-use is disabled and the owned capsule remains in inventory.
+- [ ] Verify mouse, touch, keyboard focus/Enter/Space, narrow mobile portrait, landscape and desktop layouts.
+- Expected: one compact Store row, distinct non-overlapping purchase/use hit targets, count beside the icon, icon glow only when inventory is nonzero, and unchanged wallet transaction rules.
+- Actual / browser / device / orientation:
+- Result: PASS / PASS WITH LIMITATIONS / FAIL
+- Notes:
