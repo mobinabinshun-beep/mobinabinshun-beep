@@ -15,7 +15,7 @@ test("Studio has no fixed product pixel, edge, or file-size ceiling",()=>{
 test("file import accepts MIME-less browser file objects and uses an explicit picker button",()=>{
  assert.match(js,/isSupportedImageFile\(file\)/);
  assert.match(html,/id="import-image" type="button"/);
- assert.match(html,/accept="image\/\*"/);
+ assert.match(html,/accept="image\\/\\*[,"]/);
  assert.match(js,/await qualityProfileReady/);
  assert.match(js,/nu-launcher-calibration-v1/);
 });
