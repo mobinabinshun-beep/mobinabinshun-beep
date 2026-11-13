@@ -184,7 +184,16 @@ window.addEventListener("pagehide",()=>{if(sourcePreviewUrl)URL.revokeObjectURL(
 $("extract-palette").addEventListener("click",()=>{if(!imageImported){announce("Import an image first to extract its palette.");return;}const counts=new Map();pixels.filter(Boolean).forEach(c=>counts.set(c,(counts.get(c)||0)+1));palette=[...counts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,16).map(x=>x[0]);if(!palette.length)palette=defaults.slice();renderPalette();announce("Palette extracted from current artwork.");});
 function analyzeArtwork(){
  if(!window.NUGraphicsAnalysis)throw new Error("Graphics analysis engine did not load.");
- return window.NUGraphicsAnalysis.analyze(pixels,width,height,{tileSize:8});
+ adv.layers[adv.active].pixels=pixels.slice();
+ return window.NUGraphicsAnalysis.analyze(composite(),width,height,{tileSize:8});
+}
+function createHumanReport(analysis){
+ if(!window.NUGraphicsAnalysis||!window.NUGraphicsAnalysis.createHumanReport)throw new Error("Human report generator did not load.");
+ return window.NUGraphicsAnalysis.createHumanReport(analysis,{name:$("export-name").value||"Untitled artwork"});
+}
+function downloadHumanReport(analysis){
+ const report=createHumanReport(analysis);
+ return download(new Blob([report],{type:"text/markdown;charset=utf-8"}),filename("human-report.md"));
 }
 function artworkFingerprint(){
  const source=width+"x"+height+"|"+pixels.map(p=>p||"_").join(",");
@@ -213,6 +222,7 @@ function showAnalysisSummary(analysis,pathCount){
 }
 function reportDownloadedOutput(analysis,pathCount){
  showAnalysisSummary(analysis,pathCount);
+ try{downloadHumanReport(analysis);}catch(err){announce("Artwork exported, but its human report could not be created: "+err.message);return;}
  const reward=grantStudioXP(analysis.metrics,pathCount);
  if(reward.ok)announce("Download started · +"+reward.amount+" shared XP added to all three Generation 1 games. This artwork earns XP once.");
  else if(reward.reason==="DUPLICATE_REWARD")announce("Download started · this artwork has already claimed its Studio XP reward.");
@@ -223,9 +233,10 @@ function svgSource(){if(!window.NUSVGVectorizer)throw new Error("SVG vector engi
 function filename(ext){let n=$("export-name").value.trim().replace(/[^a-z0-9-_]+/gi,"-").replace(/^-+|-+$/g,"").slice(0,48)||"nu-pixel-art";return n+"."+ext;}
 function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);return true;}
 $("export-svg").addEventListener("click",()=>{try{const result=svgSource(),analysis=analyzeArtwork();if(download(new Blob([result.source],{type:"image/svg+xml;charset=utf-8"}),filename("svg")))reportDownloadedOutput(analysis,result.pathCount);}catch(err){announce("SVG export failed: "+err.message);}});
-$("export-ir").addEventListener("click",()=>{try{const analysis=analyzeArtwork(),source=JSON.stringify(analysis,null,2);if(download(new Blob([source],{type:"application/vnd.nu-gfx+json;charset=utf-8"}),filename("nu-gfx.json")))reportDownloadedOutput(analysis,analysis.metrics.regionCount);}catch(err){announce("Graphics IR export failed: "+err.message);}});
+$("export-ir").addEventListener("click",()=>{try{const analysis=analyzeArtwork(),source=JSON.stringify({...analysis,humanReport:createHumanReport(analysis)},null,2);if(download(new Blob([source],{type:"application/vnd.nu-gfx+json;charset=utf-8"}),filename("nu-gfx.json")))reportDownloadedOutput(analysis,analysis.metrics.regionCount);}catch(err){announce("Graphics IR export failed: "+err.message);}});
+$("export-human-report")?.addEventListener("click",()=>{try{const analysis=analyzeArtwork();if(downloadHumanReport(analysis))announce("Human-readable image report downloaded.");}catch(err){announce("Human report export failed: "+err.message);}});
 $("export-svg-copy").addEventListener("click",async()=>{try{const result=svgSource();await navigator.clipboard.writeText(result.source);announce("SVG source copied · "+result.pathCount+" paths · "+result.colorCount+" colors.");}catch(err){announce("Clipboard unavailable: "+err.message+" · use Download SVG.");}});
-$("export-png").addEventListener("click",()=>{try{const out=document.createElement("canvas");out.width=width*16;out.height=height*16;const o=out.getContext("2d");o.imageSmoothingEnabled=false;pixels.forEach((c,i)=>{if(!c)return;o.fillStyle=c;o.fillRect((i%width)*16,Math.floor(i/width)*16,16,16);});const analysis=analyzeArtwork();out.toBlob(blob=>{if(blob&&download(blob,filename("png")))reportDownloadedOutput(analysis,analysis.metrics.regionCount);else announce("PNG export could not create a file.");},"image/png");}catch(err){announce("PNG export failed: "+err.message);}});
+$("export-png").addEventListener("click",()=>{try{const out=document.createElement("canvas");out.width=width*16;out.height=height*16;const o=out.getContext("2d");o.imageSmoothingEnabled=false;adv.layers[adv.active].pixels=pixels.slice();composite().forEach((c,i)=>{if(!c)return;o.fillStyle=c;o.fillRect((i%width)*16,Math.floor(i/width)*16,16,16);});const analysis=analyzeArtwork();out.toBlob(blob=>{if(blob&&download(blob,filename("png")))reportDownloadedOutput(analysis,analysis.metrics.regionCount);else announce("PNG export could not create a file.");},"image/png");}catch(err){announce("PNG export failed: "+err.message);}});
 $("show-grid")?.addEventListener("change",render);
 renderPalette();updateCanvasDisplay();render();setTool("pencil");historyButtons();initAdaptive();
 document.addEventListener("keydown",e=>{
@@ -257,7 +268,13 @@ render=function(){
  }
  adv.layers[adv.active].pixels=pixels.slice();const active=pixels;pixels=composite();renderBase();pixels=active;
 };
-svgSource=function(){const active=pixels;pixels=composite();const result=svgSourceBase();pixels=active;return result;};
+svgSource=function(){
+ const active=pixels;adv.layers[adv.active].pixels=active.slice();const visible=composite();pixels=visible;
+ const result=svgSourceBase(),analysis=window.NUGraphicsAnalysis.analyze(visible,width,height,{tileSize:8});
+ const report=createHumanReport(analysis).replace(/\]\]>/g,"]]]]><![CDATA[>");
+ const metadata='<metadata id="nu-human-report"><![CDATA['+report+']]></metadata>\n';
+ result.source=result.source.replace("</svg>",metadata+"</svg>");pixels=active;return result;
+};
 const snapshotBase=snapshot,restoreBase=restore;
 snapshot=function(){adv.layers[adv.active].pixels=pixels.slice();return {...snapshotBase(),layers:adv.layers.map(l=>({...l,pixels:l.pixels.slice()})),active:adv.active};};
 restore=function(state){if(state.layers){adv.layers=state.layers.map(l=>({...l,pixels:l.pixels.slice()}));adv.active=clamp(state.active||0,0,adv.layers.length-1);layerWidth=state.width;layerHeight=state.height;state={...state,pixels:adv.layers[adv.active].pixels.slice()};}restoreBase(state);layerUI();};
