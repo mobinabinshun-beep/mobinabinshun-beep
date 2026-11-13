@@ -7,6 +7,7 @@ on:
       - "nu-graphics-runtime.js"
       - "nu-world.css"
       - "background-candidates.html"
+      - "assets/backgrounds/**"
       - "archive/visual-layers/**"
       - ".github/workflows/graphics-ci.yml"
   pull_request:
@@ -16,6 +17,7 @@ on:
       - "nu-graphics-runtime.js"
       - "nu-world.css"
       - "background-candidates.html"
+      - "assets/backgrounds/**"
       - "archive/visual-layers/**"
       - ".github/workflows/graphics-ci.yml"
   workflow_dispatch:
@@ -28,7 +30,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          grep -Fq 'Material/Background.svg' nu-background-engine.js
+          grep -Fq 'assets/backgrounds/niroo-universe-background.svg' nu-background-engine.js
+          test -s assets/backgrounds/niroo-universe-background.svg
+          grep -Fq 'const ASSET="./assets/backgrounds/niroo-universe-background.svg"' nu-background-engine.js
           grep -Fq 'id="nu-background-image"' nu-background-engine.js
           grep -Fq 'z-index:-3' nu-background-engine.js
           ! grep -Fq 'nu-pixel-world.js' index.html
