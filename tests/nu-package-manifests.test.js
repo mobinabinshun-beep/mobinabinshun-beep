@@ -6,6 +6,7 @@ const path=require("node:path");
 
 const readJson=relative=>JSON.parse(fs.readFileSync(path.join(__dirname,"..",relative),"utf8"));
 const registry=readJson("packages/registry.json");
+const root=path.resolve(__dirname,"..");
 const game=readJson("packages/nu-game-generation-1/manifest.json");
 const studio=readJson("packages/nu-creative-studio/manifest.json");
 
@@ -16,6 +17,8 @@ test("registry declares separate game and Creative Studio packages",()=>{
 
 test("Generation 1 package preserves frozen engine and excludes Generation 2",()=>{
  assert.equal(game.runtime.hostApi,"nu.launcher.host/v1");
+ assert.equal(game.runtime.entry,"runtime/index.html");
+ for(const file of game.payload.entryFiles) assert.ok(fs.statSync(path.join(root,"packages/nu-game-generation-1",file)).isFile(),`missing game payload: ${file}`);
  assert.equal(game.protectedComponents["nu-engine.js"].policy,"read-only-frozen-baseline");
  assert.equal(game.protectedComponents["nu-engine.js"].sha256GitBlob,"cda4f4157628aefaaac9ab95c047e4ca818c5f02");
  assert.equal(game.protectedComponents.generation2,"quarantined-and-excluded");
@@ -35,6 +38,8 @@ test("Studio demo compute boost is opt-in, foreground-only and session-scoped",(
 
 test("offline Studio has no mandatory network dependency and preserves source files",()=>{
  assert.equal(studio.hostServices.network,"disabled-by-default");
+ assert.equal(studio.runtime.entry,"runtime/pixel-art-studio.html");
+ for(const file of studio.payload.entryFiles) assert.ok(fs.statSync(path.join(root,"packages/nu-creative-studio",file)).isFile(),`missing Studio payload: ${file}`);
  assert.equal(studio.hostServices.originalSource,"immutable-reference-preserved");
  assert.equal(studio.resourcePolicy.offlineMode.requiresNetwork,false);
  assert.ok(studio.resourcePolicy.processing.preferred.includes("streaming"));
