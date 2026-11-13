@@ -38,6 +38,8 @@ jobs:
         run: node --test tests/nu-wallet.test.js
       - name: Test N.U material rendering and reduced-motion behavior
         run: node --test tests/nu-materials.test.js
+      - name: Test Bubble Hunt circular geometry and hit radius
+        run: node --test tests/nu-bubble-round.test.js
       - name: Test SVG contour vectorizer
         run: node --test tests/nu-svg-vectorizer.test.js
       - name: Test graphics analysis and machine-readable IR
