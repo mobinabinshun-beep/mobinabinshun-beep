@@ -30,8 +30,8 @@ test("HP pill interaction pop uses viewport coordinates and cannot be clipped by
 
 test("HUD markup is a native button and uses fresh generation 1.25 assets",()=>{
   assert.match(html,/<button class="hp-pill-use" id="hp-pill-use" type="button"/);
-  assert.match(html,/nu-games\.js\?v=20261113-hp-pill-internal-dock-r1/);
-  assert.match(html,/nu-world\.css\?v=20261113-hp-pill-internal-dock-r1/);
+  assert.match(html,/nu-games\.js\?v=20261113-hp-pill-dock-motion-r2/);
+  assert.match(html,/nu-world\.css\?v=20261113-hp-pill-dock-motion-r2/);
 });
 
 test("HP capsule wallet rules consume exactly one capsule and cap healing at 10 HP",()=>{
@@ -45,7 +45,7 @@ test("HP capsule wallet rules consume exactly one capsule and cap healing at 10 
 
 test("HP HUD capsule remains visible at zero inventory and reports unavailable state without losing clickability",()=>{
   assert.doesNotMatch(games,/pill\.hidden=false/);
-  assert.match(games,/button\.hidden=next>=10/);
+  assert.ok(games.includes('button.hidden=hpPillTravelAnimation&&hpPillTravelAnimation.playState==="running"?true:next>=10'));
   assert.match(games,/pill\.classList\.toggle\("unavailable",state\.save\.hp>=10\|\|state\.save\.hpPills<1\)/);
   assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use\.unavailable\{[^}]*pointer-events:auto!important/);
 });
@@ -64,37 +64,47 @@ test("successful HP capsule use emits a radial interaction burst anchored to the
   assert.match(css,/\.hp-pill-interaction-burst\{position:fixed/);
 });
 
-test("HP capsule visually flies from the HP rail corner to its dock on damage and returns when HP is full",()=>{
-  assert.match(games,/function animateHpPillTravel\(direction\)/);
-  assert.match(games,/function syncHpPillDock\(hp\)/);
-  assert.match(games,/lastRenderedHp>=10&&next<10\)\{if\(button\)button\.hidden=true;animateHpPillTravel\("in"\);\}/);
-  assert.match(games,/lastRenderedHp<10&&next>=10\)\{if\(button\)button\.hidden=true;animateHpPillTravel\("out"\);\}/);
-  assert.match(games,/barRect\.right-6/);
-  assert.match(games,/barRect\.right-28/);
-  assert.match(games,/ghost\.animate\(/);
-  assert.match(games,/syncHpPillDock\(state\.save\.hp\);renderGameAssetProfile\(\)/);
-  assert.match(css,/\.hp-pill-travel-ghost\{position:fixed/);
-  assert.match(css,/@media\(prefers-reduced-motion:reduce\)\{\.hp-pill-travel-ghost/);
+test("HP capsule travel enters from the inside-right corner and returns along the same reversible path",()=>{
+  assert.ok(games.includes("function animateHpPillTravel(direction)"));
+  assert.ok(games.includes("function syncHpPillDock(hp)"));
+  assert.ok(games.includes("const corner={x:barRect.width-4"));
+  assert.ok(games.includes("const dock={x:barRect.width-30"));
+  assert.ok(games.includes("hpPillTravelAnimation.reverse()"));
+  assert.ok(games.includes("ghost.animate("));
+  assert.ok(css.includes(".hp-pill-travel-layer{position:absolute;inset:0"));
+  assert.ok(css.includes("@media(prefers-reduced-motion:reduce){.hp-pill-travel-ghost"));
 });
 
-
-test("HP capsule is absent at full HP and only docks after the arrival animation while damaged",()=>{
+test("HP capsule is absent at full HP and remains hidden until its arrival animation finishes",()=>{
   assert.match(html,/<button class="hp-pill-use" id="hp-pill-use" type="button"[^>]*hidden/);
-  assert.match(games,/if\(lastRenderedHp===null\)\{lastRenderedHp=next;if\(button\)button\.hidden=next>=10;return;\}/);
-  assert.match(games,/animation\.onfinish=\(\)=>\{if\(run!==hpPillTravelRun\)return;ghost\.remove\(\);hpPillTravelGhost=null;hpPillTravelAnimation=null;button\.hidden=direction==="out";\}/);
-  assert.match(games,/if\(lastRenderedHp>=10&&next<10\)\{if\(button\)button\.hidden=true;animateHpPillTravel\("in"\);\}/);
-  assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use\[hidden\]\{display:none!important\}/);
-  assert.match(css,/#game-view\.active \.hp-bar\{[^}]*padding-right:54px/);
-  assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use\{[^}]*right:7px/);
+  assert.ok(games.includes("lastRenderedHp=10;"));
+  assert.ok(games.includes("const finishedDirection=hpPillTravelDirection;"));
+  assert.ok(games.includes('button.hidden=finishedDirection==="out"'));
+  assert.ok(games.includes('if(lastRenderedHp>=10&&next<10){if(button)button.hidden=true;animateHpPillTravel("in");}'));
+  assert.ok(css.includes("#game-view.active .hp-bar #hp-pill-use[hidden]{display:none!important}"));
 });
 
+test("Generation 1.26 widens the HP frame and keeps the pill dock inside its right edge",()=>{
+  assert.ok(css.includes("#game-view.active .hp-bar{\n width:min(340px,calc(100vw - 20px));"));
+  assert.ok(css.includes("#game-view.active .hp-bar #hp-pill-use{\n position:absolute;"));
+  assert.ok(css.includes("right:8px;"));
+  assert.ok(css.includes("padding:9px 60px 9px 14px"));
+  assert.ok(games.includes("const corner={x:barRect.width-4"));
+  assert.ok(games.includes("const dock={x:barRect.width-30"));
+  assert.ok(html.includes("hp-pill-dock-motion-r2"));
+});
 
-test("Generation 1.25 expands the HP frame and keeps the pill dock inside its right edge",()=>{
-  assert.match(css,/#game-view\.active \.hp-bar\{[^}]*width:min\(252px,calc\(100vw - 20px\)\)/);
-  assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use\{[^}]*position:absolute/);
-  assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use\{[^}]*right:7px/);
-  assert.match(games,/const corner=\{x:barRect\.right-6/);
-  assert.match(games,/const dock=\{x:barRect\.right-28/);
-  assert.match(games,/hpPillTravelRun\+\+/);
-  assert.match(html,/hp-pill-internal-dock-r1/);
+test("HP pill stays hidden during repeated damage and reverses the same in-flight animation when HP recovers",()=>{
+  assert.ok(games.includes("hpPillTravelDirection=null"));
+  assert.ok(games.includes("hpPillTravelAnimation.reverse()"));
+  assert.ok(games.includes('hpPillTravelAnimation.playState==="running"?true:next>=10'));
+  assert.ok(games.includes('button.hidden=finishedDirection==="out"'));
+  assert.ok(games.includes("if(direction!==hpPillTravelDirection){hpPillTravelDirection=direction;hpPillTravelAnimation.reverse();}"));
+});
+
+test("Generation 1.26 reserves a responsive HP frame and an internal 42px capsule dock",()=>{
+  assert.ok(css.includes("width:42px;"));
+  assert.ok(css.includes("min-width:72px"));
+  assert.ok(css.includes("width:calc(100vw - 16px)"));
+  assert.ok(html.includes("hp-pill-dock-motion-r2"));
 });

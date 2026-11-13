@@ -356,3 +356,13 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 - When HP returns to 10/10, the icon is hidden immediately and the visual capsule travels back along the reverse path, fading out at the right inner corner. No capsule remains visible at full HP.
 - Repeated damage does not duplicate the arrival animation. Travel is visual only and does not change inventory, healing, or wallet rules. Reduced-motion settings skip travel while preserving the correct conditional visibility.
 - The human-test checklist covers frame fit, inside-edge docking, reverse exit, interaction, mobile layouts and reduced-motion behavior.
+
+
+## Generation 1.26 — HP capsule dock motion precision (2026-11-13)
+
+- The HP HUD frame is widened to 340px on desktop and remains viewport-responsive on narrow screens; the capsule has a dedicated 42px dock fully inside the frame.
+- At full HP, neither the capsule icon nor its count is visible. When HP first falls below 10, one visual capsule enters from the inside-right edge and travels to the dock; the real button remains hidden until arrival.
+- Repeated HP changes during travel no longer reveal a duplicate button. If HP changes direction mid-flight, the same animation reverses from its current position rather than restarting or jumping.
+- When HP reaches 10/10, the capsule returns along the same path and fades out at the right corner. Lowering HP during the exit reverses that same motion back into the dock.
+- Travel remains visual-only; clicking the docked icon is still the only action that consumes a capsule. Wallet, healing, inventory and reward rules are unchanged.
+- Regression coverage and the Generation 1.26 human-test checklist cover duplicate prevention, mid-flight reversal, frame fit, reduced motion and mouse/touch/keyboard acceptance.
