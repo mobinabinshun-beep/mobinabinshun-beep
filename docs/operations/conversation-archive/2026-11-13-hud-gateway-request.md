@@ -29,8 +29,8 @@
 - Candidate branch: feat/nu-game-hud-layout-capsule-shield-2026-11-13
 - Pre-change backup branch: backup/pre-hud-layout-protocol-2026-11-13
 - Base commit: d4905e6880367c5d67674300a95e404c0fab06d4
-- Human browser/device acceptance: pending.
-- Deployment: pending PR review and merge.
+- CI passed: static validation run 43492347637 and Studio regression run 43492347753.
+- PR #64 merged for public demo testing; merge commit 1b873dcee5169354900a63362f793e03f085cd8f.\n- Pages deployment status has not yet been independently verified.\n- Human browser/device acceptance remains pending.
 
 ## Required human report
 
