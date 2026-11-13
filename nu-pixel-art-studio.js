@@ -231,12 +231,35 @@ function reportDownloadedOutput(analysis,pathCount){
 }
 function svgSource(){if(!window.NUSVGVectorizer)throw new Error("SVG vector engine did not load. Refresh the studio and try again.");return window.NUSVGVectorizer.vectorize(pixels,width,height,{mode:$("vector-mode").value});}
 function filename(ext){let n=$("export-name").value.trim().replace(/[^a-z0-9-_]+/gi,"-").replace(/^-+|-+$/g,"").slice(0,48)||"nu-pixel-art";return n+"."+ext;}
-function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);return true;}
+function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);return true;}
 $("export-svg").addEventListener("click",()=>{try{const result=svgSource(),analysis=analyzeArtwork();if(download(new Blob([result.source],{type:"image/svg+xml;charset=utf-8"}),filename("svg")))reportDownloadedOutput(analysis,result.pathCount);}catch(err){announce("SVG export failed: "+err.message);}});
 $("export-ir").addEventListener("click",()=>{try{const analysis=analyzeArtwork(),source=JSON.stringify({...analysis,humanReport:createHumanReport(analysis)},null,2);if(download(new Blob([source],{type:"application/vnd.nu-gfx+json;charset=utf-8"}),filename("nu-gfx.json")))reportDownloadedOutput(analysis,analysis.metrics.regionCount);}catch(err){announce("Graphics IR export failed: "+err.message);}});
 $("export-human-report")?.addEventListener("click",()=>{try{const analysis=analyzeArtwork();if(downloadHumanReport(analysis))announce("Human-readable image report downloaded.");}catch(err){announce("Human report export failed: "+err.message);}});
 $("export-svg-copy").addEventListener("click",async()=>{try{const result=svgSource();await navigator.clipboard.writeText(result.source);announce("SVG source copied · "+result.pathCount+" paths · "+result.colorCount+" colors.");}catch(err){announce("Clipboard unavailable: "+err.message+" · use Download SVG.");}});
-$("export-png").addEventListener("click",()=>{try{const out=document.createElement("canvas");out.width=width*16;out.height=height*16;const o=out.getContext("2d");o.imageSmoothingEnabled=false;adv.layers[adv.active].pixels=pixels.slice();composite().forEach((c,i)=>{if(!c)return;o.fillStyle=c;o.fillRect((i%width)*16,Math.floor(i/width)*16,16,16);});const analysis=analyzeArtwork();out.toBlob(blob=>{if(blob&&download(blob,filename("png")))reportDownloadedOutput(analysis,analysis.metrics.regionCount);else announce("PNG export could not create a file.");},"image/png");}catch(err){announce("PNG export failed: "+err.message);}});
+$("export-png").addEventListener("click",()=>{
+ const button=$("export-png");let source=null,out=null;
+ try{
+  if(!window.NUStudioExport)throw new Error("PNG export engine did not load. Refresh the Studio and try again.");
+  const scale=Number($("export-scale").value)||1,size=window.NUStudioExport.pngDimensions(width,height,scale);
+  adv.layers[adv.active].pixels=pixels.slice();
+  const visible=composite(),rgba=window.NUStudioExport.toRgba(visible,width,height);
+  source=document.createElement("canvas");source.width=width;source.height=height;
+  const sourceContext=source.getContext("2d");if(!sourceContext)throw new Error("This browser could not create the source export canvas.");
+  const frame=sourceContext.createImageData(width,height);frame.data.set(rgba);sourceContext.putImageData(frame,0,0);
+  out=document.createElement("canvas");out.width=size.width;out.height=size.height;
+  const outputContext=out.getContext("2d");if(!outputContext)throw new Error("This browser could not create the requested PNG canvas.");
+  outputContext.imageSmoothingEnabled=false;outputContext.drawImage(source,0,0,size.width,size.height);
+  const analysis=analyzeArtwork();
+  button.disabled=true;announce("Preparing transparent PNG · "+size.width+" × "+size.height+" px…");
+  out.toBlob(blob=>{
+   try{
+    if(!blob)throw new Error("The browser could not encode this PNG. Choose a smaller output scale.");
+    if(download(blob,filename("png")))reportDownloadedOutput(analysis,analysis.metrics.regionCount);
+   }catch(err){announce("PNG export failed: "+err.message);}
+   finally{button.disabled=false;source.width=source.height=out.width=out.height=1;}
+  },"image/png");
+ }catch(err){button.disabled=false;announce("PNG export failed: "+err.message);if(source)source.width=source.height=1;if(out)out.width=out.height=1;}
+});
 $("show-grid")?.addEventListener("change",render);
 renderPalette();updateCanvasDisplay();render();setTool("pencil");historyButtons();initAdaptive();
 document.addEventListener("keydown",e=>{
