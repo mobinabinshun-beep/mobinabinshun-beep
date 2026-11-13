@@ -6,18 +6,17 @@ test("image import defaults to exact source dimensions",()=>{
  assert.match(html,/<option value="original" selected>Original file size/);
  assert.match(js,/requested==="original"\?Math\.max\(sourceWidth,sourceHeight\)/);
 });
-test("Studio has no fixed product pixel, edge, or file-size ceiling",()=>{
+test("Studio has no product pixel, edge, file-size, or Launcher-profile import ceiling",()=>{
  assert.match(js,/function cellLimit\(\)\{return Infinity;\}/);
- assert.doesNotMatch(js,/requestedCells>safeCells|safe editing budget|25\*1024\*1024|16,384 px per edge|MAX_RASTER_PIXELS/);
+ assert.doesNotMatch(js,/requestedCells>safeCells|safe editing budget|25\*1024\*1024|16,384 px per edge|MAX_RASTER_PIXELS|maxCanvasPixels|current Launcher\/device budget/);
  assert.doesNotMatch(html,/id="image-width"[^>]*max=/);
  assert.doesNotMatch(html,/id="image-height"[^>]*max=/);
 });
-test("file import accepts MIME-less browser file objects and uses an explicit picker button",()=>{
+test("file import delegates format validation to browser decoding and uses an explicit picker button",()=>{
  assert.match(js,/isSupportedImageFile\(file\)/);
  assert.match(html,/id="import-image" type="button"/);
  assert.ok(html.includes('accept="image/*,image/svg+xml"'));
- assert.match(js,/await qualityProfileReady/);
- assert.match(js,/nu-launcher-calibration-v1/);
+ assert.match(js,/decodeImage\(file\)/);
 });
 test("reduced import detail is an explicit user choice and source remains separate",()=>{
  assert.match(html,/value="256">256 px · compact/);
