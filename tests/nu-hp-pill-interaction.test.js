@@ -7,12 +7,11 @@ const html=fs.readFileSync(require.resolve("../index.html"),"utf8");
 const css=fs.readFileSync(require.resolve("../nu-world.css"),"utf8");
 const wallet=require("../nu-wallet.js");
 
-test("HP capsule activation is delegated in capture phase for pointer and keyboard input",()=>{
-  assert.match(games,/document\.addEventListener\("pointerup",handleHpPillPointerUp,true\)/);
-  assert.match(games,/document\.addEventListener\("click",handleHpPillKeyboardClick,true\)/);
-  assert.match(games,/target\.closest\("#hp-pill-use"\)/);
-  assert.match(games,/e\.detail!==0/);
-  assert.doesNotMatch(games,/hpPillButton\.addEventListener/);
+test("HP capsule uses a direct native click listener for pointer, touch and keyboard activation",()=>{
+  assert.match(games,/function bindHpPillButton\(\)\{const button=\$\("hp-pill-use"\);if\(!button\)return;button\.addEventListener\("click",e=>\{e\.preventDefault\(\);e\.stopPropagation\(\);if\(button\.hidden\)return;useHpPill\(e\);\}\);\}/);
+  assert.match(games,/renderWallet\(\);bindHpPillButton\(\);bindGameAssetProfiles\(\)/);
+  assert.doesNotMatch(games,/document\.addEventListener\("pointerup",handleHpPillPointerUp/);
+  assert.doesNotMatch(games,/document\.addEventListener\("click",handleHpPillKeyboardClick/);
 });
 
 test("successful HUD use captures the icon position before wallet rerender can hide it",()=>{
@@ -24,14 +23,15 @@ test("HP pill interaction pop uses viewport coordinates and cannot be clipped by
   assert.match(games,/function showHpPillInteraction\(anchor,amount\)/);
   assert.match(games,/el\.style\.left=\(anchor\.left\+anchor\.width\/2\)\+"px"/);
   assert.match(games,/document\.body\.appendChild\(el\)/);
+  assert.match(css,/#game-view\.active \.hp-bar\{pointer-events:auto!important/);
   assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use\{[^}]*pointer-events:auto!important/);
   assert.match(css,/\.hp-pill-hit-progress\{position:fixed!important/);
 });
 
-test("HUD markup is a native button and uses fresh generation 1.19 assets",()=>{
+test("HUD markup is a native button and uses fresh generation 1.20 assets",()=>{
   assert.match(html,/<button class="hp-pill-use" id="hp-pill-use" type="button"/);
-  assert.match(html,/nu-games\.js\?v=20261113-hp-pill-interaction-r2/);
-  assert.match(html,/nu-world\.css\?v=20261113-hp-pill-interaction-r2/);
+  assert.match(html,/nu-games\.js\?v=20261113-hp-pill-direct-click-r1/);
+  assert.match(html,/nu-world\.css\?v=20261113-hp-pill-direct-click-r1/);
 });
 
 test("HP capsule wallet rules consume exactly one capsule and cap healing at 10 HP",()=>{

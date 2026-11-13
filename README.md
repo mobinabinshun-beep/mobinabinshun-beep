@@ -320,3 +320,12 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 - Fixed the prior feedback coordinate bug: the HP bar is viewport-fixed while the game stage clips overflow, so the old stage-relative notification could be positioned outside the clipped stage. Feedback now renders in viewport coordinates on `document.body`.
 - Captures the capsule button rectangle before wallet persistence/rerender can hide the button after the final capsule is consumed.
 - Wallet rules remain unchanged; regression tests cover event delegation, pre-rerender anchoring, unclipped feedback and one-capsule consumption.
+
+
+## Generation 1.20 — HP Capsule direct-click repair (2026-11-13)
+
+- Replaced document-level pointer-up delegation (and keyboard-only click fallback) with a direct native `click` listener on the actual HP Capsule button. Native click covers mouse, touch-generated click, Enter and Space activation and avoids duplicate pointer/click consumption paths.
+- The HP rail is explicitly pointer-enabled in gameplay, and the capsule button has an enlarged 42×42 CSS-pixel hit area; the button image/count are non-target descendants so clicks resolve to the button.
+- Click propagation is stopped at the button so the HP asset-profile click handler cannot swallow or reinterpret capsule use.
+- Existing wallet rules remain unchanged; successful use triggers the anchored `+N HP` viewport animation and HP bar feedback.
+- Automated regression checks assert the direct listener and CSS hit target. Human device/browser retest remains required.

@@ -79,3 +79,17 @@ Validate the five archived N.U Mana SVG materials when used on interactive Mana 
 - Steps to reproduce:
 - Expected vs actual:
 - Severity and notes:
+
+
+## HP Capsule — Generation 1.20 direct-click retest
+- [ ] Confirm the capsule count is at least 1 and HP is below 10.
+- [ ] Tap/click the button image, then separately the count text; both must consume exactly one capsule per activation.
+- [ ] Confirm keyboard Enter and Space activation each consume exactly one capsule.
+- [ ] Confirm the click does not open/close the HP asset profile or trigger the game canvas.
+- [ ] Confirm the `+N HP` pop is visibly anchored to the icon and remains above all HUD overlays.
+- [ ] Confirm the button has a visible focus outline and at least a 42×42 CSS-pixel hit area.
+- [ ] Verify on desktop mouse and mobile touch, in portrait and landscape.
+- Expected: HP rises by min(10, missing HP), pill count drops by exactly one, and one interaction pop appears.
+- Actual / browser / device / screen orientation:
+- Result: PASS / PASS WITH LIMITATIONS / FAIL
+- Notes:
