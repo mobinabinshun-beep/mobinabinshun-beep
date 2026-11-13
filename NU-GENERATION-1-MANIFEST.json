@@ -3,7 +3,7 @@
   "generation": 1,
   "runtime": "N.U Adaptive Runtime",
   "runtimeVersion": "0.1-prototype",
-  "packageVersion": "0.5.4-gen1-casino-mini-games",
+  "packageVersion": "0.5.5-gen1-hex-gateway-calibration",
   "entry": "index.html",
   "modules": [
     "index.html",
@@ -45,6 +45,7 @@
     "native": "future adapter required"
   },
   "notes": [
+    "Generation 1.32: calibrates the shared N.U hex gateway across all internal Generation 1 pages with responsive positioning, touch-direct activation, mouse-hover dwell, two-step click/keyboard confirmation, outside-exit tolerance and pause/blur behavior. Navigation only; game rules and wallet/save state are unchanged.",
     "Generation 1.31: adds a standalone N.U Casino with playable Coin Flip, Lucky Dice and Mini Slots. The casino uses a separate local virtual-credit balance (100 starting credits), persists in the shared browser save, and never touches XP/Mana or real money. Human browser/device acceptance remains required.",
     "Generation 1.16: the Mana Collector uses five preserved N.U Material SVG assets as crisp pixel-art glints around interactive Mana targets and emits a short material-based collection burst. Other game mechanics and the adaptive runtime remain unchanged; human visual/touch QA is required.",
     "Generation 1.15: image analysis now describes the visible four-layer composite; PNG and SVG exports include a companion Markdown human report, SVG embeds the report metadata, and Graphic IR includes the report as humanReport. A direct human-report download is also available. Source image processing remains local.",
