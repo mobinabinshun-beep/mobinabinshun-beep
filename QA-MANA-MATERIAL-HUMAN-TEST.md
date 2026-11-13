@@ -33,3 +33,11 @@ Validate the five archived N.U Mana SVG materials when used on interactive Mana 
 - Screenshot or short recording (optional; do not include private data):
 - Severity: cosmetic / usability / functional / blocking
 - Additional notes:
+
+
+## Bubble Hunt — roundness and interaction check
+- [ ] Every bubble is a true circle (equal width and height), not an oval.
+- [ ] Glass highlight follows the round bubble surface.
+- [ ] Mouse/touch hit area is centered on the visible circle.
+- [ ] Touch targets remain usable on narrow mobile screens.
+- [ ] Bubble Hunt still awards exactly +1 XP for each successful hit.
