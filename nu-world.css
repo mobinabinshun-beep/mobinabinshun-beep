@@ -399,3 +399,33 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
  #game-view.active .hp-bar #hp-pill-use img{width:24px;height:24px}
  .hp-pill-travel-ghost{width:28px;height:28px}
 }
+
+
+/* Generation 1.29 — phone HP capsule sits below the compact HP rail. */
+@media(max-width:520px){
+ #game-view.active .hp-bar{
+  width:max-content;
+  max-width:calc(100vw - 24px);
+  min-width:0;
+  min-height:76px;
+  padding:8px 10px 40px;
+  gap:7px;
+  justify-content:center;
+ }
+ #game-view.active .hp-bar>span:first-child{font-size:9px;letter-spacing:-.025em}
+ #game-view.active .hp-bar #hp-value{font-size:10px}
+ #game-view.active .hp-bar .hp-track{width:clamp(58px,22vw,86px);min-width:58px;max-width:86px;flex:0 1 auto}
+ #game-view.active .hp-bar #hp-pill-use{
+  left:50%;
+  right:auto;
+  top:auto;
+  bottom:3px;
+  transform:translateX(-50%);
+  width:36px;
+  height:36px;
+  min-width:36px;
+  min-height:36px;
+ }
+ #game-view.active .hp-bar #hp-pill-use img{width:27px;height:27px}
+ .hp-pill-travel-ghost{width:30px;height:30px}
+}
