@@ -6,7 +6,7 @@
 })(typeof globalThis!=="undefined"?globalThis:this,function(){
  "use strict";
  function pngDimensions(width,height,scale,limits){
-  const opts=limits||{},maxSide=Number(opts.maxSide)||16384,maxPixels=Number(opts.maxPixels)||16777216;
+  const opts=limits||{},maxSide=Number(opts.maxSide)||16384,maxPixels=Number(opts.maxPixels)||8388608;
   if(!Number.isSafeInteger(width)||!Number.isSafeInteger(height)||width<1||height<1)throw new RangeError("Artwork dimensions must be positive safe integers.");
   if(!Number.isInteger(scale)||scale<1||scale>16)throw new RangeError("PNG scale must be an integer from 1× to 16×.");
   const outWidth=width*scale,outHeight=height*scale,pixels=outWidth*outHeight;
