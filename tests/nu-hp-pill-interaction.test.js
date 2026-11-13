@@ -23,7 +23,8 @@ test("HP pill interaction pop uses viewport coordinates and cannot be clipped by
   assert.match(games,/function showHpPillInteraction\(anchor,amount\)/);
   assert.match(games,/el\.style\.left=\(anchor\.left\+anchor\.width\/2\)\+"px"/);
   assert.match(games,/document\.body\.appendChild\(el\)/);
-  assert.match(css,/#game-view\.active \.hp-bar\{pointer-events:auto!important/);\n  assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use\{[^}]*pointer-events:auto!important/);
+  assert.match(css,/#game-view\.active \.hp-bar\{pointer-events:auto!important/);
+  assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use\{[^}]*pointer-events:auto!important/);
   assert.match(css,/\.hp-pill-hit-progress\{position:fixed!important/);
 });
 
