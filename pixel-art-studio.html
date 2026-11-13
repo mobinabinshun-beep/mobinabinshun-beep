@@ -25,7 +25,6 @@
 @media(prefers-reduced-motion:reduce){#pixel-canvas{scroll-behavior:auto}}
 .panel-summary{display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer;list-style:none;margin-bottom:14px}.panel-summary::-webkit-details-marker{display:none}.panel-summary strong{font-size:13px;letter-spacing:.12em;color:var(--gold)}.panel-summary span{font-size:9px;letter-spacing:.08em;color:var(--muted)}.tool-group{margin-bottom:12px}.tool-group>small{display:block;margin-bottom:7px;color:var(--muted);font-size:9px;letter-spacing:.14em}.tool-group .tools{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.tool-group .tool{min-height:42px;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:5px}.tool:focus-visible{outline:2px solid var(--gold);outline-offset:2px}.tool kbd{font:700 9px ui-monospace,monospace;color:var(--muted);border:1px solid #ffffff26;border-radius:4px;padding:1px 3px}.tool:hover{border-color:var(--cyan);background:#17364b}.source-preview{display:flex;align-items:center;gap:12px;padding:10px;border:1px solid #65dcff33;border-radius:10px;background:#071522;margin:0 0 12px}.source-preview[hidden]{display:none}.source-preview img{display:block;max-width:112px;max-height:84px;object-fit:contain;image-rendering:auto;border:1px solid #ffffff30;border-radius:6px;background:#0a1420}.source-preview strong{display:block;color:var(--gold);font-size:11px}.source-preview span{display:block;color:var(--muted);font-size:11px}.import-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}.import-options .field{margin:6px 0}.tool-shortcut{opacity:.6;font-size:9px}
 </style>
-<link rel="stylesheet" href="./nu-hex-gateway.css?v=20261113-hex-gateway-r1">
 </head>
 <body>
 <div class="shell">
@@ -57,22 +56,4 @@
 <script src="./nu-raster-import.js?v=20261113-import-fix-r2"></script>
 <script src="./nu-studio-export.js?v=20261113-export-download-r2"></script>
 <script src="./nu-pixel-art-studio.js?v=20261113-export-download-r4"></script>
-<div class="nu-gateway-scrim" aria-hidden="true"></div>
-<nav id="nu-hex-gateway" aria-label="N.U quick navigation">
-  <button class="nu-gateway-trigger" type="button" aria-expanded="false" aria-label="Open N.U navigation gateway">
-    <svg viewBox="0 0 58 58" role="img" aria-hidden="true"><polygon class="hex-core" points="16,3 42,3 55,29 42,55 16,55 3,29"/><polygon class="hex-inner" points="18,9 40,9 49,29 40,49 18,49 9,29"/><text class="hex-mark" x="29" y="32" text-anchor="middle">N.U</text></svg>
-  </button>
-  <span class="nu-gateway-hint">MOVE TO NAVIGATE · TAP TWICE TO CONFIRM</span>
-  <div class="nu-gateway-items">
-    <button class="nu-gateway-item" type="button" data-action="back"><span>BACK<br>HOME</span></button>
-    <button class="nu-gateway-item" type="button" data-action="library"><span>GAME<br>LIBRARY</span></button>
-    <button class="nu-gateway-item" type="button" data-action="store"><span>N.U<br>STORE</span></button>
-    <button class="nu-gateway-item" type="button" data-action="wallet"><span>WALLET</span></button>
-    <button class="nu-gateway-item" type="button" data-action="profile"><span>PLAYER<br>PROFILE</span></button>
-    <button class="nu-gateway-item" type="button" data-action="launcher"><span>LAUNCHER<br>SETTINGS</span></button>
-    <button class="nu-gateway-item" type="button" data-action="studio"><span>CREATIVE<br>STUDIO</span></button>
-    <button class="nu-gateway-item" type="button" data-action="resume"><span>RETURN<br>TO GAME</span></button>
-  </div>
-</nav>
-<script src="./nu-hex-gateway.js?v=20261113-hex-gateway-r2"></script>
 </body></html>
