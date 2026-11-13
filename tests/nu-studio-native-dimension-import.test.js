@@ -8,11 +8,18 @@ test("image import defaults to exact source dimensions",()=>{
 });
 test("Studio has no fixed product pixel, edge, or file-size ceiling",()=>{
  assert.match(js,/function cellLimit\(\)\{return Infinity;\}/);
- assert.doesNotMatch(js,/requestedCells>safeCells|safe editing budget|25\*1024\*1024|16,384 px per edge|Math\.min\(maxSide/);
+ assert.doesNotMatch(js,/requestedCells>safeCells|safe editing budget|25\*1024\*1024|16,384 px per edge|MAX_RASTER_PIXELS/);
  assert.doesNotMatch(html,/id="image-width"[^>]*max=/);
  assert.doesNotMatch(html,/id="image-height"[^>]*max=/);
 });
-test("file import accepts MIME-less browser file objects and uses an explicit picker button",()=>{\n assert.match(js,/isSupportedImageFile\(file\)/);\n assert.match(html,/id="import-image" type="button"/);\n assert.match(html,/accept="image\\/\*"/);\n assert.match(js,/await qualityProfileReady/);\n});\ntest("reduced import detail is an explicit user choice and source remains separate",()=>{
+test("file import accepts MIME-less browser file objects and uses an explicit picker button",()=>{
+ assert.match(js,/isSupportedImageFile\(file\)/);
+ assert.match(html,/id="import-image" type="button"/);
+ assert.match(html,/accept="image\/\*"/);
+ assert.match(js,/await qualityProfileReady/);
+ assert.match(js,/nu-launcher-calibration-v1/);
+});
+test("reduced import detail is an explicit user choice and source remains separate",()=>{
  assert.match(html,/value="256">256 px · compact/);
  assert.match(js,/Explicit reduced-detail working copy created/);
  assert.match(js,/originalImportFile=file/);
