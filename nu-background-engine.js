@@ -14,6 +14,9 @@ function mount(){
  img.onload=()=>{loaded=true;world.classList.add("nu-image-scene-active");node.classList.add("is-loaded");if(g.NUPixelWorld&&g.NUPixelWorld.setEnabled)g.NUPixelWorld.setEnabled(false);g.dispatchEvent(new Event("nu:background-ready"));};
  img.onerror=()=>{loaded=false;world.classList.remove("nu-image-scene-active");node.classList.add("asset-missing");g.dispatchEvent(new Event("nu:background-missing"));};
  img.src=ASSET;node.appendChild(img);world.insertBefore(node,world.firstChild);
+ // Reveal the scene immediately; CSS otherwise leaves .world at opacity:0.
+ // No other loaded script applies the calibrated class.
+ world.classList.add("calibrated");
  return node;
 }
 function setQuality(b){
