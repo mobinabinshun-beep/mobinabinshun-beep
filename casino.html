@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>N.U Casino — Generation 1</title>
+<meta name="description" content="Three lightweight N.U browser mini-games using virtual credits only.">
+<meta name="theme-color" content="#071018">
+<link rel="stylesheet" href="./nu-casino.css?v=20261113-gen1-casino-mini-games-r1">
+</head>
+<body>
+<main class="casino-shell">
+<header class="casino-top"><a class="back-link" href="./index.html">← N.U WORLD</a><span class="eyebrow">GENERATION 01 · PLAYABLE MINI-GAMES</span></header>
+<section class="casino-hero">
+<p class="eyebrow">N.U ENTERTAINMENT DECK</p><h1>THE MINI<br><em>CASINO</em></h1>
+<p>Three quick games. One local virtual-credit balance. No deposits, payments, cash prizes or cash-out.</p>
+<div class="balance-panel"><span>YOUR VIRTUAL CREDITS</span><strong id="casino-balance" aria-live="polite">100</strong><small>LOCAL SAVE · NO MONETARY VALUE</small></div>
+<label class="wager-control" for="casino-wager">WAGER PER ROUND
+<select id="casino-wager"><option value="5">5 credits</option><option value="10">10 credits</option><option value="20">20 credits</option></select></label>
+</section>
+<section class="game-grid" aria-label="Casino mini-games">
+<article class="game-card">
+<div class="game-icon">◐</div><span class="game-kicker">01 / 50–50</span><h2>Coin Flip</h2><p>Call Heads or Tails. A correct call returns twice your wager.</p>
+<div class="choice-row"><button class="choice active" data-coin="heads" aria-pressed="true">HEADS</button><button class="choice" data-coin="tails" aria-pressed="false">TAILS</button></div>
+<div class="result-display" id="coin-result" aria-live="polite">Ready to flip?</div><button class="play-button" id="coin-play">FLIP COIN</button>
+</article>
+<article class="game-card">
+<div class="game-icon">⚄</div><span class="game-kicker">02 / SIX SIDES</span><h2>Lucky Dice</h2><p>Choose one number. Match the roll to receive five times your wager.</p>
+<label class="guess-control" for="dice-guess">YOUR NUMBER<select id="dice-guess"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></label>
+<div class="result-display" id="dice-result" aria-live="polite">Pick a number.</div><button class="play-button" id="dice-play">ROLL DICE</button>
+</article>
+<article class="game-card">
+<div class="game-icon">🎰</div><span class="game-kicker">03 / THREE REELS</span><h2>Mini Slots</h2><p>Spin three symbols. Three alike pays 8×; a pair pays 2×.</p>
+<div class="reels" id="slot-reels" aria-label="Slot symbols"><span>🍒</span><span>⭐</span><span>🔔</span></div>
+<div class="result-display" id="slot-result" aria-live="polite">Ready to spin?</div><button class="play-button" id="slot-play">SPIN REELS</button>
+</article>
+</section>
+<section class="casino-foot"><p id="casino-status" role="status" aria-live="polite">Choose a game to begin. Every result uses virtual credits stored in this browser.</p><a href="./index.html">RETURN TO NIROO UNIVERSE ↗</a></section>
+</main>
+<script src="./nu-engine.js"></script><script src="./nu-wallet.js"></script><script src="./nu-casino.js?v=20261113-gen1-casino-mini-games-r1"></script>
+</body></html>
