@@ -426,3 +426,15 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 
 - [Project handoff and conversation archive (2026-11-13)](PROJECT-HANDOFF-AND-CONVERSATION-ARCHIVE-2026-11-13.md) — project map, interaction requirements, generation boundaries, casino record, QA references and a ready-to-paste new-chat prompt.
 - **Generation boundary:** N.U Casino is Generation 1.31 only. Do not move or classify it as a Generation 2 feature.
+
+
+## Generation 1.33 candidate — gameplay HUD and navigation
+
+- The shared hex gateway is hidden on the home screen and shown only during active gameplay.
+- Gameplay gateway contains only Back, Menu, and Settings / Options.
+- The N.U / NIROO UNIVERSE mark sits quietly in the upper-left background; the selected game title remains centered.
+- LV moves to the lower-left beside the XP and Mana capsule rails. XP and Mana values appear inside their respective capsules.
+- The HP frame expands while damaged to reserve a right-side HP capsule dock, then contracts when HP is restored. The existing reversible capsule travel animation is reused.
+- An N-BI Arcane Shield charge meter demonstrates the requested collapse/recharge motion. It is visual-only and does not absorb damage.
+- This is a candidate for human testing. CI/source validation does not replace browser, touch, keyboard, accessibility and responsive-device acceptance.
+
