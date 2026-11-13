@@ -347,3 +347,12 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 - Reduced-motion settings suppress the travel motion; the regular HUD control remains available.
 - Automated regression coverage checks the full-to-damaged and damaged-to-full transitions, endpoints, animation hook and reduced-motion fallback. Human visual/device acceptance is still required.
 
+
+
+## Generation 1.25 — HP capsule internal dock motion (2026-11-13)
+
+- The HP HUD frame is widened to reserve an internal slot for the golden capsule; the live clickable icon is positioned inside the frame, not outside its right edge.
+- At full HP the capsule icon and count are hidden. When HP drops below 10, a visual capsule fades in at the frame's right inner corner and travels into the reserved slot beside the HP rail; the real button becomes available only after arrival.
+- When HP returns to 10/10, the icon is hidden immediately and the visual capsule travels back along the reverse path, fading out at the right inner corner. No capsule remains visible at full HP.
+- Repeated damage does not duplicate the arrival animation. Travel is visual only and does not change inventory, healing, or wallet rules. Reduced-motion settings skip travel while preserving the correct conditional visibility.
+- The human-test checklist covers frame fit, inside-edge docking, reverse exit, interaction, mobile layouts and reduced-motion behavior.
