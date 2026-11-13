@@ -57,7 +57,7 @@ function render(){
  if(!rows.some(r=>r.key===selected))selected=rows[0]?.key||"xp";
  $("asset-select").innerHTML=rows.map(r=>'<option value="'+r.key+'">'+r.label+'</option>').join("");$("asset-select").value=selected;
  const snapshot={version:1,updatedAt:new Date().toISOString(),assets:{},market:{}};
- rows.forEach(r=>{const all=NUWallet.assetHistory(save,r.key);snapshot.assets[r.key]={chart:all.slice(-MAX_CHART_STEPS),recent:all.slice(1).slice(-MAX_TEXT_HISTORY)};});
+ rows.forEach(r=>{const all=NUWallet.assetHistory(save,r.key);snapshot.assets[r.key]={chart:all.slice(-(MAX_CHART_STEPS+1)),recent:all.slice(1).slice(-MAX_TEXT_HISTORY)};});
  const marketModel=NUVirtualMarket.build(save,marketSelected);
  snapshot.market[marketSelected]={candles:marketModel.candles.slice(-MAX_CHART_STEPS)};
  try{localStorage.setItem(CACHE_KEY,JSON.stringify(snapshot));}catch(_){}
