@@ -110,18 +110,18 @@ Validate the five archived N.U Mana SVG materials when used on interactive Mana 
 - Result: PASS / PASS WITH LIMITATIONS / FAIL
 - Notes:
 
-## HP capsule arrival / return motion — Generation 1.23
+## HP capsule conditional arrival / return motion — Generation 1.24
 
-- [ ] Begin a game with HP at 10/10 and note the capsule icon is in its normal HUD position.
+- [ ] Begin a game with HP at 10/10 and confirm NO capsule icon or count is visible anywhere in the HP HUD.
 - [ ] In Chaos Attack, allow one breach to reduce HP below 10.
-- [ ] Confirm one golden capsule image appears from the HP rail's left corner and travels to the capsule dock at the rail's right side.
-- [ ] Confirm the real capsule button remains usable after the arrival animation; animation itself does not consume a capsule.
+- [ ] Confirm the real capsule button remains completely hidden while the animated golden capsule travels from the HP rail's left corner to its dock just outside the rail's right edge; only after arrival does the clickable icon appear.
+- [ ] Confirm the real capsule button becomes usable only after arrival; animation itself does not consume a capsule.
 - [ ] Take additional damage while HP is already below 10; confirm the docked icon does not replay or duplicate.
 - [ ] Restore HP gradually; confirm the capsule stays docked until HP reaches 10/10.
-- [ ] On reaching full HP (through a successful capsule use or round-completion heal), confirm the visual capsule travels back along the reverse path to the rail corner and fades out.
+- [ ] On reaching full HP (through a successful capsule use or round-completion heal), confirm the real icon disappears immediately and a separate visual capsule travels back along the reverse path to the rail corner and fades out; after that, no icon/count remains visible.
 - [ ] Confirm no capsule inventory is consumed by either travel animation; only an intentional click/tap/Enter/Space on the capsule button consumes one.
 - [ ] Verify portrait/landscape, desktop/mobile, all three games, and reduced-motion mode.
-- Expected: one arrival per transition from full to damaged, one reverse/fade per transition back to full, with no duplicate icons, clipped animation or wallet changes.
+- Expected: no visible capsule at 10/10; exactly one arrival and then one docked clickable icon when HP drops below 10; exactly one reverse/fade and no remaining icon at 10/10. No duplicate icons, clipped animation or wallet changes.
 - Actual / browser / device / orientation:
 - Result: PASS / PASS WITH LIMITATIONS / FAIL
 - Notes:
