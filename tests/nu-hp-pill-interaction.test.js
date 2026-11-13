@@ -44,7 +44,8 @@ test("HP capsule wallet rules consume exactly one capsule and cap healing at 10 
 
 
 test("HP HUD capsule remains visible at zero inventory and reports unavailable state without losing clickability",()=>{
-  assert.doesNotMatch(games,/pill\.hidden=false/);\n  assert.match(games,/button\.hidden=next>=10/);
+  assert.doesNotMatch(games,/pill\.hidden=false/);
+  assert.match(games,/button\.hidden=next>=10/);
   assert.match(games,/pill\.classList\.toggle\("unavailable",state\.save\.hp>=10\|\|state\.save\.hpPills<1\)/);
   assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use\.unavailable\{[^}]*pointer-events:auto!important/);
 });
