@@ -54,3 +54,21 @@ test("gateway remains isolated from frozen engine and game-rule modules", () => 
   assert.doesNotMatch(js, /nu-engine\.js|nu-games\.js|nu-wallet\.js/);
   assert.match(css, /prefers-reduced-motion/);
 });
+
+
+test("gateway is scoped to active game views and dedicated mini-games", () => {
+  const js = read("nu-hex-gateway.js");
+  const css = read("nu-hex-gateway.css");
+  const index = read("index.html");
+  const launcher = read("launcher.html");
+  const studio = read("pixel-art-studio.html");
+  const casino = read("casino.html");
+  assert.match(js, /nu-gateway-enabled/);
+  assert.match(js, /gameView\?\.classList\.contains\("active"\)/);
+  assert.match(css, /body\.nu-gateway-enabled #nu-hex-gateway/);
+  assert.match(css, /body\.nu-game-active #menu-open/);
+  assert.match(index, /id="nu-hex-gateway"/);
+  assert.match(casino, /id="nu-hex-gateway"/);
+  assert.doesNotMatch(launcher, /nu-hex-gateway/);
+  assert.doesNotMatch(studio, /nu-hex-gateway/);
+});
