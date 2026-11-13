@@ -392,3 +392,11 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 - The mobile arrival/return animation now docks at the lower centered position; desktop/tablet keeps its existing right-side internal dock.
 - HP, inventory, healing, wallet transactions and full-HP visibility rules are unchanged. Automated regression coverage and a phone-first human QA checklist were updated.
 - Real-device portrait/landscape acceptance remains pending.
+
+
+## Generation 1.30 — shared HP Capsule inventory refresh (2026-11-13)
+
+- Store-side capsule use now refreshes the Store row immediately after a successful wallet transaction, so its owned count decreases without closing and reopening Store.
+- The in-game HP HUD continues to update its count through the shared wallet render path. Both controls call the same wallet consumption rule and consume exactly one capsule per successful use.
+- Full HP, empty inventory, healing cap, XP and purchase behavior are unchanged.
+- Regression tests cover immediate Store refresh and the shared wallet consumption result. Human testing should alternate Store and HUD use and confirm both counts remain synchronized.
