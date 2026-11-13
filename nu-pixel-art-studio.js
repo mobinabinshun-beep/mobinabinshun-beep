@@ -214,28 +214,49 @@ function showAnalysisSummary(analysis,pathCount){
 }
 function reportDownloadedOutput(analysis,pathCount){
  showAnalysisSummary(analysis,pathCount);
- // Each export action downloads only its selected file format.
- const reward=grantStudioXP(analysis.metrics,pathCount);
- if(reward.ok)announce("Artwork export started · +"+reward.amount+" shared XP added to all three Generation 1 games. This artwork earns XP once.");
- else if(reward.reason==="DUPLICATE_REWARD")announce("Artwork export started · this artwork has already claimed its Studio XP reward.");
- else if(reward.reason==="ARTWORK_TOO_SMALL")announce("Artwork export started · artwork is too small for an XP reward (minimum 16 painted pixels).");
- else announce("Artwork export started · XP reward not saved: "+reward.reason+".");
+ let message="File ready · if automatic download did not start, tap the download link below.";
+ try{
+  const reward=grantStudioXP(analysis.metrics,pathCount);
+  if(reward.ok)message="File ready · +"+reward.amount+" shared XP added to all three Generation 1 games. This artwork earns XP once. If needed, tap the download link below.";
+  else if(reward.reason==="DUPLICATE_REWARD")message="File ready · this artwork has already claimed its Studio XP reward. If needed, tap the download link below.";
+  else if(reward.reason==="ARTWORK_TOO_SMALL")message="File ready · artwork is too small for an XP reward. If needed, tap the download link below.";
+  else message="File ready · XP reward not saved: "+reward.reason+". If needed, tap the download link below.";
+ }catch(error){message="File ready · reward tracking was unavailable. Use the download link below if automatic download did not start.";}
+ announce(message);
 }
 function svgSource(){if(!window.NUSVGVectorizer)throw new Error("SVG vector engine did not load. Refresh the studio and try again.");return window.NUSVGVectorizer.vectorize(pixels,width,height,{mode:$("vector-mode").value});}
 function filename(ext){let n=$("export-name").value.trim().replace(/[^a-z0-9-_]+/gi,"-").replace(/^-+|-+$/g,"").slice(0,48)||"nu-pixel-art";return n+"."+ext;}
+let pendingDownloadUrl=null;
 function download(blob,name){
  if(!(blob instanceof Blob)||!blob.size)throw new Error("The export produced an empty file.");
  if(typeof URL.createObjectURL!=="function")throw new Error("This browser does not support file downloads.");
- const url=URL.createObjectURL(blob),a=document.createElement("a");
- a.href=url;a.download=name;a.style.display="none";a.rel="noopener";
- document.body.appendChild(a);
- try{a.click();}catch(error){a.remove();URL.revokeObjectURL(url);throw error;}
- setTimeout(()=>a.remove(),1000);
- setTimeout(()=>URL.revokeObjectURL(url),60000);
+ const url=URL.createObjectURL(blob),a=document.createElement("a"),fallback=$("export-download-fallback");
+ a.href=url;a.download=name;a.target="_blank";a.rel="noopener";a.textContent="Download "+name;
+ a.className="download-fallback-link";a.style.display="inline-block";a.style.margin="8px 0";a.style.padding="10px 14px";
+ a.style.border="1px solid #65dcff";a.style.borderRadius="8px";a.style.color="#bceeff";a.style.fontWeight="700";
+ if(fallback){fallback.replaceChildren(a);fallback.hidden=false;}
+ else{a.style.position="fixed";a.style.left="12px";a.style.bottom="12px";a.style.zIndex="9999";document.body.appendChild(a);}
+ try{a.click();}catch(error){announce("Automatic download was blocked. Tap the visible Download "+name+" link.");}
+ if(pendingDownloadUrl)URL.revokeObjectURL(pendingDownloadUrl);
+ pendingDownloadUrl=url;
+ setTimeout(()=>{if(pendingDownloadUrl===url){URL.revokeObjectURL(url);pendingDownloadUrl=null;}},600000);
  return true;
 }
-$("export-svg").addEventListener("click",()=>{try{const result=svgSource(),analysis=analyzeArtwork();if(download(new Blob([result.source],{type:"image/svg+xml;charset=utf-8"}),filename("svg")))reportDownloadedOutput(analysis,result.pathCount);}catch(err){announce("SVG export failed: "+err.message);}});
-$("export-ir").addEventListener("click",()=>{try{const analysis=analyzeArtwork(),source=JSON.stringify(analysis,null,2);if(download(new Blob([source],{type:"application/vnd.nu-gfx+json;charset=utf-8"}),filename("nu-gfx.json")))reportDownloadedOutput(analysis,analysis.metrics.regionCount);}catch(err){announce("Graphics IR export failed: "+err.message);}});
+$("export-svg").addEventListener("click",()=>{
+ try{
+  const result=svgSource(),name=filename("svg");
+  download(new Blob([result.source],{type:"image/svg+xml;charset=utf-8"}),name);
+  announce("SVG file prepared · "+result.pathCount+" paths. If it did not download, tap the "+name+" link below.");
+  try{reportDownloadedOutput(analyzeArtwork(),result.pathCount);}catch(_){announce("SVG file is ready. Tap the download link below if automatic download did not start.");}
+ }catch(err){announce("SVG export failed: "+err.message);}
+});
+$("export-ir").addEventListener("click",()=>{
+ try{
+  const analysis=analyzeArtwork(),source=JSON.stringify(analysis,null,2),name=filename("nu-gfx.json");
+  download(new Blob([source],{type:"application/vnd.nu-gfx+json;charset=utf-8"}),name);
+  reportDownloadedOutput(analysis,analysis.metrics.regionCount);
+ }catch(err){announce("Graphic IR export failed: "+err.message+" · this format needs a successful graphics analysis. Try PNG or SVG for this artwork.");}
+});
 $("export-svg-copy").addEventListener("click",async()=>{try{const result=svgSource();await navigator.clipboard.writeText(result.source);announce("SVG source copied · "+result.pathCount+" paths · "+result.colorCount+" colors.");}catch(err){announce("Clipboard unavailable: "+err.message+" · use Download SVG.");}});
 $("export-png").addEventListener("click",()=>{
  const button=$("export-png");let source=null,out=null;
@@ -250,12 +271,12 @@ $("export-png").addEventListener("click",()=>{
   out=document.createElement("canvas");out.width=size.width;out.height=size.height;
   const outputContext=out.getContext("2d");if(!outputContext)throw new Error("This browser could not create the requested PNG canvas.");
   outputContext.imageSmoothingEnabled=false;outputContext.drawImage(source,0,0,size.width,size.height);
-  const analysis=analyzeArtwork();
   button.disabled=true;announce("Preparing transparent PNG · "+size.width+" × "+size.height+" px…");
   out.toBlob(blob=>{
    try{
     if(!blob)throw new Error("The browser could not encode this PNG. Choose a smaller output scale.");
-    if(download(blob,filename("png")))reportDownloadedOutput(analysis,analysis.metrics.regionCount);
+    const name=filename("png");download(blob,name);
+    try{reportDownloadedOutput(analyzeArtwork(),0);}catch(_){announce("PNG file is ready. Tap the download link below if automatic download did not start.");}
    }catch(err){announce("PNG export failed: "+err.message);}
    finally{button.disabled=false;source.width=source.height=out.width=out.height=1;}
   },"image/png");
