@@ -349,7 +349,8 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 }
 #game-view.active .hp-bar #hp-pill-use img{width:30px;height:30px;object-fit:contain}
 #game-view.active .hp-bar #hp-pill-use[hidden]{display:none!important}
-.hp-pill-travel-ghost{width:36px;height:36px}
+.hp-pill-travel-layer{position:absolute;inset:0;z-index:1303;overflow:hidden;border-radius:inherit;pointer-events:none}
+.hp-pill-travel-ghost{position:absolute;z-index:1;width:36px;height:36px;object-fit:contain;image-rendering:pixelated;pointer-events:none;filter:drop-shadow(0 0 8px #b7ff75);will-change:transform,opacity}
 @media(max-width:520px){
  #game-view.active .hp-bar{
   width:calc(100vw - 16px);

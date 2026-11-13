@@ -58,7 +58,7 @@ function bindGameAssetProfiles(){
  });
  window.addEventListener("resize",()=>{if(!root.hidden){const active=document.activeElement;if(active&&active.matches(".bar-wrap,#hp-bar"))positionGameAssetProfile(active);}});
 }
-let lastRenderedHp=null,hpPillTravelAnimation=null,hpPillTravelGhost=null,hpPillTravelDirection=null,hpPillTravelRun=0;
+let lastRenderedHp=null,hpPillTravelAnimation=null,hpPillTravelGhost=null,hpPillTravelLayer=null,hpPillTravelDirection=null,hpPillTravelRun=0;
 function animateHpPillTravel(direction){
  const bar=$("hp-bar"),button=$("hp-pill-use"),source=button&&button.querySelector("img");
  if(!bar||!button)return;
@@ -66,7 +66,7 @@ function animateHpPillTravel(direction){
  const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
  if(reduced||!source||typeof source.animate!=="function"){
   if(hpPillTravelAnimation){hpPillTravelAnimation.cancel();hpPillTravelAnimation=null;}
-  if(hpPillTravelGhost){hpPillTravelGhost.remove();hpPillTravelGhost=null;}
+  if(hpPillTravelLayer){hpPillTravelLayer.remove();hpPillTravelLayer=null;hpPillTravelGhost=null;}
   hpPillTravelDirection=null;
   button.hidden=direction==="out";
   return;
@@ -78,16 +78,17 @@ function animateHpPillTravel(direction){
   return;
  }
  if(hpPillTravelAnimation){hpPillTravelAnimation.cancel();hpPillTravelAnimation=null;}
- if(hpPillTravelGhost){hpPillTravelGhost.remove();hpPillTravelGhost=null;}
+ if(hpPillTravelLayer){hpPillTravelLayer.remove();hpPillTravelLayer=null;hpPillTravelGhost=null;}
  const run=++hpPillTravelRun;
  hpPillTravelDirection=direction;
  const barRect=bar.getBoundingClientRect();
  // The visual starts just inside the right frame edge and docks in the reserved capsule slot.
- const corner={x:barRect.right-4,y:barRect.top+barRect.height/2};
- const dock={x:barRect.right-30,y:barRect.top+barRect.height/2};
+ const corner={x:barRect.width-4,y:barRect.height/2};
+ const dock={x:barRect.width-30,y:barRect.height/2};
  const from=direction==="in"?corner:dock,to=direction==="in"?dock:corner;
- const ghost=document.createElement("img");ghost.className="hp-pill-travel-ghost";ghost.src=source.src;ghost.alt="";ghost.setAttribute("aria-hidden","true");
- ghost.style.left=from.x+"px";ghost.style.top=from.y+"px";document.body.appendChild(ghost);hpPillTravelGhost=ghost;
+ const layer=document.createElement("span");layer.className="hp-pill-travel-layer";layer.setAttribute("aria-hidden","true");
+ const ghost=document.createElement("img");ghost.className="hp-pill-travel-ghost";ghost.src=source.src;ghost.alt="";
+ ghost.style.left=from.x+"px";ghost.style.top=from.y+"px";layer.appendChild(ghost);bar.appendChild(layer);hpPillTravelLayer=layer;hpPillTravelGhost=ghost;
  const dx=to.x-from.x,dy=to.y-from.y,base="translate(-50%,-50%) translate(";
  const animation=ghost.animate([
   {opacity:0,transform:base+"0px,0px) scale(.58)"},
@@ -98,10 +99,10 @@ function animateHpPillTravel(direction){
  animation.onfinish=()=>{
   if(run!==hpPillTravelRun)return;
   const finishedDirection=hpPillTravelDirection;
-  ghost.remove();hpPillTravelGhost=null;hpPillTravelAnimation=null;hpPillTravelDirection=null;
+  layer.remove();hpPillTravelLayer=null;hpPillTravelGhost=null;hpPillTravelAnimation=null;hpPillTravelDirection=null;
   button.hidden=finishedDirection==="out";
  };
- animation.oncancel=()=>{ghost.remove();if(run===hpPillTravelRun){hpPillTravelGhost=null;hpPillTravelAnimation=null;hpPillTravelDirection=null;}};
+ animation.oncancel=()=>{layer.remove();if(run===hpPillTravelRun){hpPillTravelLayer=null;hpPillTravelGhost=null;hpPillTravelAnimation=null;hpPillTravelDirection=null;}};
 }
 function syncHpPillDock(hp){
  const next=Number.isFinite(hp)?hp:10,button=$("hp-pill-use");
