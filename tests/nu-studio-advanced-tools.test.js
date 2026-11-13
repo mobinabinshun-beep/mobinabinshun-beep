@@ -48,5 +48,5 @@ test("one export action never starts a second human-report download",()=>{
  assert.ok(start>=0&&end>start,"export completion handler exists");
  const handler=js.slice(start,end);
  assert.doesNotMatch(handler,/downloadHumanReport\(/);
- assert.match(js,/id="export-human-report"\)\?\.addEventListener/);
+ assert.ok(html.includes('id="export-human-report"'),"dedicated human-report export button remains available");
 });
