@@ -153,24 +153,30 @@ $("image-file").addEventListener("change",async e=>{
   const extracted=imagePalette(data,Number($("palette-limit").value)||32,alphaCutoff);
   if(!extracted.length)throw new Error("No visible pixels remain above the transparency cutoff.");
   const mapped=window.NURasterImport.mapPixels(data,nextW,nextH,extracted,alphaCutoff,$("dither-image").checked);
-  const before=snapshot(),previous={width,height,pixels,palette,imageImported,zoom:workspace.zoom,originalImportFile};
+  const before=snapshot(),previous={width,height,pixels,palette,imageImported,zoom:workspace.zoom,originalImportFile,sourceInfo:$("source-info").textContent,sourcePreviewHidden:$("source-preview-panel").hidden,sourcePreviewSrc:$("source-preview").src};
+  let nextPreviewUrl=null;
   try{
+   nextPreviewUrl=URL.createObjectURL(file);
    width=nextW;height=nextH;pixels=mapped;palette=extracted;imageImported=true;workspace.zoom=100;
    updateCanvasDisplay();render();
-  }catch(renderError){
+   $("image-width").value=width;$("image-height").value=height;
+   $("source-preview").src=nextPreviewUrl;$("source-preview-panel").hidden=false;
+   const sizing=requested==="original"?"original dimensions preserved":"working copy resized by your selected detail";
+   $("source-info").textContent=sourceWidth+" × "+sourceHeight+" source → "+width+" × "+height+" editable pixels · "+palette.length+" colors · "+sizing;
+   renderPalette();
+   commitHistory(before);originalImportFile=file;
+   const previousPreviewUrl=sourcePreviewUrl;sourcePreviewUrl=nextPreviewUrl;nextPreviewUrl=null;
+   if(previousPreviewUrl)URL.revokeObjectURL(previousPreviewUrl);
+   requestAnimationFrame(()=>{updateCanvasDisplay();$("workspace-frame").scrollTo(0,0);});
+   announce("Imported · "+file.name+" · "+sourceWidth+" × "+sourceHeight+" source → "+width+" × "+height+" editable pixels. "+(requested==="original"?"Original dimensions preserved.":"Explicit reduced-detail working copy created.")+" Original source preserved.");
+  }catch(importError){
+   if(nextPreviewUrl)URL.revokeObjectURL(nextPreviewUrl);
    width=previous.width;height=previous.height;pixels=previous.pixels;palette=previous.palette;imageImported=previous.imageImported;workspace.zoom=previous.zoom;originalImportFile=previous.originalImportFile;
-   try{restore(before);}catch(_){}
-   throw new Error("The image could be decoded but the working canvas could not be allocated. Your previous artwork was restored. "+(renderError&&renderError.message?renderError.message:""));
+   $("source-info").textContent=previous.sourceInfo;$("source-preview-panel").hidden=previous.sourcePreviewHidden;
+   if(previous.sourcePreviewSrc)$("source-preview").src=previous.sourcePreviewSrc;
+   try{restore(before);renderPalette();}catch(_){}
+   throw new Error("Image import failed without replacing your previous artwork. "+(importError&&importError.message?importError.message:""));
   }
-  commitHistory(before);originalImportFile=file;
-  $("image-width").value=width;$("image-height").value=height;
-  if(sourcePreviewUrl)URL.revokeObjectURL(sourcePreviewUrl);
-  sourcePreviewUrl=URL.createObjectURL(file);$("source-preview").src=sourcePreviewUrl;$("source-preview-panel").hidden=false;
-  const sizing=requested==="original"?"original dimensions preserved":"working copy resized by your selected detail";
-  $("source-info").textContent=sourceWidth+" × "+sourceHeight+" source → "+width+" × "+height+" editable pixels · "+palette.length+" colors · "+sizing;
-  updateCanvasDisplay();requestAnimationFrame(()=>{updateCanvasDisplay();$("workspace-frame").scrollTo(0,0);});
-  renderPalette();render();
-  announce("Imported · "+file.name+" · "+sourceWidth+" × "+sourceHeight+" source → "+width+" × "+height+" editable pixels. "+(requested==="original"?"Original dimensions preserved.":"Explicit reduced-detail working copy created.")+" Original source preserved.");
  }catch(err){announce("Image import failed: "+(err&&err.message?err.message:"unsupported image"));}
  finally{if(bitmap&&typeof bitmap.close==="function")bitmap.close();else if(bitmap&&typeof bitmap.__nuRelease==="function")bitmap.__nuRelease();e.target.value="";importButton.disabled=false;}
 });
