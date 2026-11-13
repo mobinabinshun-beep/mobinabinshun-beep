@@ -50,12 +50,12 @@ test("PNG and SVG files are created before optional analytics and reward trackin
  const svg=js.slice(js.indexOf('$("export-svg").addEventListener'),js.indexOf('$("export-ir").addEventListener'));
  const png=js.slice(js.indexOf('$("export-png").addEventListener'));
  assert.ok(svg.indexOf("download(new Blob")<svg.indexOf("analyzeArtwork()"));
- assert.ok(png.indexOf("download(blob,name)")<png.indexOf("analyzeArtwork()"));
+ assert.ok(png.includes("download(blob,name)"));\n assert.doesNotMatch(png,/analyzeArtwork\\(\\)/);
 });
 test("Graphic IR reports analysis-limit errors without hiding the PNG and SVG alternatives",()=>{
  assert.match(js,/function graphicIRSource\(\)/);\n assert.doesNotMatch(js,/this format needs a successful graphics analysis/);
 });
-test("Graphic IR is clean structured analysis without a human-report attachment",()=>{
+test("Graphic IR is compact machine-readable data without a human-report attachment",()=>{
  assert.match(js,/format:"NU-GFX-IR\/2"/);\n assert.match(js,/encoding:"row-major-rle"/);\n assert.match(js,/instructions:\[\{op:"set-palette"/);
  assert.doesNotMatch(js,/humanReport:/);
 });
