@@ -50,12 +50,12 @@ jobs:
           node <<'NODE'
           const fs = require('fs');
           const html = fs.readFileSync('background-candidates.html', 'utf8');
-          const scripts = [...html.matchAll(/<script>([\\s\\S]*?)<\\/script>/g)].map(x => x[1]);
+          const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(x => x[1]);
           if (scripts.length !== 3) throw new Error('Expected 3 preview scripts');
           scripts.forEach((source, i) => { new Function(source); console.log('script', i + 1, 'syntax OK'); });
-          const m = scripts[0].match(/const SVG_SOURCE=("(?:\\\\.|[^"\\\\])*");/);
+          const m = scripts[0].match(/const SVG_SOURCE=("(?:\\.|[^"\\])*");/);
           if (!m) throw new Error('Embedded canonical SVG source missing');
           const svg = JSON.parse(m[1]);
-          if (!/<svg\\b/.test(svg) || !/data:image\\/png;base64,/.test(svg)) throw new Error('Canonical SVG wrapper invalid');
+          if (!/<svg\b/.test(svg) || !/data:image\/png;base64,/.test(svg)) throw new Error('Canonical SVG wrapper invalid');
           console.log('embedded SVG source OK');
           NODE
