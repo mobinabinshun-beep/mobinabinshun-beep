@@ -8,7 +8,7 @@
   const items = [...root.querySelectorAll(".nu-gateway-item")];
   const pauseButton = document.getElementById("finish-round");
   let open = false, pausedByGateway = false, selected = null, hoverTimer = 0, outsideSince = 0;
-  const routes = {
+  items.forEach((item, index) => {\n    const angle = (120 + index * 25) * Math.PI / 180;\n    item.style.setProperty("--gx", `${Math.cos(angle) * 116}px`);\n    item.style.setProperty("--gy", `${Math.sin(angle) * 116}px`);\n  });\n  const routes = {
     back: () => document.getElementById("menu-home")?.click(),
     library: () => document.getElementById("menu-library")?.click(),
     store: () => document.getElementById("menu-store")?.click(),
