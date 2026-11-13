@@ -17,7 +17,7 @@
 
 ## Implementation decisions
 
-- Gateway is scoped to active gameplay only.
+- Gateway is hidden on the main-world home screen and remains available on active gameplay and other internal Generation 1 pages.
 - Back returns to the home/library view; Menu opens the game library; Settings / Options opens Launcher Calibration.
 - Existing HP capsule state and reversible animation are reused; HP frame gets compact/expanded layout state.
 - N-BI charge meter is explicitly visual-only in this candidate; it does not absorb Chaos damage or change HP rules.
