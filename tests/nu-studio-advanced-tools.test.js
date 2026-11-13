@@ -26,15 +26,11 @@ test("advanced editing includes transforms, tone, RGB, overlay, chroma key and t
  for(const id of ["data-x","adj-apply","rgb-apply","adv-overlay","adv-chroma","adv-textadd"])assert.ok(js.includes(id),id);
 });
 
-test("human report is available and attached to the visible composite exports",()=>{
- assert.ok(html.includes('id="export-human-report"'));
- assert.match(js,/createHumanReport\(analysis\)/);
- assert.match(js,/humanReport:createHumanReport\(analysis\)/);
- assert.match(js,/id="nu-human-report"/);
- assert.match(js,/NUGraphicsAnalysis\.analyze\(composite\(\),width,height/);
- assert.match(js,/NUStudioExport\.toRgba\(visible,width,height\)/);
+test("SVG export restores the active layer even if vectorization fails",()=>{
+ assert.match(js,/svgSource=function\(\)[\s\S]*?finally\{pixels=active;\}/);
+ assert.doesNotMatch(js,/createHumanReport|downloadHumanReport|nu-human-report|export-human-report|adv-human-report/);
+ assert.doesNotMatch(html,/export-human-report/);
 });
-
 test("PNG export uses a bounded scale and transparent visible composite",()=>{
  assert.match(html,/id="export-scale"/);
  assert.match(js,/NUStudioExport\.pngDimensions\(width,height,scale\)/);
@@ -42,11 +38,15 @@ test("PNG export uses a bounded scale and transparent visible composite",()=>{
  assert.match(js,/outputContext\.imageSmoothingEnabled=false/);
 });
 
-test("one export action never starts a second human-report download",()=>{
- const start=js.indexOf("function reportDownloadedOutput(");
- const end=js.indexOf("\nfunction svgSource()",start);
- assert.ok(start>=0&&end>start,"export completion handler exists");
- const handler=js.slice(start,end);
- assert.doesNotMatch(handler,/downloadHumanReport\(/);
- assert.ok(html.includes('id="export-human-report"'),"dedicated human-report export button remains available");
+
+test("download helper validates and retains a real file URL through the click",()=>{
+ assert.match(js,/blob instanceof Blob/);
+ assert.match(js,/URL\.createObjectURL\(blob\)/);
+ assert.match(js,/a\.download=name/);
+ assert.match(js,/a\.click\(\)/);
+ assert.match(js,/setTimeout\(\(\)=>URL\.revokeObjectURL\(url\),60000\)/);
+});
+test("Graphic IR is clean structured analysis without a human-report attachment",()=>{
+ assert.match(js,/const analysis=analyzeArtwork\(\),source=JSON\.stringify\(analysis,null,2\)/);
+ assert.doesNotMatch(js,/humanReport:/);
 });
