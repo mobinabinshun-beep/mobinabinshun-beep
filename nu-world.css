@@ -432,7 +432,7 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 
 
 /* Generation 1.33 — gameplay-only gateway and compact HUD hierarchy. */
-body:not(.nu-game-active) #nu-hex-gateway,body:not(.nu-game-active) .nu-gateway-scrim{display:none!important}
+body.nu-main-home:not(.nu-game-active) #nu-hex-gateway,body.nu-main-home:not(.nu-game-active) .nu-gateway-scrim{display:none!important}
 body.nu-game-active .topbar{position:fixed;z-index:8;top:8px;left:12px;width:auto;padding:0;pointer-events:none}
 body.nu-game-active .topbar .brand{display:block;max-width:230px;font-size:14px;letter-spacing:.2em;opacity:.46;text-shadow:0 1px 8px #00101a}
 body.nu-game-active .topbar .brand small{font-size:9px;letter-spacing:.18em;color:#9ac5d9}\nbody.nu-game-active .topbar #quality-status{left:12px;top:42px}
