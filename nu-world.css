@@ -324,3 +324,24 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 /* Generation 1.24: keep the real capsule absent at full HP; dock it beside the rail only while damaged. */
 #game-view.active .hp-bar #hp-pill-use{position:absolute;right:-46px;top:50%;transform:translateY(-50%);margin:0}
 #game-view.active .hp-bar #hp-pill-use[hidden]{display:none!important}
+
+/* Generation 1.25: reserve an internal HP-pill dock; never place the live icon outside the HUD frame. */
+#game-view.active .hp-bar{
+ width:min(252px,calc(100vw - 20px));
+ min-width:min(236px,calc(100vw - 20px));
+ padding-right:54px;
+}
+#game-view.active .hp-bar #hp-pill-use{
+ position:absolute;
+ right:7px;
+ top:50%;
+ transform:translateY(-50%);
+ margin:0;
+}
+#game-view.active .hp-bar #hp-pill-use[hidden]{display:none!important}
+.hp-pill-travel-ghost{width:36px;height:36px}
+@media(max-width:520px){
+ #game-view.active .hp-bar{width:min(244px,calc(100vw - 16px));min-width:min(228px,calc(100vw - 16px));padding-right:52px}
+ #game-view.active .hp-bar #hp-pill-use{right:6px}
+ .hp-pill-travel-ghost{width:32px;height:32px}
+}
