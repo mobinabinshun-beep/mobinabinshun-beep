@@ -337,3 +337,13 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 - The burst appears only after a capsule is successfully consumed; full-HP and empty-inventory warnings remain unchanged and do not emit a success burst.
 - The animation uses viewport coordinates so it is not clipped by the game stage, and includes a reduced-motion fallback.
 - Wallet consumption, healing cap, XP cost and capsule inventory rules are unchanged.
+
+## Generation 1.23 — HP capsule arrival and return motion (2026-11-13)
+
+- When HP first drops below full, a golden capsule visual travels from the left corner of the HP HUD rail to the capsule dock beside the HP bar.
+- The docked capsule remains in its normal interactive position while HP is below 10. Further damage does not spawn duplicate travelling icons.
+- When HP returns to 10/10, the visual travels back along the reverse path to the HUD rail corner and fades away.
+- The travel animation is visual only: it never consumes or grants a capsule. Intentional capsule activation and all existing wallet/healing rules remain unchanged.
+- Reduced-motion settings suppress the travel motion; the regular HUD control remains available.
+- Automated regression coverage checks the full-to-damaged and damaged-to-full transitions, endpoints, animation hook and reduced-motion fallback. Human visual/device acceptance is still required.
+
