@@ -10,13 +10,14 @@ const studio = read("pixel-art-studio.html");
 const js = read("nu-hex-gateway.js");
 const css = read("nu-hex-gateway.css");
 
-test("gateway is present on game pages, but not utility pages", () => {
-  for (const page of [html, casino]) {
+test("gateway is present only on the main game document, not casino or utility pages", () => {
+  for (const page of [html]) {
     assert.match(page, /id="nu-hex-gateway"/);
     assert.match(page, /nu-hex-gateway\.css/);
     assert.match(page, /nu-hex-gateway\.js/);
     assert.match(page, /class="nu-gateway-scrim"/);
   }
+  assert.doesNotMatch(casino, /nu-hex-gateway/);
   assert.doesNotMatch(launcher, /nu-hex-gateway/);
   assert.doesNotMatch(studio, /nu-hex-gateway/);
 });
