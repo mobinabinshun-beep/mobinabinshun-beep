@@ -286,3 +286,12 @@ The Creative Studio now exports a readable image report alongside PNG, SVG and G
 - Regression tests cover report content, Markdown formatting, report attachment and composite export paths.
 
 Package version: `0.5.2-gen1-human-image-report`. The previously working Studio import/edit baseline is preserved at `freeze/studio-known-good-2026-11-13`; see `STUDIO-KNOWN-GOOD-LOCK.md`.
+
+
+## Generation 1.16 — Mana material interaction preview (2026-11-13)
+
+- Published the five original 32×32 SVG Mana material assets from the private N.U Material archive under `assets/material/`; source SVG geometry is preserved unchanged.
+- The Mana Collector now layers the source pixel-art glints around each interactive Mana target. Successful collection emits a short material-based particle burst.
+- The new `nu-materials.js` module loads the five local SVGs, preserves crisp pixel edges, and degrades safely if an asset cannot load. Bubble Hunt, Chaos Attack, wallet rules, XP/Mana values, and the adaptive runtime are unchanged.
+- Human acceptance is still required for desktop/mobile rendering, tap accuracy, scaling, reduced-motion expectations and visual clarity. Submit findings with the **Mana Material Human Test** issue form.
+- Public test URL: https://mobinabinshun-beep.github.io/mobinabinshun-beep/
