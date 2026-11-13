@@ -78,7 +78,7 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           import re
-          pages = ["index.html", "pixel-art-studio.html"]
+          pages = ["index.html", "launcher.html", "pixel-art-studio.html"]
           scripts = []
           for page in pages:
               html = Path(page).read_text()
