@@ -303,3 +303,11 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 - Bubble hit-testing remains radial and uses a 10px touch margin, so the interaction region stays centered and predictable.
 - The five original N.U Mana material SVGs remain in use for Mana Collector interactive targets; they are not repurposed as bubble textures because the archived set is Mana-specific.
 - Human QA should verify circle shape, visual/touch alignment, and rendering on desktop and mobile.
+
+
+## Generation 1.18 — HP Capsule HUD interaction (2026-11-13)
+
+- The Golden HP Capsule icon in the in-game HP rail is activated through a standard click/tap action, with pointer propagation isolated from the game field and HUD profile.
+- Successful use displays a short `+N HP` interaction pop anchored to the capsule icon, alongside the existing HP bar restoration and wallet transaction feedback.
+- Empty inventory and full HP continue to show a warning without consuming a capsule. Existing wallet rules and restore amounts are unchanged.
+- Automated regression checks cover click binding, event propagation isolation, successful-use feedback, and unchanged wallet consumption rules. Desktop/mobile browser acceptance remains a human-test task.
