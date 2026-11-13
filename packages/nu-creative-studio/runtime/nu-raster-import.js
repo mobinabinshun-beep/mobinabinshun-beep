@@ -5,7 +5,13 @@
  if(root)root.NURasterImport=api;
 })(typeof globalThis!=="undefined"?globalThis:this,function(){
  "use strict";
- const MAX_RASTER_PIXELS=3000000;
+ const IMAGE_EXTENSION=/\.(png|jpe?g|webp|gif|svg|bmp|avif|ico|tiff?)$/i;
+ function isSupportedImageFile(file){
+  if(!file)return false;
+  const type=String(file.type||"").toLowerCase();
+  if(type.startsWith("image/"))return true;
+  return IMAGE_EXTENSION.test(String(file.name||""));
+ }
  function nearest(rgb,colors){
   let best=colors[0],dist=Infinity;
   for(const color of colors){
@@ -15,12 +21,14 @@
   }
   return best;
  }
- function mapPixels(data,width,height,colors,alphaCutoff=0,dither=false){
-  if(!Number.isInteger(width)||!Number.isInteger(height)||width<1||height<1||width*height>MAX_RASTER_PIXELS)throw new RangeError("Raster dimensions exceed the 3,000,000-pixel safety ceiling.");
-  if(!data||data.length!==width*height*4)throw new TypeError("RGBA buffer length does not match raster dimensions.");
+ function mapPixels(data,width,height,colors,alphaCutoff=0,dither=false,options={}){
+  const cells=width*height,maxPixels=Number(options&&options.maxPixels);
+  if(!Number.isSafeInteger(width)||!Number.isSafeInteger(height)||width<1||height<1||!Number.isSafeInteger(cells))throw new RangeError("Raster dimensions are outside the supported numeric range.");
+  if(Number.isFinite(maxPixels)&&maxPixels>0&&cells>maxPixels)throw new RangeError("Raster exceeds the current Launcher resource budget ("+maxPixels.toLocaleString()+" pixels). Choose a smaller working-copy detail.");
+  if(!data||data.length!==cells*4)throw new TypeError("RGBA buffer length does not match raster dimensions.");
   if(!Array.isArray(colors)||!colors.length||colors.some(c=>typeof c!=="string"||!/^#[0-9a-f]{6}$/i.test(c)))throw new TypeError("A non-empty six-digit hexadecimal palette is required.");
-  const cutoff=Math.max(0,Math.min(255,Number(alphaCutoff)||0)),output=Array(width*height).fill(null),errors=dither?new Float32Array(width*height*3):null;
-  const add=(index,error,factor)=>{if(index<0||index>=width*height||data[index*4+3]<=cutoff)return;for(let k=0;k<3;k++)errors[index*3+k]+=error[k]*factor;};
+  const cutoff=Math.max(0,Math.min(255,Number(alphaCutoff)||0)),output=Array(cells).fill(null),errors=dither?new Float32Array(cells*3):null;
+  const add=(index,error,factor)=>{if(index<0||index>=cells||data[index*4+3]<=cutoff)return;for(let k=0;k<3;k++)errors[index*3+k]+=error[k]*factor;};
   for(let y=0;y<height;y++)for(let x=0;x<width;x++){
    const i=y*width+x,at=i*4;if(data[at+3]<=cutoff)continue;
    const rgb=[0,1,2].map(k=>Math.max(0,Math.min(255,data[at+k]+(errors?errors[i*3+k]:0))));
@@ -31,5 +39,5 @@
   }
   return output;
  }
- return {mapPixels};
+ return {mapPixels,isSupportedImageFile};
 });
