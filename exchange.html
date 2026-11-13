@@ -12,12 +12,12 @@
 <header class="exchange-top"><a href="./index.html" class="back-link">← N.U WORLD</a><span class="eyebrow">GENERATION 01 · FICTIONAL GAME ECONOMY</span></header>
 <section class="exchange-hero">
 <p class="eyebrow">N.U ECONOMY SYSTEM</p><h1>VIRTUAL <em>MARKET</em></h1>
-<p>A fictional market simulation with trading-style charts. Every movement is derived only from recorded player activity inside N.U.</p>
+<p>A fictional market simulation with trading-style charts. Every movement is derived only from your own locally saved wallet and asset activity.</p>
 <div class="exchange-notice">100% FICTIONAL · N.U ACTIVITY ONLY · NO REAL-WORLD DATA OR VALUE</div>
 </section>
 <section class="market-panel">
 <div class="panel-heading"><div><p class="eyebrow">ACTIVITY-DRIVEN SIMULATION</p><h2>MARKET INDEX</h2></div><span class="sim-tag">SIMULATED · NOT A REAL PRICE</span></div>
-<div class="market-controls"><label for="market-asset">SELECT VIRTUAL ASSET</label><select id="market-asset"></select><span id="market-events">0 PLAYER EVENTS</span></div>
+<div class="market-controls"><label for="market-asset">SELECT VIRTUAL ASSET</label><select id="market-asset"></select><span id="market-events">0 YOUR EVENTS</span></div>
 <div class="market-summary">
 <article class="exchange-card"><span>NU INDEX</span><strong id="market-index">100.00</strong></article>
 <article class="exchange-card"><span>CHANGE FROM BASELINE</span><strong id="market-change">0.00%</strong></article>
@@ -27,11 +27,11 @@
 </div>
 <div class="chart-legend"><span><i class="legend-up"></i> Index rising</span><span><i class="legend-down"></i> Index falling</span><span>OHLC · hourly activity candles</span></div>
 <canvas id="market-chart" role="img" aria-label="Fictional N.U market index candlestick chart"></canvas>
-<div id="market-empty" class="chart-empty">No player activity has been recorded for this asset yet. The simulator will create candles only after in-game wallet activity occurs.</div>
-<p class="panel-note">Positive wallet deltas are treated as simulated supply; negative deltas as simulated demand. Candle volume is derived from recorded in-game deltas. The index starts at an arbitrary N.U-only baseline of 100 and is not pegged to anything outside the game.</p>
+<div id="market-empty" class="chart-empty">No local activity has been recorded for this asset yet. The simulator will create candles only after in-game wallet activity occurs.</div>
+<p class="panel-note">Only your own positive wallet deltas are treated as simulated supply; your negative deltas are treated as simulated demand. Candle volume is derived from your recorded in-game deltas. The index starts at an arbitrary N.U-only baseline of 100 and is not pegged to anything outside the game.</p>
 </section>
 <section class="exchange-panel">
-<div class="panel-heading"><div><p class="eyebrow">PLAYER WALLET · ACTUAL LOCAL BALANCE</p><h2>ASSET BALANCE HISTORY</h2></div><span id="history-count">0 RECORDS</span></div>
+<div class="panel-heading"><div><p class="eyebrow">YOUR WALLET · SINGLE-PLAYER LOCAL BALANCE</p><h2>ASSET BALANCE HISTORY</h2></div><span id="history-count">0 RECORDS</span></div>
 <div class="exchange-summary">
 <article class="exchange-card"><span>SELECT ASSET</span><label class="sr-only" for="asset-select">Select asset</label><select id="asset-select"></select></article>
 <article class="exchange-card"><span>CURRENT BALANCE</span><strong id="asset-balance">—</strong></article>

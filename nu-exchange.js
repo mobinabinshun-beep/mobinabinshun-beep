@@ -44,7 +44,7 @@ function renderMarket(save){
  $("market-change").textContent=(model.changePct>0?"+":"")+model.changePct.toFixed(2)+"%";
  $("market-change").className=model.changePct>0?"positive":model.changePct<0?"negative":"";
  $("market-volume").textContent=format(model.volume);$("market-demand").textContent=format(model.demand);$("market-supply").textContent=format(model.supply);
- $("market-events").textContent=model.events+" PLAYER EVENTS";
+ $("market-events").textContent=model.events+" YOUR EVENTS";
  drawMarket(model);
 }
 function render(){
