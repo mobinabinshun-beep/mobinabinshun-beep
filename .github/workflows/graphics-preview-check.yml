@@ -61,6 +61,15 @@ jobs:
           python -m json.tool packages/registry.json >/dev/null
           python -m json.tool packages/nu-game-generation-1/manifest.json >/dev/null
           python -m json.tool packages/nu-creative-studio/manifest.json >/dev/null
+      - name: Build and verify offline package archives
+        run: python scripts/build-offline-packages.py
+      - name: Upload offline package preview artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nu-launcher-offline-packages-preview
+          path: dist/packages/*.zip
+          if-no-files-found: error
+          retention-days: 30
       - name: Check public runtime artwork copy
         run: |
           if [ -s assets/nu-celestial-city.png ]; then
