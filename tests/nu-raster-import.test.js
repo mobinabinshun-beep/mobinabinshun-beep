@@ -27,17 +27,14 @@ test("maps images above the legacy 262144-pixel mapper ceiling",()=>{
  const mapped=mapPixels(rgba,width,height,["#ff0000"]);
  assert.equal(mapped.length,width*height);assert.equal(mapped[0],"#ff0000");assert.equal(mapped.at(-1),"#ff0000");
 });
-test("accepts valid image extensions when browsers omit or misreport MIME metadata",()=>{
+test("lets the browser decoder validate content regardless of MIME or extension",()=>{
  assert.equal(isSupportedImageFile({name:"art.png",type:""}),true);
- assert.equal(isSupportedImageFile({name:"art.webp",type:"application/octet-stream"}),true);
- assert.equal(isSupportedImageFile({name:"art.svg",type:""}),true);
- assert.equal(isSupportedImageFile({name:"notes.txt",type:"text/plain"}),false);
+ assert.equal(isSupportedImageFile({name:"art.heic",type:"application/octet-stream"}),true);
+ assert.equal(isSupportedImageFile({name:"image-without-extension",type:""}),true);
+ assert.equal(isSupportedImageFile({name:"renamed-file.bin",type:"application/octet-stream"}),true);
+ assert.equal(isSupportedImageFile(null),false);
 });
-test("rejects images above the active Launcher resource budget, not a hard-coded mapper ceiling",()=>{
- const width=1200,height=1000,rgba=new Uint8ClampedArray(0);
- assert.throws(()=>mapPixels(rgba,width,height,["#ffffff"],0,false,{maxPixels:1000000}),/current Launcher resource budget/);
-});
-test("accepts the same raster when the active Launcher budget allows it",()=>{
- const rgba=new Uint8ClampedArray([255,0,0,255]);
- assert.deepEqual(mapPixels(rgba,1,1,["#ff0000"],0,false,{maxPixels:1}),["#ff0000"]);
+test("mapper has no product or Launcher pixel ceiling; allocation determines feasibility",()=>{
+ const width=1200,height=1000,rgba=new Uint8ClampedArray(width*height*4);
+ assert.equal(mapPixels(rgba,width,height,["#ffffff"]).length,width*height);
 });
