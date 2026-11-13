@@ -59,3 +59,25 @@ test("Graphic IR is clean structured analysis without a human-report attachment"
  assert.match(js,/const analysis=analyzeArtwork\(\),source=JSON\.stringify\(analysis,null,2\)/);
  assert.doesNotMatch(js,/humanReport:/);
 });
+
+test("advanced export exposes PNG, SVG, SVG source code and compact machine-readable IR",()=>{
+ for(const id of ["adv-png","adv-svg","adv-svg-code","adv-ir","adv-export-downloads"])assert.ok(js.includes('id="'+id+'"'),id);
+ assert.match(js,/format:"NU-GFX-IR\/2"/);
+ assert.match(js,/encoding:"row-major-rle"/);
+});
+test("advanced SVG export downloads before any optional analysis",()=>{
+ const start=js.indexOf('$("adv-svg").onclick='),end=js.indexOf('layerUI();',start),block=js.slice(start,end);
+ assert.ok(block.indexOf("download(new Blob")<block.indexOf("analyzeArtwork()")||!block.includes("analyzeArtwork()"));
+});
+test("SVG export has a raster-embedded SVG fallback for vectorizer size limits",()=>{
+ assert.match(js,/function rasterSvgSource\(\)/);
+ assert.match(js,/embedded-raster-fallback/);
+});
+test("download fallback is visible in the advanced export tab and does not force a new tab",()=>{
+ assert.match(js,/\$\("adv-export-downloads"\)\|\|\$\("export-download-fallback"\)/);
+ assert.doesNotMatch(js,/a\.target="_blank"/);
+});
+test("PNG export supports toBlob and a data URL fallback",()=>{
+ assert.match(js,/typeof out\.toBlob==="function"/);
+ assert.match(js,/out\.toDataURL\("image\/png"\)/);
+});
