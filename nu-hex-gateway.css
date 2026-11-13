@@ -1,4 +1,7 @@
-/* N.U Hex Gateway — isolated navigation layer */
+/* N.U Hex Gateway — isolated navigation layer; enabled only during gameplay */
+#nu-hex-gateway,.nu-gateway-scrim{display:none}
+body.nu-gateway-enabled #nu-hex-gateway,body.nu-gateway-enabled .nu-gateway-scrim{display:block}
+body.nu-game-active #menu-open,body.nu-game-active #back-home,body.nu-game-active #finish-round{display:none!important}
 #nu-hex-gateway{position:fixed;z-index:120;top:calc(clamp(68px,12vh,118px) - 130px);right:-100px;width:300px;height:300px;pointer-events:none;font-family:inherit}
 #nu-hex-gateway *{box-sizing:border-box}
 #nu-hex-gateway .nu-gateway-trigger{position:absolute;left:130px;top:130px;z-index:3;display:grid;place-items:center;width:58px;height:58px;padding:0;border:0;background:transparent;color:#b8f2ff;cursor:pointer;pointer-events:auto;filter:drop-shadow(0 0 10px #51dfff66);transition:transform .22s ease,filter .22s ease}

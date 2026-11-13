@@ -8,6 +8,8 @@
   const trigger = root.querySelector(".nu-gateway-trigger");
   const items = [...root.querySelectorAll(".nu-gateway-item")];
   const pauseButton = document.getElementById("finish-round");
+  const gameView = document.getElementById("game-view");
+  const isCasinoPage = Boolean(document.querySelector(".casino-shell"));
   let open = false;
   let pausedByGateway = false;
   let selected = null;
@@ -15,6 +17,18 @@
   let hoverTimer = 0;
   let activationTimer = 0;
   let outsideSince = 0;
+
+  function syncGatewayScope() {
+    const gameActive = isCasinoPage || Boolean(gameView?.classList.contains("active"));
+    document.body.classList.toggle("nu-gateway-enabled", gameActive);
+    document.body.classList.toggle("nu-game-active", Boolean(gameView?.classList.contains("active")));
+    if (!gameActive && open) setOpen(false, false);
+  }
+
+  syncGatewayScope();
+  if (gameView) {
+    new MutationObserver(syncGatewayScope).observe(gameView, { attributes: true, attributeFilter: ["class"] });
+  }
 
   items.forEach((item, index) => {
     item.tabIndex = -1;
