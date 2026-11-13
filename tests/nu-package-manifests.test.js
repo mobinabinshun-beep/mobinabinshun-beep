@@ -25,15 +25,13 @@ test("Generation 1 package preserves frozen engine and excludes Generation 2",()
  assert.equal(game.resourcePolicy.gameMayRaiseHostBudget,false);
 });
 
-test("Studio demo compute boost is opt-in, foreground-only and session-scoped",()=>{
- const boost=studio.resourcePolicy.demoBoost;
- assert.equal(boost.allowed,true);
- assert.equal(boost.scope,"browser-demo-session-only");
- assert.equal(boost.requiresExplicitOptIn,true);
- assert.equal(boost.requiresForegroundVisibility,true);
- assert.equal(boost.mayOverrideLauncherBudget,false);
- assert.ok(boost.autoStopsOn.includes("page-hidden"));
- assert.ok(boost.autoStopsOn.includes("memory-pressure"));
+test("Studio image import has no product pixel ceiling and defers feasibility to the host system",()=>{
+ const policy=studio.resourcePolicy.demoExecution;
+ assert.equal(policy.resourceOwner,"user-device-and-browser");
+ assert.match(policy.policy,/without-product-defined-pixel-or-file-size-ceilings/);
+ assert.match(policy.failureBehavior,/preserve-original-source-and-previous-project/);
+ assert.equal(policy.mayOverrideHostLimits,false);
+ assert.equal(studio.hostServices.resourceBudget,"host-system-capability-best-effort-no-product-pixel-ceiling");
 });
 
 test("offline Studio has no mandatory network dependency and preserves source files",()=>{
