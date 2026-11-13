@@ -409,3 +409,9 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 - Casino uses a separate virtual-credit wallet starting at 100 credits. Wagers and payouts are recorded in the local transaction ledger and persist in the same browser save as the Generation 1 world.
 - Casino credits are not XP, Mana, HP Capsules, cash, or redeemable value. No deposits, payments, withdrawals, or cash-out exist.
 - Responsive layout, keyboard-operable native controls, insufficient-credit guard, and human QA checklist added. Human acceptance is pending.
+
+
+## Project continuity and new-chat handoff
+
+- [Project handoff and conversation archive (2026-11-13)](PROJECT-HANDOFF-AND-CONVERSATION-ARCHIVE-2026-11-13.md) — project map, interaction requirements, generation boundaries, casino record, QA references and a ready-to-paste new-chat prompt.
+- **Generation boundary:** N.U Casino is Generation 1.31 only. Do not move or classify it as a Generation 2 feature.
