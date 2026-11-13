@@ -72,8 +72,8 @@ test("gateway exposes exactly Back, Menu and Settings on all supported pages", (
 test("Generation 1.33 HUD keeps game identity, LV and resource values in their requested positions", () => {
   assert.match(html, /id="nu-game-brand"/);
   assert.match(html, /class="hud-chip level-chip" id="level-chip"/);
-  assert.match(html, /class="bar-label">XP</span>/);
-  assert.match(html, /class="bar-label">MANA</span>/);
+  assert.match(html, /class="bar-label">XP<\\/span>/);
+  assert.match(html, /class="bar-label">MANA<\\/span>/);
   assert.match(games, /\$\("xp-value"\)\.textContent=\(state\.save\.xp%100\)\+" \/ 100 XP"/);
   assert.match(games, /\$\("mana-value"\)\.textContent=\(state\.save\.mana%10\)\+" \/ 10 MANA"/);
   assert.match(worldCss, /\.level-chip\{position:fixed/);
