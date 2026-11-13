@@ -15,7 +15,8 @@ function loadModule(reduced=false){
   const window={matchMedia:()=>({matches:reduced})};
   vm.runInNewContext(source,{window,Image:MockImage,performance:{now:()=>1000},Date,Math});
   const calls=[];
-  const ctx={save(){},restore(){},translate(){},rotate(){},drawImage(...args){calls.push(args);},globalAlpha:1,imageSmoothingEnabled:true};
+  const stack=[];
+  const ctx={save(){stack.push(this.imageSmoothingEnabled);},restore(){this.imageSmoothingEnabled=stack.pop();},translate(){},rotate(){},drawImage(...args){calls.push(args);},globalAlpha:1,imageSmoothingEnabled:true};
   return {api:window.NUMaterials,loaded,calls,ctx};
 }
 
