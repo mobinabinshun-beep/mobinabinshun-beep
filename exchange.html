@@ -2,27 +2,42 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>N.U Exchange — Generation 1</title>
-<meta name="description" content="Generation 1 virtual asset history and exchange overview for N.U.">
+<title>N.U Virtual Market — Generation 1</title>
+<meta name="description" content="A fictional N.U game-world market simulator driven only by player activity.">
 <meta name="theme-color" content="#071018">
-<link rel="stylesheet" href="./nu-exchange.css?v=20261113-gen1-asset-history-r1">
+<link rel="stylesheet" href="./nu-exchange.css?v=20261114-virtual-market-r1">
 </head>
 <body>
 <main class="exchange-shell">
-<header class="exchange-top"><a href="./index.html" class="back-link">← N.U WORLD</a><span class="eyebrow">GENERATION 01 · VIRTUAL ECONOMY</span></header>
+<header class="exchange-top"><a href="./index.html" class="back-link">← N.U WORLD</a><span class="eyebrow">GENERATION 01 · FICTIONAL GAME ECONOMY</span></header>
 <section class="exchange-hero">
-<p class="eyebrow">N.U ECONOMY SYSTEM</p><h1>ASSET <em>EXCHANGE</em></h1>
-<p>Review your Generation 1 asset balances and how they have changed through recorded wallet activity.</p>
-<div class="exchange-notice">LOCAL DEMO DATA · VIRTUAL ASSETS ONLY · NO REAL-MONEY VALUE</div>
+<p class="eyebrow">N.U ECONOMY SYSTEM</p><h1>VIRTUAL <em>MARKET</em></h1>
+<p>A fictional market simulation with trading-style charts. Every movement is derived only from recorded player activity inside N.U.</p>
+<div class="exchange-notice">100% FICTIONAL · N.U ACTIVITY ONLY · NO REAL-WORLD DATA OR VALUE</div>
 </section>
-<section class="exchange-summary" aria-label="Selected asset summary">
+<section class="market-panel">
+<div class="panel-heading"><div><p class="eyebrow">ACTIVITY-DRIVEN SIMULATION</p><h2>MARKET INDEX</h2></div><span class="sim-tag">SIMULATED · NOT A REAL PRICE</span></div>
+<div class="market-controls"><label for="market-asset">SELECT VIRTUAL ASSET</label><select id="market-asset"></select><span id="market-events">0 PLAYER EVENTS</span></div>
+<div class="market-summary">
+<article class="exchange-card"><span>NU INDEX</span><strong id="market-index">100.00</strong></article>
+<article class="exchange-card"><span>CHANGE FROM BASELINE</span><strong id="market-change">0.00%</strong></article>
+<article class="exchange-card"><span>ACTIVITY VOLUME</span><strong id="market-volume">0</strong></article>
+<article class="exchange-card"><span>SIMULATED DEMAND</span><strong id="market-demand">0</strong></article>
+<article class="exchange-card"><span>SIMULATED SUPPLY</span><strong id="market-supply">0</strong></article>
+</div>
+<div class="chart-legend"><span><i class="legend-up"></i> Index rising</span><span><i class="legend-down"></i> Index falling</span><span>OHLC · hourly activity candles</span></div>
+<canvas id="market-chart" role="img" aria-label="Fictional N.U market index candlestick chart"></canvas>
+<div id="market-empty" class="chart-empty">No player activity has been recorded for this asset yet. The simulator will create candles only after in-game wallet activity occurs.</div>
+<p class="panel-note">Positive wallet deltas are treated as simulated supply; negative deltas as simulated demand. Candle volume is derived from recorded in-game deltas. The index starts at an arbitrary N.U-only baseline of 100 and is not pegged to anything outside the game.</p>
+</section>
+<section class="exchange-panel">
+<div class="panel-heading"><div><p class="eyebrow">PLAYER WALLET · ACTUAL LOCAL BALANCE</p><h2>ASSET BALANCE HISTORY</h2></div><span id="history-count">0 RECORDS</span></div>
+<div class="exchange-summary">
 <article class="exchange-card"><span>SELECT ASSET</span><label class="sr-only" for="asset-select">Select asset</label><select id="asset-select"></select></article>
 <article class="exchange-card"><span>CURRENT BALANCE</span><strong id="asset-balance">—</strong></article>
 <article class="exchange-card"><span>NET CHANGE IN HISTORY</span><strong id="asset-change">—</strong></article>
-</section>
-<section class="exchange-panel">
-<div class="panel-heading"><div><p class="eyebrow">WALLET LEDGER · RECORDED DATA</p><h2>ASSET CHANGE CHART</h2></div><span id="history-count">0 RECORDS</span></div>
-<p class="panel-note">This chart shows reconstructed wallet balance over the retained transaction history. It is not a market-price or exchange-rate chart. No historical values are generated when the ledger has no supporting records.</p>
+</div>
+<p class="panel-note">This separate chart reconstructs your own local wallet balance. It is not the simulated market index.</p>
 <canvas id="asset-chart" role="img" aria-label="Selected asset balance history chart"></canvas>
 <div id="chart-empty" class="chart-empty" hidden>No recorded changes for this asset yet. The current balance is shown above.</div>
 </section>
@@ -32,10 +47,10 @@
 </section>
 <section class="exchange-panel conversion-panel">
 <div class="panel-heading"><div><p class="eyebrow">CONVERSION MODULE</p><h2>ASSET SWAP</h2></div><span class="pending-tag">RULES PENDING</span></div>
-<p>Conversion pairs, rates, fees, limits and eligibility have not yet been approved. Swaps are therefore disabled; no exchange rate or market price is invented. Once the owner-defined rules are recorded, this panel can show live quotes and a separate rate-history chart.</p>
+<p>Market charts are simulation-only. Asset conversion remains disabled until the N.U owner approves the in-game pairs, settlement rules, fees and limits. No external or real-world rates are used.</p>
 <button type="button" disabled>CONVERSION NOT YET AVAILABLE</button>
 </section>
-<footer class="exchange-footer">N.U — NIROO UNIVERSE · GENERATION 1 EXPERIMENTAL ECONOMY</footer>
+<footer class="exchange-footer">N.U — NIROO UNIVERSE · GENERATION 1 FICTIONAL ECONOMY</footer>
 </main>
-<script src="./nu-engine.js"></script><script src="./nu-wallet.js"></script><script src="./nu-exchange.js?v=20261113-gen1-asset-history-r1"></script>
+<script src="./nu-engine.js"></script><script src="./nu-wallet.js"></script><script src="./nu-market-sim.js?v=20261114-virtual-market-r1"></script><script src="./nu-exchange.js?v=20261114-virtual-market-r1"></script>
 </body></html>
