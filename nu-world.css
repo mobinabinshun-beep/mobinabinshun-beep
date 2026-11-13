@@ -319,3 +319,8 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 .hp-pill-travel-ghost{position:fixed;z-index:1602;width:36px;height:36px;object-fit:contain;image-rendering:pixelated;pointer-events:none;filter:drop-shadow(0 0 8px #b7ff75);will-change:transform,opacity}
 @media(max-width:520px){.hp-pill-travel-ghost{width:32px;height:32px}}
 @media(prefers-reduced-motion:reduce){.hp-pill-travel-ghost{display:none!important}}
+
+
+/* Generation 1.24: keep the real capsule absent at full HP; dock it beside the rail only while damaged. */
+#game-view.active .hp-bar #hp-pill-use{position:absolute;right:-46px;top:50%;transform:translateY(-50%);margin:0}
+#game-view.active .hp-bar #hp-pill-use[hidden]{display:none!important}
