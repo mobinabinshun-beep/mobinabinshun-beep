@@ -1,0 +1,79 @@
+{
+  "id": "nu.creative.studio",
+  "name": "N.U Creative Studio and Graphics Platform",
+  "version": "0.1.0-preview",
+  "status": "development-package-contract",
+  "generation": {
+    "min": 1,
+    "max": 1
+  },
+  "runtime": {
+    "hostApi": "nu.launcher.host/v1",
+    "entry": "pixel-art-studio.html",
+    "execution": "foreground-process",
+    "requiredFeatures": ["dom", "canvas-2d", "file-import-export"],
+    "optionalFeatures": ["webgl", "webgpu", "offscreen-canvas", "workers", "filesystem-access"]
+  },
+  "payload": {
+    "entryFiles": [
+      "pixel-art-studio.html",
+      "nu-engine.js",
+      "nu-wallet.js",
+      "nu-graphics-core.js",
+      "nu-svg-vectorizer.js",
+      "nu-graphics-analysis.js",
+      "nu-studio-layout.js",
+      "nu-raster-import.js",
+      "nu-pixel-art-studio.js"
+    ],
+    "assets": ["assets/"],
+    "data": []
+  },
+  "hostServices": {
+    "capabilityProfile": "read-only",
+    "resourceBudget": "request-and-observe",
+    "storage": "package-scoped-project-library",
+    "fileImport": "explicit-user-selection",
+    "fileExport": "explicit-user-action",
+    "originalSource": "immutable-reference-preserved",
+    "network": "disabled-by-default"
+  },
+  "resourcePolicy": {
+    "profileOwner": "launcher",
+    "demoBoost": {
+      "allowed": true,
+      "scope": "browser-demo-session-only",
+      "requiresExplicitOptIn": true,
+      "requiresForegroundVisibility": true,
+      "autoStopsOn": ["opt-out", "page-hidden", "memory-pressure", "host-budget-revoked"],
+      "mayOverrideLauncherBudget": false
+    },
+    "offlineMode": {
+      "allowed": true,
+      "requiresNetwork": false,
+      "usesSameLocalHostBudget": true
+    },
+    "processing": {
+      "preferred": ["streaming", "tiles", "worker-pool", "offscreen-canvas"],
+      "fallback": ["main-thread-chunked-processing"],
+      "never": ["unbounded-full-image-duplication"]
+    }
+  },
+  "permissions": {
+    "networkDomains": [],
+    "localFiles": "user-initiated-import-export-only",
+    "persistentStorage": "package-scoped",
+    "deviceTelemetry": "coarse-capability-only",
+    "backgroundExecution": "not-requested"
+  },
+  "integrity": {
+    "contentHashes": "generated-by-release-builder",
+    "publisherSignature": "required-before-install",
+    "rollback": "last-known-good"
+  },
+  "limitations": [
+    "This contract does not yet implement a worker pool, tiled raster pipeline, native filesystem adapter or signed installer.",
+    "The browser demo boost is isolated from installed packages and cannot raise the Launcher-owned resource ceiling.",
+    "Original imported files must remain unchanged through failed or cancelled decode, processing, history and export operations."
+  ]
+}
