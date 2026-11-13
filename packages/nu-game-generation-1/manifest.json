@@ -1,0 +1,67 @@
+{
+  "id": "nu.game.generation-1",
+  "name": "N.U Generation 1 Game Collection",
+  "version": "0.1.0-preview",
+  "status": "offline-source-bundle-preview",
+  "generation": {"min": 1, "max": 1},
+  "runtime": {
+    "hostApi": "nu.launcher.host/v1",
+    "entry": "runtime/index.html",
+    "execution": "foreground-process",
+    "requiredFeatures": ["dom", "canvas-2d"],
+    "optionalFeatures": ["webgl", "webgpu", "offscreen-canvas", "workers"]
+  },
+  "payload": {
+    "entryFiles": [
+      "runtime/index.html", "runtime/nu-world.css", "runtime/nu-engine.js",
+      "runtime/nu-pixel-world.js", "runtime/nu-graphics-core.js",
+      "runtime/nu-background-engine.js", "runtime/nu-dynamic-layers.js",
+      "runtime/nu-game-render-adapter.js", "runtime/nu-graphics-runtime.js",
+      "runtime/nu-wallet.js", "runtime/nu-games.js", "runtime/nu-player-ui.js",
+      "runtime/assets/nu-hp-pill-golden-pixel.svg"
+    ],
+    "assets": ["runtime/assets/"],
+    "data": []
+  },
+  "hostServices": {
+    "capabilityProfile": "read-only",
+    "resourceBudget": "request-and-observe",
+    "saveStorage": "package-scoped",
+    "network": "declared-permissions-only",
+    "input": ["keyboard", "pointer", "touch", "gamepad-if-supported"]
+  },
+  "resourcePolicy": {
+    "profileOwner": "launcher",
+    "gameMayRaiseHostBudget": false,
+    "simulationDeterminism": "preserve",
+    "qualityMayScale": true,
+    "gameRulesMayScale": false,
+    "workers": "host-budgeted",
+    "visibility": "pause-optional-rendering; preserve-explicit-game-state"
+  },
+  "protectedComponents": {
+    "nu-engine.js": {
+      "policy": "read-only-frozen-baseline",
+      "sha256GitBlob": "cda4f4157628aefaaac9ab95c047e4ca818c5f02"
+    },
+    "generation2": "quarantined-and-excluded"
+  },
+  "permissions": {
+    "networkDomains": [],
+    "localFiles": "user-initiated-import-export-only",
+    "persistentStorage": "package-scoped",
+    "deviceTelemetry": "coarse-capability-only",
+    "backgroundExecution": "not-requested"
+  },
+  "integrity": {
+    "contentHashes": "SHA256SUMS.txt-generated-by-builder",
+    "publisherSignature": "not-signed-preview-bundle",
+    "rollback": "launcher-required-not-in-this-archive"
+  },
+  "limitations": [
+    "This is an offline source bundle, not a native installer or signed Launcher package.",
+    "Native Launcher process isolation and adapters are not included.",
+    "The frozen engine is included unchanged and must remain read-only.",
+    "The page still contains optional navigation links to the public hub and Launcher preview."
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "registry": "nu-local-package-registry",
+  "channel": "development",
+  "status": "package-contract-preview",
+  "packages": [
+    {
+      "id": "nu.game.generation-1",
+      "manifest": "./nu-game-generation-1/manifest.json",
+      "installMode": "isolated-package",
+      "entry": "runtime/index.html"
+    },
+    {
+      "id": "nu.creative.studio",
+      "manifest": "./nu-creative-studio/manifest.json",
+      "installMode": "isolated-package",
+      "entry": "runtime/pixel-art-studio.html"
+    }
+  ],
+  "sharedServices": {
+    "hostApi": "nu.launcher.host/v1",
+    "capabilityBroker": "launcher-owned",
+    "resourceCoordinator": "launcher-owned",
+    "storage": "package-scoped",
+    "network": "permission-gated",
+    "packageVerification": "required-before-install"
+  },
+  "security": {
+    "executeDuringDiscovery": false,
+    "verifyManifest": true,
+    "verifyContentHashes": true,
+    "verifyPublisherSignature": true,
+    "leastPrivilege": true,
+    "atomicActivation": true,
+    "rollbackToLastKnownGood": true
+  },
+  "release": {
+    "downloadableArtifacts": "CI preview ZIP artifacts; unsigned and not installable",
+    "nativeInstallers": false,
+    "reason": "This commit defines package boundaries only. Build, signing, platform installers, sandbox integration and device QA remain pending."
+  }
+}

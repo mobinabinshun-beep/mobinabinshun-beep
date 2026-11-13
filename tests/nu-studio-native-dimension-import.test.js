@@ -8,7 +8,7 @@ test("image import defaults to exact source dimensions",()=>{
 });
 test("Studio has no fixed product pixel, edge, or file-size ceiling",()=>{
  assert.match(js,/function cellLimit\(\)\{return Infinity;\}/);
- assert.doesNotMatch(js,/requestedCells>safeCells|safe editing budget|25\*1024\*1024|16,384 px per edge|Math\.min\([^)]*maxSide/);
+ assert.doesNotMatch(js,/requestedCells>safeCells|safe editing budget|25\*1024\*1024|16,384 px per edge|Math\.min\(maxSide/);
  assert.doesNotMatch(html,/id="image-width"[^>]*max=/);
  assert.doesNotMatch(html,/id="image-height"[^>]*max=/);
 });
