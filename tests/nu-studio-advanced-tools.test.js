@@ -20,7 +20,7 @@ test("source original and generated edited SVG have separate export actions",()=
  assert.match(js,/originalImportFile=file/);
  assert.match(js,/id="adv-original"/);
  assert.match(js,/id="adv-svg"/);
- assert.match(html,/image\/svg\+xml/);
+ assert.ok(html.includes('accept="*/*"'));
 });
 test("advanced editing includes transforms, tone, RGB, overlay, chroma key and text",()=>{
  for(const id of ["data-x","adj-apply","rgb-apply","adv-overlay","adv-chroma","adv-textadd"])assert.ok(js.includes(id),id);
