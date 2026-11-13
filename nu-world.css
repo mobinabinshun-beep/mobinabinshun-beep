@@ -290,3 +290,11 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 #game-view.active .hp-bar{z-index:1301;pointer-events:none}
 #game-view.active .hp-bar #hp-pill-use{position:relative;z-index:1302;pointer-events:auto!important;touch-action:manipulation;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
 .hp-pill-hit-progress{position:fixed!important;z-index:1600;left:0;top:0;white-space:nowrap;pointer-events:none;will-change:transform,opacity}
+
+
+/* N.U Gen1.20 — explicit clickable HP capsule target; do not disable pointer events on its rail. */
+#game-view.active .hp-bar{pointer-events:auto!important;z-index:1301}
+#game-view.active .hp-bar #hp-pill-use{pointer-events:auto!important;position:relative;z-index:1302;display:inline-flex;min-width:42px;min-height:42px;align-items:center;justify-content:center;touch-action:manipulation;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+#game-view.active .hp-bar #hp-pill-use img{pointer-events:none}
+#game-view.active .hp-bar #hp-pill-use span{pointer-events:none}
+#game-view.active .hp-bar #hp-pill-use:focus-visible{outline:2px solid #caff9f;outline-offset:3px}
