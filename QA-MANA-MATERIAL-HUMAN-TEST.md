@@ -93,3 +93,19 @@ Validate the five archived N.U Mana SVG materials when used on interactive Mana 
 - Actual / browser / device / screen orientation:
 - Result: PASS / PASS WITH LIMITATIONS / FAIL
 - Notes:
+
+
+## HP Capsule — Generation 1.22 interaction burst human retest
+
+- [ ] With HP below 10 and at least one capsule, click/tap the HP capsule icon once.
+- [ ] Confirm the feedback originates at the capsule icon: a bright green circular ring expands, eight small particles radiate outward, and a glowing `+N HP` label rises.
+- [ ] Confirm the burst stays visible above the HUD and is not clipped by the game canvas/stage.
+- [ ] Confirm exactly one burst and one capsule consumption per activation (mouse, touch, Enter and Space).
+- [ ] Confirm the HP bar updates and the capsule count decreases by exactly one.
+- [ ] At full HP or with zero capsules, confirm warning feedback appears but no success burst and no capsule is consumed.
+- [ ] Verify reduced-motion mode: feedback remains readable without the particle/ring animation.
+- [ ] Test desktop and mobile, portrait and landscape, across Bubble Hunt, Mana Collector and Chaos Attack.
+- Expected: successful use produces the icon-anchored ring/particle/label burst; all wallet rules remain unchanged.
+- Actual / browser / device / screen orientation:
+- Result: PASS / PASS WITH LIMITATIONS / FAIL
+- Notes:
