@@ -429,3 +429,50 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
  #game-view.active .hp-bar #hp-pill-use img{width:27px;height:27px}
  .hp-pill-travel-ghost{width:30px;height:30px}
 }
+
+
+/* Generation 1.33 — gameplay-only gateway and compact HUD hierarchy. */
+body:not(.nu-game-active) #nu-hex-gateway,body:not(.nu-game-active) .nu-gateway-scrim{display:none!important}
+body.nu-game-active .topbar{position:fixed;z-index:8;top:8px;left:12px;width:auto;padding:0;pointer-events:none}
+body.nu-game-active .topbar .brand{display:block;max-width:230px;font-size:14px;letter-spacing:.2em;opacity:.46;text-shadow:0 1px 8px #00101a}
+body.nu-game-active .topbar .brand small{font-size:9px;letter-spacing:.18em;color:#9ac5d9}
+body.nu-game-active .topbar #quality-status,body.nu-game-active .topbar #menu-open{display:none!important}
+body.nu-game-active #game-view.active .view-head{top:8px;left:50%;right:auto;transform:translateX(-50%);justify-content:center}
+body.nu-game-active #game-view.active .view-head #back-home{display:none!important}
+body.nu-game-active #game-view.active .view-head h2{font-size:clamp(13px,2.2vw,18px);letter-spacing:.12em;text-align:center;max-width:58vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.nu-game-active #game-view.active .hud{top:auto;bottom:62px;left:12px;right:12px;justify-content:flex-end;gap:6px}
+body.nu-game-active #game-view.active .hud-chip{font-size:9px;padding:5px 8px}
+body.nu-game-active #game-view.active .level-chip{position:fixed;z-index:8;left:12px;bottom:36px;top:auto;min-width:42px;text-align:center;border-radius:16px;background:rgba(4,16,27,.72)}
+body.nu-game-active #game-view.active .bars{bottom:14px;left:66px;right:12px;display:flex;align-items:center;justify-content:center;gap:7px}
+body.nu-game-active #game-view.active .bar-wrap{width:min(39vw,260px);height:24px;border-radius:14px;overflow:hidden;display:flex;align-items:center;isolation:isolate}
+body.nu-game-active #game-view.active .bar-wrap .bar-fill{position:absolute;inset:0 auto 0 0;z-index:-1;border-radius:inherit}
+body.nu-game-active #game-view.active .bar-wrap .bar-label{position:relative;left:auto;bottom:auto;z-index:1;padding-left:9px;font-size:9px;font-weight:900;letter-spacing:.08em}
+body.nu-game-active #game-view.active .bar-wrap .bar-value{left:auto;right:9px;top:50%;transform:translateY(-50%);z-index:1;font-size:9px;white-space:nowrap}
+body.nu-game-active #game-view.active .mana-capsules{display:none}
+#game-view.active .hp-bar{width:180px;min-width:180px;min-height:44px;height:44px;padding:7px 10px;gap:7px;justify-content:center;transition:width .38s cubic-bezier(.2,.75,.2,1),min-width .38s,padding .38s,transform .38s;overflow:visible}
+#game-view.active .hp-bar.has-pill{width:252px;min-width:252px;padding-right:54px;transform:translateX(-50%)}
+#game-view.active .hp-bar .hp-track{width:72px;min-width:60px;max-width:86px;flex:1 1 auto}
+#game-view.active .hp-bar #hp-pill-use{right:5px;top:50%;left:auto;bottom:auto;transform:translateY(-50%);width:40px;height:40px;min-width:40px;min-height:40px;opacity:1;transition:opacity .18s}
+#game-view.active .hp-bar #hp-pill-use img{width:30px;height:30px}
+#game-view.active .hp-bar.has-pill #hp-pill-use:not([hidden]){animation:nu-hp-pill-dock .36s cubic-bezier(.18,.72,.22,1) both}
+@keyframes nu-hp-pill-dock{from{opacity:0;transform:translate(18px,-50%) scale(.65)}to{opacity:1;transform:translate(0,-50%) scale(1)}}
+.nbi-shield-bar{position:fixed;z-index:6;top:66px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;width:180px;min-height:20px;padding:4px 8px;border:1px solid #8a72ff66;border-radius:12px;background:rgba(12,8,34,.62);backdrop-filter:blur(10px);color:#c8baff;font-size:8px;letter-spacing:.06em;transition:top .42s ease,opacity .25s,transform .42s}
+.nbi-shield-track{height:5px;flex:1;min-width:30px;overflow:hidden;border-radius:8px;background:#211a48}
+#nbi-shield-fill{display:block;width:100%;height:100%;border-radius:inherit;background:linear-gradient(90deg,#5641b7,#b8a4ff);box-shadow:0 0 8px #9a7cff;transition:width .35s ease}
+.nbi-shield-bar.is-depleted{opacity:.2;transform:translate(-50%,24px) scale(.92)}
+.nbi-shield-bar.is-recharging{opacity:1;transform:translate(-50%,0) scale(1)}
+@media(max-width:520px){
+ body.nu-game-active .topbar{top:7px;left:8px}
+ body.nu-game-active .topbar .brand{font-size:12px}
+ body.nu-game-active .topbar .brand small{font-size:8px}
+ body.nu-game-active #game-view.active .view-head{top:30px}
+ body.nu-game-active #game-view.active .hud{bottom:60px}
+ body.nu-game-active #game-view.active .bars{left:58px;right:8px;gap:5px}
+ body.nu-game-active #game-view.active .bar-wrap{width:calc(50% - 3px);height:23px}
+ body.nu-game-active #game-view.active .bar-wrap .bar-value{font-size:8px;right:5px}
+ body.nu-game-active #game-view.active .bar-wrap .bar-label{padding-left:6px;font-size:8px}
+ body.nu-game-active #game-view.active .level-chip{left:8px;bottom:34px}
+ #game-view.active .hp-bar.has-pill{width:min(252px,calc(100vw - 22px));min-width:0}
+ .nbi-shield-bar{top:62px;width:174px}
+}
+@media(prefers-reduced-motion:reduce){#game-view.active .hp-bar,.nbi-shield-bar,#nbi-shield-fill{transition:none!important}#game-view.active .hp-bar.has-pill #hp-pill-use:not([hidden]){animation:none}}
