@@ -6,7 +6,7 @@
 })(typeof globalThis!=="undefined"?globalThis:this,function(){
   "use strict";
   function validate(pixels,width,height){
-    if(!Number.isInteger(width)||!Number.isInteger(height)||width<1||height<1||width*height>262144)throw new RangeError("Image dimensions must be positive and within the 262144-pixel analysis budget.");
+    if(!Number.isInteger(width)||!Number.isInteger(height)||width<1||height<1||width*height>1048576)throw new RangeError("Image dimensions must be positive and within the 1048576-pixel analysis budget.");
     if(!pixels||pixels.length!==width*height)throw new TypeError("Pixel buffer length does not match image dimensions.");
     for(const color of pixels)if(color!==null&&color!==undefined&&!/^#[0-9a-f]{6}$/i.test(color))throw new TypeError("Pixels must be null or six-digit hexadecimal colors.");
   }
