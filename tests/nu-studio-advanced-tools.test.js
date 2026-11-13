@@ -41,3 +41,12 @@ test("PNG export uses a bounded scale and transparent visible composite",()=>{
  assert.match(js,/NUStudioExport\.toRgba\(visible,width,height\)/);
  assert.match(js,/outputContext\.imageSmoothingEnabled=false/);
 });
+
+test("one export action never starts a second human-report download",()=>{
+ const start=js.indexOf("function reportDownloadedOutput(");
+ const end=js.indexOf("\nfunction svgSource()",start);
+ assert.ok(start>=0&&end>start,"export completion handler exists");
+ const handler=js.slice(start,end);
+ assert.doesNotMatch(handler,/downloadHumanReport\(/);
+ assert.ok(html.includes('id="export-human-report"'),"dedicated human-report export button remains available");
+});

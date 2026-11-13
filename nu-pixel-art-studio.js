@@ -222,12 +222,13 @@ function showAnalysisSummary(analysis,pathCount){
 }
 function reportDownloadedOutput(analysis,pathCount){
  showAnalysisSummary(analysis,pathCount);
- try{downloadHumanReport(analysis);}catch(err){announce("Artwork exported, but its human report could not be created: "+err.message);}
+ // One export click must start exactly one file download. The human report
+ // remains embedded in SVG/Graphic IR and available from its own button.
  const reward=grantStudioXP(analysis.metrics,pathCount);
- if(reward.ok)announce("Download started · +"+reward.amount+" shared XP added to all three Generation 1 games. This artwork earns XP once.");
- else if(reward.reason==="DUPLICATE_REWARD")announce("Download started · this artwork has already claimed its Studio XP reward.");
- else if(reward.reason==="ARTWORK_TOO_SMALL")announce("Download started · artwork is too small for an XP reward (minimum 16 painted pixels).");
- else announce("Download started · XP reward not saved: "+reward.reason+".");
+ if(reward.ok)announce("Artwork export started · +"+reward.amount+" shared XP added to all three Generation 1 games. This artwork earns XP once.");
+ else if(reward.reason==="DUPLICATE_REWARD")announce("Artwork export started · this artwork has already claimed its Studio XP reward.");
+ else if(reward.reason==="ARTWORK_TOO_SMALL")announce("Artwork export started · artwork is too small for an XP reward (minimum 16 painted pixels).");
+ else announce("Artwork export started · XP reward not saved: "+reward.reason+".");
 }
 function svgSource(){if(!window.NUSVGVectorizer)throw new Error("SVG vector engine did not load. Refresh the studio and try again.");return window.NUSVGVectorizer.vectorize(pixels,width,height,{mode:$("vector-mode").value});}
 function filename(ext){let n=$("export-name").value.trim().replace(/[^a-z0-9-_]+/gi,"-").replace(/^-+|-+$/g,"").slice(0,48)||"nu-pixel-art";return n+"."+ext;}
