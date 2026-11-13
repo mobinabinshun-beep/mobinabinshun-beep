@@ -174,3 +174,18 @@ Validate the five archived N.U Mana SVG materials when used on interactive Mana 
 - Actual / browser / device / viewport width / orientation:
 - Result: PASS / PASS WITH LIMITATIONS / FAIL
 - Notes:
+
+
+## Mobile HP rail and capsule placement — Generation 1.29
+
+- [ ] On a phone in portrait orientation, confirm the HP frame is only as wide as the HP label, rail and value; it should no longer stretch across most of the screen.
+- [ ] Confirm the frame extends slightly below the HP rail to create a dedicated lower pocket for the Golden HP Capsule.
+- [ ] When HP drops below 10, confirm the capsule icon is centered below the HP rail, fully visible and not covered by the rail, frame edge, or other HUD elements.
+- [ ] Tap the capsule icon itself; confirm it remains directly accessible and consumes exactly one capsule while restoring up to 10 missing HP.
+- [ ] Confirm the arrival animation travels from the frame's inside-right edge to the lower centered dock; restoring HP to 10 reverses the same path and hides the icon.
+- [ ] Test 320px-wide portrait, wider portrait, landscape, all three Generation 1 games, keyboard focus/Enter/Space, and reduced-motion mode.
+- [ ] Confirm desktop/tablet layout and Store capsule row are unchanged.
+- Expected: a compact HP frame wraps the HP rail horizontally and extends below it vertically, with an unobstructed, tappable capsule dock underneath.
+- Actual / browser / device / viewport width / orientation:
+- Result: PASS / PASS WITH LIMITATIONS / FAIL
+- Notes:
