@@ -29,3 +29,9 @@ This feature belongs to Generation 1 and runs in the existing browser prototype.
 ## Future server direction — archive idea only
 
 A future server-backed version may be considered separately for authenticated per-player persistence, server-side transaction validation, idempotent settlement, audit/recovery, and optional cross-device continuity. A shared multiplayer economy is a separate future product decision and requires explicit owner approval. None of these server or multiplayer ideas are part of the current offline/downloadable demo or implementation commitment.
+
+## Exchange display and local cache limits — 2026-11-14
+- HP (the current HP meter) is not an exchange-listed asset. HP Capsules remain a distinct inventory item and are not the HP meter.
+- The exchange's own browser cache stores only the latest 24 balance-chart steps per listed asset, the latest 5 written transaction-history entries per asset, and at most 24 market candles for the selected asset. Each refresh replaces this derived cache snapshot, so older exchange-view entries are not retained there.
+- The simulator reads only the latest 24 local wallet transactions. The underlying game wallet ledger remains separate; the exchange cache limit does not delete or rewrite the game's wallet save.
+- Both charts display horizontal and vertical guide lines to make the 24-step history easier to read.
