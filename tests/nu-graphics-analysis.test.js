@@ -37,3 +37,11 @@ test("creates a human-readable report with dimensions, palette and region bounds
   assert.match(report,/#ff0000/);
   assert.match(report,/bounds x=0, y=0, width=2, height=1/);
 });
+
+test("supports analysis above the former 262144-pixel ceiling",()=>{
+ const width=513,height=512,pixels=Array(width*height).fill("#123456");
+ const result=analyze(pixels,width,height);
+ assert.equal(result.dimensions.width,width);
+ assert.equal(result.dimensions.height,height);
+ assert.equal(result.metrics.paintedPixels,width*height);
+});
