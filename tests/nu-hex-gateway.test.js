@@ -82,7 +82,7 @@ test("Generation 1.33 HUD keeps game identity, LV and resource values in their r
 test("HP capsule waits for the expanding frame; N-BI is a separate visual-only meter", () => {
   assert.match(html, /id="hp-bar"/);
   assert.match(html, /id="nbi-shield-bar"/);
-  assert.match(games, /hpPillDockTimer=setTimeout\(\(\)=>animateHpPillTravel\("in"\),390\)/);
+  assert.match(games, /hpPillDockTimer=setTimeout\(\(\)=>\{hpPillDockTimer=0;animateHpPillTravel\("in"\);\},390\)/);
   assert.match(games, /function updateNbiShield\(amount=0\)/);
   assert.match(games, /updateNbiShield\(25\)/);
   assert.match(worldCss, /\.hp-bar\.has-pill\{width:252px/);
