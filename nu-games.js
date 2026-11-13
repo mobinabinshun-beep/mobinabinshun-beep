@@ -61,11 +61,14 @@ function bindGameAssetProfiles(){
 let lastRenderedHp=null;
 function animateHpPillTravel(direction){
  const bar=$("hp-bar"),button=$("hp-pill-use"),source=button&&button.querySelector("img");
- if(!bar||!button||!source||typeof source.animate!=="function")return;
- if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
- const barRect=bar.getBoundingClientRect(),buttonRect=button.getBoundingClientRect();
+ if(!bar||!button)return;
+ button.hidden=true;
+ const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+ if(reduced||!source||typeof source.animate!=="function"){button.hidden=direction==="out";return;}
+ const barRect=bar.getBoundingClientRect();
  const corner={x:barRect.left+Math.min(16,barRect.width*.08),y:barRect.top+barRect.height/2};
- const dock={x:buttonRect.left+buttonRect.width/2,y:buttonRect.top+buttonRect.height/2};
+ // The dock is a stable slot just outside the rail; it remains measurable while the real button is hidden.
+ const dock={x:barRect.right+25,y:barRect.top+barRect.height/2};
  const from=direction==="in"?corner:dock,to=direction==="in"?dock:corner;
  const ghost=document.createElement("img");ghost.className="hp-pill-travel-ghost";ghost.src=source.src;ghost.alt="";ghost.setAttribute("aria-hidden","true");
  ghost.style.left=from.x+"px";ghost.style.top=from.y+"px";document.body.appendChild(ghost);
@@ -75,16 +78,17 @@ function animateHpPillTravel(direction){
   {offset:.2,opacity:1,transform:base+(dx*.2)+"px,"+(dy*.2)+"px) scale(1.12)"},
   {opacity:direction==="in"?1:0,transform:base+dx+"px,"+dy+"px) scale("+(direction==="in"?"1":".5")+")"}
  ],{duration:direction==="in"?620:560,easing:"cubic-bezier(.18,.72,.22,1)",fill:"forwards"});
- animation.onfinish=()=>ghost.remove();
+ animation.onfinish=()=>{ghost.remove();button.hidden=direction==="out";};
 }
 function syncHpPillDock(hp){
- const next=Number.isFinite(hp)?hp:10;
- if(lastRenderedHp===null){lastRenderedHp=next;return;}
- if(lastRenderedHp>=10&&next<10)animateHpPillTravel("in");
- else if(lastRenderedHp<10&&next>=10)animateHpPillTravel("out");
+ const next=Number.isFinite(hp)?hp:10,button=$("hp-pill-use");
+ if(lastRenderedHp===null){lastRenderedHp=next;if(button)button.hidden=next>=10;return;}
+ if(lastRenderedHp>=10&&next<10){if(button)button.hidden=true;animateHpPillTravel("in");}
+ else if(lastRenderedHp<10&&next>=10){if(button)button.hidden=true;animateHpPillTravel("out");}
+ else if(button)button.hidden=next>=10;
  lastRenderedHp=next;
 }
-function renderWallet(){syncHpPillDock(state.save.hp);renderGameAssetProfile();const pill=$("hp-pill-use");if(pill){pill.hidden=false;const count=pill.querySelector("#hp-pill-count");if(count)count.textContent="×"+state.save.hpPills;const reason=state.save.hp>=10?"HP is already full.":state.save.hpPills<1?"No HP capsule in inventory.":"Use one HP capsule to restore up to 10 HP.";pill.setAttribute("aria-label",reason);pill.title=reason;pill.classList.toggle("unavailable",state.save.hp>=10||state.save.hpPills<1);}const xp=state.save.xp%100,mana=state.save.mana%10;$("xp-fill").style.width=xp+"%";$("mana-fill").style.width=(mana*10)+"%";$("xp-fill").parentElement.style.setProperty("--capsule-boundary",xp+"%");$("mana-fill").parentElement.style.setProperty("--capsule-boundary",(mana*10)+"%");$("xp-fill").setAttribute("aria-valuenow",String(xp));$("mana-fill").setAttribute("aria-valuenow",String(mana));$("xp-value").textContent=state.save.xp?state.save.xp+" / 100":"";$("mana-value").textContent=state.save.mana?state.save.mana+" / 10":"";$("level-chip").textContent="LV "+state.save.level;$("hp-value").textContent=state.save.hp+"/10";$("hp-fill").style.width=(state.save.hp*10)+"%";$("mana-capsules").innerHTML=Array.from({length:state.save.manaCapsules},(_,i)=>{const amount=Math.max(0,Math.min(10,state.save.mana-i*10));return '<span class="mana-slot" title="Mana capsule '+(i+1)+' · '+amount+'/10"><i style="width:'+(amount*10)+'%"></i></span>';}).join("");}
+function renderWallet(){syncHpPillDock(state.save.hp);renderGameAssetProfile();const pill=$("hp-pill-use");if(pill){const count=pill.querySelector("#hp-pill-count");if(count)count.textContent="×"+state.save.hpPills;const reason=state.save.hp>=10?"HP is already full.":state.save.hpPills<1?"No HP capsule in inventory.":"Use one HP capsule to restore up to 10 HP.";pill.setAttribute("aria-label",reason);pill.title=reason;pill.classList.toggle("unavailable",state.save.hp>=10||state.save.hpPills<1);}const xp=state.save.xp%100,mana=state.save.mana%10;$("xp-fill").style.width=xp+"%";$("mana-fill").style.width=(mana*10)+"%";$("xp-fill").parentElement.style.setProperty("--capsule-boundary",xp+"%");$("mana-fill").parentElement.style.setProperty("--capsule-boundary",(mana*10)+"%");$("xp-fill").setAttribute("aria-valuenow",String(xp));$("mana-fill").setAttribute("aria-valuenow",String(mana));$("xp-value").textContent=state.save.xp?state.save.xp+" / 100":"";$("mana-value").textContent=state.save.mana?state.save.mana+" / 10":"";$("level-chip").textContent="LV "+state.save.level;$("hp-value").textContent=state.save.hp+"/10";$("hp-fill").style.width=(state.save.hp*10)+"%";$("mana-capsules").innerHTML=Array.from({length:state.save.manaCapsules},(_,i)=>{const amount=Math.max(0,Math.min(10,state.save.mana-i*10));return '<span class="mana-slot" title="Mana capsule '+(i+1)+' · '+amount+'/10"><i style="width:'+(amount*10)+'%"></i></span>';}).join("");}
 function showFloat(){} // N.U policy: no floating XP/Mana/reward text on interactive objects.
 function announceTransaction(message,tone="success"){const el=$("transaction-toast");if(!el)return;el.textContent=message;el.className="transaction-toast "+tone+" visible";clearTimeout(el._hideTimer);el._hideTimer=setTimeout(()=>el.classList.remove("visible"),2200);}function showFloatingChange(message,tone="gain"){const root=$("floating-notifications");if(!root)return;const item=document.createElement("div");item.className="floating-change "+tone;item.textContent=message;root.appendChild(item);setTimeout(()=>item.remove(),1800);}
 function showHpGain(amount){const track=$("hp-fill").parentElement;track.classList.remove("hp-restored");void track.offsetWidth;track.classList.add("hp-restored");const el=document.createElement("span");el.className="hp-gain";el.textContent="+"+amount+" HP";track.appendChild(el);setTimeout(()=>{el.remove();track.classList.remove("hp-restored");},1100);}
