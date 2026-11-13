@@ -23,6 +23,7 @@ body.nu-gateway-enabled #nu-hex-gateway,body.nu-gateway-enabled .nu-gateway-scri
 .nu-gateway-scrim{position:fixed;inset:0;z-index:110;opacity:0;visibility:hidden;pointer-events:none;background:rgba(135,205,228,.105);backdrop-filter:blur(6px) saturate(.58) brightness(.84);-webkit-backdrop-filter:blur(6px) saturate(.58) brightness(.84);transition:opacity .2s ease,visibility .2s ease}
 body.nu-gateway-open .nu-gateway-scrim{opacity:1;visibility:visible;pointer-events:auto}
 body.nu-gateway-open .world,body.nu-gateway-open .casino-shell,body.nu-gateway-open .launcher,body.nu-gateway-open .shell{filter:blur(2.5px) saturate(.62);transition:filter .2s ease}
+body.nu-gateway-open .world .shell{filter:none}
 body.nu-gateway-open .casino-shell *,body.nu-gateway-open .launcher *,body.nu-gateway-open .shell *{animation-play-state:paused!important}
 body.nu-gateway-open #nu-hex-gateway{pointer-events:auto}
 body.nu-game-active #menu-open,body.nu-game-active #back-home,body.nu-game-active #finish-round{display:none!important}
