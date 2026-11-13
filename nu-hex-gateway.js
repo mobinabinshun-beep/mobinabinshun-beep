@@ -7,7 +7,7 @@
   const trigger = root.querySelector(".nu-gateway-trigger");
   const items = [...root.querySelectorAll(".nu-gateway-item")];
   const pauseButton = document.getElementById("finish-round");
-  let open = false, pausedByGateway = false, selected = null, hoverTimer = 0, activationTimer = 0, outsideSince = 0;
+  let open = false, pausedByGateway = false, selected = null, clickArmed = null, hoverTimer = 0, activationTimer = 0, outsideSince = 0;
   items.forEach((item, index) => {
     const angle = (120 + index * 25) * Math.PI / 180;
     item.style.setProperty("--gx", `${Math.cos(angle) * 116}px`);
@@ -38,9 +38,9 @@
     root.classList.toggle("is-open", open);
     document.body.classList.toggle("nu-gateway-open", open);
     trigger.setAttribute("aria-expanded", String(open));
-    trigger.setAttribute("aria-label", open ? "Close N.U navigation gateway" : "Open N.U navigation gateway");
+    trigger.setAttribute("aria-label", open ? "Close N.U navigation gateway" : "Open N.U navigation gateway");\n    items.forEach(item => { item.tabIndex = open ? 0 : -1; });
     if (open) { pauseGame(); trigger.focus({preventScroll:true}); }
-    else { clearTimeout(hoverTimer); clearTimeout(activationTimer); selected = null; items.forEach(i => i.classList.remove("is-selected","is-confirming")); if (shouldResume) resumeGame(); else pausedByGateway = false; }
+    else { clearTimeout(hoverTimer); clearTimeout(activationTimer); selected = null; clickArmed = null; items.forEach(i => i.classList.remove("is-selected","is-confirming")); if (shouldResume) resumeGame(); else pausedByGateway = false; }
   }
   function select(item) {
     if (selected && selected !== item) selected.classList.remove("is-selected");
@@ -69,7 +69,7 @@
       hoverTimer = window.setTimeout(() => activate(item), 320);
     });
     item.addEventListener("pointerleave", () => { clearTimeout(hoverTimer); clearTimeout(activationTimer); });
-    item.addEventListener("click", e => {
+    item.addEventListener("focus", () => select(item));\n    item.addEventListener("click", e => {
       e.preventDefault(); e.stopPropagation(); clearTimeout(hoverTimer);
       confirm(item);
     });
