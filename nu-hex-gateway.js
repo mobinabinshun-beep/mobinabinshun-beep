@@ -25,13 +25,20 @@
   syncGatewayScope();
   if (gameView) new MutationObserver(syncGatewayScope).observe(gameView, {attributes:true,attributeFilter:["class"]});
 
-  items.forEach((item,index) => {
-    item.tabIndex = -1;
-    const angle = (112 + index * 18) * Math.PI / 180;
-    const radius = window.matchMedia("(max-width: 600px)").matches ? 100 : 112;
-    item.style.setProperty("--gx", `${Math.cos(angle) * radius}px`);
-    item.style.setProperty("--gy", `${Math.sin(angle) * radius}px`);
-  });
+  function layoutItems() {
+    const compact = window.matchMedia("(max-width: 600px)").matches;
+    const radius = compact ? 100 : 112;
+    const step = items.length > 1 ? 144 / (items.length - 1) : 0;
+    items.forEach((item,index) => {
+      item.tabIndex = open ? 0 : -1;
+      const angle = (112 + index * step) * Math.PI / 180;
+      item.style.setProperty("--gx", `${Math.cos(angle) * radius}px`);
+      item.style.setProperty("--gy", `${Math.sin(angle) * radius}px`);
+    });
+  }
+  layoutItems();
+  window.addEventListener("resize",layoutItems,{passive:true});
+  window.addEventListener("orientationchange",layoutItems,{passive:true});
 
   function goHome() {
     const home = document.getElementById("menu-home");
