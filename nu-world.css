@@ -364,3 +364,20 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
  #game-view.active .hp-bar #hp-pill-use img{width:28px;height:28px}
  .hp-pill-travel-ghost{width:32px;height:32px}
 }
+
+
+/* Generation 1.27: one HP capsule Store row with independent use and buy hit targets. */
+.shop-hp-pill-item{display:grid;grid-template-columns:62px minmax(0,1fr) auto;align-items:center;gap:14px}
+.shop-hp-pill-use{width:58px;min-height:58px;padding:4px;border:1px solid #8ba0ae55;border-radius:12px;background:rgba(7,18,28,.72);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.shop-hp-pill-use:disabled{cursor:not-allowed;opacity:.58}
+.shop-hp-pill-use .hp-pill-icon{width:36px;height:36px;object-fit:contain;image-rendering:pixelated;filter:grayscale(1) saturate(.35) brightness(.48);opacity:.58;transition:filter .18s ease,opacity .18s ease}
+.shop-hp-pill-use .hp-pill-icon.is-owned{filter:drop-shadow(0 0 7px #b7ff75) saturate(1.2) brightness(1.12);opacity:1}
+.shop-hp-pill-count{font:800 10px/1 ui-monospace,monospace;color:#91a4b0;font-variant-numeric:tabular-nums}
+.shop-hp-pill-use:has(.hp-pill-icon.is-owned) .shop-hp-pill-count{color:#d8ffb8}
+.shop-hp-pill-use:focus-visible,.shop-hp-pill-buy:focus-visible{outline:2px solid #caff9f;outline-offset:3px}
+.shop-hp-pill-description{min-width:0}
+.shop-hp-pill-description strong{display:block}
+.shop-hp-pill-description p{margin:5px 0 0}
+.shop-hp-pill-buy{min-width:112px;justify-self:end}
+@media(max-width:520px){.shop-hp-pill-item{grid-template-columns:54px minmax(0,1fr) auto;gap:8px;padding:12px}.shop-hp-pill-use{width:52px;min-height:54px}.shop-hp-pill-use .hp-pill-icon{width:32px;height:32px}.shop-hp-pill-buy{min-width:82px;padding:9px 8px;font-size:10px}}
+@media(prefers-reduced-motion:reduce){.shop-hp-pill-use .hp-pill-icon{transition:none}}
