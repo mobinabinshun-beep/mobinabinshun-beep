@@ -53,9 +53,10 @@
     },
     store: () => openMainView("store"),
     wallet: () => openMainView("wallet"),
-    profile: () => openMainView("profile"),\n    resume: () => {},
+    profile: () => openMainView("profile"),
     launcher: () => { window.location.href = "./launcher.html"; },
-    studio: () => { window.location.href = "./pixel-art-studio.html"; }
+    studio: () => { window.location.href = "./pixel-art-studio.html"; },
+    resume: () => {}
   };
 
   function pauseGame() {
@@ -103,12 +104,13 @@
   }
 
   function activate(item) {
-    const action = routes[item.dataset.action];
+    const actionKey = item.dataset.action;
+    const action = routes[actionKey];
     if (!action) return;
     item.classList.add("is-confirming");
     clearTimeout(activationTimer);
     activationTimer = window.setTimeout(() => {
-      setOpen(false, false);
+      setOpen(false, actionKey === "resume");
       action();
     }, 430);
   }
