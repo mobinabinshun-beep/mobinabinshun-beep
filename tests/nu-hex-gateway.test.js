@@ -24,9 +24,9 @@ test("gateway supports hover, touch/click confirmation, keyboard escape and outs
   assert.match(js, /pointerenter/);
   assert.match(js, /addEventListener\("click"/);
   assert.match(js, /addEventListener\("keydown"/);
-  assert.match(js, /e\.key === "Escape"/);
+  assert.match(js, /event\\.key === "Escape"/);
   assert.match(js, /pad = 10/);
-  assert.match(js, /is-confirming/);
+  assert.match(js, /is-confirming/);\n  assert.match(js, /clickArmed === item/);\n  assert.match(js, /item.tabIndex = open \? 0 : -1/);
 });
 
 test("opening the gateway pauses an active round and restores it on dismissal", () => {
