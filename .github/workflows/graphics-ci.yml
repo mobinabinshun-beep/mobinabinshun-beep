@@ -54,7 +54,7 @@ jobs:
           node <<'NODE'
           const fs = require('fs');
           const svg = fs.readFileSync('assets/backgrounds/niroo-universe-background.svg', 'utf8');
-          if (!/<svg\\b/.test(svg)) throw new Error('Public background is not an SVG document');
-          if (!/data:image\\/png;base64,/.test(svg)) throw new Error('Embedded source artwork is missing');
+          if (!/<svg\b/.test(svg)) throw new Error('Public background is not an SVG document');
+          if (!/data:image\/png;base64,/.test(svg)) throw new Error('Embedded source artwork is missing');
           console.log('Canonical public SVG is present and contains its embedded artwork.');
           NODE
