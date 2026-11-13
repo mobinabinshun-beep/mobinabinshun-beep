@@ -4,7 +4,7 @@
  */
 (function(g){
 "use strict";
-const ASSET="./assets/nu-celestial-city.png";
+const ASSET="https://raw.githubusercontent.com/niroouniverse-creator/NU-INGEST-ARCHIVE/main/ASSETS/NU-Celestial-City/Original%20reference%20image%20file%20for%20Niroo%20Universe%20(N.U).png";
 let node=null,img=null,loaded=false,mode="ambient",frozen=false;
 function mount(){
  if(node)return node;
