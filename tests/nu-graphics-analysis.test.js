@@ -30,7 +30,8 @@ test("creates a human-readable report with dimensions, palette and region bounds
   const result=analyze(["#ff0000","#ff0000",null,"#00ff00"],2,2);
   const {createHumanReport}=require("../nu-graphics-analysis.js");
   const report=createHumanReport(result,{name:"Test artwork"});
-  assert.match(report,/N\\.U Human Image Report/);
+  assert.match(report,/N\.U Human Image Report/);
+  assert.ok(report.includes("\n## Artwork\n"));
   assert.match(report,/2 × 2 pixels/);
   assert.match(report,/Transparent pixels: 1/);
   assert.match(report,/#ff0000/);
