@@ -19,7 +19,7 @@
   let suppressClickUntil = 0;
 
   function syncGatewayScope() {
-    document.body.classList.add("nu-gateway-enabled");
+    document.body.classList.toggle("nu-gateway-enabled", Boolean(gameView?.classList.contains("active")));
     document.body.classList.toggle("nu-game-active", Boolean(gameView?.classList.contains("active")));
   }
   syncGatewayScope();
@@ -27,8 +27,8 @@
 
   function layoutItems() {
     const compact = window.matchMedia("(max-width: 600px)").matches;
-    const radius = compact ? 100 : 112;
-    const step = items.length > 1 ? 144 / (items.length - 1) : 0;
+    const radius = compact ? 92 : 104;
+    const step = items.length > 1 ? 116 / (items.length - 1) : 0;
     items.forEach((item,index) => {
       item.tabIndex = open ? 0 : -1;
       const angle = (112 + index * step) * Math.PI / 180;
@@ -63,12 +63,7 @@
     store: () => openMainView("store"),
     wallet: () => openMainView("wallet"),
     profile: () => openMainView("profile"),
-    launcher: () => { window.location.href = "./launcher.html"; },
-    studio: () => { window.location.href = "./pixel-art-studio.html"; },
-    casino: () => { window.location.href = "./casino.html"; },
-    resume: () => {
-      if (!gameView) window.location.href = "./index.html";
-    }
+    settings: () => { window.location.href = "./launcher.html"; }
   };
 
   function pauseGame() {
