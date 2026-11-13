@@ -366,3 +366,12 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 - When HP reaches 10/10, the capsule returns along the same path and fades out at the right corner. Lowering HP during the exit reverses that same motion back into the dock.
 - Travel remains visual-only; clicking the docked icon is still the only action that consumes a capsule. Wallet, healing, inventory and reward rules are unchanged.
 - Regression coverage and the Generation 1.26 human-test checklist cover duplicate prevention, mid-flight reversal, frame fit, reduced motion and mouse/touch/keyboard acceptance.
+
+
+## Generation 1.27 — Store HP Capsule split actions (2026-11-13)
+
+- Removed the separate "Use owned capsule" Store card; the HP Capsule now appears in one purchase row.
+- The left-side capsule icon and adjacent count are the use control; it is enabled only when the player owns a capsule and HP is below maximum. The icon glows when inventory is nonzero and appears dim when none are owned.
+- The right-side BUY control remains a separate purchase action. Buying deducts 10 XP and adds one capsule; clicking the icon consumes one owned capsule and restores up to 10 missing HP.
+- Purchase and use hit targets are independent; existing wallet validation and transaction rules are unchanged.
+- Added responsive layout, regression assertions and a human QA checklist. Browser/device human acceptance remains pending.
