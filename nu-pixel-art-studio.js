@@ -164,11 +164,11 @@ $("image-file").addEventListener("change",async e=>{
    const sizing=requested==="original"?"original dimensions preserved":"working copy resized by your selected detail";
    $("source-info").textContent=sourceWidth+" × "+sourceHeight+" source → "+width+" × "+height+" editable pixels · "+palette.length+" colors · "+sizing;
    renderPalette();
+   requestAnimationFrame(()=>{updateCanvasDisplay();$("workspace-frame").scrollTo(0,0);});
+   announce("Imported · "+file.name+" · "+sourceWidth+" × "+sourceHeight+" source → "+width+" × "+height+" editable pixels. "+(requested==="original"?"Original dimensions preserved.":"Explicit reduced-detail working copy created.")+" Original source preserved.");
    commitHistory(before);originalImportFile=file;
    const previousPreviewUrl=sourcePreviewUrl;sourcePreviewUrl=nextPreviewUrl;nextPreviewUrl=null;
    if(previousPreviewUrl)URL.revokeObjectURL(previousPreviewUrl);
-   requestAnimationFrame(()=>{updateCanvasDisplay();$("workspace-frame").scrollTo(0,0);});
-   announce("Imported · "+file.name+" · "+sourceWidth+" × "+sourceHeight+" source → "+width+" × "+height+" editable pixels. "+(requested==="original"?"Original dimensions preserved.":"Explicit reduced-detail working copy created.")+" Original source preserved.");
   }catch(importError){
    if(nextPreviewUrl)URL.revokeObjectURL(nextPreviewUrl);
    width=previous.width;height=previous.height;pixels=previous.pixels;palette=previous.palette;imageImported=previous.imageImported;workspace.zoom=previous.zoom;originalImportFile=previous.originalImportFile;
