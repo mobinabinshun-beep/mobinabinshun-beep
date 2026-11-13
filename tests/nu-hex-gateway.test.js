@@ -16,8 +16,8 @@ test("gateway is mounted as a persistent navigation control on every internal pa
   }
 });
 
-test("gateway exposes the seven requested destinations", () => {
-  for (const action of ["back", "library", "store", "wallet", "profile", "launcher", "studio"]) {
+test("gateway exposes the eight requested destinations", () => {
+  for (const action of ["back", "library", "store", "wallet", "profile", "launcher", "studio", "resume"]) {
     assert.match(html, new RegExp('data-action="' + action + '"'));
     assert.match(js, new RegExp(action + ":"));
   }
@@ -30,7 +30,7 @@ test("gateway supports hover, two-step click, keyboard escape and 10px outside e
   assert.match(js, /event\.key === "Escape"/);
   assert.match(js, /tolerance = 10/);
   assert.match(js, /is-confirming/);
-  assert.match(js, /clickArmed === item/);
+  assert.match(js, /clickArmed === item/);\n  assert.match(js, /actionKey === "resume"/);
   assert.match(js, /item\.tabIndex = open \? 0 : -1/);
 });
 
