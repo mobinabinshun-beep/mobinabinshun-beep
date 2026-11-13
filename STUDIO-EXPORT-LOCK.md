@@ -1,5 +1,6 @@
 # N.U Creative Studio — Export Regression Lock
 
+**Verified fixed snapshot:** `freeze/studio-export-fixed-2026-11-13`  
 **Pre-repair source snapshot:** `freeze/studio-export-known-good-2026-11-13`
 **Working repair:** `fix/studio-export-resolution-guard-2026-11-13`
 **Earlier import/edit recovery point:** `freeze/studio-known-good-2026-11-13`
@@ -25,6 +26,11 @@
 2. Make Studio changes on a feature branch and merge only after all required CI checks pass.
 3. Do not modify protected adaptive runtime, game simulation, wallet/economy or unrelated modules for Studio export work.
 4. Treat any failure in import, composite export, transparent PNG, SVG or Graphic IR tests as a release blocker.
+
+## Verified repair record
+- PR #32 was merged after both `N.U Studio export regression gates` (run 4) and `N.U graphics preview smoke checks` (run 271) passed.
+- The merge commit is `dd8779d42e1201d99f0c4d24bb99e5d85b4b48ad`.
+- The public Pages deployment and real-device download behavior must still be verified separately; automated tests do not prove a browser saved a file to disk.
 
 ## Enforcement status
 The repository connector used for this repair does not expose GitHub branch-protection/ruleset administration. The freeze branches preserve exact recovery points, and this document records the required gates; server-enforced branch protection still needs to be enabled in GitHub Settings by a repository administrator.
