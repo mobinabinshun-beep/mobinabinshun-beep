@@ -128,3 +128,13 @@ test("Generation 1.28 makes the HP HUD frame visibly more compact on phone scree
   assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use img\{width:24px;height:24px/);
   assert.ok(html.includes("20261113-mobile-hp-bar-compact-r1"));
 });
+
+
+test("Generation 1.29 places the phone HP capsule below a compact HP rail",()=>{
+  assert.match(css,/@media\(max-width:520px\)\{\s*#game-view\.active \.hp-bar\{\s*width:max-content;\s*max-width:calc\(100vw - 24px\);/);
+  assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use\{\s*left:50%;\s*right:auto;\s*top:auto;\s*bottom:3px;\s*transform:translateX\(-50%\)/);
+  assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use img\{width:27px;height:27px/);
+  assert.ok(games.includes('const mobileDock=window.matchMedia&&window.matchMedia("(max-width:520px)").matches;'));
+  assert.ok(games.includes("y:barRect.height-21"));
+  assert.ok(html.includes("20261113-mobile-hp-capsule-under-rail-r1"));
+});
