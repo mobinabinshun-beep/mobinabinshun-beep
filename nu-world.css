@@ -429,3 +429,6 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
  #game-view.active .hp-bar #hp-pill-use img{width:27px;height:27px}
  .hp-pill-travel-ghost{width:30px;height:30px}
 }
+
+/* Keep the canonical image scene above the decorative sky gradient. */
+.sky{z-index:-4!important}
