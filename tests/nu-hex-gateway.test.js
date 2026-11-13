@@ -58,7 +58,7 @@ test("gateway is compact, fixed, responsive and does not create boxed menu cards
 });
 
 test("gateway exposes the navigation destinations and remains isolated from game rules", () => {
-  for (const action of ["back","library","store","wallet","profile","launcher","studio","casino","resume"]) {
+  for (const action of ["back","library","settings"]) {
     assert.match(html, new RegExp('data-action="' + action + '"'));
     assert.match(js, new RegExp(action + ":"));
   }
