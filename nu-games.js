@@ -112,16 +112,16 @@ function syncHpPillDock(hp){
  if(bar)bar.classList.toggle("has-pill",next<10);
  if(lastRenderedHp===null){
   lastRenderedHp=10;
-  if(next<10){if(button)button.hidden=true;clearTimeout(hpPillDockTimer);hpPillDockTimer=setTimeout(()=>animateHpPillTravel("in"),390);}
+  if(next<10){if(button)button.hidden=true;clearTimeout(hpPillDockTimer);hpPillDockTimer=setTimeout(()=>{hpPillDockTimer=0;animateHpPillTravel("in");},390);}
   else if(button)button.hidden=true;
   lastRenderedHp=next;
   return;
  }
  if(lastRenderedHp>=10&&next<10){if(button)button.hidden=true;clearTimeout(hpPillDockTimer);hpPillDockTimer=setTimeout(()=>animateHpPillTravel("in"),390);}
- else if(lastRenderedHp<10&&next>=10){if(button)button.hidden=true;clearTimeout(hpPillDockTimer);hpPillDockTimer=setTimeout(()=>animateHpPillTravel("out"),390);}
+ else if(lastRenderedHp<10&&next>=10){if(button)button.hidden=true;clearTimeout(hpPillDockTimer);hpPillDockTimer=setTimeout(()=>{hpPillDockTimer=0;animateHpPillTravel("out");},390);}
  else if(button){
   // Keep the real control hidden until the travelling image has fully docked.
-  button.hidden=hpPillTravelAnimation&&hpPillTravelAnimation.playState==="running"?true:next>=10;
+  button.hidden=hpPillDockTimer||(hpPillTravelAnimation&&hpPillTravelAnimation.playState==="running")?true:next>=10;
  }
  lastRenderedHp=next;
 }
