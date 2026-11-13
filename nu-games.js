@@ -58,27 +58,33 @@ function bindGameAssetProfiles(){
  });
  window.addEventListener("resize",()=>{if(!root.hidden){const active=document.activeElement;if(active&&active.matches(".bar-wrap,#hp-bar"))positionGameAssetProfile(active);}});
 }
-let lastRenderedHp=null;
+let lastRenderedHp=null,hpPillTravelAnimation=null,hpPillTravelGhost=null,hpPillTravelRun=0;
 function animateHpPillTravel(direction){
  const bar=$("hp-bar"),button=$("hp-pill-use"),source=button&&button.querySelector("img");
  if(!bar||!button)return;
  button.hidden=true;
+ hpPillTravelRun++;
+ const run=hpPillTravelRun;
+ if(hpPillTravelAnimation){hpPillTravelAnimation.cancel();hpPillTravelAnimation=null;}
+ if(hpPillTravelGhost){hpPillTravelGhost.remove();hpPillTravelGhost=null;}
  const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
  if(reduced||!source||typeof source.animate!=="function"){button.hidden=direction==="out";return;}
  const barRect=bar.getBoundingClientRect();
- const corner={x:barRect.left+Math.min(16,barRect.width*.08),y:barRect.top+barRect.height/2};
- // The dock is a stable slot just outside the rail; it remains measurable while the real button is hidden.
- const dock={x:barRect.right+25,y:barRect.top+barRect.height/2};
+ // The capsule enters from the frame's right inner edge and docks in the reserved slot.
+ const corner={x:barRect.right-6,y:barRect.top+barRect.height/2};
+ const dock={x:barRect.right-28,y:barRect.top+barRect.height/2};
  const from=direction==="in"?corner:dock,to=direction==="in"?dock:corner;
  const ghost=document.createElement("img");ghost.className="hp-pill-travel-ghost";ghost.src=source.src;ghost.alt="";ghost.setAttribute("aria-hidden","true");
- ghost.style.left=from.x+"px";ghost.style.top=from.y+"px";document.body.appendChild(ghost);
+ ghost.style.left=from.x+"px";ghost.style.top=from.y+"px";document.body.appendChild(ghost);hpPillTravelGhost=ghost;
  const dx=to.x-from.x,dy=to.y-from.y,base="translate(-50%,-50%) translate(";
  const animation=ghost.animate([
   {opacity:0,transform:base+"0px,0px) scale(.55)"},
-  {offset:.2,opacity:1,transform:base+(dx*.2)+"px,"+(dy*.2)+"px) scale(1.12)"},
+  {offset:.22,opacity:1,transform:base+(dx*.22)+"px,"+(dy*.22)+"px) scale(1.12)"},
   {opacity:direction==="in"?1:0,transform:base+dx+"px,"+dy+"px) scale("+(direction==="in"?"1":".5")+")"}
  ],{duration:direction==="in"?620:560,easing:"cubic-bezier(.18,.72,.22,1)",fill:"forwards"});
- animation.onfinish=()=>{ghost.remove();button.hidden=direction==="out";};
+ hpPillTravelAnimation=animation;
+ animation.onfinish=()=>{if(run!==hpPillTravelRun)return;ghost.remove();hpPillTravelGhost=null;hpPillTravelAnimation=null;button.hidden=direction==="out";};
+ animation.oncancel=()=>{ghost.remove();if(run===hpPillTravelRun){hpPillTravelGhost=null;hpPillTravelAnimation=null;}};
 }
 function syncHpPillDock(hp){
  const next=Number.isFinite(hp)?hp:10,button=$("hp-pill-use");
