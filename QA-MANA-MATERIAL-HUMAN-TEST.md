@@ -124,3 +124,21 @@ Validate the five archived N.U Mana SVG materials when used on interactive Mana 
 - Actual / browser / device / orientation:
 - Result: PASS / PASS WITH LIMITATIONS / FAIL
 - Notes:
+
+
+## HP capsule arrival / reverse-exit precision retest — Generation 1.26
+
+- [ ] At 10/10 HP, confirm the entire widened HP frame is visible but no capsule icon or count is present.
+- [ ] Reduce HP below 10; watch the golden capsule appear at the inside-right corner and travel left into the dedicated dock beside the HP rail.
+- [ ] Confirm the live clickable button stays hidden until the travelling capsule fully docks.
+- [ ] Cause another HP decrease while the capsule is travelling; confirm there is only one visual capsule and no premature live button.
+- [ ] While the capsule is still travelling inward, restore HP to 10; confirm the same moving capsule reverses smoothly from its current position toward the right corner and fades out.
+- [ ] While the capsule is travelling outward, lower HP again; confirm it reverses smoothly and returns to the dock without duplicating.
+- [ ] Once docked and HP remains below 10, click/tap the capsule itself; confirm exactly one capsule is consumed and HP is restored under the existing wallet rules.
+- [ ] Restore HP to 10/10; confirm the icon and count are absent after the reverse exit.
+- [ ] Verify the widened frame does not overlap the title, game controls, or viewport edges on desktop, narrow mobile portrait, and landscape.
+- [ ] Verify reduced-motion behavior, all three Generation 1 games, and no travel-triggered inventory change.
+- Expected: one continuous capsule visual, exact path reversal on mid-animation HP changes, no icon at full HP, and a clickable dock only after arrival.
+- Actual / browser / device / orientation:
+- Result: PASS / PASS WITH LIMITATIONS / FAIL
+- Notes:
