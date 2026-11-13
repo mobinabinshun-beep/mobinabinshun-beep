@@ -44,7 +44,7 @@ def build(folder: str, expected_id: str) -> Path:
         raise SystemExit(f"{folder}: frozen engine missing")
     if folder == "nu-game-generation-1":
         # Git blob SHA for the frozen engine is part of the accepted baseline.
-        blob = b"blob " + str(engine.stat().st_size).encode() + b"\\0" + engine.read_bytes()
+        blob = b"blob " + str(engine.stat().st_size).encode() + bytes([0]) + engine.read_bytes()
         git_blob = hashlib.sha1(blob).hexdigest()
         expected = manifest["protectedComponents"]["nu-engine.js"]["sha256GitBlob"]
         if git_blob != expected:
