@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>N.U — Background Candidate Lab</title>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#070d15;color:#eaf5ff;font:14px/1.7 system-ui,sans-serif}.wrap{max-width:1200px;margin:auto;padding:20px}.head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.muted{color:#9bb1c3;font-size:12px}.panel{background:#0e1b29;border:1px solid #36546a;border-radius:14px;padding:14px;margin:12px 0}.choices{display:flex;flex-wrap:wrap;gap:8px}.choices button,.tools button{background:#14283a;border:1px solid #41647d;border-radius:9px;color:#eaf5ff;padding:9px 12px;cursor:pointer}.choices button[aria-pressed=true]{border-color:#f0bd72;background:#3a2b1d}.stage{height:min(68vh,660px);min-height:360px;position:relative;overflow:hidden;border:1px solid #49657b;border-radius:14px;background:#050a12;isolation:isolate}.stage>*{position:absolute;inset:0;width:100%;height:100%}.stage img{object-fit:cover;object-position:center}.stage canvas{display:none;image-rendering:pixelated}.stage .cssscene{display:none;background:radial-gradient(ellipse at 48% 70%,rgba(31,76,106,.34),transparent 48%),linear-gradient(180deg,#08111c 0%,#0b1b2b 58%,#101c28 100%)}.stage .horizon{position:absolute;inset:auto -15% -24vh;height:47vh;border-top:1px solid rgba(124,209,244,.2);border-radius:50% 50% 0 0;background:radial-gradient(ellipse at 50% 0%,rgba(72,159,194,.22),transparent 63%);filter:blur(1px)}.stage .veil{display:none;pointer-events:none;background:radial-gradient(ellipse at 50% 22%,rgba(255,195,122,.14),transparent 36%),linear-gradient(180deg,transparent 48%,rgba(2,9,17,.24));z-index:4}.stage[data-active="svg"] #asset-svg,.stage[data-active="png"] #asset-png{display:block}.stage[data-active="gen1"] #pixel-world,.stage[data-active="gen2"] #gen2-world{display:block}.stage[data-active="css"] .cssscene{display:block}.stage[data-atmosphere="on"] .veil{display:block}.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}.status{font:12px ui-monospace,monospace;color:#b8d9e8;overflow-wrap:anywhere}.report{white-space:pre-wrap;background:#07121d;border:1px solid #284456;border-radius:10px;padding:10px;font:12px/1.6 ui-monospace,monospace}.tag{display:inline-block;border:1px solid #49657b;border-radius:20px;padding:2px 8px;font-size:11px;color:#b9d9e9}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.card{background:#0a1723;border:1px solid #29465a;border-radius:10px;padding:12px}.card h3{font-size:14px;margin:0 0 5px}.card p{font-size:12px;color:#a9bdcb;margin:0}.good{color:#a7ffb4}.warn{color:#ffd38c}a{color:#8edcff}@media(max-width:600px){.wrap{padding:12px}.stage{min-height:300px;height:56vh}}
+</style></head><body><main class="wrap">
+<header class="head"><div><h1 style="margin:0">آزمایشگاه یکپارچهٔ پس‌زمینه N.U</h1><div class="muted">Candidate Lab · نسخهٔ آزمایشی مستقل — هیچ گزینه‌ای در هسته قفل نشده است</div></div><span class="tag">قابل مقایسه در مرورگر</span></header>
+<section class="panel"><b>انتخاب نسخهٔ پس‌زمینه</b><div class="choices" role="group" aria-label="Background candidates">
+<button data-pick="svg" aria-pressed="true">A · تصویر مرجع SVG</button><button data-pick="png" aria-pressed="false">B · تصویر مرجع PNG</button><button data-pick="gen1" aria-pressed="false">C · شهر پیکسلی نسل ۱</button><button data-pick="gen2" aria-pressed="false">D · صحنهٔ کیهانی نسل ۲</button><button data-pick="css" aria-pressed="false">E · آسمان CSS قدیمی</button>
+</div><div class="tools"><button id="fit">حالت نمایش: Cover</button><button id="atmo">افکت نور: خاموش</button><span id="status" class="status">در حال بررسی بارگذاری تصویر SVG…</span></div></section>
+<div class="stage" id="stage" data-active="svg" data-atmosphere="off">
+<img id="asset-svg" alt="N.U canonical Background.svg" src="https://raw.githubusercontent.com/mobinabinshun-beep/Repository/main/Material/Background.svg">
+<img id="asset-png" alt="N.U original reference PNG" src="https://raw.githubusercontent.com/mobinabinshun-beep/mobinabinshun-beep/Official-public-information-and-discovery-hub-for-N.U-(Niroo-Universe),-its-publishing-network,-projects,-publications-and-related-creative-works/assets/Original%20reference%20image%20for%20Niroo%20Universe%20(N.U).png" style="display:none">
+<div class="cssscene"><div class="horizon"></div></div>
+<canvas id="pixel-world" width="480" height="270"></canvas>
+<canvas id="gen2-world"></canvas>
+<div class="veil"></div>
+</div>
+<section class="panel"><b>گزارش فنی زنده</b><div id="report" class="report">منتظر نتیجهٔ بارگذاری و انتخاب نسخه…</div><p class="muted">این صفحه فقط برای ارزیابی بصری است. پس از انتخاب، باید موبایل/دسکتاپ، کاهش حرکت، خوانایی UI، سرعت بارگذاری و پایداری فریم بررسی شود.</p></section>
+<section class="panel"><b>آنچه در مخازن پیدا شد</b><div class="grid">
+<div class="card"><h3>A · Material/Background.svg</h3><p>مرجع تصویری اصلی در مخزن Repository؛ 2,767,594 بایت. مناسب‌ترین گزینه برای تست به‌عنوان پایه، اما محتوای SVG در API قابل استخراج نبود و باید در مرورگر بارگذاری شود.</p></div>
+<div class="card"><h3>B · Original reference PNG</h3><p>فایل مرجع تصویری دیگر در مخزن دمو؛ 2,467,298 بایت. قابل تست به‌عنوان مقایسهٔ مستقل با SVG.</p></div>
+<div class="card"><h3>C · Generation 1 pixel renderer</h3><p>شهر پیکسلی 480×270 با آسمان زمان‌محور، زمین، رودخانه، شهر، ترافیک و ذرات. کاملاً قابل تست؛ اما طبق Visual Bible جغرافیا و نقشهٔ آن پیشنهاد هنری است، نه مرجع قطعی کانن.</p></div>
+<div class="card"><h3>D · Generation 2 cosmic renderer</h3><p>سیارهٔ بزرگ، حلقه‌های طلایی، ماه، رشته‌کوه، شهر و ارگ مرکزی. کد آن در مخزن Repository و صفحهٔ تست مستقل نسل دوم وجود دارد؛ اینجا فقط رندر پس‌زمینه جدا شده است.</p></div>
+<div class="card"><h3>E · CSS sky / horizon</h3><p>گرادیان آسمان و افق قدیمی در nu-world.css و نسخه‌های پشتیبان. مناسب fallback سبک، نه تصویر مرجع نهایی.</p></div>
+<div class="card"><h3>Atmosphere overlay</h3><p>nu-dynamic-layers.js: درخشش، پرتو و ذرات مستقل. این یک لایهٔ مکمل است، نه بک‌گراند پایه؛ باید فقط بعد از انتخاب پایه آزمایش شود.</p></div>
+</div></section>
+<section class="panel"><b>چک‌لیست تأیید انسانی</b><div class="grid">
+<div class="card"><h3>۱. نمایش</h3><p>پس‌زمینه در بار اول، refresh، حالت ناشناس و موبایل ظاهر شود.</p></div>
+<div class="card"><h3>۲. خوانایی</h3><p>عنوان، کارت‌ها، HUD و پنجره‌ها روی تصویر خوانا بمانند.</p></div>
+<div class="card"><h3>۳. عملکرد</h3><p>بارگذاری، مصرف حافظه، FPS و رفتار reduced-motion بررسی شود.</p></div>
+<div class="card"><h3>۴. تصمیم</h3><p>فقط پس از تأیید بصری و فنی، گزینهٔ برنده به هسته منتقل و قفل شود.</p></div>
+</div><div class="tools"><button id="copy">کپی گزارش تست</button><span id="copy-status" class="muted"></span></div></section>
+</main>
+<script>
+const stage=document.getElementById("stage"),statusEl=document.getElementById("status"),report=document.getElementById("report");
+let active="svg",fit="cover",atmo=false,startedGen1=false,gen2RAF=0,gen2Quality=5,gen2Particles=[],gen2Clouds=[],gen2Stars=[];
+function update(){statusEl.textContent="انتخاب: "+active.toUpperCase()+" · "+(active==="svg"||active==="png"?(document.getElementById(active==="svg"?"asset-svg":"asset-png").naturalWidth?"تصویر بارگذاری شد":"در انتظار/خطای بارگذاری"):"Renderer محلی فعال");report.textContent="candidate="+active+"\nfit="+fit+"\natmosphere="+atmo+"\nviewport="+innerWidth+"x"+innerHeight+"\ndevicePixelRatio="+devicePixelRatio+"\nreducedMotion="+matchMedia("(prefers-reduced-motion: reduce)").matches+"\nSVG="+document.getElementById("asset-svg").naturalWidth+"x"+document.getElementById("asset-svg").naturalHeight+"\nPNG="+document.getElementById("asset-png").naturalWidth+"x"+document.getElementById("asset-png").naturalHeight+"\nبرای قبولی: تصویر واقعی + خوانایی UI + بدون خطای کنسول + عملکرد قابل قبول.";}
+function stopGen2(){cancelAnimationFrame(gen2RAF);gen2RAF=0;}
+function pick(name){active=name;stage.dataset.active=name;document.querySelectorAll("[data-pick]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.pick===name)));if(window.NUPixelWorld)window.NUPixelWorld.setEnabled(name==="gen1");if(name==="gen1"&&!startedGen1){startedGen1=true;window.dispatchEvent(new Event("nu:calibrated"));}if(name==="gen2")startGen2();else stopGen2();update();}
+document.querySelectorAll("[data-pick]").forEach(b=>b.addEventListener("click",()=>pick(b.dataset.pick)));
+document.getElementById("fit").onclick=()=>{fit=fit==="cover"?"contain":"cover";document.getElementById("fit").textContent="حالت نمایش: "+(fit==="cover"?"Cover":"Contain");document.querySelectorAll(".stage img").forEach(i=>i.style.objectFit=fit);update();};
+document.getElementById("atmo").onclick=()=>{atmo=!atmo;stage.dataset.atmosphere=atmo?"on":"off";document.getElementById("atmo").textContent="افکت نور: "+(atmo?"روشن":"خاموش");update();};
+["asset-svg","asset-png"].forEach(id=>{const el=document.getElementById(id);el.onload=update;el.onerror=()=>{statusEl.textContent=id+" بارگذاری نشد؛ URL/دسترسی یا CORS را بررسی کن";update();};});
+window.addEventListener("resize",update);update();
+</script>
+<script>
+/* N.U World Renderer v0.2 — layered pixel horizon, procedural and source-neutral. */
+(function(){
+"use strict";
+const canvas=document.getElementById("pixel-world");if(!canvas)return;
+const ctx=canvas.getContext("2d",{alpha:true});if(!ctx)return;
+const W=480,H=270;
+let quality=4,raf=0,last=0,visible=true,started=false,enabled=true,clockTimer=0;
+const reduce=typeof matchMedia==="function"&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+let phase="night",hour=0,camX=0,camY=0,weatherMode="sleep",particles=[],clouds=[],buildings=[],stars=[],traffic=[];
+let seed=0x4e553031;
+const rand=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function makeWorld(){
+ buildings=[];stars=[];clouds=[];particles=[];traffic=[];
+ let x=-8;while(x<W+12){const w=13+rand()*29|0,h=16+rand()*66|0;buildings.push({x,w,h,d:rand(),windows:Array.from({length:Math.floor(w*h/95)},()=>({x:2+rand()*(w-4),y:3+rand()*(h-5),on:rand()>.68,phase:rand()*8}))});x+=w+3+rand()*9;}
+ for(let i=0;i<100;i++)stars.push({x:rand()*W,y:rand()*155,r:rand()>.92?2:1,a:.25+rand()*.65,p:rand()*6});
+ for(let i=0;i<7;i++)clouds.push({x:rand()*W,y:15+rand()*82,s:.6+rand()*.8,v:.04+rand()*.12});
+ for(let i=0;i<34;i++)particles.push({a:rand()*Math.PI*2,r:rand()*22+5,base:rand()*22+5,z:.3+rand()*.7,s:.15+rand()*.6,seed:rand()*10});
+ for(let i=0;i<8;i++){const air=i%4===0;traffic.push({x:rand()*W,y:air?92+rand()*48:242+rand()*15,v:.25+rand()*.55,air});}
+}
+function clock(){
+ const d=new Date();hour=d.getHours()+d.getMinutes()/60;
+ phase=hour<5.5||hour>=20.5?"night":hour<7.5?"dawn":hour<17.5?"day":"dusk";
+ document.documentElement.dataset.worldTime=phase;
+}
+function sunPosition(){
+ const angle=(hour-6)/12*Math.PI;return {x:W*(.5+.43*Math.cos(angle)),y:116-76*Math.sin(Math.max(0,angle))};
+}
+function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),Math.max(1,Math.round(w)),Math.max(1,Math.round(h)));}
+function poly(points,c){ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(points[0][0],points[0][1]);for(let i=1;i<points.length;i++)ctx.lineTo(points[i][0],points[i][1]);ctx.closePath();ctx.fill();}
+function sky(t){
+ const pal=phase==="day"?["#426c85","#8ba5a0","#c6b49a"]:phase==="dawn"?["#202c49","#73566b","#d0937b"]:phase==="dusk"?["#18243c","#60465a","#b87970"]:["#050d20","#14243a","#263b4a"];
+ const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,pal[0]);g.addColorStop(.62,pal[1]);g.addColorStop(1,pal[2]);ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+ const sun=sunPosition();if(phase!=="night"){rect(sun.x-5,sun.y-5,10,10,phase==="dawn"||phase==="dusk"?"#ffd0a0":"#f5e1a6");rect(sun.x-9,sun.y-2,18,4,"#f5d6a0");}
+ else{rect(386,42,13,13,"#d9e9f0");rect(390,39,8,3,"#d9e9f0");rect(393,52,4,3,"#a8c2d2");}
+ if(phase==="night"){for(const s of stars){const a=reduce?s.a:s.a*(.7+.3*Math.sin(last*.001+s.p));rect(s.x,s.y,s.r,s.r,"rgba(220,239,255,"+a+")");}}
+ // Thin, slow cloud banks; muted in study and almost still in sleep.
+ for(const c of clouds){const x=(c.x+t*.002*c.v+camX*.05+W*4)%W;const alpha=phase==="day"?.12:.08;rect(x,c.y,24*c.s,2,"rgba(206,224,232,"+alpha+")");rect(x+5,c.y-2,12*c.s,2,"rgba(206,224,232,"+(alpha*.7)+")");}
+}
+function land(){
+ // Far desert ridge and low mountains: no neon, low detail at distance.
+ poly([[0,164],[0,142],[40,127],[83,143],[130,119],[179,145],[224,125],[273,148],[328,128],[376,144],[425,123],[480,145],[480,270],[0,270]],"#344653");
+ poly([[0,175],[0,157],[54,147],[102,163],[151,144],[203,165],[252,149],[303,169],[351,146],[409,166],[452,151],[480,160],[480,270],[0,270]],"#263f46");
+ // A quiet tropical coast at one edge, with dark forest belt at the other.
+ rect(0,180,78,90,"#263e37");for(let i=0;i<16;i++){const x=i*6+(i*17%3);const top=161-(i*11%9);rect(x,top,3,14+(i*7%9),"#1c332f");rect(x-2,top-2,7,4,"#365342");}
+ poly([[385,190],[480,181],[480,270],[395,270]],"#254b5a");poly([[390,192],[480,184],[480,190],[395,199]],"#9a9a7c");
+ // River bends from the distant valley toward the foreground.
+ poly([[210,173],[225,170],[251,190],[273,208],[306,230],[323,270],[284,270],[278,237],[248,214],[229,191]],"#356a78");
+ poly([[218,176],[225,174],[252,196],[273,216],[301,239],[312,270],[301,270],[293,244],[266,221],[244,202]],"#6a9a9b");
+ // Terraced fields / cultivated rows.
+ for(let i=0;i<8;i++){const y=212+i*7;rect(0,y,105,2,i%2?"#405a3e":"#4b6242");for(let x=5;x<100;x+=12)rect(x,y-2,2,3,"#72825a");}
+}
+function city(t){
+ // Far city silhouettes, progressively denser and larger toward the foreground.
+ buildings.forEach((b,i)=>{const y=196-b.h*(.42+b.d*.58)+camY*.1;const x=b.x+camX*(.08+b.d*.2);const color=b.d<.35?"#253b4b":b.d<.7?"#1b3446":"#142b3e";rect(x,y,b.w,b.h,color);rect(x+1,y-2,b.w-2,2,"#3a5360");if(b.d>.75){for(const win of b.windows){if(!win.on)continue;const glow=phase==="night"?.75:phase==="dusk"?.34:phase==="dawn"?.2:.07;const flick=reduce?1:.85+.15*Math.sin(t*.001+win.phase);rect(x+win.x,y+win.y,2,2,"rgba(255,205,137,"+(glow*flick)+")");}}});
+ // Sparse road lanes and distant traffic, only readable on nearer depth.
+ rect(0,239,W,1,"rgba(155,184,173,.22)");
+ if(!reduce){traffic.forEach((v,i)=>{v.x=(v.x+v.v*(weatherMode==="game"?1.8:weatherMode==="study"?.5:.18))%W;const y=v.y;if(v.air){rect(v.x,y,7,1,"#a8cbd4");rect(v.x+2,y-2,3,1,"#a8cbd4");rect(v.x+3,y+1,2,1,"rgba(170,210,220,.35)");}else{rect(v.x,y,6,1,"#d4b88a");rect(v.x+1,y-1,3,1,"#b4c8a0");}});}
+}
+function weather(t){
+ if(reduce)return;
+ const count=quality<=2?7:quality<=5?15:26;
+ for(let i=0;i<count;i++){
+  const p=particles[i];let radius=p.r;
+  if(weatherMode==="game"){
+   const speed=p.s*(1.1+4.2*(1-clamp(p.r/230,0,1)));
+   p.r+=speed;if(p.r>230)p.r=5+p.base;radius=p.r;
+  }else{
+   const rate=weatherMode==="study"?.00013:.000045;
+   radius=p.base+Math.sin(t*.00035+p.seed)*2;p.a+=rate*16;
+  }
+  const a=p.a+(weatherMode==="game"?0:t*.00001);
+  const x=W/2+Math.cos(a)*radius,y=H/2+Math.sin(a)*radius*.56;
+  const size=1+radius/90*p.z,alpha=clamp((radius/230)*.55,0,.45);
+  rect(x,y,size,size,"rgba(173,220,229,"+alpha+")");
+ }
+}
+function draw(t){
+ if(!visible||!started||!enabled)return;const fps=quality<=2?12:quality<=4?16:quality<=7?20:24,interval=1000/fps;if(t-last<interval){raf=requestAnimationFrame(draw);return;}last=t;
+ ctx.clearRect(0,0,W,H);sky(t);land();city(t);weather(t);
+ // soft atmospheric haze between the city and the viewer
+ const haze=ctx.createLinearGradient(0,150,0,H);haze.addColorStop(0,"rgba(175,204,199,.03)");haze.addColorStop(1,"rgba(4,13,24,.26)");ctx.fillStyle=haze;ctx.fillRect(0,150,W,120);
+ if(!reduce&&enabled)raf=requestAnimationFrame(draw);
+}
+function resize(){canvas.width=W;canvas.height=H;if(reduce&&started&&enabled)draw(performance.now());}
+function setCamera(x,y){camX=clamp(x,-28,28);camY=clamp(y,-20,20);document.documentElement.style.setProperty("--camera-x",camX+"px");document.documentElement.style.setProperty("--camera-y",camY+"px");}
+function updateClock(){const old=phase;clock();if(reduce&&old!==phase&&enabled)draw(performance.now());}
+function setClock(on){if(on&&!clockTimer)clockTimer=setInterval(updateClock,30000);else if(!on&&clockTimer){clearInterval(clockTimer);clockTimer=0;}}
+function start(){if(started)return;started=true;makeWorld();clock();resize();if(!reduce&&enabled)raf=requestAnimationFrame(draw);else if(reduce&&enabled)draw(performance.now());if(enabled)setClock(true);document.addEventListener("visibilitychange",()=>{visible=!document.hidden;if(visible&&enabled){last=0;if(!reduce)raf=requestAnimationFrame(draw);else draw(performance.now());}else cancelAnimationFrame(raf);});window.addEventListener("resize",resize,{passive:true});}
+window.NUPixelWorld={setQuality(n){quality=clamp(Number(n)||4,1,10);},setEnabled(on){enabled=!!on;if(!enabled){cancelAnimationFrame(raf);setClock(false);ctx.clearRect(0,0,W,H);}else if(started&&visible){setClock(true);last=0;if(!reduce)raf=requestAnimationFrame(draw);else draw(performance.now());}},setCamera, lastTouchWasDrag:false, setWeatherMode(mode){if(["sleep","study","game"].includes(mode))weatherMode=mode;},getPhase(){return phase;}};
+window.addEventListener("nu:calibrated",start,{once:true});
+})();
+</script>
+<script>
+const gen2Canvas=document.getElementById("gen2-world"),ctx=gen2Canvas.getContext("2d");
+function gen2Resize(){gen2Canvas.width=innerWidth*devicePixelRatio;gen2Canvas.height=innerHeight*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);gen2MakeParticles();}
+function gen2MakeParticles(){gen2Particles=Array.from({length:gen2Quality*13},()=>({x:Math.random(),y:Math.random(),r:.4+Math.random()*1.6,s:.1+Math.random()*.35,p:Math.random()*6}));gen2Clouds=Array.from({length:7},()=>({x:Math.random(),y:.28+Math.random()*.25,s:.03+Math.random()*.08}));gen2Stars=Array.from({length:110},()=>({x:Math.random(),y:Math.random()*.48,a:.2+Math.random()*.7,p:Math.random()*7}));}
+function draw(t){const w=innerWidth,h=innerHeight;ctx.clearRect(0,0,w,h);const sky=ctx.createLinearGradient(0,0,0,h);sky.addColorStop(0,"#030711");sky.addColorStop(.48,"#17212a");sky.addColorStop(.72,"#72533d");sky.addColorStop(1,"#080d13");ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
+ // Huge planet with crescent rim
+ const px=-w*.1+Math.sin(t*.00004)*8,py=h*.32,pr=Math.min(w,h)*.47;const pg=ctx.createRadialGradient(px+pr*.55,py-pr*.2,pr*.1,px,py,pr);pg.addColorStop(0,"#26323b");pg.addColorStop(.78,"#111a23");pg.addColorStop(1,"#02060c");ctx.fillStyle=pg;ctx.beginPath();ctx.arc(px,py,pr,0,Math.PI*2);ctx.fill();ctx.strokeStyle="#c28b52";ctx.globalAlpha=.23;ctx.lineWidth=3;ctx.beginPath();ctx.arc(px+pr*.08,py,pr*.99,-1.1,1.1);ctx.stroke();ctx.globalAlpha=1;
+ // Golden astronomical rings and central beacon
+ const cx=w*.51,cy=h*.2;ctx.save();ctx.translate(cx,cy);ctx.strokeStyle="#d39b58";ctx.globalAlpha=.28;for(let i=0;i<7;i++){ctx.beginPath();ctx.ellipse(0,0,35+i*19,22+i*17,0,0,Math.PI*2);ctx.stroke();}ctx.globalAlpha=.7;ctx.beginPath();ctx.moveTo(-w,0);ctx.lineTo(w,0);ctx.moveTo(0,-h);ctx.lineTo(0,h);ctx.stroke();ctx.restore();
+ const glow=ctx.createRadialGradient(cx,cy,2,cx,cy,90);glow.addColorStop(0,"#ffe0a0cc");glow.addColorStop(1,"#e99a3a00");ctx.fillStyle=glow;ctx.fillRect(cx-90,cy-90,180,180);
+ // moon and orbit
+ const mx=w*.82,my=h*.29;ctx.strokeStyle="#c58e54";ctx.globalAlpha=.24;ctx.beginPath();ctx.ellipse(mx,my,100,70,-.2,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1;ctx.fillStyle="#e7d8bc";ctx.beginPath();ctx.arc(mx+30,my-10,15,0,Math.PI*2);ctx.fill();ctx.fillStyle="#101722";ctx.beginPath();ctx.arc(mx+37,my-17,15,0,Math.PI*2);ctx.fill();
+ // distant ridges
+ for(let layer=0;layer<3;layer++){ctx.beginPath();ctx.moveTo(0,h*.63+layer*18);for(let x=0;x<=w;x+=w/12){const y=h*.54+layer*22+Math.sin(x*.008+layer*2)*h*.035+Math.cos(x*.019)*h*.018;ctx.lineTo(x,y);}ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.closePath();ctx.fillStyle=["#30333a","#202830","#101922"][layer];ctx.fill();}
+ // golden city and central citadel
+ const base=h*.79;for(let i=0;i<Math.floor(w/17);i++){const x=i*17,hh=18+((i*31)%65);ctx.fillStyle=i%4?"#18232c":"#293039";ctx.fillRect(x,base-hh,12,hh);ctx.fillStyle="#b9894c";ctx.globalAlpha=.25;ctx.fillRect(x+4,base-hh+8,2,3);ctx.globalAlpha=1;}
+ ctx.save();ctx.translate(cx,base-8);ctx.fillStyle="#171a20";ctx.beginPath();ctx.moveTo(-w*.11,0);ctx.lineTo(-w*.08,-70);ctx.lineTo(-w*.045,-110);ctx.lineTo(-w*.022,-165);ctx.lineTo(0,-235);ctx.lineTo(w*.022,-165);ctx.lineTo(w*.045,-110);ctx.lineTo(w*.08,-70);ctx.lineTo(w*.11,0);ctx.closePath();ctx.fill();ctx.strokeStyle="#b77a3d";ctx.globalAlpha=.8;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,-238);ctx.lineTo(0,-280);ctx.stroke();ctx.restore();
+ // river light reflection
+ ctx.fillStyle="#0b1b26";ctx.beginPath();ctx.moveTo(w*.35,base);ctx.lineTo(w*.62,base);ctx.lineTo(w*.8,h);ctx.lineTo(w*.2,h);ctx.closePath();ctx.fill();for(let i=0;i<12;i++){const yy=base+12+i*13,xx=cx+Math.sin(i*2+t*.0003)*i*5;ctx.fillStyle="rgba(222,166,99,"+(.06+Math.sin(t*.001+i)*.025)+")";ctx.fillRect(xx-i*4,yy,i*8+5,1);}
+ // atmospheric gen2Clouds and parallax gen2Stars
+ if(gen2Quality>=2){ctx.fillStyle="#c5b4a1";ctx.globalAlpha=.07;gen2Clouds.forEach(c=>{c.x=(c.x+c.s*.00004)%1;ctx.beginPath();ctx.ellipse(c.x*w,c.y*h,80,12,0,0,Math.PI*2);ctx.fill();});ctx.globalAlpha=1;}
+ gen2Stars.forEach(s=>{ctx.fillStyle="rgba(220,226,232,"+(s.a*(.75+.25*Math.sin(t*.001+s.p)))+")";ctx.fillRect(s.x*w,s.y*h,1.2,1.2);});
+ if(gen2Quality>=3){gen2Particles.forEach(p=>{p.x=(p.x+p.s*.00003)%1;ctx.fillStyle="rgba(222,170,105,.24)";ctx.fillRect(p.x*w,p.y*h,p.r,p.r);});}
+ if(gen2Quality>=7){ctx.strokeStyle="#d7a65c";ctx.globalAlpha=.12;ctx.beginPath();ctx.arc(cx,base-180,70+Math.sin(t*.0005)*5,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1;}
+ // subtle foreground silhouette
+ ctx.fillStyle="#05080d";ctx.beginPath();ctx.moveTo(0,h*.88);ctx.lineTo(w*.18,h*.84);ctx.lineTo(w*.25,h);ctx.lineTo(0,h);ctx.fill();ctx.beginPath();ctx.moveTo(w,h*.85);ctx.lineTo(w*.8,h*.83);ctx.lineTo(w*.75,h);ctx.lineTo(w,h);ctx.fill();
+}
+function gen2Loop(t){if(stage.dataset.active==="gen2"){draw(t);gen2RAF=requestAnimationFrame(gen2Loop);}}
+function startGen2(){stopGen2();gen2Resize();gen2RAF=requestAnimationFrame(gen2Loop);}
+window.addEventListener("resize",gen2Resize);
+document.getElementById("copy").onclick=async()=>{const s=report.textContent;try{await navigator.clipboard.writeText(s);document.getElementById("copy-status").textContent="گزارش کپی شد";}catch(e){document.getElementById("copy-status").textContent="کپی خودکار در دسترس نیست؛ متن گزارش را دستی کپی کن";}};
+</script></body></html>
