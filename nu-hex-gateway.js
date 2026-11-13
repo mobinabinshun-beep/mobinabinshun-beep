@@ -29,7 +29,10 @@
       document.getElementById("menu-home")?.click();
       document.getElementById("menu-library")?.click();
     },
-    store: () => document.getElementById("menu-store")?.click(),
+    store: () => {
+      document.getElementById("menu-home")?.click();
+      document.getElementById("menu-store")?.click();
+    },
     wallet: () => {
       document.getElementById("menu-home")?.click();
       document.getElementById("menu-wallet")?.click();
@@ -142,13 +145,14 @@
 
   document.addEventListener("pointermove", event => {
     if (!open || event.pointerType !== "mouse") return;
-    const rect = root.getBoundingClientRect();
     const tolerance = 10;
-    const inside =
-      event.clientX >= rect.left - tolerance &&
-      event.clientX <= rect.right + tolerance &&
-      event.clientY >= rect.top - tolerance &&
-      event.clientY <= rect.bottom + tolerance;
+    const inside = [trigger, ...items].some(element => {
+      const rect = element.getBoundingClientRect();
+      return event.clientX >= rect.left - tolerance &&
+        event.clientX <= rect.right + tolerance &&
+        event.clientY >= rect.top - tolerance &&
+        event.clientY <= rect.bottom + tolerance;
+    });
 
     if (inside) {
       outsideSince = 0;
