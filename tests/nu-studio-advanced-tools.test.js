@@ -41,3 +41,10 @@ test("PNG export uses a bounded scale and transparent visible composite",()=>{
  assert.match(js,/NUStudioExport\.toRgba\(visible,width,height\)/);
  assert.match(js,/outputContext\.imageSmoothingEnabled=false/);
 });
+
+test("PNG export uses a bounded scale and transparent visible composite",()=>{
+ assert.match(html,/id="export-scale"/);
+ assert.match(js,/NUStudioExport\.pngDimensions\(width,height,scale\)/);
+ assert.match(js,/NUStudioExport\.toRgba\(visible,width,height\)/);
+ assert.match(js,/outputContext\.imageSmoothingEnabled=false/);
+});
