@@ -1,0 +1,76 @@
+{
+  "id": "nu.game.generation-1",
+  "name": "N.U Generation 1 Game Collection",
+  "version": "0.1.0-preview",
+  "status": "development-package-contract",
+  "generation": {
+    "min": 1,
+    "max": 1
+  },
+  "runtime": {
+    "hostApi": "nu.launcher.host/v1",
+    "entry": "index.html",
+    "execution": "foreground-process",
+    "requiredFeatures": ["dom", "canvas-2d"],
+    "optionalFeatures": ["webgl", "webgpu", "offscreen-canvas", "workers"]
+  },
+  "payload": {
+    "entryFiles": [
+      "index.html",
+      "nu-world.css",
+      "nu-engine.js",
+      "nu-pixel-world.js",
+      "nu-graphics-core.js",
+      "nu-background-engine.js",
+      "nu-dynamic-layers.js",
+      "nu-game-render-adapter.js",
+      "nu-graphics-runtime.js",
+      "nu-wallet.js",
+      "nu-games.js",
+      "nu-player-ui.js"
+    ],
+    "assets": ["assets/"],
+    "data": ["NU-GENERATION-1-MANIFEST.json"]
+  },
+  "hostServices": {
+    "capabilityProfile": "read-only",
+    "resourceBudget": "request-and-observe",
+    "saveStorage": "package-scoped",
+    "network": "declared-permissions-only",
+    "input": ["keyboard", "pointer", "touch", "gamepad-if-supported"]
+  },
+  "resourcePolicy": {
+    "profileOwner": "launcher",
+    "gameMayRaiseHostBudget": false,
+    "simulationDeterminism": "preserve",
+    "qualityMayScale": true,
+    "gameRulesMayScale": false,
+    "workers": "host-budgeted",
+    "visibility": "pause-optional-rendering; preserve-explicit-game-state"
+  },
+  "protectedComponents": {
+    "nu-engine.js": {
+      "policy": "read-only-frozen-baseline",
+      "sha256GitBlob": "cda4f4157628aefaaac9ab95c047e4ca818c5f02"
+    },
+    "generation2": "quarantined-and-excluded"
+  },
+  "permissions": {
+    "networkDomains": [],
+    "localFiles": "user-initiated-import-export-only",
+    "persistentStorage": "package-scoped",
+    "deviceTelemetry": "coarse-capability-only",
+    "backgroundExecution": "not-requested"
+  },
+  "integrity": {
+    "contentHashes": "generated-by-release-builder",
+    "publisherSignature": "required-before-install",
+    "signatureAlgorithm": "release-policy-defined",
+    "rollback": "last-known-good"
+  },
+  "limitations": [
+    "This is a package manifest contract, not a signed installable artifact.",
+    "Native Launcher process isolation and platform adapters are not implemented here.",
+    "The frozen engine is referenced but must not be edited by this package work."
+  ]
+}
