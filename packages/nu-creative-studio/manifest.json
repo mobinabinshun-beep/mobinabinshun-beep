@@ -43,7 +43,7 @@
   },
   "hostServices": {
     "capabilityProfile": "read-only",
-    "resourceBudget": "launcher-owned-device-profile-before-import",
+    "resourceBudget": "host-system-capability-best-effort-no-product-pixel-ceiling",
     "storage": "package-scoped-project-library",
     "fileImport": "explicit-user-selection; MIME-independent-extension-fallback; browser-decode-validation",
     "fileExport": "explicit-user-action",
@@ -52,23 +52,16 @@
   },
   "resourcePolicy": {
     "profileOwner": "launcher",
-    "demoBoost": {
-      "allowed": true,
-      "scope": "browser-demo-session-only",
-      "requiresExplicitOptIn": true,
-      "requiresForegroundVisibility": true,
-      "autoStopsOn": [
-        "opt-out",
-        "page-hidden",
-        "memory-pressure",
-        "host-budget-revoked"
-      ],
-      "mayOverrideLauncherBudget": false
+    "demoExecution": {
+      "resourceOwner": "user-device-and-browser",
+      "policy": "attempt-requested-original-dimensions-without-product-defined-pixel-or-file-size-ceilings",
+      "failureBehavior": "browser-or-device-allocation-and-processing-failure; preserve-original-source-and-previous-project",
+      "mayOverrideHostLimits": false
     },
     "offlineMode": {
       "allowed": true,
       "requiresNetwork": false,
-      "usesSameLocalHostBudget": true
+      "usesHostSystemCapabilitiesWithoutProductDefinedPixelCeilings": true
     },
     "processing": {
       "preferred": [
@@ -101,7 +94,7 @@
     "This is an offline source bundle, not a native installer or signed Launcher package.",
     "The browser demo boost policy is specified but not yet wired to a runtime consent control and worker scheduler.",
     "Original imported files must remain unchanged through failed or cancelled decode, processing, history and export operations.",
-    "Tile/streaming raster processing remains a follow-up; full-resolution imports are preflighted against the active device/Launcher canvas budget and fail without replacing the current project.",
+    "Tile/streaming raster processing remains a follow-up; full-resolution imports are attempted without product-defined pixel ceilings and may fail naturally when browser or device resources are insufficient, without replacing the current project.",
     "The browser demo still needs the production Launcher host adapter; this preview consumes the local graphics capability profile."
   ]
 }
