@@ -92,6 +92,10 @@
       "",
       "## Plain-language reading",
       m.paintedPixels===0?"The canvas is empty or fully transparent.":"The artwork contains "+m.paintedPixels.toLocaleString()+" painted pixels across "+m.colorCount+" colors and "+m.regionCount+" connected regions.",
+      "",
+      "## خلاصه انسانی",
+      m.paintedPixels===0?"بوم تصویر خالی یا کاملاً شفاف است.":"این تصویر "+d.width+" در "+d.height+" پیکسل اندازه دارد و از "+m.paintedPixels.toLocaleString()+" پیکسل رنگ‌شده، "+m.colorCount+" رنگ و "+m.regionCount+" بخش پیوسته تشکیل شده است.",
+      "تعداد پیکسل‌های شفاف: "+(d.width*d.height-m.paintedPixels).toLocaleString(),
       m.regionCount===1?"The visible artwork forms one connected region.":m.regionCount>1?"The visible artwork is split into "+m.regionCount+" separate connected regions.":"No visible connected region was detected.",
       "",
       "## Palette"
