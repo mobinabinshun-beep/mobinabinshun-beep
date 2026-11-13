@@ -14,7 +14,7 @@ test("Gateway is detached from all live Generation 1 entry pages", () => {
   for (const page of [html, casino, launcher, studio]) {
     assert.doesNotMatch(page, /id="nu-hex-gateway"/);
     assert.doesNotMatch(page, /nu-gateway-scrim/);
-    assert.doesNotMatch(page, /nu-hex-gateway\\.(?:css|js)/);
+    assert.doesNotMatch(page, /nu-hex-gateway\.(?:css|js)/);
   }
 });
 
@@ -67,5 +67,5 @@ test("archived Gateway routes remain isolated from game rules", () => {
 
 test("Gateway remains visually frozen and unsupported N-BI shield UI stays absent", () => {
   assert.match(css, /#nu-hex-gateway,\.nu-gateway-scrim\{display:none!important\}/);
-  assert.doesNotMatch(html, /id="nbi-shield-bar"/);
+  for (const page of [html, casino, launcher, studio]) assert.doesNotMatch(page, /id="nbi-shield-bar"/);
 });
