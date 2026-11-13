@@ -438,3 +438,10 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 - An N-BI Arcane Shield charge meter demonstrates the requested collapse/recharge motion. It is visual-only and does not absorb damage.
 - This is a candidate for human testing. CI/source validation does not replace browser, touch, keyboard, accessibility and responsive-device acceptance.
 
+
+
+### N.U implementation protocol and human-test report
+
+- Operating procedure: [NU-OPS-IMPLEMENT-01](./docs/operations/NU-OPS-IMPLEMENT-01.md)
+- Human-test report template: [HUMAN-TEST-REPORT-TEMPLATE](./docs/operations/HUMAN-TEST-REPORT-TEMPLATE.md)
+- Dated request archive and implementation records are stored under docs/operations/.
