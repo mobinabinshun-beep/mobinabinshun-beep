@@ -19,8 +19,11 @@
   let suppressClickUntil = 0;
 
   function syncGatewayScope() {
-    document.body.classList.toggle("nu-gateway-enabled", Boolean(gameView?.classList.contains("active")));
-    document.body.classList.toggle("nu-game-active", Boolean(gameView?.classList.contains("active")));
+    const gameActive = Boolean(gameView?.classList.contains("active"));
+    const mainHome = Boolean(gameView && !gameActive);
+    document.body.classList.toggle("nu-main-home", mainHome);
+    document.body.classList.toggle("nu-gateway-enabled", !mainHome);
+    document.body.classList.toggle("nu-game-active", gameActive);
   }
   syncGatewayScope();
   if (gameView) new MutationObserver(syncGatewayScope).observe(gameView, {attributes:true,attributeFilter:["class"]});
