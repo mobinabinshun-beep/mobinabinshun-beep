@@ -3,7 +3,7 @@
   "generation": 1,
   "runtime": "N.U Adaptive Runtime",
   "runtimeVersion": "0.1-prototype",
-  "packageVersion": "0.5.2-gen1-human-image-report",
+  "packageVersion": "0.5.3-gen1-mana-material-interactions",
   "entry": "index.html",
   "modules": [
     "index.html",
@@ -15,6 +15,7 @@
     "nu-dynamic-layers.js",
     "nu-game-render-adapter.js",
     "nu-graphics-runtime.js",
+    "nu-materials.js",
     "nu-games.js",
     "pixel-art-studio.html",
     "nu-svg-vectorizer.js",
@@ -41,6 +42,7 @@
     "native": "future adapter required"
   },
   "notes": [
+    "Generation 1.16: the Mana Collector uses five preserved N.U Material SVG assets as crisp pixel-art glints around interactive Mana targets and emits a short material-based collection burst. Other game mechanics and the adaptive runtime remain unchanged; human visual/touch QA is required.",
     "Generation 1.15: image analysis now describes the visible four-layer composite; PNG and SVG exports include a companion Markdown human report, SVG embeds the report metadata, and Graphic IR includes the report as humanReport. A direct human-report download is also available. Source image processing remains local.",
     "Generation 1.14 candidate: Studio workspace uses deterministic fit geometry and ResizeObserver sizing; pointer mapping is centralized; import shows an original-source preview, preserves a separate working copy, offers smooth/nearest resampling and optional Floyd–Steinberg dithering; import size is bounded at 25 MB. Game HUD asset-profile interactions no longer bubble into gameplay pointer handlers and the profile is positioned beside the active resource bar. Browser acceptance remains pending.",
     "Game HUD now exposes per-game asset profiles on hover/focus; each profile is a filtered projection of the global wallet, not a separate balance store. HP capsule can be purchased or used from the Store and used from the in-game HP icon.",
