@@ -53,6 +53,8 @@ jobs:
         run: node --test tests/nu-bubble-round.test.js
       - name: Test HP capsule HUD click interaction and feedback
         run: node --test tests/nu-hp-pill-interaction.test.js
+      - name: Test canonical background engine and visual-layer quarantine
+        run: node --test tests/nu-background-engine.test.js
       - name: Test SVG contour vectorizer
         run: node --test tests/nu-svg-vectorizer.test.js
       - name: Test graphics analysis and machine-readable IR
@@ -71,13 +73,12 @@ jobs:
         run: node --test tests/nu-studio-native-dimension-import.test.js
       - name: Validate manifest JSON
         run: python -m json.tool NU-GENERATION-1-MANIFEST.json >/dev/null
-      - name: Check public runtime artwork copy
+      - name: Check canonical public background artwork
         run: |
-          if [ -s assets/nu-celestial-city.png ]; then
-            file assets/nu-celestial-city.png
-          else
-            echo "::warning::Canonical PNG is in the private archive; upload it to assets/nu-celestial-city.png to activate the image-first public background."
-          fi
+          set -euo pipefail
+          test -s assets/backgrounds/niroo-universe-background.svg
+          file assets/backgrounds/niroo-universe-background.svg
+          grep -Fq 'data:image/png;base64,' assets/backgrounds/niroo-universe-background.svg
       - name: Verify local script references
         run: |
           python - <<'PY'
