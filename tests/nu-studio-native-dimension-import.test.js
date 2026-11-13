@@ -8,7 +8,7 @@ test("image import defaults to exact source dimensions",()=>{
 });
 test("Studio has no product pixel, edge, file-size, or Launcher-profile import ceiling",()=>{
  assert.match(js,/function cellLimit\(\)\{return Infinity;\}/);
- assert.doesNotMatch(js,/requestedCells>safeCells|safe editing budget|25\*1024\*1024|16,384 px per edge|MAX_RASTER_PIXELS|maxCanvasPixels|current Launcher\/device budget/);
+ assert.doesNotMatch(js,/requestedCells>safeCells|requestedCells>maxPixels|safe editing budget|25\*1024\*1024|16,384 px per edge|MAX_RASTER_PIXELS|current Launcher\/device budget/);
  assert.doesNotMatch(html,/id="image-width"[^>]*max=/);
  assert.doesNotMatch(html,/id="image-height"[^>]*max=/);
 });
