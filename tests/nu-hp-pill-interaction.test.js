@@ -30,8 +30,8 @@ test("HP pill interaction pop uses viewport coordinates and cannot be clipped by
 
 test("HUD markup is a native button and uses the current generation 1.29 assets",()=>{
   assert.match(html,/<button class="hp-pill-use" id="hp-pill-use" type="button"/);
-  assert.match(html,/nu-games\.js\?v=20261113-mobile-hp-bar-compact-r1/);
-  assert.match(html,/nu-world\.css\?v=20261113-mobile-hp-bar-compact-r1/);
+  assert.match(html,/nu-games\.js\?v=20261113-mobile-hp-capsule-under-rail-r1/);
+  assert.match(html,/nu-world\.css\?v=20261113-mobile-hp-capsule-under-rail-r1/);
 });
 
 test("HP capsule wallet rules consume exactly one capsule and cap healing at 10 HP",()=>{
@@ -106,7 +106,7 @@ test("Generation 1.26 reserves a responsive HP frame and an internal 42px capsul
   assert.ok(css.includes("width:42px;"));
   assert.ok(css.includes("min-width:72px"));
   assert.ok(css.includes("width:calc(100vw - 16px)"));
-  assert.ok(html.includes("hp-pill-dock-motion-r2"));
+  assert.ok(html.includes("20261113-mobile-hp-capsule-under-rail-r1"));
 });
 
 
