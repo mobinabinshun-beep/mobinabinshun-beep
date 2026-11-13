@@ -7,7 +7,7 @@
   const trigger = root.querySelector(".nu-gateway-trigger");
   const items = [...root.querySelectorAll(".nu-gateway-item")];
   const pauseButton = document.getElementById("finish-round");
-  let open = false, pausedByGateway = false, selected = null, hoverTimer = 0, outsideSince = 0;
+  let open = false, pausedByGateway = false, selected = null, hoverTimer = 0, activationTimer = 0, outsideSince = 0;
   items.forEach((item, index) => {\n    const angle = (120 + index * 25) * Math.PI / 180;\n    item.style.setProperty("--gx", `${Math.cos(angle) * 116}px`);\n    item.style.setProperty("--gy", `${Math.sin(angle) * 116}px`);\n  });\n  const routes = {
     back: () => document.getElementById("menu-home")?.click(),
     library: () => { document.getElementById("menu-home")?.click(); document.getElementById("menu-library")?.click(); },
@@ -35,7 +35,7 @@
     trigger.setAttribute("aria-expanded", String(open));
     trigger.setAttribute("aria-label", open ? "Close N.U navigation gateway" : "Open N.U navigation gateway");
     if (open) { pauseGame(); trigger.focus({preventScroll:true}); }
-    else { clearTimeout(hoverTimer); selected = null; items.forEach(i => i.classList.remove("is-selected","is-confirming")); if (shouldResume) resumeGame(); else pausedByGateway = false; }
+    else { clearTimeout(hoverTimer); clearTimeout(activationTimer); selected = null; items.forEach(i => i.classList.remove("is-selected","is-confirming")); if (shouldResume) resumeGame(); else pausedByGateway = false; }
   }
   function select(item) {
     if (selected && selected !== item) selected.classList.remove("is-selected");
@@ -46,7 +46,7 @@
     const action = routes[key];
     if (!action) return;
     item.classList.add("is-confirming");
-    window.setTimeout(() => { setOpen(false, false); action(); }, 430);
+    clearTimeout(activationTimer);\n    activationTimer = window.setTimeout(() => { setOpen(false, false); action(); }, 430);
   }
   function confirm(item) {
     if (selected === item) activate(item);
@@ -54,7 +54,7 @@
   }
   trigger.addEventListener("click", e => { e.preventDefault(); setOpen(!open); });
   trigger.addEventListener("pointerenter", e => { if (e.pointerType === "mouse") setOpen(true); });
-  root.addEventListener("pointerleave", e => { if (e.pointerType === "mouse" && open) { clearTimeout(hoverTimer); } });
+  root.addEventListener("pointerleave", e => { if (e.pointerType === "mouse" && open) { clearTimeout(hoverTimer); clearTimeout(activationTimer); } });
   items.forEach(item => {
     item.addEventListener("pointerenter", e => {
       if (e.pointerType !== "mouse" || !open) return;
@@ -62,7 +62,7 @@
       clearTimeout(hoverTimer);
       hoverTimer = window.setTimeout(() => activate(item), 320);
     });
-    item.addEventListener("pointerleave", () => clearTimeout(hoverTimer));
+    item.addEventListener("pointerleave", () => { clearTimeout(hoverTimer); clearTimeout(activationTimer); });
     item.addEventListener("click", e => {
       e.preventDefault(); e.stopPropagation(); clearTimeout(hoverTimer);
       confirm(item);
