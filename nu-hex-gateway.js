@@ -18,7 +18,7 @@
 
   items.forEach((item, index) => {
     item.tabIndex = -1;
-    const angle = (120 + index * 25) * Math.PI / 180;
+    const angle = (115 + index * 20) * Math.PI / 180;
     item.style.setProperty("--gx", `${Math.cos(angle) * 116}px`);
     item.style.setProperty("--gy", `${Math.sin(angle) * 116}px`);
   });
@@ -53,7 +53,7 @@
     },
     store: () => openMainView("store"),
     wallet: () => openMainView("wallet"),
-    profile: () => openMainView("profile"),
+    profile: () => openMainView("profile"),\n    resume: () => {},
     launcher: () => { window.location.href = "./launcher.html"; },
     studio: () => { window.location.href = "./pixel-art-studio.html"; }
   };
