@@ -23,6 +23,10 @@ test("the historical profile stays display-only while exposing three temporary a
   assert.doesNotMatch(html, /player-id-number|player-rank-hue|player-identity-save/);
   for (const id of ["demo-card-hue","demo-card-tone","demo-card-lightness"]) assert.ok(html.includes('id="'+id+'"'));
   assert.match(html, /CARD APPEARANCE · DEMO CONTROLS/);
+  assert.ok(html.indexOf('class="demo-profile-card"') < html.indexOf('class="demo-profile-appearance"'));
+  assert.match(css, /#demo-card-hue::-webkit-slider-runnable-track/);
+  assert.match(css, /#demo-card-tone::-webkit-slider-runnable-track/);
+  assert.match(css, /#demo-card-lightness::-webkit-slider-runnable-track/);
   assert.match(html, /saved appearance settings are available/);
   assert.match(playerUi, /if\(!\$\("player-id"\)\)return/);
   assert.match(playerUi, /demo-profile-warning/);
