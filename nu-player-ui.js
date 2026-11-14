@@ -140,7 +140,7 @@
   }
   if(appearanceConfirm)appearanceConfirm.addEventListener("click",()=>setAppearanceLock(true));
   if(appearanceReset)appearanceReset.addEventListener("click",()=>{setAppearanceLock(false);applyAppearance(true);});
-  const imageInput=$("demo-card-image"),avatar=$("profile-view .demo-avatar");
+  const imageInput=$("demo-card-image");
   const avatarEl=document.querySelector("#profile-view .demo-avatar");
   if(imageInput)imageInput.addEventListener("change",()=>{
     const file=imageInput.files&&imageInput.files[0];
@@ -160,7 +160,7 @@
     publicToggles.forEach(toggle=>{toggle.checked=false;});
     if(demoPrivatePreview)demoPrivatePreview.checked=false;
     if(imageInput)imageInput.value="";
-    if(avatarEl){avatarEl.style.backgroundImage="";avatarEl.style.backgroundPosition="center";avatarEl.style.backgroundSize="";}
+    if(avatarEl){avatarEl.style.backgroundImage="";avatarEl.style.backgroundPosition="center";avatarEl.style.backgroundSize="";avatarEl.innerHTML="IMAGE<br>PLACEHOLDER<br><small>DEMO ONLY · NO UPLOAD</small>";}
     document.querySelectorAll("[data-demo-placement]").forEach((button,index)=>button.setAttribute("aria-pressed",String(index===0)));
     const imageState=$("demo-image-state");if(imageState)imageState.textContent="PLACEHOLDER IMAGE · POSITION 1 OF 8";
     renderPublicPreview();setAppearanceLock(false);
