@@ -80,6 +80,7 @@ function refresh(){
  const cache=readCache()||next;frame(cache,rows);
  const games=NUExchangeCore.listGames();$("change-from").innerHTML=games.map(g=>'<option value="'+g.id+'">'+esc(g.name)+'</option>').join("");
  $("change-to").innerHTML=games.map(g=>'<option value="'+g.id+'">'+esc(g.name)+'</option>').join("");
+ $("change-coin").innerHTML=NUExchangeCore.listCoins().map(a=>'<option value="'+a.id+'">'+esc(a.label)+'</option>').join("");
  $("change-asset").innerHTML=NUExchangeCore.listAssets().map(a=>'<option value="'+a.id+'">'+esc(a.label)+'</option>').join("");
  $("change-empty").hidden=games.length>0;$("change-submit").disabled=true;updateGuard();
 }
