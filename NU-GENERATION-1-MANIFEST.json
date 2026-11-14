@@ -3,7 +3,7 @@
   "generation": 1,
   "runtime": "N.U Adaptive Runtime",
   "runtimeVersion": "0.1-prototype",
-  "packageVersion": "0.5.7-gen1-exchange-modular-runtime",
+  "packageVersion": "0.5.9-gen1-unified-profile-workshop-preview",
   "entry": "index.html",
   "modules": [
     "index.html",
@@ -50,6 +50,7 @@
     "native": "future adapter required"
   },
   "notes": [
+    "Generation 1 unified profile workshop preview (2026-11-14): preserves the historical four-field card and exposes all current profile design alternatives for human comparison: hue, neutral white/dark tint, selected-color lightness and optional saturation; exact age, age band, both or no age; Bio and Interests; optional/local-identity-required/required public-card models; per-field privacy and share-consent preview; private-view YES/NO and fake passphrase flow; appearance-only, appearance-plus-fields and full lock policies; card/HUD/Wallet/hidden stats placement; holographic materials, typography, geometry, glow, transparency, scanlines, texture, motion, reduced effects, high contrast and device quality; local image fit and 2x4 crop-anchor/photo-slot semantics; recovery choices; platform and launcher delivery alternatives; local save, export protection, import validation and future sync models; reduced-effects and high-contrast accessibility previews. All are temporary preview controls that reset on close. No credentials are authenticated, no data is saved/exported/imported/recovered, no image is uploaded and no network sync/share occurs.",
     "Generation 1.33 candidate: Exchange now includes a fictional activity-driven virtual market simulator with OHLC candles, volume, demand/supply and N.U-only index; it derives every movement from the local player transaction ledger and never uses real-world financial data.",
     "Generation 1.32.1: remove duplicate legacy menu/back buttons from main-world internal views so the shared hex gateway is the single navigation entry point.",
     "Generation 1.32: calibrates the shared N.U hex gateway across all internal Generation 1 pages with responsive positioning, touch-direct activation, mouse-hover dwell, two-step click/keyboard confirmation, outside-exit tolerance and pause/blur behavior. Navigation only; game rules and wallet/save state are unchanged.",
