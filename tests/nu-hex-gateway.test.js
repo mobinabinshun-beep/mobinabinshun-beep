@@ -10,22 +10,26 @@ const studio = read("pixel-art-studio.html");
 const js = read("nu-hex-gateway.js");
 const css = read("nu-hex-gateway.css");
 
-test("gateway is mounted on every internal Generation 1 page", () => {
+test("Gateway markup remains present while controller activation is limited to the main game", () => {
   for (const page of [html, casino, launcher, studio]) {
     assert.match(page, /id="nu-hex-gateway"/);
-    assert.match(page, /nu-hex-gateway\.css\?v=20261113-hex-gateway-calibration-r2/);
-    assert.match(page, /nu-hex-gateway\.js\?v=20261113-hex-gateway-calibration-r1/);
     assert.match(page, /class="nu-gateway-scrim"/);
   }
+  assert.match(html, /nu-hex-gateway\.css\?v=20261114-main-game-unfreeze-r3/);
+  assert.match(html, /nu-hex-gateway\.js\?v=20261114-main-game-unfreeze-r2/);
+  assert.match(js, /if \(!root \|\| !scrim \|\| !gameView\) return/);
+  assert.match(js, /classList\.add\("nu-gateway-enabled","nu-main-game-page"\)/);
+  assert.match(css, /body\.nu-main-game-page #nu-hex-gateway/);
+  assert.match(css, /body\.nu-main-game-page \.nu-gateway-scrim/);
 });
 
-test("gateway remains available across all views in the main world", () => {
-  assert.match(js, /classList\.add\("nu-gateway-enabled","nu-main-game-page"\)/);\n  assert.match(js, /if \(!root \|\| !scrim \|\| !gameView\) return/);
+test("Gateway remains available across all views in the main world and preserves legacy controls", () => {
   assert.match(js, /gameView\?\.classList\.contains\("active"\)/);
   assert.match(js, /MutationObserver/);
-  assert.match(css, /body\.nu-gateway-enabled #nu-hex-gateway/);
-  assert.match(css, /body\.nu-gateway-enabled #menu-open/);
-  assert.match(css, /body\.nu-gateway-enabled #wallet-back/);
+  assert.doesNotMatch(css, /#menu-open[^{}]*display:none/);
+  assert.doesNotMatch(css, /#finish-round[^{}]*display:none/);
+  assert.match(html, /id="menu-open"/);
+  assert.match(html, /id="finish-round"/);
 });
 
 test("touch activates an item on release while mouse hover and click retain separate paths", () => {
@@ -46,7 +50,7 @@ test("outside exit uses the 10px tolerance and returns gameplay to its prior sta
   assert.match(css, /backdrop-filter:blur\(6px\)/);
 });
 
-test("gateway is compact, fixed, responsive and does not create boxed menu cards", () => {
+test("Gateway is compact, fixed, responsive and does not create boxed menu cards", () => {
   assert.match(css, /position:fixed/);
   assert.match(css, /top:clamp\(118px,17vh,154px\)/);
   assert.match(css, /right:clamp\(12px,2\.4vw,28px\)/);
@@ -57,16 +61,15 @@ test("gateway is compact, fixed, responsive and does not create boxed menu cards
   assert.match(js, /window\.addEventListener\("orientationchange",layoutItems/);
 });
 
-test("gateway exposes the navigation destinations and remains isolated from game rules", () => {
+test("Gateway destinations remain isolated from game rules and Casino stays linked", () => {
   for (const action of ["back","library","store","wallet","profile","launcher","studio","casino","resume"]) {
     assert.match(html, new RegExp('data-action="' + action + '"'));
     assert.match(js, new RegExp(action + ":"));
   }
+  assert.match(html, /href="\.\/casino\.html"/);
   assert.doesNotMatch(js, /nu-engine\.js|nu-games\.js|nu-wallet\.js/);
 });
 
-
-test("gateway is frozen and no unsupported N-BI shield meter is rendered", () => {
-  assert.match(css, /#nu-hex-gateway,\.nu-gateway-scrim\{display:none!important\}/);
+test("unsupported N-BI shield meter is not rendered", () => {
   assert.doesNotMatch(html, /id="nbi-shield-bar"/);
 });
