@@ -26,7 +26,10 @@ Gateway exists to reduce permanent navigation clutter and reclaim visual space d
 
 ## Verification
 - Updated `tests/nu-hex-gateway.test.js` to assert gameplay header removal, compact placement, reduced orbit and lightweight scrim.
-- CI must pass on the PR before this candidate is considered ready.
+- Gateway-specific regression: PASS (Node syntax check + `tests/nu-hex-gateway.test.js`).
+- HUD layout and graphics-integrity checks: PASS.
+- Wallet regression, Studio export regression and static validation report failures in unchanged wallet-tab / Lore-asset assertions. No wallet, Studio or game-runtime files are part of this candidate; those failures are recorded as unrelated and are not being modified here.
+- Human desktop/mobile acceptance remains pending; no claim of visual acceptance is made.
 - Human desktop/mobile acceptance remains pending; no claim of visual acceptance is made.
 
 ## Rollback
