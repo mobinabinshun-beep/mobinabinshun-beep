@@ -600,3 +600,7 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 .demo-extra-field[hidden],#demo-age-exact-field[hidden]{display:none!important}
 .demo-profile-card:focus-within{outline:1px solid rgba(113,224,255,.35);outline-offset:3px}
 @media(prefers-contrast:more){.demo-profile-card,.demo-profile-lab,.demo-profile-appearance{border-color:#fff}.demo-lab-hint{color:#e7f5ff}}
+
+.demo-stats-card-preview{grid-column:1/-1;padding:8px 10px;border:1px solid rgba(113,224,255,.24);border-radius:7px;background:rgba(5,20,32,.82);color:#a9eaff;font:700 9px/1.5 ui-monospace,monospace;letter-spacing:.04em}
+.demo-avatar[data-placement-mode=slot]{outline:1px dashed rgba(113,224,255,.6);outline-offset:-5px}
+.demo-avatar[data-placement-mode=anchor]{outline:1px solid rgba(113,224,255,.28);outline-offset:-2px}
