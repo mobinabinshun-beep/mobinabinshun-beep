@@ -32,7 +32,7 @@
    steps.push({id:String(e.tx.id||("step-"+e.i)),time,title:String(e.tx.title||e.tx.kind||"Player asset activity"),delta:e.delta,index:price,changePct:(price/BASE_INDEX-1)*100,volume:magnitude,demand:candle.demand,supply:candle.supply,open:candle.open,high:candle.high,low:candle.low,close:candle.close});
   }
   const bounded=steps.slice(-MAX_CANDLES),last=bounded[bounded.length-1];
-  return {asset:ASSETS.find(a=>a.key===key),steps:bounded,candles:bounded,index:last?last.index:BASE_INDEX,changePct:(last?last.index:BASE_INDEX)/BASE_INDEX*100-100,volume:bounded.reduce((n,s)=>n+s.volume,0),demand:bounded.reduce((n,s)=>n+s.demand,0),supply:bounded.reduce((n,s)=>n+s.supply,0),events:bounded.length,baseline:BASE_INDEX};
+  return {asset:ASSETS.find(a=>a.key===key),steps:bounded,candles:bounded,index:last?last.index:BASE_INDEX,changePct:((last?last.index:BASE_INDEX)/BASE_INDEX-1)*100,volume:bounded.reduce((n,s)=>n+s.volume,0),demand:bounded.reduce((n,s)=>n+s.demand,0),supply:bounded.reduce((n,s)=>n+s.supply,0),events:bounded.length,baseline:BASE_INDEX};
  }
  function assets(){return ASSETS.slice();}
  return {ASSETS,BASE_INDEX,MAX_CANDLES,MAX_EVENTS,assets,build};
