@@ -22,11 +22,11 @@ For every instruction such as «اعمال کن»، «پیاده کن»، «فی
 **LOCK ID:** NU-LOCK-GATEWAY-ICON-01  
 **Status:** SCOPED UNFREEZE APPROVED — 2026-11-14; main game page only.
 
-- The owner explicitly authorized unfreezing the Gateway for the main game page (index.html, including its home/library and active game views).
-- Gateway must remain hidden and behaviorally inactive on Casino, Launcher, Creative Studio, and all other internal pages until separate owner approval.
+- The owner explicitly authorized unfreezing the Gateway only while an actual game is active in index.html. Keep it hidden on the home screen, library, menu, profile, store and all non-game views.
+- Gateway must remain hidden and behaviorally inactive on Casino, Launcher, Creative Studio, and all other internal pages until separate owner approval. Existing legacy navigation remains available.
 - Keep the legacy main MENU and in-game PAUSE/RESUME controls visible and operable; Gateway is additive navigation, not a replacement for those controls.
 - Do not change Gateway destinations, shared game rules, wallet/save data, or unrelated pages as part of this scoped unfreeze.
-- Any further page expansion requires a new explicit owner approval identifying the target pages and behavior.
+- Gateway actions are limited to Back/Home, Menu Options (existing menu), and Settings Options (existing Launcher settings route). Any further page expansion or new destination requires separate explicit owner approval.
 
 ## 4. Shield visibility
 - Do not display a shield meter, charge bar, shield capsule or shield status when the player has no shield item/state.
