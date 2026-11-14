@@ -11,6 +11,7 @@ const html = read("index.html");
 const css = read("nu-world.css");
 const engine = read("nu-background-engine.js");
 const runtime = read("nu-graphics-runtime.js");
+const assetReadme = read("assets/README.md");
 
 test("public runtime ships the byte-identical canonical Material background", () => {
   const assetPath = path.join(root, "assets/backgrounds/niroo-universe-background.svg");
