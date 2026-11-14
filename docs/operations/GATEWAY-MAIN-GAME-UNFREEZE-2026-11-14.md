@@ -3,7 +3,7 @@
 **Date:** 2026-11-14  
 **Lock:** NU-LOCK-GATEWAY-ICON-01  
 **Approval:** Explicit owner approval to unfreeze Gateway on the main game page only  
-**Status:** Candidate refined; CI pending for latest commit; public demo deployment pending
+**Status:** Candidate refined; all required automated CI passed; public demo deployment authorized and pending merge
 
 ## Scope
 - Main game entry: index.html, active gameplay view only. Gateway is hidden on the home screen, library, menu, profile, store and every non-game view.
@@ -50,4 +50,4 @@
 10. Use Settings Options to open the existing Launcher route; confirm Gateway remains hidden there. Visit Creative Studio and confirm its prior frozen state remains unchanged.
 11. Repeat in phone portrait/landscape and with reduced-motion enabled.
 
-**Current public Pages URL (still serves the pre-PR default-branch build; candidate not deployed):** https://mobinabinshun-beep.github.io/mobinabinshun-beep/
+**Public Pages URL (candidate is approved for demo deployment; verify deployed revision after merge):** https://mobinabinshun-beep.github.io/mobinabinshun-beep/
