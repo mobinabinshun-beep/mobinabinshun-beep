@@ -34,7 +34,7 @@
 
   function layoutItems() {
     const compact = window.matchMedia("(max-width: 600px)").matches;
-    const radius = compact ? 100 : 112;
+    const radius = compact ? 82 : 94;
     const step = items.length > 1 ? 144 / (items.length - 1) : 0;
     items.forEach((item,index) => {
       item.tabIndex = open ? 0 : -1;
