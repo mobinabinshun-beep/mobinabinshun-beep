@@ -448,3 +448,19 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 - The shared wallet asset registry remains extensible for additional games and currencies. Wallet and game-scoped asset rows omit zero balances; newly registered positive balances appear automatically.
 - Zero XP/Mana HUD bars and zero XP/Mana profile values are hidden until the player has a positive balance. Transaction details omit zero-value deltas.
 - This is a browser-local demo wallet; it does not imply cloud synchronization or real-money assets.
+
+
+## Generation 1 — unified player profile workshop preview (2026-11-14)
+
+- Operational target and lock rules: [Player Profile & Card Appearance Specification](./docs/implementation/NU-G1-PLAYER-PROFILE-OPERATIONAL-SPEC.md).
+- Public demo QA checklist: [Profile Appearance Human QA](./docs/qa/NU-G1-PROFILE-APPEARANCE-HUMAN-QA-2026-11-14.md).
+
+- The restored historical profile remains the base layout: image placeholder plus Name, Callsign, Family Name and Age.
+- A separate card-appearance panel sits below the historical card with three core preview axes (hue spectrum, neutral white/dark tint, selected-color lightness) plus a fourth optional saturation comparison axis.
+- The workshop also previews optional Age Band/Bio/Interests, per-field public selection, simulated private view and appearance lock, local image preview with a 2×4 placement grid, and holographic material/type/geometry/glow/glass/scanline/texture/motion/quality controls, plus comparison selectors for age representation, stats placement, lock scope, public-card requirement, private access, recovery, sharing consent, save/export/import/sync concepts, image fit and 2×4 placement semantics.
+- All workshop state is temporary and resets when the profile closes. Public-field selection is only a local preview; private-view is not authentication; image selection uses a local data URL and is not uploaded. No profile data or appearance preference is persisted.
+- This public demo is a visual interaction prototype, not the operational player profile.
+- **Packaging target:** at the end of Generation 1, prepare the operational downloadable/launcher-mounted build—not the public demo—as the distributable release. The operational profile must follow the approved Generation 1 player scenarios and objectives: the player completes the profile fields, chooses and confirms the card appearance, and the confirmed appearance is frozen according to the documented lock rules. Online-server operation and cross-platform installers remain future implementation work, not capabilities of this demo.
+
+## Generation 1 player profile workshop — human review candidate
+The experimental profile keeps the restored historical four-field card as its base. The separate workshop exposes alternatives for human comparison before any product decision: three core color axes plus optional saturation; exact age, age band, both or no age; optional Bio and Interests; public-card/local-identity models; field privacy and share-consent preview; simulated private access and recovery; three appearance-lock policies; platform, launcher, save/export/import and future sync comparisons; reduced-effects and high-contrast previews; stats placement on card, HUD, Wallet projection or hidden; holographic material/type/geometry/effects; local image fit and 2×4 crop-anchor/photo-slot meanings; and simulated save/export/import/server-sync boundaries. Every control is temporary and resets when the profile closes. The workshop does not authenticate credentials, persist profile data, upload images, transfer public data or synchronize with a server. See the [human QA checklist](docs/qa/NU-G1-PROFILE-APPEARANCE-HUMAN-QA-2026-11-14.md).

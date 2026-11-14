@@ -27,5 +27,7 @@ test("wallet tabs reveal a floating hologram only on interaction",()=>{
 test("Player ID keeps the original stable local identifier behavior",()=>{
   assert.match(ui,/return "NU-"\+Array\.from\(bytes,b=>b\.toString\(16\)\.padStart\(2,"0"\)\)\.join\(""/);
   assert.match(ui,/if\(!s\.playerId\)\{s\.playerId=makePlayerId\(\)/);
-  assert.match(html,/class="glass player-id-card classic-player-card"/);
+  assert.match(html,/class="demo-profile-card"/);
+  for(const id of ["demo-name","demo-call","demo-family","demo-age"])assert.ok(html.includes('id="'+id+'"'));
+  assert.doesNotMatch(html,/class="glass player-id-card classic-player-card"/);
 });
