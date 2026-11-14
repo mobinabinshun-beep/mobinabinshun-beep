@@ -631,3 +631,23 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 .world>#world-canvas,.world>#pixel-world,.world>.horizon,.world>.world-effects{
  position:absolute;z-index:2;pointer-events:none
 }
+
+
+/* N.U world-scene stack: the canonical image is the base; sky and effects stay above. */
+.world{position:relative!important;isolation:isolate!important;overflow:hidden}
+.world>.nu-world-background{
+ position:absolute!important;inset:0!important;z-index:0!important;
+ display:block!important;visibility:visible!important;opacity:1!important;
+ overflow:hidden!important;pointer-events:none!important
+}
+.world>.nu-world-background>img{
+ position:absolute!important;inset:0!important;display:block!important;
+ width:100%!important;height:100%!important;object-fit:contain!important;
+ object-position:center!important;filter:none!important;opacity:1!important;
+ transform:translate3d(var(--camera-x,0px),var(--camera-y,0px),0) scale(var(--nu-camera-zoom,1))!important;
+ transform-origin:center center!important
+}
+.world>.sky{position:absolute;z-index:1!important;pointer-events:none}
+.world>#world-canvas,.world>#pixel-world,.world>.horizon,.world>.world-effects{
+ position:absolute;z-index:2;pointer-events:none
+}

@@ -36,7 +36,7 @@ jobs:
           grep -Fq 'id="nu-background-image"' nu-background-engine.js
           grep -Fq 'z-index:0;overflow:hidden' nu-background-engine.js
           grep -Fq 'world.insertBefore(node,world.firstChild)' nu-background-engine.js
-          grep -Fq '.sky{z-index:-4!important}' nu-world.css
+          grep -Fq 'world>.sky{position:absolute;z-index:1!important' nu-world.css
           ! grep -Fq 'nu-pixel-world.js' index.html
           grep -Fq 'nu-background-engine.js' index.html
           grep -Fq 'visualOverlays:"quarantined"' nu-graphics-runtime.js
