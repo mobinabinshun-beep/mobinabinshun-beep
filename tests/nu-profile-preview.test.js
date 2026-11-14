@@ -115,6 +115,7 @@ test("full review matrix includes security, storage, sharing and placement simul
   }
   assert.match(playerUi,/NO FILE, SAVE OR NETWORK REQUEST CREATED/);
   assert.match(playerUi,/demo-platform-target/);
+  assert.match(playerUi,/demo-auth-model/);
   assert.match(playerUi,/demo-high-contrast/);
   assert.match(playerUi,/demo-reduced-effects/);
   assert.match(playerUi,/PHOTO SLOT /);
