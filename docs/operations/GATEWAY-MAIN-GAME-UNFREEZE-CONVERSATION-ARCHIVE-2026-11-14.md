@@ -23,6 +23,7 @@ The owner explicitly authorized unlocking N.U Gateway for the main game pages on
 - nu-hex-gateway.js
 - nu-hex-gateway.css
 - tests/nu-hex-gateway.test.js
+- .github/workflows/gateway-main-game.yml
 - docs/operations/NU-OPS-IMPLEMENT-01.md
 - docs/operations/GATEWAY-MAIN-GAME-UNFREEZE-2026-11-14.md
 - This archive
