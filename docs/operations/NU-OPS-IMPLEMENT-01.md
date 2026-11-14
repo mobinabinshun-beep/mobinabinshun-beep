@@ -48,7 +48,7 @@ Rollback by reverting the scoped PR/commit or restoring the exact pre-change bac
 
 ## 7. Scoped freeze — Generation 1 player profile appearance
 **LOCK ID:** NU-LOCK-G1-PROFILE-APPEARANCE-01  
-**Status:** PRE-PACKAGING FREEZE REQUESTED — 2026-11-14
+**Status:** ACTIVE — owner requested pre-packaging freeze, 2026-11-14
 
 - Preserve the restored historical profile card and its four fields.
 - Keep the three appearance axes in a separate panel below the card: hue spectrum, neutral white/dark tint, and selected-color lightness.
