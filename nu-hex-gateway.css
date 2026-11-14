@@ -1,6 +1,6 @@
 /* N.U Hex Gateway — compact, responsive navigation layer for the main game page */
 #nu-hex-gateway,.nu-gateway-scrim{display:none}
-body.nu-main-game-page #nu-hex-gateway,body.nu-main-game-page .nu-gateway-scrim{display:block}
+body.nu-game-active #nu-hex-gateway,body.nu-game-active .nu-gateway-scrim{display:block}
 #nu-hex-gateway{position:fixed;z-index:120;top:clamp(118px,17vh,154px);right:clamp(12px,2.4vw,28px);width:58px;height:58px;pointer-events:none;font-family:inherit}
 #nu-hex-gateway *{box-sizing:border-box}
 #nu-hex-gateway .nu-gateway-trigger{position:absolute;inset:0;z-index:3;display:grid;place-items:center;width:58px;height:58px;padding:0;border:0;background:transparent;color:#b8f2ff;cursor:pointer;pointer-events:auto;filter:drop-shadow(0 0 10px #51dfff66);transition:transform .22s ease,filter .22s ease;touch-action:manipulation}
