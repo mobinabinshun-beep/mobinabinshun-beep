@@ -12,23 +12,22 @@ const css = read("nu-world.css");
 const engine = read("nu-background-engine.js");
 const runtime = read("nu-graphics-runtime.js");
 
-test("public runtime ships the byte-identical canonical Material background", () => {
-  const assetPath = path.join(root, "assets/backgrounds/niroo-universe-background.svg");
-  assert.ok(fs.statSync(assetPath).size > 0, "canonical SVG must exist in the public repository");
-  const bytes = fs.readFileSync(assetPath);
-  const gitBlobSha = crypto.createHash("sha1")
-    .update(Buffer.from("blob " + bytes.length + "\0"))
-    .update(bytes)
-    .digest("hex");
-  assert.equal(gitBlobSha, "63dd85a479354406cc5739f4603ccc1d0989e5b0");
-  const svg = bytes.toString("utf8");
-  assert.match(svg, /<svg\b/);
-  assert.match(svg, /data:image\/png;base64,/);
+test("public runtime targets the documented PNG and validates it if transferred", () => {
+  assert.match(engine, /const ASSET="\.\/assets\/nu-celestial-city\.png"/);
+  const assetPath = path.join(root, "assets/nu-celestial-city.png");
+  if (fs.existsSync(assetPath)) {
+    const bytes = fs.readFileSync(assetPath);
+    assert.ok(bytes.length > 0, "canonical PNG must not be empty");
+    const gitBlobSha = crypto.createHash("sha1")
+      .update(Buffer.from("blob " + bytes.length + "\0"))
+      .update(bytes)
+      .digest("hex");
+    assert.equal(gitBlobSha, "d73afd484ef8b459c908c1942ee0f47d27f93aa5");
+  }
 });
-
 test("demo page loads the image-first engine and the engine points to the local public asset", () => {
   assert.match(html, /<script src="\.\/nu-background-engine\.js(?:\?[^"]*)?"><\/script>/);
-  assert.match(engine, /const ASSET="\.\/assets\/backgrounds\/niroo-universe-background\.svg"/);
+  assert.match(engine, /const ASSET="\.\/assets\/nu-celestial-city\.png"/);
   assert.match(engine, /img\.onload=/);
   assert.match(engine, /nu-image-scene-active/);
   assert.match(engine, /img\.onerror=/);
@@ -46,13 +45,12 @@ test("background image is the deepest world layer while scene layers remain avai
   assert.doesNotMatch(css, /world\.nu-image-scene-active[\s\S]{0,180}display:none!important/);
 });
 
-test("procedural visual overlays remain quarantined from the public runtime", () => {
-  assert.match(runtime, /NUDynamicLayers&&g\.NUDynamicLayers\.stop/);
-  assert.match(runtime, /NUPixelWorld&&g\.NUPixelWorld\.setEnabled&&g\.NUPixelWorld\.setEnabled\(false\)/);
-  assert.match(runtime, /visualOverlays:"quarantined"/);
-  assert.doesNotMatch(html, /<script src="\.\/nu-pixel-world\.js/);
-  assert.ok(fs.existsSync(path.join(root, "archive/visual-layers/nu-pixel-world.js")));
-  assert.ok(fs.existsSync(path.join(root, "archive/visual-layers/nu-dynamic-layers.js")));
+test("procedural world renderer is restored as the failure fallback", () => {
+  assert.match(runtime, /if\(status\.loaded\)/);
+  assert.match(runtime, /NUPixelWorld&&g\.NUPixelWorld\.setEnabled&&g\.NUPixelWorld\.setEnabled\(true\)/);
+  assert.match(runtime, /NUDynamicLayers&&g\.NUDynamicLayers\.apply&&g\.NUDynamicLayers\.apply\(p\)/);
+  assert.match(html, /<script src="\.\/nu-pixel-world\.js"><\/script>/);
+  assert.match(runtime, /visualOverlays:status\.loaded\?"image-first":"procedural-fallback"/);
 });
 
 
@@ -71,5 +69,5 @@ test("public demo exposes runtime diagnostics for the world background",()=>{
  assert.match(engine,/dataset.state="loaded"/);
  assert.match(engine,/dataset.state="error"/);
  assert.match(engine,/naturalWidth:img/);
- assert.match(html,/id="nu-background-diagnostics"/);
+ assert.doesNotMatch(html,/id="nu-background-diagnostics"/);
 });

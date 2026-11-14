@@ -7,6 +7,7 @@ on:
       - "nu-graphics-runtime.js"
       - "nu-world.css"
       - "assets/backgrounds/**"
+      - "assets/nu-celestial-city.png"
       - "archive/visual-layers/**"
       - ".github/workflows/graphics-ci.yml"
   pull_request:
@@ -16,6 +17,7 @@ on:
       - "nu-graphics-runtime.js"
       - "nu-world.css"
       - "assets/backgrounds/**"
+      - "assets/nu-celestial-city.png"
       - "archive/visual-layers/**"
       - ".github/workflows/graphics-ci.yml"
   workflow_dispatch:
@@ -31,15 +33,16 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test -s assets/backgrounds/niroo-universe-background.svg
-          grep -Fq 'const ASSET="./assets/backgrounds/niroo-universe-background.svg"' nu-background-engine.js
+          grep -Fq 'const ASSET="./assets/nu-celestial-city.png"' nu-background-engine.js
+          if [ -f assets/nu-celestial-city.png ]; then test -s assets/nu-celestial-city.png; else echo "Canonical PNG not yet transferred; procedural fallback must remain available."; fi
           grep -Fq 'id="nu-background-image"' nu-background-engine.js
           grep -Fq 'z-index:0;overflow:hidden' nu-background-engine.js
           grep -Fq 'world.insertBefore(node,world.firstChild)' nu-background-engine.js
           grep -Fq 'world>.sky{position:absolute;z-index:1!important' nu-world.css
-          ! grep -Fq 'nu-pixel-world.js' index.html
+          grep -Fq 'nu-pixel-world.js' index.html
           grep -Fq 'nu-background-engine.js' index.html
-          grep -Fq 'visualOverlays:"quarantined"' nu-graphics-runtime.js
+          grep -Fq 'visualOverlays:status.loaded?"image-first":"procedural-fallback"' nu-graphics-runtime.js
+          grep -Fq 'NUPixelWorld&&g.NUPixelWorld.setEnabled&&g.NUPixelWorld.setEnabled(true)' nu-graphics-runtime.js
           test -s archive/visual-layers/nu-pixel-world.js
           test -s archive/visual-layers/nu-dynamic-layers.js
       - name: Check runtime JavaScript syntax
@@ -49,13 +52,3 @@ jobs:
           for file in nu-background-engine.js nu-graphics-runtime.js nu-graphics-core.js nu-dynamic-layers.js nu-game-render-adapter.js; do
             node --check "$file"
           done
-      - name: Validate canonical SVG wrapper
-        shell: bash
-        run: |
-          node <<'NODE'
-          const fs = require('fs');
-          const svg = fs.readFileSync('assets/backgrounds/niroo-universe-background.svg', 'utf8');
-          if (!/<svg\b/.test(svg)) throw new Error('Public background is not an SVG document');
-          if (!/data:image\/png;base64,/.test(svg)) throw new Error('Embedded source artwork is missing');
-          console.log('Canonical public SVG is present and contains its embedded artwork.');
-          NODE

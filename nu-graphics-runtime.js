@@ -27,12 +27,25 @@ async function start(sample){
   const p=await g.NUGraphicsCore.start(sample);
   g.NUBackgroundEngine.mount();
   g.NUBackgroundEngine.setQuality(p.budget);
-  // Legacy procedural city and atmospheric compositor intentionally remain dormant.
-  g.NUDynamicLayers&&g.NUDynamicLayers.stop&&g.NUDynamicLayers.stop();
-  g.NUPixelWorld&&g.NUPixelWorld.setEnabled&&g.NUPixelWorld.setEnabled(false);
   g.NUGameRenderAdapter.apply(p);
   watchPage();
-  g.dispatchEvent(new CustomEvent("nu:graphics-ready",{detail:{profile:p,background:g.NUBackgroundEngine.getStatus(),visualOverlays:"quarantined"}}));
+  // Keep the established world renderer alive unless the canonical image has
+  // actually loaded. A failed/empty asset must never blank the playable world.
+  function applyVisualPolicy(){
+   const status=g.NUBackgroundEngine.getStatus();
+   if(status.loaded){
+    g.NUDynamicLayers&&g.NUDynamicLayers.stop&&g.NUDynamicLayers.stop();
+    g.NUPixelWorld&&g.NUPixelWorld.setEnabled&&g.NUPixelWorld.setEnabled(false);
+   }else{
+    g.NUPixelWorld&&g.NUPixelWorld.setQuality&&g.NUPixelWorld.setQuality(p.quality||5);
+    g.NUPixelWorld&&g.NUPixelWorld.setEnabled&&g.NUPixelWorld.setEnabled(true);
+    g.NUDynamicLayers&&g.NUDynamicLayers.apply&&g.NUDynamicLayers.apply(p);
+   }
+   g.dispatchEvent(new CustomEvent("nu:graphics-ready",{detail:{profile:p,background:status,visualOverlays:status.loaded?"image-first":"procedural-fallback"}}));
+  }
+  g.addEventListener("nu:background-ready",applyVisualPolicy,{once:true});
+  g.addEventListener("nu:background-missing",applyVisualPolicy,{once:true});
+  applyVisualPolicy();
  }catch(error){running=false;console.warn("N.U graphics runtime fallback",error);}
 }
 g.NUGraphicsRuntime={start,setGameActive(active){const mode=active?"game":"ambient";g.NUBackgroundEngine&&g.NUBackgroundEngine.setMode(mode);},setMode(mode){g.NUBackgroundEngine&&g.NUBackgroundEngine.setMode(mode);}};
