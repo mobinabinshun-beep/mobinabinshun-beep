@@ -55,6 +55,7 @@
     });
   }
   function renderProfile(){
+    if(!$("player-id"))return;
     const s=ensureIdentity(),name=safeText(s.displayName,"N.U Explorer"),callsign=safeText(s.callsign,"Unassigned");
     $("player-id").textContent=s.playerId;
     $("player-display-name").textContent=name;
@@ -84,9 +85,16 @@
     if(view===walletView){setWalletTab("balances");renderWallet();}else renderProfile();
     const menu=$("menu");if(menu)menu.classList.remove("open");
   }
-  function close(){document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));(previousView&&previousView!==walletView&&previousView!==profileView?previousView:$("home-view")).classList.add("active");previousView=null;window.dispatchEvent(new Event("nu:player-overlay-close"));}
+  function close(){if(profileView.classList.contains("active")){["demo-name","demo-call","demo-family","demo-age"].forEach(id=>{const field=$(id);if(field)field.value="";});const warning=$("demo-profile-warning");if(warning)warning.hidden=true;}document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));(previousView&&previousView!==walletView&&previousView!==profileView?previousView:$("home-view")).classList.add("active");previousView=null;window.dispatchEvent(new Event("nu:player-overlay-close"));}
   $("wallet-back").addEventListener("click",close);
   $("profile-back").addEventListener("click",close);
+  const demoFields=["demo-name","demo-call","demo-family","demo-age"];
+  demoFields.forEach(id=>{const field=$(id);if(field)field.addEventListener("input",()=>{$("demo-profile-warning").hidden=false;});});
+  const demoClose=$("demo-profile-close"),demoClear=$("demo-profile-clear");
+  if(demoClose)demoClose.addEventListener("click",close);
+  if(demoClear)demoClear.addEventListener("click",close);
+  profileView.addEventListener("click",event=>{if(event.target===profileView)close();});
+  document.addEventListener("keydown",event=>{if(event.key==="Enter"&&profileView.classList.contains("active")){event.preventDefault();close();}});
   $("menu-wallet").addEventListener("click",()=>open(walletView));
   $("menu-profile").addEventListener("click",()=>open(profileView));
   document.querySelectorAll("[data-wallet-tab]").forEach(button=>button.addEventListener("click",()=>{
@@ -94,7 +102,8 @@
     if(tab==="profile"){open(profileView);return;}
     setWalletTab(tab);
   }));
-  $("player-identity-save").addEventListener("click",()=>{
+  const identitySave=$("player-identity-save");
+  if(identitySave)identitySave.addEventListener("click",()=>{
     const s=ensureIdentity();
     s.displayName=safeText($("player-name-input").value,"");
     s.callsign=safeText($("player-callsign-input").value,"");
@@ -104,7 +113,8 @@
     window.dispatchEvent(new CustomEvent("nu:save-updated"));
     renderProfile();
   });
-  $("player-identity-reset").addEventListener("click",()=>{
+  const identityReset=$("player-identity-reset");
+  if(identityReset)identityReset.addEventListener("click",()=>{
     const s=ensureIdentity();s.displayName="";s.callsign="";
     if(!persist(s)){$("player-save-status").textContent="Could not save this change.";return;}
     window.dispatchEvent(new CustomEvent("nu:identity-updated",{detail:{playerId:s.playerId,displayName:s.displayName,callsign:s.callsign}}));
