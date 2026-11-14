@@ -509,3 +509,40 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 .bar-wrap[hidden],.player-stats>div[hidden]{display:none!important}
 
 .mana-capsules[hidden],.wallet-asset-summary[hidden]{display:none!important}
+
+
+/* Classic resource HUD restoration — LV first, XP and Mana rails stacked beneath. */
+#game-view.active .bars{
+ position:fixed;left:12px;right:auto;bottom:12px;width:min(232px,calc(100vw - 24px));
+ display:flex;flex-direction:column;align-items:stretch;justify-content:flex-end;
+ gap:16px;z-index:8;pointer-events:none;
+}
+#game-view.active #level-chip{align-self:flex-start;order:0;white-space:nowrap}
+#game-view.active .bars .bar-wrap{
+ order:1;display:block;position:relative;flex:0 0 12px;
+ width:100%;height:12px;min-width:0;
+ background:#03090fbd;border:1px solid #ffffff25;border-radius:99px;
+ backdrop-filter:none;-webkit-backdrop-filter:none;
+}
+#game-view.active .bars .bar-wrap:nth-child(2){order:1;grid-row:auto;grid-column:auto;justify-self:stretch}
+#game-view.active .bars .bar-wrap:nth-child(3){order:2;grid-row:auto;grid-column:auto;justify-self:stretch}
+#game-view.active .bars .bar-label{
+ position:absolute;left:0;right:auto;top:auto;bottom:15px;
+ transform:none;font-size:9px;letter-spacing:normal;white-space:nowrap;
+}
+#game-view.active .bars .bar-value{
+ position:absolute;left:50%;right:auto;top:50%;
+ transform:translate(-50%,-50%);font-size:9px;
+}
+#game-view.active .bars .mana-capsules{
+ order:3;position:static;display:flex;align-self:flex-start;
+ gap:3px;margin-top:-10px;padding:0;font-size:8px;
+}
+@media(max-width:700px){
+ #game-view.active .bars{left:8px;right:auto;bottom:8px;width:min(204px,calc(100vw - 16px));gap:16px}
+ #game-view.active .bars .bar-wrap{width:100%;height:12px;flex-basis:12px}
+ #game-view.active .bars .bar-label{font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){
+ #game-view.active .bars .bar-fill{transition:none}
+}
