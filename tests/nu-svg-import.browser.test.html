@@ -1,0 +1,20 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>N.U SVG import sanitizer tests</title>
+<script src="../nu-svg-import.js"></script>
+<pre id="result">Running…</pre>
+<script>
+"use strict";
+const checks=[];
+function check(name,condition){if(!condition)throw new Error("FAILED: "+name);checks.push("PASS: "+name);}
+const source='<svg xmlns="http://www.w3.org/2000/svg" width="12" height="8" onload="alert(1)"><'+'script>alert(1)</'+'script><foreignObject><div>unsafe</div></foreignObject><path id="shape" d="M0 0h4v4z" fill="#ff0000"/><image href="https://example.com/a.png" width="2" height="2"/></svg>';
+const safe=NUSVGImport.sanitize(source);
+check("valid SVG root retained",safe.includes("<svg"));
+check("safe vector geometry retained",safe.includes("<path"));
+check("event handler stripped",!safe.includes("onload"));
+check("script and foreignObject stripped",!safe.includes("<script")&&!safe.includes("foreignObject"));
+check("external image reference stripped",!safe.includes("https://"));
+check("SVG file detection",NUSVGImport.isSVGFile({name:"drawing.svg",type:""}));
+check("non-SVG file detection",{name:"drawing.png",type:"image/png"}.name==="drawing.png"&&!NUSVGImport.isSVGFile({name:"drawing.png",type:"image/png"}));
+document.getElementById("result").textContent=checks.join("\n");
+</script>
