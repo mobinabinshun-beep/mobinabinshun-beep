@@ -31,7 +31,7 @@ test("personal rank palette is external to the identity card and has a dedicated
   const palette = html.indexOf('class="profile-palette-panel"');
   const cardEnd = html.indexOf('</div><div class="profile-palette-panel">', card);
   assert.ok(card >= 0 && palette > card && cardEnd > card);
-  assert.match(html, /id="player-rank-hue" type="range"/);
+  assert.match(html, /id="player-rank-hue"[^>]*type="range"/);
   assert.match(js, /nu-profile-rank-palette-v1/);
   assert.match(js, /localStorage\.setItem/);
   assert.match(js, /localStorage\.getItem/);
