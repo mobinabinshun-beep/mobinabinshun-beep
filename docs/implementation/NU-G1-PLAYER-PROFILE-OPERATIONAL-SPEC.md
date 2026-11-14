@@ -69,7 +69,11 @@ At the end of Generation 1, package the **operational launcher-mounted downloada
 
 After this scoped preview is reviewed, freeze the profile card's structure, the three-axis control model, and the separation between profile fields and appearance panel until Generation 1 packaging. Any change before packaging requires explicit owner approval and a documented reason. This freeze does not claim that the operational workflow is already implemented.
 
-## 8. Acceptance checklist
+## 8. Profile panel inventory audit
+
+The current profile view contains the historical profile card, the separate appearance panel, the personal-data warning, the demo limitation note and the close action. The restored four text fields are present. No other profile subpanel is defined by the inspected baseline, manifest, handoff, launcher architecture or profile regression test. The following are known omissions by design—not silently forgotten demo controls: image upload/crop, 2×4 image placement, staged final confirmation, appearance lock, persistent player account and online/server synchronization. Wallet balances and transaction tabs remain separate wallet surfaces, not missing profile panels.
+
+## 9. Acceptance checklist
 
 - [ ] Original card layout and four fields remain intact.
 - [ ] Appearance panel is below and separate from the card.
