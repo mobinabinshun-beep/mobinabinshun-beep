@@ -85,7 +85,7 @@
     if(view===walletView){setWalletTab("balances");renderWallet();}else renderProfile();
     const menu=$("menu");if(menu)menu.classList.remove("open");
   }
-  function close(){if(profileView.classList.contains("active")){["demo-name","demo-call","demo-family","demo-age"].forEach(id=>{const field=$(id);if(field)field.value="";});const warning=$("demo-profile-warning");if(warning)warning.hidden=true;applyAppearance(true);}document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));(previousView&&previousView!==walletView&&previousView!==profileView?previousView:$("home-view")).classList.add("active");previousView=null;window.dispatchEvent(new Event("nu:player-overlay-close"));}
+  function close(){if(profileView.classList.contains("active")){["demo-name","demo-call","demo-family","demo-age"].forEach(id=>{const field=$(id);if(field)field.value="";});const warning=$("demo-profile-warning");if(warning)warning.hidden=true;applyAppearance(true);resetWorkshop();}document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));(previousView&&previousView!==walletView&&previousView!==profileView?previousView:$("home-view")).classList.add("active");previousView=null;window.dispatchEvent(new Event("nu:player-overlay-close"));}
   $("wallet-back").addEventListener("click",close);
   $("profile-back").addEventListener("click",close);
   const demoFields=["demo-name","demo-call","demo-family","demo-age"];
@@ -115,6 +115,57 @@
   }
   Object.values(appearanceControls).forEach(control=>{if(control)control.addEventListener("input",()=>applyAppearance(false));});
   applyAppearance(false);
+  const demoPublicPreview=$("demo-public-preview"),demoPrivatePreview=$("demo-private-preview"),demoPrivateState=$("demo-private-state");
+  const publicToggles=[...document.querySelectorAll("[data-demo-public]")];
+  function renderPublicPreview(){
+    if(!demoPublicPreview)return;
+    const privateMode=!!(demoPrivatePreview&&demoPrivatePreview.checked);
+    if(demoPrivateState)demoPrivateState.textContent=privateMode?"OPEN · SIMULATED":"CLOSED";
+    const selected=publicToggles.filter(toggle=>toggle.checked).map(toggle=>{
+      const field=$(toggle.dataset.demoPublic),value=field&&field.value.trim();
+      return value?field.previousElementSibling.textContent+": "+value:null;
+    }).filter(Boolean);
+    demoPublicPreview.textContent=privateMode?"PRIVATE VIEW PREVIEW · This is only a visual simulation.":selected.length?selected.join(" · "):"Public card preview is empty until you explicitly select fields.";
+  }
+  publicToggles.forEach(toggle=>toggle.addEventListener("change",renderPublicPreview));
+  demoFields.forEach(id=>{const field=$(id);if(field)field.addEventListener("input",renderPublicPreview);});
+  if(demoPrivatePreview)demoPrivatePreview.addEventListener("change",renderPublicPreview);
+  const appearanceConfirm=$("demo-appearance-confirm"),appearanceReset=$("demo-appearance-reset"),appearanceState=$("demo-appearance-state");
+  let appearanceLocked=false;
+  function setAppearanceLock(locked){
+    appearanceLocked=locked;
+    Object.values(appearanceControls).forEach(control=>{if(control)control.disabled=locked;});
+    if(appearanceConfirm)appearanceConfirm.disabled=locked;
+    if(appearanceState)appearanceState.textContent=locked?"STAGE B COMPLETE · APPEARANCE LOCK SIMULATED · IMAGE AND POSITION REMAIN EDITABLE":"STAGE A · APPEARANCE IS NOT CONFIRMED";
+  }
+  if(appearanceConfirm)appearanceConfirm.addEventListener("click",()=>setAppearanceLock(true));
+  if(appearanceReset)appearanceReset.addEventListener("click",()=>{setAppearanceLock(false);applyAppearance(true);});
+  const imageInput=$("demo-card-image"),avatar=$("profile-view .demo-avatar");
+  const avatarEl=document.querySelector("#profile-view .demo-avatar");
+  if(imageInput)imageInput.addEventListener("change",()=>{
+    const file=imageInput.files&&imageInput.files[0];
+    if(!file)return;
+    if(!file.type.startsWith("image/")){imageInput.value="";return;}
+    const reader=new FileReader();
+    reader.onload=()=>{if(avatarEl){avatarEl.style.backgroundImage="url("+JSON.stringify(String(reader.result))+")";avatarEl.style.backgroundSize="cover";avatarEl.style.backgroundPosition="center";avatarEl.textContent="";}const state=$("demo-image-state");if(state)state.textContent="LOCAL IMAGE PREVIEW · NOT UPLOADED · POSITION "+(document.querySelector('[data-demo-placement][aria-pressed="true"]')?.dataset.demoPlacement||"1")+" OF 8";};
+    reader.readAsDataURL(file);
+  });
+  document.querySelectorAll("[data-demo-placement]").forEach(button=>button.addEventListener("click",()=>{
+    document.querySelectorAll("[data-demo-placement]").forEach(item=>{const active=item===button;item.setAttribute("aria-pressed",String(active));});
+    const position=Number(button.dataset.demoPlacement),row=Math.floor((position-1)/4),col=(position-1)%4;
+    if(avatarEl)avatarEl.style.backgroundPosition=(col*33.333)+"% "+(row*100)+"%";
+    const state=$("demo-image-state");if(state)state.textContent="LOCAL IMAGE PREVIEW · POSITION "+position+" OF 8";
+  }));
+  function resetWorkshop(){
+    publicToggles.forEach(toggle=>{toggle.checked=false;});
+    if(demoPrivatePreview)demoPrivatePreview.checked=false;
+    if(imageInput)imageInput.value="";
+    if(avatarEl){avatarEl.style.backgroundImage="";avatarEl.style.backgroundPosition="center";avatarEl.style.backgroundSize="";}
+    document.querySelectorAll("[data-demo-placement]").forEach((button,index)=>button.setAttribute("aria-pressed",String(index===0)));
+    const imageState=$("demo-image-state");if(imageState)imageState.textContent="PLACEHOLDER IMAGE · POSITION 1 OF 8";
+    renderPublicPreview();setAppearanceLock(false);
+  }
+  renderPublicPreview();
   const demoClose=$("demo-profile-close"),demoClear=$("demo-profile-clear");
   if(demoClose)demoClose.addEventListener("click",close);
   if(demoClear)demoClear.addEventListener("click",close);
