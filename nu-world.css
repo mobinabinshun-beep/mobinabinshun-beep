@@ -432,3 +432,22 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 
 /* Keep the canonical image scene above the decorative sky gradient. */
 .sky{z-index:-4!important}
+
+/* N.U Generation 1 HUD calibration — LV + XP + Mana in one compact lower rail. */
+#game-view.active .bars{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(0,1fr);grid-template-rows:22px;grid-template-areas:"level xp mana";align-items:center;justify-items:stretch;gap:8px;left:12px;right:12px;bottom:10px;}
+#game-view.active #level-chip{grid-area:level;justify-self:start;white-space:nowrap;padding:5px 8px;font-size:10px;}
+#game-view.active .bar-wrap:first-of-type{grid-area:xp;width:100%;height:22px;min-width:0;}
+#game-view.active .bar-wrap:nth-of-type(2){grid-area:mana;width:100%;height:22px;min-width:0;}
+#game-view.active .bar-label{left:8px;top:50%;bottom:auto;transform:translateY(-50%);z-index:2;font-size:8px;letter-spacing:.015em;}
+#game-view.active .bar-value{left:auto;right:8px;top:50%;transform:translateY(-50%);z-index:2;font-size:9px;}
+#game-view.active .mana-capsules{position:absolute;right:0;top:-13px;display:flex;gap:3px;max-width:40%;overflow:hidden;}
+@media(max-width:700px){#game-view.active .bars{left:8px;right:8px;bottom:8px;grid-template-columns:auto minmax(0,1fr) minmax(0,1fr);gap:6px;}
+#game-view.active #level-chip{padding:4px 6px;font-size:9px;}
+#game-view.active .bar-wrap:first-of-type,#game-view.active .bar-wrap:nth-of-type(2){height:20px;}
+#game-view.active .bar-label{left:6px;font-size:7px;}
+#game-view.active .bar-value{right:6px;font-size:8px;}
+}
+@media(max-width:360px){#game-view.active .bars{grid-template-columns:auto minmax(0,1fr) minmax(0,1fr);gap:4px;}
+#game-view.active #level-chip{padding:3px 5px;font-size:8px;}
+#game-view.active .bar-label{font-size:6px;letter-spacing:0;}
+}
