@@ -26,7 +26,8 @@ The separate appearance panel contains three core independent controls plus an o
 
 1. **Color spectrum / hue:** choose the card's base color.
 2. **White ↔ dark neutral tone:** apply a neutral white or black tint independently of the selected hue.
-3. **Color light ↔ dark:** adjust the lightness of the selected color itself.\n4. **Saturation (comparison-only):** independently test saturation so reviewers can decide whether it should remain, be merged or be removed.
+3. **Color light ↔ dark:** adjust the lightness of the selected color itself.
+4. **Saturation (comparison-only):** independently test saturation so reviewers can decide whether it should remain, be merged or be removed.
 
 The axes are intentionally distinct: hue selects the color family; neutral tone adds/removes white or black overlay; color lightness changes the selected hue's own brightness.
 
