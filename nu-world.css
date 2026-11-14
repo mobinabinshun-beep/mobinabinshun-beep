@@ -464,3 +464,45 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 .wallet-hologram-title::before{content:"";height:1px;width:min(120px,22%);margin-right:12px;background:linear-gradient(90deg,rgba(115,231,255,.8),transparent);box-shadow:0 0 9px rgba(91,220,255,.55)}
 @media(max-width:520px){.wallet-card-tabs{gap:5px;margin:20px -14px -14px;padding:0 8px}.wallet-card-tab{min-width:0;flex:1;padding:10px 7px;font-size:8px;letter-spacing:.08em}.wallet-hologram-title{font-size:9px;letter-spacing:.12em}}
 @media(prefers-reduced-motion:reduce){.wallet-card-tab{transition:none}}
+
+
+/* N.U classic profile preview restoration — isolated from wallet and game surfaces. */
+#profile-view{--profile-hue:195}
+#profile-view .profile-mode-switch{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin:10px auto 8px}
+#profile-view .profile-mode-switch .btn{font-size:9px;letter-spacing:.1em}
+#profile-view .profile-mode-switch .btn.is-active{border-color:hsl(var(--profile-hue) 88% 72% / .9);box-shadow:0 0 18px hsl(var(--profile-hue) 90% 60% / .18);color:hsl(var(--profile-hue) 100% 88%)}
+#profile-view .profile-mode-note,#profile-view .profile-demo-boundary{max-width:760px;margin:8px auto 14px;text-align:center;color:#9fb1bf;font-size:10px;line-height:1.7}
+#profile-view .classic-player-card{max-width:760px;margin:14px auto 0;padding:22px;border:1px solid hsl(var(--profile-hue) 75% 62% / .42);box-shadow:0 18px 50px #0008,inset 0 1px hsl(var(--profile-hue) 80% 85% / .08);background:linear-gradient(145deg,rgba(23,31,42,.96),rgba(7,15,25,.96))}
+#profile-view .player-card-top{border-bottom-color:hsl(var(--profile-hue) 70% 65% / .28)}
+#profile-view .player-emblem{border-color:hsl(var(--profile-hue) 78% 70% / .75);background:linear-gradient(145deg,hsl(var(--profile-hue) 40% 24%),#101923);color:hsl(var(--profile-hue) 100% 90%);box-shadow:0 0 22px hsl(var(--profile-hue) 85% 60% / .18)}
+#profile-view .player-card-top h3{color:hsl(var(--profile-hue) 100% 88%)}
+#profile-view .player-rank-label{display:inline-block;margin-top:8px;padding:5px 9px;border:1px solid hsl(var(--profile-hue) 80% 65% / .42);border-radius:99px;color:hsl(var(--profile-hue) 95% 82%);font:800 9px ui-monospace,monospace;letter-spacing:.14em;background:hsl(var(--profile-hue) 75% 45% / .09)}
+#profile-view .player-private-fields[hidden],#profile-view .profile-public-note[hidden]{display:none!important}
+#profile-view .player-private-fields{padding-top:12px}
+#profile-view .player-id-number{border-bottom-color:hsl(var(--profile-hue) 70% 65% / .25)}
+#profile-view .player-id-number strong{color:hsl(var(--profile-hue) 100% 86%)}
+#profile-view .player-stats>div{border-color:hsl(var(--profile-hue) 70% 65% / .2);background:hsl(var(--profile-hue) 35% 12% / .65)}
+#profile-view .player-stats strong{color:hsl(var(--profile-hue) 90% 91%)}
+#profile-view .player-xp-track{border-color:hsl(var(--profile-hue) 70% 65% / .35)}
+#profile-view .player-xp-track>div{background:linear-gradient(90deg,hsl(var(--profile-hue) 75% 42%),hsl(var(--profile-hue) 100% 82%));box-shadow:0 0 12px hsl(var(--profile-hue) 90% 65% / .45)}
+#profile-view .profile-public-note{margin:18px 0 0;padding:12px;border-top:1px solid hsl(var(--profile-hue) 70% 65% / .2);color:#9fb9c8;text-align:center;font:9px/1.7 ui-monospace,monospace;letter-spacing:.08em}
+#profile-view .profile-palette-panel{max-width:760px;margin:14px auto 0;padding:16px 18px;border:1px solid hsl(var(--profile-hue) 70% 65% / .25);border-radius:14px;background:rgba(7,16,27,.72)}
+#profile-view .profile-palette-heading{display:flex;justify-content:space-between;gap:12px;align-items:center;color:#dcebf4;font:800 10px ui-monospace,monospace;letter-spacing:.12em}
+#profile-view .profile-palette-heading span{color:hsl(var(--profile-hue) 100% 82%);font-size:9px}
+#profile-view .profile-palette-label{display:block;margin:12px 0 8px;color:#9fb1bf;font-size:10px}
+#profile-view .profile-rank-spectrum{display:block;width:100%;height:20px;margin:0;appearance:none;-webkit-appearance:none;border:1px solid #d6e4ef55;border-radius:99px;background:linear-gradient(90deg,hsl(0 90% 58%),hsl(60 90% 58%),hsl(120 90% 52%),hsl(180 90% 52%),hsl(240 90% 62%),hsl(300 90% 58%),hsl(359 90% 58%));cursor:pointer}
+#profile-view .profile-rank-spectrum::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:18px;height:26px;border:2px solid #f4fbff;border-radius:7px;background:hsl(var(--profile-hue) 95% 60%);box-shadow:0 0 12px hsl(var(--profile-hue) 100% 65% / .75)}
+#profile-view .profile-rank-spectrum::-moz-range-thumb{width:14px;height:22px;border:2px solid #f4fbff;border-radius:7px;background:hsl(var(--profile-hue) 95% 60%);box-shadow:0 0 12px hsl(var(--profile-hue) 100% 65% / .75)}
+#profile-view .profile-rank-spectrum:focus-visible{outline:2px solid hsl(var(--profile-hue) 100% 78%);outline-offset:4px}
+#profile-view .profile-palette-note{margin:9px 0 12px;color:#849baa;font-size:9px;line-height:1.7}
+#profile-view #profile-palette-reset{padding:8px 12px;font-size:9px}
+#profile-view[data-profile-mode="owner"] .profile-mode-note{color:#f0c985}
+#profile-view[data-profile-mode="owner"] .player-private-fields{display:block}
+@media(max-width:620px){#profile-view .classic-player-card{padding:16px}#profile-view .player-stats{grid-template-columns:repeat(2,minmax(0,1fr))}#profile-view .profile-palette-panel{padding:14px}}
+@media(prefers-reduced-motion:reduce){#profile-view .profile-mode-switch .btn,#profile-view .player-xp-track>div{transition:none!important}}
+
+/* Wallet tabs are attached to the upper card edge and rise out of it on focus/selection. */
+.wallet-card-tabs{align-items:flex-start;margin:-22px -22px 24px;padding:0 14px;min-height:44px}
+.wallet-card-tab{border-top:0;border-bottom:1px solid rgba(113,224,255,.32);border-radius:0 0 11px 11px;transform:translateY(9px)}
+.wallet-card-tab:hover,.wallet-card-tab:focus-visible,.wallet-card-tab.is-active{transform:translateY(0);box-shadow:0 7px 20px rgba(30,181,225,.13),inset 0 -1px rgba(255,255,255,.12)}
+@media(max-width:520px){.wallet-card-tabs{margin:-14px -14px 20px;padding:0 8px}}
