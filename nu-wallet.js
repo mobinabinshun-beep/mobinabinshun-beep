@@ -5,7 +5,7 @@
   if(root)root.NUWallet=api;
 })(typeof window!=="undefined"?window:globalThis,function(){
   "use strict";
-  const MAX_HP=10,HP_PILL_COST=10,MAX_TRANSACTIONS=40;
+  const MAX_HP=10,HP_PILL_COST=10,MAX_TRANSACTIONS=24;
   const number=(value,fallback,min=0,max=Number.MAX_SAFE_INTEGER)=>{
     const n=Number(value);
     return Number.isFinite(n)?Math.max(min,Math.min(max,n)):fallback;
