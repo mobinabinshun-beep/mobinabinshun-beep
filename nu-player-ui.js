@@ -138,7 +138,7 @@
   if(demoPrivatePreview)demoPrivatePreview.addEventListener("change",renderPublicPreview);
   const appearanceConfirm=$("demo-appearance-confirm"),appearanceReset=$("demo-appearance-reset"),appearanceState=$("demo-appearance-state");
   const lockPolicy=$("demo-lock-policy");
-  const appearanceEditableIds=["demo-card-hue","demo-card-tone","demo-card-lightness","demo-card-saturation","demo-reduced-effects","demo-high-contrast","demo-frame-material","demo-card-font","demo-corners","demo-holo","demo-glow","demo-glass","demo-scanlines","demo-data-texture","demo-motion","demo-reduced-effects","demo-high-contrast","demo-quality"];
+  const appearanceEditableIds=["demo-card-hue","demo-card-tone","demo-card-lightness","demo-card-saturation","demo-frame-material","demo-card-font","demo-corners","demo-holo","demo-glow","demo-glass","demo-scanlines","demo-data-texture","demo-motion","demo-reduced-effects","demo-high-contrast","demo-quality"];
   let appearanceLocked=false;
   function setAppearanceLock(locked){
     appearanceLocked=locked;
@@ -188,7 +188,7 @@
     ["demo-share-consent","demo-scanlines","demo-data-texture","demo-motion","demo-reduced-effects","demo-high-contrast"].forEach(id=>{const el=$(id);if(el)el.checked=id==="demo-scanlines";});
     ["demo-share-state","demo-auth-state","demo-recovery-state","demo-storage-state","demo-storage-options-preview"].forEach((id,index)=>{const el=$(id);if(el)el.textContent=["NO SHARE PREVIEW REQUESTED","PRIVATE ACCESS NOT TESTED · NO AUTHENTICATION","RECOVERY FLOW NOT TESTED · NO DATA RECOVERED","NO SAVE / EXPORT / IMPORT / SYNC PERFORMED","DELIVERY / STORAGE OPTIONS ARE CONCEPTS ONLY · NO BUILD OR SERVICE CREATED"][index];});
     if($("demo-passphrase-test"))$("demo-passphrase-test").value="";
-    applyAppearance(true);applyVisualDesign(true);applyAgeModel();applyStatsLocation();setAppearanceLock(false);renderPublicPreview();
+    applyAppearance(true);applyVisualDesign(true);applyAgeModel();applyStatsLocation();applyStorageOptions();setAppearanceLock(false);renderPublicPreview();
   }
   renderPublicPreview();
   function applyAgeModel(){
@@ -249,7 +249,7 @@
     const labels={"demo-save-preview":"LOCAL SAVE SIMULATION ONLY","demo-export-preview":"ENCRYPTED EXPORT CONCEPT ONLY","demo-import-preview":"VALIDATED IMPORT CONCEPT ONLY","demo-sync-preview":"FUTURE SERVER SYNC CONCEPT ONLY"};
     if($("demo-storage-state"))$("demo-storage-state").textContent=labels[id]+" · NO FILE, SAVE OR NETWORK REQUEST CREATED";
   }));
-  const visualIds=["demo-frame-material","demo-card-font","demo-corners","demo-holo","demo-glow","demo-glass","demo-scanlines","demo-data-texture","demo-motion","demo-quality"];
+  const visualIds=["demo-frame-material","demo-card-font","demo-corners","demo-holo","demo-glow","demo-glass","demo-scanlines","demo-data-texture","demo-motion","demo-reduced-effects","demo-high-contrast","demo-quality"];
   function applyVisualDesign(reset){
     const defaults={"demo-frame-material":"glass","demo-card-font":"mono","demo-corners":"soft","demo-holo":"60","demo-glow":"45","demo-glass":"55","demo-scanlines":true,"demo-data-texture":false,"demo-motion":false,"demo-reduced-effects":false,"demo-high-contrast":false,"demo-quality":"balanced"};
     visualIds.forEach(id=>{const el=$(id);if(el&&reset){if(el.type==="checkbox")el.checked=defaults[id];else el.value=defaults[id];}});
