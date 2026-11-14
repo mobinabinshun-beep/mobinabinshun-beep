@@ -172,10 +172,6 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 #nu-background-image{position:fixed;inset:-1.4%;z-index:-5;overflow:hidden;pointer-events:none;background:#080b12;opacity:1}
 #nu-background-image img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 52%;opacity:1!important;filter:none!important;transform:translate3d(calc(var(--camera-x,0px)*-.16),calc(var(--camera-y,0px)*-.14),0) scale(1.035);transform-origin:center center;transition:transform .32s ease-out;will-change:transform}
 #nu-background-image:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,6,12,.10),transparent 34%,rgba(3,6,12,.08) 68%,rgba(3,6,12,.34)),radial-gradient(ellipse at center,transparent 46%,rgba(2,5,10,.32) 100%);pointer-events:none}
-.world.nu-image-scene-active .sky,
-.world.nu-image-scene-active #pixel-world,
-.world.nu-image-scene-active #world-canvas,
-.world.nu-image-scene-active .horizon{display:none!important}
 #nu-dynamic-layers{position:fixed!important;inset:0!important;width:100%!important;height:100%!important;z-index:-2!important;opacity:1!important;mix-blend-mode:screen;pointer-events:none}
 .world.nu-image-scene-active .shell{position:relative;z-index:1}
 #nu-background-image[data-mode="focus"] img{transform:scale(1.025);filter:saturate(.92) brightness(.82)!important}
