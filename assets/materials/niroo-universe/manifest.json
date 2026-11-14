@@ -1,0 +1,72 @@
+{
+  "schema": "nu.material.layers/v1",
+  "material_id": "niroo-universe-reference-world",
+  "version": "0.1.0-preview",
+  "canvas": {
+    "width": 1536,
+    "height": 1024,
+    "viewBox": "0 0 1536 1024",
+    "fit": "contain"
+  },
+  "source_artwork": {
+    "path": "assets/backgrounds/niroo-universe-background.svg",
+    "immutable": true,
+    "processing": "none",
+    "note": "Uses the existing repository artwork as the untouched base; verify its pixel identity against the newly supplied PNG before production lock."
+  },
+  "layers": [
+    {
+      "id": "nu.base.original",
+      "file": "assets/materials/niroo-universe/layers/00-base-original.svg",
+      "z_index": -100,
+      "kind": "base",
+      "animated": false,
+      "enabled": true
+    },
+    {
+      "id": "nu.celestial.orbits",
+      "file": "assets/materials/niroo-universe/layers/10-celestial-orbits.svg",
+      "z_index": -90,
+      "kind": "overlay",
+      "animated": true,
+      "enabled": true
+    },
+    {
+      "id": "nu.environment.day-night",
+      "file": "assets/materials/niroo-universe/layers/20-day-night-cycle.svg",
+      "z_index": -80,
+      "kind": "atmosphere",
+      "animated": true,
+      "enabled": true
+    },
+    {
+      "id": "nu.particles.ambient",
+      "file": "assets/materials/niroo-universe/layers/30-ambient-particles.svg",
+      "z_index": -70,
+      "kind": "particles",
+      "animated": true,
+      "enabled": true
+    },
+    {
+      "id": "nu.reflections.water",
+      "file": "assets/materials/niroo-universe/layers/40-water-reflections.svg",
+      "z_index": -60,
+      "kind": "reflection",
+      "animated": true,
+      "enabled": true
+    },
+    {
+      "id": "nu.light.central-pulse",
+      "file": "assets/materials/niroo-universe/layers/50-central-light-pulse.svg",
+      "z_index": -50,
+      "kind": "light",
+      "animated": true,
+      "enabled": true
+    }
+  ],
+  "runtime_contract": {
+    "camera": "apply one identical camera transform to the base and all overlays",
+    "stacking": "ascending z_index; application UI above material",
+    "motion": "SVG SMIL; honor prefers-reduced-motion"
+  }
+}

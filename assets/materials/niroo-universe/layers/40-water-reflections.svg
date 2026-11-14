@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1536" height="1024" viewBox="0 0 1536 1024"><title>Water reflection shimmer</title><desc>Low intensity stylized shimmer in water area.</desc><defs></defs><g fill="none" stroke="#e9c18c" stroke-width="2" opacity=".18"><path d="M700 820h110M620 866h190M790 912h145M560 952h260"><animate attributeName="opacity" values=".04;.34;.06" dur="9s" repeatCount="indefinite"/></path></g></svg>
