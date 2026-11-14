@@ -7,7 +7,7 @@ The owner explicitly authorized unlocking N.U Gateway for the main game pages on
 - Inspected the active implementation protocol, known-good lock, main page, Gateway controller/styles, and Gateway regression tests.
 - Confirmed the previous CSS freeze globally hid Gateway while the shared controller still attempted to activate on internal pages.
 - Created an exact-source backup branch and a separate candidate branch before editing.
-- Scoped controller activation and Gateway visibility to the main game page.
+- Scoped controller activation and Gateway visibility to active gameplay only; the home/library screen remains free of the icon.
 - Preserved the existing main MENU and in-game PAUSE/RESUME controls.
 - Kept Casino, Launcher and Creative Studio page source untouched; Gateway remains hidden/inactive there.
 - Preserved N.U branding and existing LV/HP/XP/Mana HUD; no unsupported shield meter was added.
@@ -29,7 +29,7 @@ The owner explicitly authorized unlocking N.U Gateway for the main game pages on
 - This archive
 
 ## Validation state
-- Source-level regression assertions were revised; CI must run against the pull request before merge/deploy.
+- Source-level regression assertions were revised to enforce active-game-only visibility and the three requested Gateway actions. A fresh CI run is required for the latest refinement before demo deployment.
 - Public Pages deployment has not yet been verified for this candidate.
 - Desktop/mobile human QA remains pending. CI must not be described as human acceptance.
 
