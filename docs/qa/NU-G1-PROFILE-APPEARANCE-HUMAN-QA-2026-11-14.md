@@ -57,7 +57,7 @@ Record browser and OS, device class, viewport, pass/fail per item, console error
 - [ ] Public-card availability choices are visible: optional, local-identity-required/public-optional, and required comparison.
 - [ ] Share preview is blocked unless explicit consent is selected; no network transfer occurs.
 - [ ] YES/NO private-access flow is understandable; only fake test text is used and no authentication occurs.
-- [ ] Recovery options can be previewed without recovering or changing data.
+- [ ] Recovery options (owner/admin-authorized reset, local recovery phrase, no recovery, compare) can be previewed without recovering or changing data.
 - [ ] Local save, export, import and server-sync buttons clearly report simulation only and create no file, save or network request.
 - [ ] Image fit toggles crop-to-fill / contain.
 - [ ] 2×4 grid can be compared as image anchor or photo slot.
