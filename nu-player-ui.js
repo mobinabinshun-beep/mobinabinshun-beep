@@ -88,8 +88,8 @@
   function close(){if(profileView.classList.contains("active")){["demo-name","demo-call","demo-family","demo-age"].forEach(id=>{const field=$(id);if(field)field.value="";});const warning=$("demo-profile-warning");if(warning)warning.hidden=true;applyAppearance(true);resetWorkshop();}document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));(previousView&&previousView!==walletView&&previousView!==profileView?previousView:$("home-view")).classList.add("active");previousView=null;window.dispatchEvent(new Event("nu:player-overlay-close"));}
   $("wallet-back").addEventListener("click",close);
   $("profile-back").addEventListener("click",close);
-  const demoFields=["demo-name","demo-call","demo-family","demo-age"];
-  demoFields.forEach(id=>{const field=$(id);if(field)field.addEventListener("input",()=>{$("demo-profile-warning").hidden=false;});});
+  const demoFields=["demo-name","demo-call","demo-family","demo-age","demo-age-band","demo-bio","demo-interests"];
+  demoFields.forEach(id=>{const field=$(id);if(field){["input","change"].forEach(type=>field.addEventListener(type,()=>{$("demo-profile-warning").hidden=false;}));}});
   const appearanceDefaults={hue:205,tone:0,lightness:48};
   const appearanceCard=$("profile-view").querySelector(".demo-profile-card");
   const appearancePanel=$("profile-view").querySelector(".demo-profile-appearance");
@@ -123,7 +123,7 @@
     if(demoPrivateState)demoPrivateState.textContent=privateMode?"OPEN · SIMULATED":"CLOSED";
     const selected=publicToggles.filter(toggle=>toggle.checked).map(toggle=>{
       const field=$(toggle.dataset.demoPublic),value=field&&field.value.trim();
-      return value?field.previousElementSibling.textContent+": "+value:null;
+      const label=field&&(field.closest("label")?.textContent||field.previousElementSibling?.textContent||toggle.dataset.demoPublic);\n      return value?label.replace(/\\s+/g," ").trim()+": "+value:null;
     }).filter(Boolean);
     demoPublicPreview.textContent=privateMode?"PRIVATE VIEW PREVIEW · This is only a visual simulation.":selected.length?selected.join(" · "):"Public card preview is empty until you explicitly select fields.";
   }
@@ -142,7 +142,7 @@
     if(appearanceState)appearanceState.textContent=locked?"STAGE B COMPLETE · APPEARANCE LOCK SIMULATED · IMAGE AND POSITION REMAIN EDITABLE":"STAGE A · APPEARANCE IS NOT CONFIRMED";
   }
   if(appearanceConfirm)appearanceConfirm.addEventListener("click",()=>setAppearanceLock(true));
-  if(appearanceReset)appearanceReset.addEventListener("click",()=>{setAppearanceLock(false);applyAppearance(true);});
+  if(appearanceReset)appearanceReset.addEventListener("click",()=>{setAppearanceLock(false);applyAppearance(true);applyVisualDesign(true);});
   const imageInput=$("demo-card-image");
   const avatarEl=document.querySelector("#profile-view .demo-avatar");
   if(imageInput)imageInput.addEventListener("change",()=>{
@@ -169,6 +169,25 @@
     renderPublicPreview();setAppearanceLock(false);
   }
   renderPublicPreview();
+  const visualIds=["demo-frame-material","demo-card-font","demo-corners","demo-holo","demo-glow","demo-glass","demo-scanlines","demo-data-texture","demo-motion","demo-quality"];
+  function applyVisualDesign(reset){
+    const defaults={"demo-frame-material":"glass","demo-card-font":"mono","demo-corners":"soft","demo-holo":"60","demo-glow":"45","demo-glass":"55","demo-scanlines":true,"demo-data-texture":false,"demo-motion":false,"demo-quality":"balanced"};
+    visualIds.forEach(id=>{const el=$(id);if(el&&reset){if(el.type==="checkbox")el.checked=defaults[id];else el.value=defaults[id];}});
+    const card=appearanceCard;if(!card)return;
+    card.dataset.material=$("demo-frame-material").value;
+    card.dataset.font=$("demo-card-font").value;
+    card.dataset.corners=$("demo-corners").value;
+    card.dataset.quality=$("demo-quality").value;
+    card.style.setProperty("--demo-holo-opacity",String(Number($("demo-holo").value)/100));
+    card.style.setProperty("--demo-glow-strength",String(Number($("demo-glow").value)/100));
+    card.style.setProperty("--demo-glass-alpha",String(Number($("demo-glass").value)/100));
+    card.classList.toggle("has-scanlines",!!$("demo-scanlines").checked);
+    card.classList.toggle("has-data-texture",!!$("demo-data-texture").checked);
+    card.classList.toggle("has-ambient-motion",!!$("demo-motion").checked);
+    ["holo","glow","glass"].forEach(key=>{const out=$("demo-"+key+"-value");if(out)out.textContent=$("demo-"+key).value+"%";});
+  }
+  visualIds.forEach(id=>{const el=$(id);if(el){el.addEventListener("input",()=>applyVisualDesign(false));el.addEventListener("change",()=>applyVisualDesign(false));}});
+  applyVisualDesign(false);
   const demoClose=$("demo-profile-close"),demoClear=$("demo-profile-clear");
   if(demoClose)demoClose.addEventListener("click",close);
   if(demoClear)demoClear.addEventListener("click",close);
