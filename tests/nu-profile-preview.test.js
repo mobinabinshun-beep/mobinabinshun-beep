@@ -10,9 +10,9 @@ test("wallet tabs are mounted before wallet panel content at the upper edge", ()
   const tabs = html.indexOf('class="wallet-card-tabs"');
   const balances = html.indexOf('data-wallet-panel="balances"');
   assert.ok(panel >= 0 && tabs > panel && balances > tabs);
-  assert.match(css, /\.wallet-card-tabs\{align-items:flex-start;margin:-22px -22px 24px/);
-  assert.match(css, /\.wallet-card-tab\{border-top:0;[\s\S]*?transform:translateY\(9px\)/);
-  assert.match(css, /\.wallet-card-tab:hover,[\s\S]*?transform:translateY\(0\)/);
+  assert.match(css, /\.wallet-card-tabs\{position:relative;z-index:0/);
+  assert.match(css, /\.wallet-card-tab\{position:relative;z-index:0;[\s\S]*?transform:translateY\(13px\)/);
+  assert.match(css, /\.wallet-card-tab:hover,[\s\S]*?transform:translateY\(-10px\)/);
 });
 
 test("classic profile preview keeps public and owner fields separated", () => {
