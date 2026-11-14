@@ -19,9 +19,15 @@ test("the original profile uses the 150px image placeholder and two-column field
   assert.match(css, /@media\(max-width:600px\)\{\.demo-profile-card\{grid-template-columns:1fr\}/);
 });
 
-test("the historical profile remains transient and does not expose later identity/palette controls", () => {
-  assert.doesNotMatch(html, /player-id-number|player-rank-hue|profile-palette-panel|player-identity-save/);
+test("the historical profile stays display-only while exposing three temporary appearance controls", () => {
+  assert.doesNotMatch(html, /player-id-number|player-rank-hue|player-identity-save/);
+  for (const id of ["demo-card-hue","demo-card-tone","demo-card-lightness"]) assert.ok(html.includes('id="'+id+'"'));
+  assert.match(html, /CARD APPEARANCE · DEMO CONTROLS/);
+  assert.match(html, /saved appearance settings are available/);
   assert.match(playerUi, /if\(!\$\("player-id"\)\)return/);
   assert.match(playerUi, /demo-profile-warning/);
   assert.match(playerUi, /demo-profile-close/);
+  assert.match(playerUi, /applyAppearance\(true\)/);
+  assert.match(playerUi, /--demo-card-hue/);
+  assert.match(playerUi, /--demo-neutral-alpha/);
 });
