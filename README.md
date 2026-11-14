@@ -441,3 +441,13 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 - Casino Credits are shown as a Generation 1 virtual asset, separate from XP, Mana and HP.
 - No conversion pairs, rates, fees, or exchange eligibility are invented. Conversion remains unavailable until the owner approves the pair/rate rules.
 - History is limited to the wallet's retained local transaction window (currently 40 entries). Local browser data is not server-authoritative and does not synchronize across devices.
+
+
+## Generation 1.15 — Creative Studio SVG and blueprint controls (2026-11-14)
+
+- The blank Creative Studio canvas now starts at 3×3. The square starter presets are every odd size from 1×1 through 361×361; manual artwork dimensions use odd steps and are normalized to an odd value when applied. Imported source dimensions remain preserved unless the user explicitly chooses a reduced import detail or resizes the working copy.
+- Added local SVG file import. The importer parses XML, accepts an allowlist of vector elements/attributes, strips script/event handlers and external references, and rasterizes the sanitized vector into the editable pixel grid. The original SVG file is not modified or uploaded. Unsupported SVG features (for example filters, embedded images, external stylesheets and text rendering) are intentionally not executed or imported.
+- SVG export remains editable vector geometry (contour paths or pixel runs). The oversized-raster fallback now emits valid XML line breaks and an embedded PNG only when contour vectorization exceeds its safe limit.
+- Added an optional non-destructive Blueprint overlay with the central pixel highlighted, horizontal/vertical center axes and selectable 1/4/8/16-section guides. It is a visual guide only and does not alter artwork or export data.
+- Added a Node regression test for center-cell selection, including 1×1, 3×3 and 361×361 boards.
+- Manual browser QA remains required for SVG renderer compatibility, real-device import memory limits, visual overlay alignment at zoom/scroll levels, and download behavior. SVG import is a raster-to-pixel workflow, not an editable vector-layer importer; SVG export is the vector interchange format.
