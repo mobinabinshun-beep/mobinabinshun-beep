@@ -3,12 +3,14 @@
   "use strict";
   const root = document.getElementById("nu-hex-gateway");
   const scrim = document.querySelector(".nu-gateway-scrim");
-  if (!root || !scrim) return;
+  const gameView = document.getElementById("game-view");
+  // The owner approved Gateway only for the main game page. Other internal
+  // pages keep their legacy navigation and remain untouched by this controller.
+  if (!root || !scrim || !gameView) return;
 
   const trigger = root.querySelector(".nu-gateway-trigger");
   const items = [...root.querySelectorAll(".nu-gateway-item")];
   const pauseButton = document.getElementById("finish-round");
-  const gameView = document.getElementById("game-view");
   let open = false;
   let pausedByGateway = false;
   let selected = null;
@@ -19,7 +21,7 @@
   let suppressClickUntil = 0;
 
   function syncGatewayScope() {
-    document.body.classList.add("nu-gateway-enabled");
+    document.body.classList.add("nu-gateway-enabled","nu-main-game-page");
     document.body.classList.toggle("nu-game-active", Boolean(gameView?.classList.contains("active")));
   }
   syncGatewayScope();
