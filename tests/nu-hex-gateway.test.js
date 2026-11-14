@@ -20,7 +20,7 @@ test("gateway is mounted on every internal Generation 1 page", () => {
 });
 
 test("gateway remains available across all views in the main world", () => {
-  assert.match(js, /classList\.add\("nu-gateway-enabled"\)/);
+  assert.match(js, /classList\.add\("nu-gateway-enabled","nu-main-game-page"\)/);\n  assert.match(js, /if \(!root \|\| !scrim \|\| !gameView\) return/);
   assert.match(js, /gameView\?\.classList\.contains\("active"\)/);
   assert.match(js, /MutationObserver/);
   assert.match(css, /body\.nu-gateway-enabled #nu-hex-gateway/);
