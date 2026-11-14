@@ -6,6 +6,13 @@
 })(typeof window!=="undefined"?window:globalThis,function(){
   "use strict";
   const MAX_HP=10,HP_PILL_COST=10,MAX_TRANSACTIONS=24;
+  const assetRegistry=new Map();
+  const gameAssetRegistry=new Map();
+  function registerAsset(definition){
+    if(!definition||typeof definition.key!=="string"||!/^[a-zA-Z][a-zA-Z0-9_-]{0,47}$/.test(definition.key))return false;
+    assetRegistry.set(definition.key,{key:definition.key,label:String(definition.label||definition.key).slice(0,48),unit:String(definition.unit||"").slice(0,16),group:String(definition.group||"game").slice(0,32),precision:Number.isInteger(definition.precision)?Math.max(0,Math.min(8,definition.precision)):0});return true;
+  }
+  function registerGameAssets(gameId,keys){if(typeof gameId!=="string"||!Array.isArray(keys))return false;gameAssetRegistry.set(gameId.toLowerCase(),new Set(keys.filter(k=>typeof k==="string")));return true;}
   const number=(value,fallback,min=0,max=Number.MAX_SAFE_INTEGER)=>{
     const n=Number(value);
     return Number.isFinite(n)?Math.max(min,Math.min(max,n)):fallback;
@@ -73,24 +80,33 @@
     return {ok:true,state:next,wager:stake,payout:returned,net:returned-stake,transaction:entry};
   }
   function gameAssetRows(raw,gameId){
-    const rows=assetRows(raw),shared={hp:true},profiles={
-      bubble:{xp:true,hp:true,hpPills:true},
-      mana:{mana:true,manaCapsules:true,hp:true},
-      chaos:{hp:true,mana:true,xp:true,hpPills:true,manaCapsules:true}
-    };
-    const selected=profiles[String(gameId||"").toLowerCase()]||shared;
-    return rows.filter(row=>selected[row.key]);
+    const id=String(gameId||"").toLowerCase(),rows=assetRows(raw);
+    const defaults={bubble:["xp","hp","hpPills"],mana:["mana","manaCapsules","hp"],chaos:["hp","mana","xp","hpPills","manaCapsules"]};
+    const keys=gameAssetRegistry.get(id)||new Set(defaults[id]||["hp"]);
+    return rows.filter(row=>keys.has(row.key));
   }
   function assetRows(raw){
-    const s=normalizeSave(raw);
-    return [
-      {key:"xp",label:"XP",value:s.xp,unit:""},
-      {key:"mana",label:"Mana",value:s.mana,unit:""},
-      {key:"hp",label:"HP",value:s.hp,unit:"/ 10"},
-      {key:"hpPills",label:"HP Capsules",value:s.hpPills,unit:""},
-      {key:"manaCapsules",label:"Mana Capsules",value:s.manaCapsules,unit:""},
-      {key:"casinoCredits",label:"Casino Credits",value:s.casinoCredits,unit:""},
+    const s=normalizeSave(raw),rows=[
+      {key:"xp",label:"XP",value:s.xp,unit:"",group:"progression"},
+      {key:"mana",label:"Mana",value:s.mana,unit:"",group:"resources"},
+      {key:"hp",label:"HP",value:s.hp,unit:"/ 10",group:"vitals"},
+      {key:"hpPills",label:"HP Capsules",value:s.hpPills,unit:"",group:"consumables"},
+      {key:"manaCapsules",label:"Mana Capsules",value:s.manaCapsules,unit:"",group:"consumables"},
+      {key:"casinoCredits",label:"Casino Credits",value:s.casinoCredits,unit:"",group:"games"},
+      {key:"xCredits",label:"X Credits",value:s.xCredits,unit:"",group:"currency"},
+      {key:"nCredits",label:"N Credits",value:s.nCredits,unit:"",group:"currency"}
     ];
+    const dynamic=s.assets&&typeof s.assets==="object"&&!Array.isArray(s.assets)?s.assets:{};
+    for(const [key,definition] of assetRegistry){
+      if(Object.prototype.hasOwnProperty.call(dynamic,key)){
+        const value=Number(dynamic[key]);if(Number.isFinite(value))rows.push({key,label:definition.label,value,unit:definition.unit,group:definition.group});
+      }
+    }
+    for(const [key,value] of Object.entries(dynamic)){
+      if(assetRegistry.has(key))continue;
+      const amount=Number(value);if(Number.isFinite(amount))rows.push({key,label:key.replace(/[-_]/g," ").replace(/\b\w/g,c=>c.toUpperCase()),value:amount,unit:"",group:"game"});
+    }
+    return rows;
   }
   function assetHistory(raw,key){
     const s=normalizeSave(raw),current=Number(s[key]);
@@ -107,5 +123,5 @@
     if(!entries.length)points.push({id:"current",at:"",title:"Current balance · no recorded changes",delta:0,balance:current});
     return points;
   }
-  return {MAX_HP,HP_PILL_COST,MAX_TRANSACTIONS,normalizeSave,buyHpPill,useHpPill,grantXP,settleCasinoRound,assetRows,gameAssetRows,assetHistory};
+  return {MAX_HP,HP_PILL_COST,MAX_TRANSACTIONS,normalizeSave,buyHpPill,useHpPill,grantXP,settleCasinoRound,registerAsset,registerGameAssets,assetRows,gameAssetRows,assetHistory};
 });
