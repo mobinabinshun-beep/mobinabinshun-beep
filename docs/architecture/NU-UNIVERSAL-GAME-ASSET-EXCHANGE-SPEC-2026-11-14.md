@@ -7,14 +7,14 @@
 
 ## 1. Product objective
 
-Build one extensible exchange layer that can understand assets and player profiles from every current and future N.U game. Generation 1 examples include XP in the painting/creative game, Bubble Hunt resources, Mana, capsules and casino credits. Future games must register through the same contract rather than requiring a bespoke exchange rewrite.
+Build one extensible exchange layer that can understand assets and player profiles from every current and future N.U game. Bubble Hunt, Chaos Attack and Mana Collector belong to one shared Generation 1 economic profile (`nu.g1.shared-economy`) backed by one common wallet/save, with game-specific filtered views and source provenance. Creative Studio rewards currently feed the legacy shared XP field but must retain Studio provenance in the target model. Future games register through the same contract rather than requiring a bespoke exchange rewrite.
 
 The exchange is an internal N.U game-economy system. It is not a real-money exchange, external crypto market, or promise that every item is freely convertible.
 
 ## 2. Current code findings (inspected 2026-11-14)
 
 - `nu-wallet.js` currently stores a browser-local save with XP, Mana, HP, HP capsules, Mana capsules and casino credits. Transaction history is capped at 40 entries.
-- `NUWallet.gameAssetRows()` has hard-coded game profiles (`bubble`, `mana`, `chaos`) and a fallback. It does not yet provide a universal player profile or a discoverable game/asset manifest.
+- `NUWallet.gameAssetRows()` has hard-coded filtered views (`bubble`, `mana`, `chaos`) over one common wallet/save; README confirms these are views, not separate balances. A profile-family manifest and per-event provenance are not yet implemented.
 - `nu-exchange-core.js` has a minimal in-memory `registerGame()` registry, but asset metadata is limited to id/label/unit. It has no canonical valuation, conversion route, profile bridge, persistence, or settlement implementation.
 - `transferAvailability()` deliberately returns `SETTLEMENT_NOT_IMPLEMENTED`; `transfer()` returns `CROSS_GAME_SETTLEMENT_DISABLED`. Keep this safety boundary until authoritative settlement exists.
 - `exchange.html` currently labels the conversion panel “GAME-TO-GAME ASSET TRANSFER”; selectors depend on registered adapters and can remain empty.
@@ -74,7 +74,7 @@ Browser localStorage is not authoritative and is not safe for cross-device, mult
 
 - Inventory all existing games and their actual save schemas before mapping assets. Do not infer missing values.
 - Register each current game with a manifest; mark unsupported items non-convertible.
-- Keep XP_Studio and XP_Bubble Hunt game-scoped, preserve provenance, and approve any equivalence ratio before enabling a route.
+- Use the Generation 1 shared profile family for Bubble Hunt, Chaos Attack and Mana Collector; keep source attribution and map Studio/new-game assets by benchmark rung and approved ratios.
 - Publish an asset catalog with current balance, unit, owning game, valuation class and conversion eligibility.
 - Implement profile bridge in read-only mode first.
 - Implement quote preview with no ledger mutation.
@@ -184,3 +184,52 @@ All event records and chart series must carry `gameId`, `assetId`, `unit`, `sour
 4. Define and approve any XP_Bubble Hunt / XP_Studio equivalence ratio before enabling that pair.
 5. Keep XP_Bubble Hunt / Mana disabled and test that all disallowed pairs are rejected.
 6. Keep settlement disabled until the authoritative ledger and all safety requirements in Sections 6 and 9 pass.
+
+
+## 13. Generation 1 shared profile and benchmark catalog (owner direction, 2026-11-14)
+
+### 13.1 Shared profile family
+
+Bubble Hunt, Chaos Attack and Mana Collector are one economic family: `nu.g1.shared-economy`. They share one wallet/save and a common asset pool; the current per-game asset-profile UI is a filtered view, not a separate wallet. The profile bridge must show both the common balances and the source/game provenance of each earning or spending event.
+
+Studio is a separate creative tool with its own earning formula and owner-defined progression anchor, although the current prototype writes Studio rewards into the legacy shared XP field. New data must preserve the Studio source identity. Do not infer the origin of historical shared XP.
+
+### 13.2 Generation 1 benchmark anchors
+
+Source audit of `nu-games.js`, `nu-wallet.js`, `nu-pixel-art-studio.js` and README:
+- Bubble Hunt: +1 shared XP for each successful target interaction.
+- Chaos Attack: +3 shared XP for each successful N-BI shot; each successful shot consumes 10 Mana.
+- Mana Collector: +1 Mana for each successful Mana collection.
+- Mana storage: one Mana Capsule provides 10 Mana capacity; current wallet starts with one and caps at 10. No capsule purchase ladder was found.
+- Golden HP Capsule: costs 10 legacy shared XP; restores up to 10 missing HP. This is not the Bubble Hunt Capsule.
+- HP: maximum 10; successful round completion restores up to 1 HP; Chaos breach removes 1 HP.
+- Casino Credits: starts at 100 virtual credits and is used only in Casino. It is not cash and has no deposit or cash-out.
+- X Credits and N Credits exist as legacy save fields but no implemented earning/spending valuation was found.
+- Studio: provisional export formula awards 1–25 XP per eligible unique artwork fingerprint. It currently credits the legacy shared XP field. Owner's target anchor is 50 XP_Studio per Studio level; existing wallet code still increments legacy level every 100 XP.
+
+Owner-provided Bubble Hunt anchor: 100 XP_Bubble Hunt = 1 Bubble Hunt Capsule. The inspected current game code grants +1 XP per successful interaction but does not implement this capsule mint/redemption ladder. The later capsule/coin/credit rungs remain UNVERIFIED until their authoritative game rules are located.
+
+### 13.3 Price benchmark and modular matching
+
+Use the new catalog as the Generation 1 baseline:
+`docs/economy/NU-GENERATION-1-BASE-ECONOMY-REFERENCE-CATALOG-2026-11-14.md`.
+
+Each new game's assets are evaluated independently against:
+- earning mechanism and verified yield per successful action/minute;
+- time, skill, difficulty, risk and ease-of-farming adjustment;
+- progression role and ladder thresholds;
+- sinks, cost, redemption utility and capacity;
+- supply, caps, reset cadence and scarcity;
+- source-of-truth and anti-automation integrity.
+
+Matching one rung does not make the entire ladder equivalent. A new game's coin can match the Bubble Hunt earning index while its 1,000-coin capsule remains unmatched to the Bubble Hunt Capsule. A new game may have no XP at all; its coins/credits can still be benchmarked through their own earning and sink mechanics. Different labels do not prevent equivalence; matching names do not establish it.
+
+Illustrative ratio only: if policy approves 2 units of a new-game asset as equivalent to 1 XP_Bubble Hunt benchmark unit, record 0.5 BHXP-index per new-game unit. This is not a default live rate. Easier earning, faster farming or lower risk must be measured and reflected in the adjustment factor.
+
+### 13.4 Index and quote requirements
+
+Maintain separate earning, effort, progression, sink, scarcity/supply and integrity indices. A quote must identify the reference profile, asset pair, ratio, evidence, adjustment factors, fee, rounding, limits, policy version, approver and expiry. A route may be approved for one rung while other rungs remain non-equivalent. XP_Bubble Hunt -> Mana remains prohibited. No conversion is inferred from raw chart values.
+
+### 13.5 Implementation boundaries
+
+The current prototype still uses one legacy shared XP balance and browser-local storage. Do not silently split or relabel historical XP. New events require `gameId`, `profileFamily`, `assetId`, `sourceEvent`, amount, timestamp and adapter version. Preserve legacy XP as unattributed until an owner-approved migration exists. No settlement, wallet, ledger, Gateway, merge or deployment behavior is enabled by this specification.
