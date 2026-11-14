@@ -4,8 +4,8 @@ const core=require("../nu-exchange-core.js"),guard=require("../nu-exchange-guard
 function memory(){const m=new Map();return {getItem:k=>m.has(k)?m.get(k):null,setItem:(k,v)=>m.set(k,String(v)),removeItem:k=>m.delete(k)};}
 test("registry starts empty and only exposes explicitly registered game assets",()=>{
  core.clear();assert.deepEqual(core.listGames(),[]);assert.deepEqual(core.listAssets(),[]);
- const unregister=core.registerGame({id:"game-a",name:"Game A",assets:[{id:"crystal",label:"Crystal"}]});
- assert.equal(core.listAssets()[0].games[0].id,"game-a");unregister();assert.deepEqual(core.listGames(),[]);
+ const unregister=core.registerGame({id:"game-a",name:"Game A",assets:[{id:"crystal",label:"Crystal"}],coins:[{id:"nu-coin",label:"N.U Coin"}]});
+ assert.equal(core.listAssets()[0].games[0].id,"game-a");assert.equal(core.listCoins()[0].id,"nu-coin");unregister();assert.deepEqual(core.listGames(),[]);
 });
 test("cross-game settlement remains disabled until both approved adapters exist",()=>{
  core.clear();core.registerGame({id:"a",name:"A",assets:[{id:"coin",label:"Coin"}],transferEnabled:false});core.registerGame({id:"b",name:"B",assets:[{id:"coin",label:"Coin"}],transferEnabled:false});
