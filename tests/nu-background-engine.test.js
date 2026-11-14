@@ -38,7 +38,7 @@ test("demo page loads the image-first engine and the engine points to the local 
 });
 
 test("background image paints above the decorative sky but below foreground content", () => {
-  assert.match(engine, /z-index:-3/);
+  assert.match(engine, /z-index:-1/);
   assert.match(css, /\.sky\{z-index:-4!important\}/);
   assert.match(html, /<div class="sky"><\/div>/);
 });

@@ -23,3 +23,13 @@
 - Persistent profile save or launcher-level profile locking.
 
 This is the earliest profile implementation found in the repository history. It is a demo mock-up, not an authenticated player account.
+
+
+## 2026-11-14 — scoped appearance-control preview
+
+- Preserved the historical profile card and its four optional fields.
+- Added a separate appearance panel immediately below the profile card with three independent controls: hue spectrum, neutral white/dark overlay, and selected-color lightness.
+- Controls update only the visible demo card preview. They are not persisted and reset to the neutral defaults when the profile closes.
+- Appearance adjustments do not trigger the personal-data warning; editing profile text fields still does.
+- This is a demo interaction only. No image upload, account identity, server sync, profile save, or operational player-card lock is introduced.
+- Human QA remains required for visual balance, mobile layout, keyboard/touch behavior and reset behavior.
