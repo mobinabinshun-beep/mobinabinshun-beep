@@ -35,3 +35,27 @@ test("the historical profile stays display-only while exposing three temporary a
   assert.match(playerUi, /--demo-card-hue/);
   assert.match(playerUi, /--demo-neutral-alpha/);
 });
+
+
+test("unified workshop exposes explicit privacy, private-view simulation and staged appearance confirmation", () => {
+  for (const marker of ["demo-public-preview","demo-private-preview","demo-appearance-confirm","demo-appearance-reset"]) assert.ok(html.includes('id="'+marker+'"'));
+  for (const field of ["demo-name","demo-call","demo-family","demo-age"]) assert.ok(html.includes('data-demo-public="'+field+'"'));
+  assert.match(html, /All fields start private/);
+  assert.match(playerUi, /STAGE B COMPLETE/);
+  assert.match(playerUi, /control.disabled=locked/);
+  assert.match(playerUi, /resetWorkshop\(\)/);
+});
+
+test("image placement concept has eight cells and local-only file preview", () => {
+  assert.equal((html.match(/data-demo-placement=/g)||[]).length,8);
+  assert.match(html, /type="file" accept="image\/\*"/);
+  assert.match(playerUi, /readAsDataURL/);
+  assert.match(playerUi, /PLACEHOLDER IMAGE · POSITION 1 OF 8/);
+  assert.match(css, /\.demo-placement-grid\{display:grid;grid-template-columns:repeat\(4/);
+});
+
+test("profile keeps game stats and wallet outside the historical display card", () => {
+  assert.match(html, /GAME STATUS &amp; WALLET BOUNDARY/);
+  assert.match(html, /PROFILE CARD.*DISPLAY IDENTITY ONLY/);
+  assert.doesNotMatch(html, /player-id-number/);
+});
