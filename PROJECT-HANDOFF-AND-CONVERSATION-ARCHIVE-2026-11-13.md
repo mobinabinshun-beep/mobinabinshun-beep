@@ -128,4 +128,4 @@ This file captures all project context and user requirements that were visible i
 - Operational target: player completes profile fields, explores a provisional appearance, then confirms a final appearance in a second stage. That confirmation freezes card color/customization. After lock, only the image and its placement in a 2×4 grid remain editable.
 - The image upload, placement grid, two-stage workflow, persistent profile and server behavior are not implemented in the public demo.
 - At Generation 1 closeout, prepare the operational launcher-mounted downloadable build, not the public demo, for packaging. See `docs/implementation/NU-G1-PLAYER-PROFILE-OPERATIONAL-SPEC.md`.
-- The profile appearance panel is under a scoped pre-packaging freeze; changes require explicit owner approval. Human browser/device QA is still required.
+- No profile appearance freeze or lock has been authorized; a full historical and cross-repository audit must precede any lock decision. Human browser/device QA is still required.
