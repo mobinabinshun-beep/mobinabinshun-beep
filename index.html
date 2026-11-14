@@ -51,7 +51,7 @@
 <label><input type="checkbox" data-demo-public="demo-name"> Name</label>
 <label><input type="checkbox" data-demo-public="demo-call"> Callsign</label>
 <label><input type="checkbox" data-demo-public="demo-family"> Family Name</label>
-<label><input type="checkbox" data-demo-public="demo-age"> Age</label>
+<label><input type="checkbox" data-demo-public="demo-age"> Age</label><label><input type="checkbox" data-demo-public="demo-age-band" data-demo-editable> Age Band</label><label><input type="checkbox" data-demo-public="demo-bio" data-demo-editable> Bio</label><label><input type="checkbox" data-demo-public="demo-interests" data-demo-editable> Interests</label>
 </div>
 <label class="demo-private-toggle"><input id="demo-private-preview" type="checkbox"> Preview private profile view (simulation only)</label>
 <div id="demo-public-preview" class="demo-public-preview" aria-live="polite">Public card preview is empty until you explicitly select fields.</div>
@@ -78,6 +78,39 @@
 <button type="button" data-demo-placement="1" aria-pressed="true">1</button><button type="button" data-demo-placement="2" aria-pressed="false">2</button><button type="button" data-demo-placement="3" aria-pressed="false">3</button><button type="button" data-demo-placement="4" aria-pressed="false">4</button><button type="button" data-demo-placement="5" aria-pressed="false">5</button><button type="button" data-demo-placement="6" aria-pressed="false">6</button><button type="button" data-demo-placement="7" aria-pressed="false">7</button><button type="button" data-demo-placement="8" aria-pressed="false">8</button>
 </div>
 <p id="demo-image-state" class="demo-lab-hint" aria-live="polite">PLACEHOLDER IMAGE · POSITION 1 OF 8</p>
+</div>
+<div class="demo-lab-block">
+<h4>OPTIONAL OPERATIONAL PROFILE DETAILS · CONCEPT</h4>
+<p>Separate from the restored historical four-field card. Temporary review fields only.</p>
+<label class="demo-extra-field">AGE BAND (OPTIONAL)
+<select id="demo-age-band" data-demo-editable><option value="">Not provided</option><option>Under 18</option><option>18–24</option><option>25–34</option><option>35–44</option><option>45–54</option><option>55+</option><option>Prefer not to say</option></select></label>
+<label class="demo-extra-field">BIO (OPTIONAL)<textarea id="demo-bio" data-demo-editable rows="2" maxlength="240" placeholder="Short introduction — test text only"></textarea></label>
+<label class="demo-extra-field">INTERESTS / HOBBIES (OPTIONAL)<input id="demo-interests" data-demo-editable maxlength="160" placeholder="Topics and interests — test text only"></label>
+<p class="demo-lab-hint">Age band is an alternative operational concept to exact age; final field model remains subject to owner review.</p>
+</div>
+<div class="demo-lab-block">
+<h4>HOLOGRAPHIC CARD DESIGN LAB · CONCEPT CONTROLS</h4>
+<div class="demo-extra-field"><label for="demo-frame-material">FRAME MATERIAL</label><select id="demo-frame-material" data-demo-editable><option value="glass">Holographic glass</option><option value="metal">Brushed metal</option><option value="ceramic">Ceramic composite</option></select></div>
+<div class="demo-extra-field"><label for="demo-card-font">TYPOGRAPHY</label><select id="demo-card-font" data-demo-editable><option value="mono">Technical mono</option><option value="modern">Modern sans</option><option value="serif">Editorial serif</option></select></div>
+<div class="demo-extra-field"><label for="demo-corners">CORNER GEOMETRY</label><select id="demo-corners" data-demo-editable><option value="soft">Soft radius</option><option value="sharp">Angular</option><option value="round">Rounded</option></select></div>
+<div class="demo-extra-field"><label for="demo-holo">HOLOGRAM INTENSITY <output id="demo-holo-value">60%</output></label><input id="demo-holo" data-demo-editable type="range" min="0" max="100" value="60"></div>
+<div class="demo-extra-field"><label for="demo-glow">EDGE GLOW <output id="demo-glow-value">45%</output></label><input id="demo-glow" data-demo-editable type="range" min="0" max="100" value="45"></div>
+<div class="demo-extra-field"><label for="demo-glass">GLASS TRANSPARENCY <output id="demo-glass-value">55%</output></label><input id="demo-glass" data-demo-editable type="range" min="0" max="100" value="55"></div>
+<div class="demo-privacy-grid">
+<label><input id="demo-scanlines" data-demo-editable type="checkbox" checked> Scan lines</label>
+<label><input id="demo-data-texture" data-demo-editable type="checkbox"> Data texture</label>
+<label><input id="demo-motion" data-demo-editable type="checkbox"> Ambient motion</label>
+</div>
+<div class="demo-extra-field"><label for="demo-quality">DEVICE QUALITY PRESET</label><select id="demo-quality" data-demo-editable><option value="economy">Economy</option><option value="balanced" selected>Balanced</option><option value="enhanced">Enhanced</option></select></div>
+<p class="demo-lab-hint">Visual-only design controls. Reduced-motion preferences and readability must override decorative effects.</p>
+</div>
+<div class="demo-lab-block">
+<h4>LOCAL SAVE, SECURITY &amp; FUTURE NETWORK · STATUS PREVIEW</h4>
+<div class="demo-concept-row"><span>LOCAL PLAYER SAVE</span><strong>CONCEPT ONLY · NOT CONNECTED</strong></div>
+<div class="demo-concept-row"><span>ENCRYPTED EXPORT / VALIDATED IMPORT</span><strong>NOT IMPLEMENTED IN DEMO</strong></div>
+<div class="demo-concept-row"><span>PUBLIC SHARE</span><strong>NO AUTO-SHARE · EXPLICIT OPT-IN REQUIRED</strong></div>
+<div class="demo-concept-row"><span>ONLINE SYNC / SERVER</span><strong>FUTURE WORK · OFFLINE IN THIS DEMO</strong></div>
+<p class="demo-lab-hint">The operational target requires protected local saves, authenticated private access, safe import/export and recovery. This public preview collects no password and performs no save, import, export or network sync.</p>
 </div>
 <div class="demo-lab-block">
 <h4>GAME STATUS &amp; WALLET BOUNDARY</h4>
