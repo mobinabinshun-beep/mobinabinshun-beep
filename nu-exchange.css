@@ -22,7 +22,7 @@
 .bias-indicator[data-direction="down"]{text-shadow:0 0 14px rgba(255,139,145,.35)}
 @keyframes bias-pulse{0%,100%{opacity:.72;transform:translateY(0)}50%{opacity:1;transform:translateY(-2px)}}
 #market-history{margin-bottom:18px}
-.change-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.change-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
 .change-grid .exchange-card select{width:100%}
 .conversion-panel button,.maintenance-latch button{border:1px solid var(--line);background:#152938;color:#8096a3;border-radius:7px;padding:11px 14px;font-weight:800}
 .conversion-panel button:disabled{cursor:not-allowed;opacity:.7}
