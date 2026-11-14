@@ -15,7 +15,7 @@
 - [ ] Appearance panel remains separate below the historical card.
 - [ ] Stage A sliders respond to mouse, touch and keyboard.
 - [ ] Confirm simulates Stage B lock and disables appearance sliders, profile text fields and public/private visibility toggles.
-- [ ] After the simulated lock, only image replacement and the 2×4 placement controls remain editable.
+- [ ] After the simulated lock, only image replacement and the 2×4 placement controls remain editable, including the extended profile and visual-design controls.
 - [ ] Reset returns to Stage A and default appearance.
 - [ ] Appearance confirmation does not claim to persist across sessions.
 
@@ -32,6 +32,15 @@
 - [ ] Selecting each cell updates the placement state.
 - [ ] Closing the profile removes the local preview and restores the placeholder.
 - [ ] File selection and placement work on desktop and mobile where supported.
+
+## Extended operational profile concepts
+- [ ] Age Band, Bio and Interests appear separately from the historical four-field card.
+- [ ] Extended fields are optional, temporary and private by default.
+- [ ] Frame material, typography and corner geometry update the preview.
+- [ ] Hologram intensity, edge glow and glass transparency update the preview.
+- [ ] Scan lines, data texture and ambient motion can be toggled.
+- [ ] Quality preset is visible as a preview choice; reduced-motion remains respected.
+- [ ] Local save, encrypted export/import and future network sections are clearly labelled as not implemented.
 
 ## Game data separation
 - [ ] Profile card remains separate from HP, XP, Mana, Wallet balances and transaction history.
