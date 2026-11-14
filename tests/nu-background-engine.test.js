@@ -46,13 +46,12 @@ test("background image is the deepest world layer while scene layers remain avai
   assert.doesNotMatch(css, /world\.nu-image-scene-active[\s\S]{0,180}display:none!important/);
 });
 
-test("procedural visual overlays remain quarantined from the public runtime", () => {
-  assert.match(runtime, /NUDynamicLayers&&g\.NUDynamicLayers\.stop/);
-  assert.match(runtime, /NUPixelWorld&&g\.NUPixelWorld\.setEnabled&&g\.NUPixelWorld\.setEnabled\(false\)/);
-  assert.match(runtime, /visualOverlays:"quarantined"/);
-  assert.doesNotMatch(html, /<script src="\.\/nu-pixel-world\.js/);
-  assert.ok(fs.existsSync(path.join(root, "archive/visual-layers/nu-pixel-world.js")));
-  assert.ok(fs.existsSync(path.join(root, "archive/visual-layers/nu-dynamic-layers.js")));
+test("procedural world renderer is restored as the failure fallback", () => {
+  assert.match(runtime, /if\(status\.loaded\)/);
+  assert.match(runtime, /NUPixelWorld&&g\.NUPixelWorld\.setEnabled&&g\.NUPixelWorld\.setEnabled\(true\)/);
+  assert.match(runtime, /NUDynamicLayers&&g\.NUDynamicLayers\.apply&&g\.NUDynamicLayers\.apply\(p\)/);
+  assert.match(html, /<script src="\.\/nu-pixel-world\.js"><\/script>/);
+  assert.match(runtime, /visualOverlays:status\.loaded\?"image-first":"procedural-fallback"/);
 });
 
 
@@ -71,5 +70,5 @@ test("public demo exposes runtime diagnostics for the world background",()=>{
  assert.match(engine,/dataset.state="loaded"/);
  assert.match(engine,/dataset.state="error"/);
  assert.match(engine,/naturalWidth:img/);
- assert.match(html,/id="nu-background-diagnostics"/);
+ assert.doesNotMatch(html,/id="nu-background-diagnostics"/);
 });
