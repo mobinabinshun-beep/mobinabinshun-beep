@@ -452,6 +452,9 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 
 ## Generation 1 — player profile appearance preview (2026-11-14)
 
+- Operational target and lock rules: [Player Profile & Card Appearance Specification](./docs/implementation/NU-G1-PLAYER-PROFILE-OPERATIONAL-SPEC.md).
+- Public demo QA checklist: [Profile Appearance Human QA](./docs/qa/NU-G1-PROFILE-APPEARANCE-HUMAN-QA-2026-11-14.md).
+
 - The restored historical profile remains the base layout: image placeholder plus Name, Callsign, Family Name and Age.
 - A separate card-appearance panel sits directly below the profile card and exposes three preview-only axes: color hue spectrum, neutral white/dark tint, and selected-color lightness.
 - The controls affect only the card preview and reset when the profile closes. They do not save profile data or appearance preferences and do not upload anything.
