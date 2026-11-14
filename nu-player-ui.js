@@ -85,7 +85,7 @@
     if(view===walletView){setWalletTab("balances");renderWallet();}else renderProfile();
     const menu=$("menu");if(menu)menu.classList.remove("open");
   }
-  function close(){document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));(previousView&&previousView!==walletView&&previousView!==profileView?previousView:$("home-view")).classList.add("active");previousView=null;window.dispatchEvent(new Event("nu:player-overlay-close"));}
+  function close(){if(profileView.classList.contains("active")){["demo-name","demo-call","demo-family","demo-age"].forEach(id=>{const field=$(id);if(field)field.value="";});const warning=$("demo-profile-warning");if(warning)warning.hidden=true;}document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));(previousView&&previousView!==walletView&&previousView!==profileView?previousView:$("home-view")).classList.add("active");previousView=null;window.dispatchEvent(new Event("nu:player-overlay-close"));}
   $("wallet-back").addEventListener("click",close);
   $("profile-back").addEventListener("click",close);
   const demoFields=["demo-name","demo-call","demo-family","demo-age"];
