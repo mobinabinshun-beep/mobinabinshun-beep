@@ -25,6 +25,8 @@ test("public runtime ships the byte-identical canonical Material background", ()
   const svg = bytes.toString("utf8");
   assert.match(svg, /<svg\b/);
   assert.match(svg, /data:image\/png;base64,/);
+  assert.match(assetReadme, /assets\/backgrounds\/niroo-universe-background\.svg/);
+  assert.doesNotMatch(assetReadme, /Until the binary is uploaded|Upload required/);
 });
 
 test("demo page loads the image-first engine and the engine points to the local public asset", () => {
