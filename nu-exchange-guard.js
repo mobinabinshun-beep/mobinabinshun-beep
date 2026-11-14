@@ -7,7 +7,7 @@
  "use strict";
  const LIMIT=10,COOLDOWN_MS=120000,KEY="nu_exchange_cooldown_until_v1";
  function create(options){
-  const storage=options&&options.storage||null,now=options&&options.now||(()=>Date.now();
+  const storage=options&&options.storage||null,now=options&&options.now||(()=>Date.now());
   let successes=0;
   function read(){try{return Number(storage&&storage.getItem(KEY))||0;}catch(_){return 0;}}
   function write(value){try{if(storage)storage.setItem(KEY,String(value));}catch(_){}}
