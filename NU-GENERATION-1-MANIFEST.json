@@ -3,7 +3,7 @@
   "generation": 1,
   "runtime": "N.U Adaptive Runtime",
   "runtimeVersion": "0.1-prototype",
-  "packageVersion": "0.5.6-gen1-hex-gateway-single-entrypoint",
+  "packageVersion": "0.5.7-gen1-exchange-modular-runtime",
   "entry": "index.html",
   "modules": [
     "index.html",
@@ -28,7 +28,11 @@
     "casino.html",
     "nu-casino.js",
     "nu-casino.css",
-    "nu-market-sim.js"
+    "nu-market-sim.js",
+    "nu-exchange-core.js",
+    "nu-exchange-guard.js",
+    "nu-exchange-replay.js",
+    "nu-exchange-lock.js"
   ],
   "randomPool": [
     "bubble",
@@ -163,12 +167,34 @@
     }
   ],
   "generation1Exchange": {
-    "status": "experimental-candidate",
+    "status": "modular-offline-single-player-candidate",
     "page": "exchange.html",
     "script": "nu-exchange.js",
-    "stylesheet": "nu-exchange.css",
-    "chart": "activity-driven-fictional-market-index-with-hourly-OHLC-candles-and-player-derived-volume-demand-supply",
-    "conversion": "disabled-pending-owner-approved-in-game-pairs-and-settlement-rules",
-    "note": "Fictional N.U-only market simulator. Index baseline 100 is arbitrary game-only units; positive wallet deltas represent simulated supply and negative deltas represent simulated demand. No external market data, real-world price peg, real-money value or cash-out."
+    "modules": [
+      "nu-exchange-core.js",
+      "nu-exchange-guard.js",
+      "nu-exchange-replay.js",
+      "nu-exchange-lock.js",
+      "nu-market-sim.js"
+    ],
+    "assets": "Only wallet-backed Generation 1 assets are listed; no placeholder coin is invented.",
+    "crossGameChange": "Prepared registry for Launcher game adapters; transfer settlement remains disabled until two compatible approved game adapters exist.",
+    "history": {
+      "writtenTransactionsPerAsset": 5,
+      "chartStepsPerAsset": 24,
+      "marketStepsPerAsset": 24,
+      "cache": "Dedicated local exchange cache rebuilt from the local wallet on refresh; underlying wallet ledger is not truncated."
+    },
+    "replayScales": [
+      "24s",
+      "1m24s",
+      "24m",
+      "1h24m",
+      "24d",
+      "2m24d"
+    ],
+    "cooldown": "Ten successful operations may complete in one Exchange visit; the 11th attempted operation starts a 120-second cooldown. Leaving before the 11th attempt resets the in-memory visit count.",
+    "maintenanceLock": "Cross-game transfer module is locked by default. A two-step local maintenance latch is a UX safeguard only, not authentication or anti-cheat.",
+    "note": "Fictional N.U-only activity visualization. Replay animation changes presentation only and never fabricates wallet events or real-world financial data."
   }
 }
