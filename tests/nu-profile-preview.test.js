@@ -108,3 +108,19 @@ test("image fit and placement alternatives remain editable after full preview lo
   assert.match(playerUi,/photoControl=\["demo-image-fit","demo-placement-mode"\]/);
   assert.match(playerUi,/applyVisualDesign\(true\);applyAgeModel\(\);applyStatsLocation\(\)/);
 });
+
+test("full review matrix includes security, storage, sharing and placement simulations", () => {
+  for (const id of ["demo-save-preview","demo-export-preview","demo-import-preview","demo-sync-preview","demo-storage-state","demo-stats-card-preview","demo-image-fit","demo-placement-mode"]) {
+    assert.ok(html.includes('id="'+id+'"'), "missing "+id);
+  }
+  assert.match(playerUi,/NO FILE, SAVE OR NETWORK REQUEST CREATED/);
+  assert.match(playerUi,/PHOTO SLOT /);
+  assert.match(playerUi,/IMAGE ANCHOR /);
+  assert.match(playerUi,/demo-stats-card-preview/);
+});
+
+test("closing the profile clears extended personal fields and fake passphrase input", () => {
+  assert.match(playerUi,/demo-age-band","demo-bio","demo-interests","demo-passphrase-test/);
+  assert.match(playerUi,/resetWorkshop\(\)/);
+  assert.match(playerUi,/applyAppearance\(true\);applyVisualDesign\(true\);applyAgeModel\(\);applyStatsLocation\(\)/);
+});
