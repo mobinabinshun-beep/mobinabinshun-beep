@@ -163,25 +163,26 @@
     if(!file)return;
     if(!file.type.startsWith("image/")||file.size>5*1024*1024){imageInput.value="";const state=$("demo-image-state");if(state)state.textContent="CHOOSE AN IMAGE FILE UP TO 5 MB";return;}
     const reader=new FileReader();
-    reader.onload=()=>{if(avatarEl){avatarEl.style.backgroundImage="url("+JSON.stringify(String(reader.result))+")";avatarEl.style.backgroundSize=$("demo-image-fit")?.value||"cover";avatarEl.style.backgroundPosition="center";avatarEl.textContent="";}const state=$("demo-image-state");if(state)state.textContent="LOCAL IMAGE PREVIEW · NOT UPLOADED · POSITION "+(document.querySelector('[data-demo-placement][aria-pressed="true"]')?.dataset.demoPlacement||"1")+" OF 8";};
+    reader.onload=()=>{if(avatarEl){avatarEl.style.backgroundImage="url("+JSON.stringify(String(reader.result))+")";avatarEl.style.backgroundSize=$("demo-image-fit")?.value||"cover";avatarEl.style.backgroundPosition="center";avatarEl.textContent="";}const active=document.querySelector('[data-demo-placement][aria-pressed="true"]')?.dataset.demoPlacement||"1";const mode=$("demo-placement-mode")?.value||"anchor";const state=$("demo-image-state");if(state)state.textContent="LOCAL IMAGE PREVIEW · NOT UPLOADED · "+(mode==="slot"?"PHOTO SLOT ":"IMAGE ANCHOR ")+active+" OF 8";};
     reader.readAsDataURL(file);
   });
   document.querySelectorAll("[data-demo-placement]").forEach(button=>button.addEventListener("click",()=>{
     document.querySelectorAll("[data-demo-placement]").forEach(item=>{const active=item===button;item.setAttribute("aria-pressed",String(active));});
     const position=Number(button.dataset.demoPlacement),row=Math.floor((position-1)/4),col=(position-1)%4;
-    if(avatarEl)avatarEl.style.backgroundPosition=(col*33.333)+"% "+(row*100)+"%";
-    const state=$("demo-image-state");if(state)state.textContent="LOCAL IMAGE PREVIEW · POSITION "+position+" OF 8";
+    const mode=$("demo-placement-mode")?.value||"anchor";
+    if(avatarEl){avatarEl.dataset.placementMode=mode;if(mode==="slot"){avatarEl.dataset.photoSlot=String(position);avatarEl.style.backgroundPosition="center";}else{delete avatarEl.dataset.photoSlot;avatarEl.style.backgroundPosition=(col*33.333)+"% "+(row*100)+"%";}}
+    const state=$("demo-image-state");if(state)state.textContent=(mode==="slot"?"PHOTO SLOT ":"IMAGE ANCHOR ")+position+" OF 8";
   }));
   function resetWorkshop(){
     publicToggles.forEach(toggle=>{toggle.checked=false;});
     if(demoPrivatePreview)demoPrivatePreview.checked=false;
     if(imageInput)imageInput.value="";
-    if(avatarEl){avatarEl.style.backgroundImage="";avatarEl.style.backgroundPosition="center";avatarEl.style.backgroundSize="";avatarEl.innerHTML="IMAGE<br>PLACEHOLDER<br><small>DEMO ONLY · NO UPLOAD</small>";}
+    if(avatarEl){avatarEl.style.backgroundImage="";avatarEl.style.backgroundPosition="center";avatarEl.style.backgroundSize="";delete avatarEl.dataset.placementMode;delete avatarEl.dataset.photoSlot;avatarEl.innerHTML="IMAGE<br>PLACEHOLDER<br><small>DEMO ONLY · NO UPLOAD</small>";}
     document.querySelectorAll("[data-demo-placement]").forEach((button,index)=>button.setAttribute("aria-pressed",String(index===0)));
     const imageState=$("demo-image-state");if(imageState)imageState.textContent="PLACEHOLDER IMAGE · POSITION 1 OF 8";
-    ["demo-age-model","demo-stats-location","demo-card-privacy","demo-lock-policy","demo-recovery-mode","demo-image-fit","demo-placement-mode"].forEach(id=>{const el=$(id);if(el)el.selectedIndex=0;});
+    ["demo-age-model","demo-stats-location","demo-card-privacy","demo-lock-policy","demo-image-fit","demo-placement-mode"].forEach(id=>{const el=$(id);if(el)el.selectedIndex=0;});\n    if($("demo-recovery-mode"))$("demo-recovery-mode").value="compare";
     ["demo-share-consent","demo-scanlines","demo-data-texture","demo-motion"].forEach(id=>{const el=$(id);if(el)el.checked=id==="demo-scanlines";});
-    ["demo-share-state","demo-auth-state","demo-recovery-state"].forEach((id,index)=>{const el=$(id);if(el)el.textContent=["NO SHARE PREVIEW REQUESTED","PRIVATE ACCESS NOT TESTED · NO AUTHENTICATION","RECOVERY FLOW NOT TESTED · NO DATA RECOVERED"][index];});
+    ["demo-share-state","demo-auth-state","demo-recovery-state","demo-storage-state"].forEach((id,index)=>{const el=$(id);if(el)el.textContent=["NO SHARE PREVIEW REQUESTED","PRIVATE ACCESS NOT TESTED · NO AUTHENTICATION","RECOVERY FLOW NOT TESTED · NO DATA RECOVERED","NO SAVE / EXPORT / IMPORT / SYNC PERFORMED"][index];});
     if($("demo-passphrase-test"))$("demo-passphrase-test").value="";
     applyAppearance(true);applyVisualDesign(true);applyAgeModel();applyStatsLocation();setAppearanceLock(false);renderPublicPreview();
   }
@@ -221,6 +222,10 @@
     const mode=$("demo-recovery-mode")?.value||"compare";
     if($("demo-recovery-state"))$("demo-recovery-state").textContent="RECOVERY OPTION PREVIEW · "+mode.toUpperCase()+" · NO DATA WAS SAVED OR RECOVERED";
   });
+  ["demo-save-preview","demo-export-preview","demo-import-preview","demo-sync-preview"].forEach(id=>$(id)?.addEventListener("click",()=>{
+    const labels={"demo-save-preview":"LOCAL SAVE SIMULATION ONLY","demo-export-preview":"ENCRYPTED EXPORT CONCEPT ONLY","demo-import-preview":"VALIDATED IMPORT CONCEPT ONLY","demo-sync-preview":"FUTURE SERVER SYNC CONCEPT ONLY"};
+    if($("demo-storage-state"))$("demo-storage-state").textContent=labels[id]+" · NO FILE, SAVE OR NETWORK REQUEST CREATED";
+  }));
   const visualIds=["demo-frame-material","demo-card-font","demo-corners","demo-holo","demo-glow","demo-glass","demo-scanlines","demo-data-texture","demo-motion","demo-quality"];
   function applyVisualDesign(reset){
     const defaults={"demo-frame-material":"glass","demo-card-font":"mono","demo-corners":"soft","demo-holo":"60","demo-glow":"45","demo-glass":"55","demo-scanlines":true,"demo-data-texture":false,"demo-motion":false,"demo-quality":"balanced"};
