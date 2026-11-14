@@ -5,7 +5,7 @@
 <title>N.U Virtual Market — Generation 1</title>
 <meta name="description" content="A fictional N.U game-world market simulator driven only by player activity.">
 <meta name="theme-color" content="#071018">
-<link rel="stylesheet" href="./nu-exchange.css?v=20261114-exchange-history-r2">
+<link rel="stylesheet" href="./nu-exchange.css?v=20261114-exchange-modular-r1">
 </head>
 <body>
 <main class="exchange-shell">
@@ -17,18 +17,18 @@
 </section>
 <section class="market-panel">
 <div class="panel-heading"><div><p class="eyebrow">ACTIVITY-DRIVEN SIMULATION</p><h2>MARKET INDEX</h2></div><span class="sim-tag">SIMULATED · NOT A REAL PRICE</span></div>
-<div class="market-controls"><label for="market-asset">SELECT VIRTUAL ASSET</label><select id="market-asset"></select><span id="market-events">0 YOUR EVENTS</span></div>
+<div class="market-controls"><label for="market-asset">SELECT VIRTUAL ASSET</label><select id="market-asset"></select><span id="market-events">0 / 24 PLAYER STEPS</span><label for="chart-time-scale">REPLAY SCALE</label><select id="chart-time-scale"></select></div>
 <div class="market-summary">
 <article class="exchange-card"><span>NU INDEX</span><strong id="market-index">100.00</strong></article>
 <article class="exchange-card"><span>CHANGE FROM BASELINE</span><strong id="market-change">0.00%</strong></article>
 <article class="exchange-card"><span>ACTIVITY VOLUME</span><strong id="market-volume">0</strong></article>
 <article class="exchange-card"><span>SIMULATED DEMAND</span><strong id="market-demand">0</strong></article>
-<article class="exchange-card"><span>SIMULATED SUPPLY</span><strong id="market-supply">0</strong></article>
+<article class="exchange-card"><span>SIMULATED SUPPLY</span><strong id="market-supply">0</strong></article><article class="exchange-card behavior-card"><span>PLAYER ACTIVITY TENDENCY</span><strong id="market-bias" class="bias-indicator">BALANCED</strong></article>
 </div>
-<div class="chart-legend"><span><i class="legend-up"></i> Index rising</span><span><i class="legend-down"></i> Index falling</span><span>OHLC · hourly activity candles</span></div>
+<div class="chart-legend"><span><i class="legend-up"></i> Index rising</span><span><i class="legend-down"></i> Index falling</span><span>24 recorded player steps · animated replay</span><span id="replay-mode-label">24 SECONDS · REPLAYING YOUR SAVED ACTIVITY</span><span id="replay-progress">0 / 24</span></div>
 <canvas id="market-chart" role="img" aria-label="Fictional N.U market index candlestick chart"></canvas>
 <div id="market-empty" class="chart-empty">No local activity has been recorded for this asset yet. The simulator will create candles only after in-game wallet activity occurs.</div>
-<p class="panel-note">Only your own positive wallet deltas are treated as simulated supply; your negative deltas are treated as simulated demand. Candle volume is derived from your recorded in-game deltas. The index starts at an arbitrary N.U-only baseline of 100 and is not pegged to anything outside the game.</p>
+<div class="panel-heading"><div><p class="eyebrow">LAST FIVE RECORDED STEPS</p><h2>PLAYER MARKET HISTORY</h2></div><span>LOCAL ACTIVITY ONLY</span></div><div id="market-history" class="asset-transactions"></div><p class="panel-note">Only your own recorded asset changes are replayed. Positive and negative deltas are visual tendencies, not a shared order book, real demand, or real prices. Replay speed changes presentation only; it never creates transactions.</p>
 </section>
 <section class="exchange-panel">
 <div class="panel-heading"><div><p class="eyebrow">YOUR WALLET · SINGLE-PLAYER LOCAL BALANCE</p><h2>ASSET BALANCE HISTORY</h2></div><span id="history-count">0 RECORDS</span></div>
@@ -46,11 +46,24 @@
 <div id="asset-transactions" class="asset-transactions"></div>
 </section>
 <section class="exchange-panel conversion-panel">
-<div class="panel-heading"><div><p class="eyebrow">CONVERSION MODULE</p><h2>ASSET SWAP</h2></div><span class="pending-tag">RULES PENDING</span></div>
-<p>Market charts are simulation-only. Asset conversion remains disabled until the N.U owner approves the in-game pairs, settlement rules, fees and limits. No external or real-world rates are used.</p>
-<button type="button" disabled>CONVERSION NOT YET AVAILABLE</button>
+<div class="panel-heading"><div><p class="eyebrow">MODULAR CROSS-GAME CHANGE</p><h2>GAME-TO-GAME ASSET TRANSFER</h2></div><span id="exchange-lock-status" class="pending-tag">TRANSFER MODULE LOCKED</span></div>
+<p>This module is prepared for Launcher game adapters. Only a compatible asset transfer from one implemented N.U game to another may be supported. No standalone coin swap, outside rate, or real-money conversion is provided.</p>
+<div class="exchange-summary change-grid">
+ <article class="exchange-card"><span>SOURCE GAME</span><select id="change-from" aria-label="Source game"></select></article>
+ <article class="exchange-card"><span>DESTINATION GAME</span><select id="change-to" aria-label="Destination game"></select></article>
+ <article class="exchange-card"><span>SHARED COIN</span><select id="change-coin" aria-label="Transfer coin"></select></article><article class="exchange-card"><span>SHARED ASSET</span><select id="change-asset" aria-label="Transfer asset"></select></article><article class="exchange-card"><span>AMOUNT</span><input id="change-amount" type="number" min="0" step="any" placeholder="—" disabled></article>
+</div>
+<div id="change-empty" class="chart-empty">No game adapters have registered transfer-ready assets yet. The selectors remain empty until Launcher and game manifests provide compatible data.</div>
+<button id="change-submit" type="button" disabled>GAME-TO-GAME CHANGE NOT YET AVAILABLE</button>
+<p id="exchange-cooldown-status" class="panel-note" role="status">READY · 0/10 SUCCESSFUL ACTIONS THIS VISIT</p>
+<details class="maintenance-latch"><summary>Two-step maintenance unlock</summary>
+<p>Local maintenance safeguard only; this is not account authentication or anti-cheat protection.</p>
+<label for="unlock-phrase">Enter exact confirmation phrase</label><input id="unlock-phrase" type="text" autocomplete="off" spellcheck="false" placeholder="UNLOCK N.U EXCHANGE">
+<div class="unlock-actions"><button id="unlock-step-one" type="button">STEP 1 · ARM UNLOCK</button><button id="unlock-step-two" type="button">STEP 2 · CONFIRM</button><button id="relock-module" type="button">RE-LOCK MODULE</button></div>
+<p id="unlock-feedback" role="status"></p>
+</details>
 </section>
 <footer class="exchange-footer">N.U — NIROO UNIVERSE · GENERATION 1 FICTIONAL ECONOMY</footer>
 </main>
-<script src="./nu-engine.js"></script><script src="./nu-wallet.js"></script><script src="./nu-market-sim.js?v=20261114-exchange-history-r2"></script><script src="./nu-exchange.js?v=20261114-exchange-history-r2"></script>
+<script src="./nu-engine.js"></script><script src="./nu-wallet.js"></script><script src="./nu-exchange-core.js?v=20261114-modular-r1"></script><script src="./nu-exchange-guard.js?v=20261114-modular-r1"></script><script src="./nu-exchange-replay.js?v=20261114-modular-r1"></script><script src="./nu-exchange-lock.js?v=20261114-modular-r1"></script><script src="./nu-market-sim.js?v=20261114-exchange-modular-r1"></script><script src="./nu-exchange.js?v=20261114-exchange-modular-r1"></script>
 </body></html>

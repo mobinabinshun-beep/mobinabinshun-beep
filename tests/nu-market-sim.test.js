@@ -37,7 +37,7 @@ test("same-hour activity is aggregated into OHLC candle",()=>{
   {at:"2026-11-14T10:10:00.000Z",deltas:{casinoCredits:20}},
   {at:"2026-11-14T10:20:00.000Z",deltas:{casinoCredits:-20}}
  ]},"casinoCredits");
- assert.equal(result.candles.length,1);
+ assert.equal(result.candles.length,2);
  assert.ok(result.candles[0].high>=result.candles[0].open);
  assert.ok(result.candles[0].low<=result.candles[0].close);
 });
