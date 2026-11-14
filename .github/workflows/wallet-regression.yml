@@ -1,6 +1,9 @@
 name: N.U wallet and profile regression
 
 on:
+  push:
+    branches:
+      - "fix/player-card-id-and-bottom-wallet-tabs-*"
   pull_request:
     paths:
       - "index.html"
@@ -10,6 +13,7 @@ on:
       - "nu-hex-gateway.css"
       - "nu-world.css"
       - "tests/nu-wallet.test.js"
+      - "tests/nu-wallet-tabs.test.js"
       - "tests/nu-hex-gateway.test.js"
       - ".github/workflows/wallet-regression.yml"
 
@@ -30,4 +34,4 @@ jobs:
           node --check nu-player-ui.js
           node --check nu-hex-gateway.js
       - name: Run wallet and Gateway tests
-        run: node --test tests/nu-wallet.test.js tests/nu-hex-gateway.test.js
+        run: node --test tests/nu-wallet.test.js tests/nu-wallet-tabs.test.js tests/nu-hex-gateway.test.js
