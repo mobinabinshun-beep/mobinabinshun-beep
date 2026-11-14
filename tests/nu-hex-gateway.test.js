@@ -16,7 +16,7 @@ test("Gateway markup remains present while controller activation is limited to g
     assert.match(page, /class="nu-gateway-scrim"/);
   }
   assert.match(html, /nu-hex-gateway\.css\?v=20261114-gameplay-declutter-r2/);
-  assert.match(html, /nu-hex-gateway\.js\?v=20261114-wallet-gateway-r1/);
+  assert.match(html, /nu-hex-gateway\.js\?v=20261114-gameplay-declutter-r2/);
   assert.match(js, /if \(!root \|\| !scrim \|\| !gameView \|\| !walletView\) return/);
   assert.match(js, /classList\.toggle\("nu-game-active", gameActive\)/);
   assert.match(js, /classList\.toggle\("nu-main-game-page", gameActive\)/);
@@ -61,7 +61,8 @@ test("Gateway is compact, fixed, responsive and does not create boxed menu cards
   assert.match(css, /right:14px;width:48px;height:48px/);
   assert.match(css, /scale\(1\.2\)/);
   assert.match(css, /prefers-reduced-motion/);
-  assert.match(js, /const radius = compact \? 82 : 94/);\n  assert.match(js, /function layoutItems\(\)/);
+  assert.match(js, /const radius = compact \? 82 : 94/);
+  assert.match(js, /function layoutItems\(\)/);
   assert.match(js, /window\.addEventListener\("resize",layoutItems/);
   assert.match(js, /window\.addEventListener\("orientationchange",layoutItems/);
 });
