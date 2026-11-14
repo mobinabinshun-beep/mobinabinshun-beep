@@ -283,7 +283,7 @@ function rasterSvgSource(){
  c.width=width;c.height=height;const x=c.getContext("2d");if(!x)throw new Error("SVG fallback canvas is unavailable.");
  const frame=x.createImageData(width,height);frame.data.set(rgba);x.putImageData(frame,0,0);
  const uri=c.toDataURL("image/png");
- return '<?xml version="1.0" encoding="UTF-8"?>\\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="'+width+'" height="'+height+'" viewBox="0 0 '+width+' '+height+'"><title>N.U artwork — embedded raster fallback</title><image width="'+width+'" height="'+height+'" href="'+uri+'" xlink:href="'+uri+'"/></svg>\\n';
+ return '<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="'+width+'" height="'+height+'" viewBox="0 0 '+width+' '+height+'"><title>N.U artwork — embedded raster fallback</title><image width="'+width+'" height="'+height+'" href="'+uri+'" xlink:href="'+uri+'"/></svg>\n';
 }
 $("export-svg").addEventListener("click",()=>{
  try{
