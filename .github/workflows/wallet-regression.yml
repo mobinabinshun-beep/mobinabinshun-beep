@@ -4,16 +4,19 @@ on:
   push:
     branches:
       - "fix/player-card-id-and-bottom-wallet-tabs-*"
+      - "fix/classic-profile-palette-top-tabs-*"
   pull_request:
     paths:
       - "index.html"
       - "nu-wallet.js"
       - "nu-player-ui.js"
+      - "nu-profile-preview.js"
       - "nu-hex-gateway.js"
       - "nu-hex-gateway.css"
       - "nu-world.css"
       - "tests/nu-wallet.test.js"
       - "tests/nu-wallet-tabs.test.js"
+      - "tests/nu-profile-preview.test.js"
       - "tests/nu-hex-gateway.test.js"
       - ".github/workflows/wallet-regression.yml"
 
@@ -32,6 +35,7 @@ jobs:
         run: |
           node --check nu-wallet.js
           node --check nu-player-ui.js
+          node --check nu-profile-preview.js
           node --check nu-hex-gateway.js
       - name: Run wallet and Gateway tests
-        run: node --test tests/nu-wallet.test.js tests/nu-wallet-tabs.test.js tests/nu-hex-gateway.test.js
+        run: node --test tests/nu-wallet.test.js tests/nu-wallet-tabs.test.js tests/nu-profile-preview.test.js tests/nu-hex-gateway.test.js
