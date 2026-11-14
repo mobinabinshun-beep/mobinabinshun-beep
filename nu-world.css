@@ -520,3 +520,14 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 .wallet-asset{min-width:0}
 @media(max-width:520px){.wallet-card-tabs{gap:5px;width:calc(100% - 12px);padding:0 3px;min-height:64px}.wallet-card-tab{flex:1;min-width:0;padding:11px 5px;font-size:9px;letter-spacing:.05em}.wallet-card-tab::after{font-size:10px;max-width:90vw}.wallet-panel{padding:16px}.wallet-assets{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.wallet-card-tab,.wallet-card-tab::after{transition:none}}
+
+
+/* Pixel-faithful full-frame review: preserve every source pixel; camera exploration is opt-in. */
+#nu-background-image{inset:0!important;background:#080b12!important;overflow:hidden!important}
+#nu-background-image img{
+ object-fit:contain!important;object-position:center!important;
+ transform:translate3d(var(--camera-x,0px),var(--camera-y,0px),0) scale(var(--nu-camera-zoom,1))!important;
+ transform-origin:center center!important;filter:none!important;opacity:1!important;transition:none!important;
+ image-rendering:auto;
+}
+#nu-background-image:after{display:none!important}
