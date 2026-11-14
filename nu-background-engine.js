@@ -39,7 +39,7 @@ function setCamera(x,y,zoom=cameraZoom){
  node.style.setProperty("--camera-x",px+"px");node.style.setProperty("--camera-y",py+"px");
  node.style.setProperty("--nu-camera-zoom",String(cameraZoom));
 }
-function getStatus(){return {mounted:!!node,loaded,mode,frozen,cameraZoom,fit:"contain",asset:ASSET,source:"assets/backgrounds/niroo-universe-background.svg",layer:"world-background",stacking:"bottom-of-world",state:node?.dataset.state||"not-mounted",naturalWidth:img?.naturalWidth||0,naturalHeight:img?.naturalHeight||0};}
+function getStatus(){return {mounted:!!node,loaded,mode,frozen,cameraZoom,fit:"contain",asset:ASSET,source:"assets/nu-celestial-city.png",layer:"world-background",stacking:"bottom-of-world",state:node?.dataset.state||"not-mounted",naturalWidth:img?.naturalWidth||0,naturalHeight:img?.naturalHeight||0};}
 g.NUBackgroundEngine={mount,setQuality,setMode,setFrozen,setCamera,getStatus};
 document.addEventListener("DOMContentLoaded",mount,{once:true});
 if(document.readyState!=="loading")mount();
