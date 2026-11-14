@@ -31,7 +31,7 @@ The owner explicitly authorized unlocking N.U Gateway for the main game pages on
 ## Validation state
 - Source-level regression assertions were revised to enforce active-game-only visibility and the three requested Gateway actions. A fresh CI run is required for the latest refinement before demo deployment.
 - Public Pages deployment has not yet been verified for this candidate.
-- Desktop/mobile human QA remains pending. CI must not be described as human acceptance.
+- Desktop/mobile human QA remains pending. CI must not be described as human acceptance. The merge targets the public demo stage only, not final production promotion.
 
 ## Rollback
 Revert the scoped pull request/commit or restore the exact backup branch. Never force-push the default branch.
