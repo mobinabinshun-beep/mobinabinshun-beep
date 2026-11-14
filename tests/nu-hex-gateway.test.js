@@ -51,7 +51,8 @@ test("outside exit uses the 10px tolerance and returns gameplay to its prior sta
   assert.match(js, /performance\.now\(\) - outsideSince > 110/);
   assert.match(js, /pauseGame\(\)/);
   assert.match(js, /resumeGame\(\)/);
-  assert.match(css, /background:rgba\(3,12,20,\.28\)/);\n  assert.doesNotMatch(css, /body\.nu-gateway-open \.world[^{}]*filter:blur/);
+  assert.match(css, /background:rgba\(3,12,20,\.28\)/);
+  assert.doesNotMatch(css, /body\.nu-gateway-open \.world[^{}]*filter:blur/);
 });
 
 test("Gateway is compact, fixed, responsive and does not create boxed menu cards", () => {
