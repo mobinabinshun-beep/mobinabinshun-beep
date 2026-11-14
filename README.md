@@ -441,3 +441,10 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 - Casino Credits are shown as a Generation 1 virtual asset, separate from XP, Mana and HP.
 - No conversion pairs, rates, fees, or exchange eligibility are invented. Conversion remains unavailable until the owner approves the pair/rate rules.
 - History is limited to the wallet's retained local transaction window (currently 40 entries). Local browser data is not server-authoritative and does not synchronize across devices.
+
+
+## Wallet presentation and earned-asset visibility — 2026-11-14
+- Wallet navigation uses three recessed upper-left tabs; their translucent hologram labels appear only during hover, keyboard focus or touch press, and are not left open as ambient decoration.
+- The shared wallet asset registry remains extensible for additional games and currencies. Wallet and game-scoped asset rows omit zero balances; newly registered positive balances appear automatically.
+- Zero XP/Mana HUD bars and zero XP/Mana profile values are hidden until the player has a positive balance. Transaction details omit zero-value deltas.
+- This is a browser-local demo wallet; it does not imply cloud synchronization or real-money assets.

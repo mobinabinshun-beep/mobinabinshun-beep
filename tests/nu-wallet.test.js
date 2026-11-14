@@ -61,6 +61,15 @@ test("wallet lists only implemented assets and excludes undefined Lore",()=>{
   assert.ok(rows.some(row=>row.key==="hpPills"&&row.value===1));
   assert.ok(!rows.some(row=>["xCredits","nCredits","upgrade","lore"].includes(row.key)));
 });
+test("zero-balance assets stay hidden and appear after the first earned unit",()=>{
+  const empty=wallet.assetRows({xp:0,mana:0,hp:0,hpPills:0,manaCapsules:0,casinoCredits:0,xCredits:0,nCredits:0,assets:{nuTestShard:0}});
+  assert.deepEqual(empty,[]);
+  assert.equal(wallet.registerAsset({key:"nuTestShard",label:"N.U Test Shard",group:"game"}),true);
+  const before=wallet.assetRows({xp:0,mana:0,hp:0,hpPills:0,manaCapsules:0,casinoCredits:0,xCredits:0,nCredits:0,assets:{nuTestShard:0}});
+  assert.deepEqual(before,[]);
+  const after=wallet.assetRows({xp:0,mana:0,hp:0,hpPills:0,manaCapsules:0,casinoCredits:0,xCredits:0,nCredits:0,assets:{nuTestShard:1}});
+  assert.deepEqual(after.map(row=>[row.key,row.value]),[["nuTestShard",1]]);
+});
 test("transaction history remains bounded",()=>{
   const s=wallet.normalizeSave({transactions:Array.from({length:50},(_,i)=>({id:String(i)}))});
   assert.equal(wallet.MAX_TRANSACTIONS,24);
