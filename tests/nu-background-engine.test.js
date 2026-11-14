@@ -59,7 +59,8 @@ test("pixel-faithful review mode shows the full artwork and keeps camera explora
   assert.match(engine, /object-fit:contain/);
   assert.match(engine, /fit:"contain"/);
   assert.match(engine, /cameraZoom=Math\.max\(1,Math\.min\(3/);
-  assert.match(engine, /artworkWidth=\(img\.naturalWidth\|\|width\)\*fit/);\n  assert.match(engine, /maxX=Math\.max\(0,\(artworkWidth\*\(cameraZoom-1\)\)\/2\)/);
+  assert.match(engine, /artworkWidth=\(img\.naturalWidth\|\|width\)\*fit/);
+  assert.match(engine, /maxX=Math\.max\(0,\(artworkWidth\*\(cameraZoom-1\)\)\/2\)/);
   assert.match(css, /object-fit:contain!important/);
   assert.match(css, /#nu-background-image:after\{display:none!important\}/);
   assert.match(css, /--nu-camera-zoom/);
