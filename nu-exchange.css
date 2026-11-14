@@ -34,3 +34,9 @@
 .cooldown-active{color:var(--negative)!important;font-weight:800}
 @media(max-width:850px){.market-summary{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:560px){.market-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.change-grid{grid-template-columns:1fr}.market-controls select#chart-time-scale{max-width:100%}}
+
+/* Exchange chart controls and accessible reduced-motion mode */
+.market-view-options{display:flex;gap:12px;flex-wrap:wrap;margin:10px 0;color:var(--muted);font-size:12px}
+.market-view-options label{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.market-view-options input{accent-color:var(--accent);width:15px;height:15px}
+@media(prefers-reduced-motion:reduce){.bias-indicator{animation:none!important;transition:none!important}}
