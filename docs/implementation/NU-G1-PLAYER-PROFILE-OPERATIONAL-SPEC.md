@@ -26,7 +26,7 @@ The separate appearance panel contains three core independent controls plus an o
 
 1. **Color spectrum / hue:** choose the card's base color.
 2. **White ↔ dark neutral tone:** apply a neutral white or black tint independently of the selected hue.
-3. **Color light ↔ dark:** adjust the lightness of the selected color itself.
+3. **Color light ↔ dark:** adjust the lightness of the selected color itself.\n4. **Saturation (comparison-only):** independently test saturation so reviewers can decide whether it should remain, be merged or be removed.
 
 The axes are intentionally distinct: hue selects the color family; neutral tone adds/removes white or black overlay; color lightness changes the selected hue's own brightness.
 
@@ -78,7 +78,7 @@ No profile/card freeze or lock is authorized by this document. First reconcile t
 
 ## 8. Profile panel inventory audit
 
-The current profile view contains the historical profile card, the separate appearance panel, privacy/public-display workshop, local-identity concept panel, staged-appearance simulation, local image/2×4 placement simulation, game-status/wallet boundary note, personal-data warning, demo limitation note and close action. The following remain operational omissions by design: secure authentication, durable appearance lock, image crop and production upload, profile persistence, secure local save/export/import integration and online/server synchronization. The additional profile fields and visual-design controls remain review concepts until their final behavior is approved. Wallet balances and transaction tabs remain separate wallet surfaces, not missing profile panels.
+The current profile view contains the historical profile card, separate appearance panel, privacy/public-display workshop, local-identity concept panel, staged-appearance simulation with three lock policies, exact-age/age-band comparison, Bio/Interests, private access YES/NO simulation, recovery choices, explicit share-consent preview, local image fit and 2×4 crop-anchor/photo-slot alternatives, holographic design controls, stats placement comparison, local save/export/import/server-sync simulations, game-status/wallet boundary note, personal-data warning, demo limitation note and close action. The following remain operational omissions by design: secure authentication, durable appearance lock, image crop and production upload, profile persistence, secure local save/export/import integration and online/server synchronization. The additional profile fields and visual-design controls remain review concepts until their final behavior is approved. Wallet balances and transaction tabs remain separate wallet surfaces, not missing profile panels.
 
 ## 9. Acceptance checklist
 
