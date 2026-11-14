@@ -21,17 +21,33 @@
   function renderWallet(){
     const s=load(),root=$("wallet-assets"),history=$("wallet-transactions");
     if(!root||!history)return;
-    const rows=NUWallet.assetRows(s);
-    root.innerHTML=rows.map(row=>'<div class="wallet-asset" data-asset-group="'+String(row.group||"game").replace(/[^a-z0-9_-]/gi,"")+'"><span>'+row.label+'</span><strong>'+Number(row.value).toLocaleString(undefined,{maximumFractionDigits:8})+row.unit+'</strong></div>').join("");
+    const rows=NUWallet.assetRows(s).filter(row=>Number(row.value)>0);
+    root.replaceChildren();
+    if(!rows.length){
+      const empty=document.createElement("p");
+      empty.className="wallet-muted";
+      empty.textContent="No earned assets yet. Your first acquired asset will appear here.";
+      root.appendChild(empty);
+    }else{
+      rows.forEach(row=>{
+        const card=document.createElement("div"),label=document.createElement("span"),value=document.createElement("strong");
+        card.className="wallet-asset";
+        card.dataset.assetGroup=String(row.group||"game").replace(/[^a-z0-9_-]/gi,"");
+        label.textContent=String(row.label||row.key);
+        value.textContent=Number(row.value).toLocaleString(undefined,{maximumFractionDigits:8})+String(row.unit||"");
+        card.append(label,value);
+        root.appendChild(card);
+      });
+    }
     const summary=$("wallet-asset-summary");
-    if(summary){const currencies=rows.filter(row=>row.group==="currency"||row.group==="games").length;summary.textContent=rows.length+" ASSET TYPES · "+currencies+" GAME / CREDIT TYPES";}
+    if(summary){const currencies=rows.filter(row=>row.group==="currency"||row.group==="games").length;summary.textContent=rows.length+" OWNED ASSET TYPES · "+currencies+" GAME / CREDIT TYPES";}
     history.replaceChildren();
     const tx=s.transactions.slice(-24).reverse();
     if(!tx.length){const empty=document.createElement("p");empty.className="wallet-muted";empty.textContent="No recorded wallet transactions yet.";history.appendChild(empty);return;}
     tx.forEach(item=>{
       const row=document.createElement("div"),title=document.createElement("span"),detail=document.createElement("small");
       row.className="wallet-transaction";title.textContent=String(item.title||"Wallet transaction");
-      detail.textContent=Object.entries(item.deltas||{}).map(([key,value])=>{
+      detail.textContent=Object.entries(item.deltas||{}).filter(([,value])=>Number(value)!==0).map(([key,value])=>{
         const label=key==="hpPills"?"HP Capsule":key==="hp"?"HP":key==="xp"?"XP":key;
         return (Number(value)>0?"+":"")+Number(value)+" "+label;
       }).join(" · ");
@@ -44,10 +60,12 @@
     $("player-display-name").textContent=name;
     $("player-callsign").textContent=callsign;
     $("player-level").textContent=String(s.level);
-    $("player-xp").textContent=s.xp+" XP";
+    $("player-xp").parentElement.hidden=s.xp<1;
+    $("player-xp").textContent=s.xp>0?s.xp+" XP":"";
     $("player-xp-progress").style.width=(s.xp%100)+"%";
     $("player-hp").textContent=s.hp+"/10";
-    $("player-mana").textContent=s.mana+"";
+    $("player-mana").parentElement.hidden=s.mana<1;
+    $("player-mana").textContent=s.mana>0?String(s.mana):"";
     $("player-name-input").value=s.displayName||"";
     $("player-callsign-input").value=s.callsign||"";
   }
