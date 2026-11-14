@@ -19,7 +19,7 @@ test("public runtime targets the documented PNG and validates it if transferred"
     const bytes = fs.readFileSync(assetPath);
     assert.ok(bytes.length > 0, "canonical PNG must not be empty");
     const gitBlobSha = crypto.createHash("sha1")
-      .update(Buffer.from("blob " + bytes.length + "\\0"))
+      .update(Buffer.from("blob " + bytes.length + "\0"))
       .update(bytes)
       .digest("hex");
     assert.equal(gitBlobSha, "d73afd484ef8b459c908c1942ee0f47d27f93aa5");
