@@ -14,7 +14,8 @@
 - [ ] Hue, neutral white/dark tint and color lightness operate independently.
 - [ ] Appearance panel remains separate below the historical card.
 - [ ] Stage A sliders respond to mouse, touch and keyboard.
-- [ ] Confirm simulates Stage B lock and disables appearance sliders.
+- [ ] Confirm simulates Stage B lock and disables appearance sliders, profile text fields and public/private visibility toggles.
+- [ ] After the simulated lock, only image replacement and the 2×4 placement controls remain editable.
 - [ ] Reset returns to Stage A and default appearance.
 - [ ] Appearance confirmation does not claim to persist across sessions.
 
