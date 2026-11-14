@@ -50,6 +50,12 @@ test("normalization clamps HP, Mana and upgrade to their supported ranges",()=>{
   assert.equal(s.upgrade,9);
   assert.equal(s.xp,4);
 });
+test("wallet save normalization preserves the existing local Player ID",()=>{
+  const existingId="NU-ABCDEF012345";
+  const normalized=wallet.normalizeSave({playerId:existingId,displayName:"Explorer"});
+  assert.equal(normalized.playerId,existingId);
+  assert.equal(normalized.displayName,"Explorer");
+});
 test("wallet lists only implemented assets and excludes undefined Lore",()=>{
   const rows=wallet.assetRows({xp:14,level:2,mana:3,hp:6,hpPills:1,manaCapsules:2,xCredits:0,nCredits:0,upgrade:0});
   assert.ok(rows.some(row=>row.key==="hpPills"&&row.value===1));
