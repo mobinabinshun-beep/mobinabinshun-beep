@@ -211,7 +211,7 @@
   $("demo-age-model")?.addEventListener("change",applyAgeModel);applyAgeModel();
   $("demo-stats-location")?.addEventListener("change",applyStatsLocation);applyStatsLocation();
   function applyStorageOptions(){
-    const ids=["demo-platform-target","demo-launcher-model","demo-save-model","demo-export-model","demo-import-model","demo-sync-model"];
+    const ids=["demo-auth-model","demo-platform-target","demo-launcher-model","demo-save-model","demo-export-model","demo-import-model","demo-sync-model"];
     const values=ids.map(id=>$(id)?.selectedOptions?.[0]?.textContent||"Not selected");
     const out=$("demo-storage-options-preview");
     if(out)out.textContent=values.join(" · ")+" · CONCEPT PREVIEW ONLY · NO BUILD / SAVE / EXPORT / IMPORT / SERVER";
