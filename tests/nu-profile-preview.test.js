@@ -63,7 +63,7 @@ test("profile keeps game stats and wallet outside the historical display card", 
 });
 
 test("final preview lock leaves only image replacement and placement controls editable", () => {
-  assert.match(playerUi, /demoFields\.forEach\(id=>\{const field=\$\(id\);if\(field\)field\.disabled=locked;\}\)/);
+  assert.match(playerUi, /demoFields\.forEach\(id=>\{const field=\$\(id\);if\(field\)field\.disabled=lockFields;\}\)/);
   assert.match(playerUi, /publicToggles\.forEach\(toggle=>\{toggle\.disabled=locked;\}\)/);
   assert.match(playerUi, /demoPrivatePreview\.disabled=locked/);
   assert.match(playerUi, /imageInput\.addEventListener\("change"/);
