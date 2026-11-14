@@ -89,7 +89,7 @@ $("asset-select").addEventListener("change",e=>{selected=e.target.value;replaySt
 $("market-asset").addEventListener("change",e=>{marketSelected=e.target.value;replayStart=Date.now();refresh();});
 $("chart-time-scale").innerHTML=NUExchangeReplay.MODES.map(m=>'<option value="'+m.id+'">'+m.label+'</option>').join("");
 $("chart-time-scale").value=replayMode;$("chart-time-scale").addEventListener("change",e=>{replayMode=e.target.value;replayStart=Date.now();refresh();});
-$("unlock-step-one").addEventListener("click",unlockOne);$("unlock-step-two").addEventListener("click",unlockTwo);
+$("unlock-step-one").addEventListener("click",unlockOne);$("unlock-step-two").addEventListener("click",unlockTwo);$("relock-module").addEventListener("click",()=>{maintenance.relock();$("unlock-feedback").textContent="Transfer module re-locked.";updateGuard();});
 window.NUExchangeAttempt=async function(commit){
  if(maintenance.isLocked())return {ok:false,reason:"MODULE_LOCKED"};
  const gate=guard.beforeAttempt();if(!gate.allowed){updateGuard();return gate;}
