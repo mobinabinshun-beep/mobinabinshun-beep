@@ -85,11 +85,34 @@
     if(view===walletView){setWalletTab("balances");renderWallet();}else renderProfile();
     const menu=$("menu");if(menu)menu.classList.remove("open");
   }
-  function close(){if(profileView.classList.contains("active")){["demo-name","demo-call","demo-family","demo-age"].forEach(id=>{const field=$(id);if(field)field.value="";});const warning=$("demo-profile-warning");if(warning)warning.hidden=true;}document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));(previousView&&previousView!==walletView&&previousView!==profileView?previousView:$("home-view")).classList.add("active");previousView=null;window.dispatchEvent(new Event("nu:player-overlay-close"));}
+  function close(){if(profileView.classList.contains("active")){["demo-name","demo-call","demo-family","demo-age"].forEach(id=>{const field=$(id);if(field)field.value="";});const warning=$("demo-profile-warning");if(warning)warning.hidden=true;applyAppearance(true);}document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));(previousView&&previousView!==walletView&&previousView!==profileView?previousView:$("home-view")).classList.add("active");previousView=null;window.dispatchEvent(new Event("nu:player-overlay-close"));}
   $("wallet-back").addEventListener("click",close);
   $("profile-back").addEventListener("click",close);
   const demoFields=["demo-name","demo-call","demo-family","demo-age"];
   demoFields.forEach(id=>{const field=$(id);if(field)field.addEventListener("input",()=>{$("demo-profile-warning").hidden=false;});});
+  const appearanceDefaults={hue:205,tone:0,lightness:48};
+  const appearanceCard=$("profile-view").querySelector(".demo-profile-card");
+  const appearanceControls={hue:$("demo-card-hue"),tone:$("demo-card-tone"),lightness:$("demo-card-lightness")};
+  function applyAppearance(reset){
+    if(!appearanceCard)return;
+    Object.entries(appearanceControls).forEach(([key,control])=>{
+      if(!control)return;
+      if(reset)control.value=String(appearanceDefaults[key]);
+    });
+    const hue=Number(appearanceControls.hue&&appearanceControls.hue.value||appearanceDefaults.hue);
+    const tone=Number(appearanceControls.tone&&appearanceControls.tone.value||0);
+    const lightness=Number(appearanceControls.lightness&&appearanceControls.lightness.value||appearanceDefaults.lightness);
+    appearanceCard.style.setProperty("--demo-card-hue",String(hue));
+    appearanceCard.style.setProperty("--demo-card-lightness",lightness+"%");
+    appearanceCard.style.setProperty("--demo-neutral-rgb",tone>=0?"255,255,255":"0,0,0");
+    appearanceCard.style.setProperty("--demo-neutral-alpha",String(Math.abs(tone)/100*(tone>=0?.42:.52)));
+    const hueValue=$("demo-card-hue-value"),toneValue=$("demo-card-tone-value"),lightValue=$("demo-card-lightness-value");
+    if(hueValue)hueValue.textContent=hue+"°";
+    if(toneValue)toneValue.textContent=tone===0?"NEUTRAL":tone>0?"WHITE "+tone+"%":"DARK "+Math.abs(tone)+"%";
+    if(lightValue)lightValue.textContent=lightness+"%";
+  }
+  Object.values(appearanceControls).forEach(control=>{if(control)control.addEventListener("input",()=>applyAppearance(false));});
+  applyAppearance(false);
   const demoClose=$("demo-profile-close"),demoClear=$("demo-profile-clear");
   if(demoClose)demoClose.addEventListener("click",close);
   if(demoClear)demoClear.addEventListener("click",close);
