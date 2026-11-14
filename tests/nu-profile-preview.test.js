@@ -9,7 +9,8 @@ test("restores the first Gen1 display-only profile placeholder", () => {
   assert.match(html, /<h2>N\.U PLAYER PROFILE<\/h2>/);
   assert.match(html, /class="demo-avatar"/);
   for (const id of ["demo-name","demo-call","demo-family","demo-age"]) assert.ok(html.includes('id="'+id+'"'));
-  assert.match(html, /DEMO ONLY · NO UPLOAD/);
+  assert.match(playerUi, /readAsDataURL/);
+  assert.match(playerUi, /NO FILE, SAVE OR NETWORK REQUEST CREATED/);
   assert.match(html, /Values are temporary and are not saved/);
 });
 
@@ -29,7 +30,7 @@ test("the historical profile stays display-only while exposing four temporary ap
   assert.match(css, /#demo-card-lightness::-webkit-slider-runnable-track/);
   assert.match(css, /#demo-card-saturation::-webkit-slider-runnable-track/);
   assert.match(playerUi, /--demo-card-saturation/);
-  assert.match(html, /saved appearance settings are available/);
+  assert.match(html, /confirm once to freeze appearance/);
   assert.match(playerUi, /if\(!\$\("player-id"\)\)return/);
   assert.match(playerUi, /demo-profile-warning/);
   assert.match(playerUi, /demo-profile-close/);
