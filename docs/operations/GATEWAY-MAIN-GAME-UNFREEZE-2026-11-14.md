@@ -51,4 +51,4 @@
 10. Visit Launcher and Creative Studio and confirm their prior frozen Gateway state remains unchanged.
 11. Repeat in phone portrait/landscape and with reduced-motion enabled.
 
-**Public demo:** https://mobinabinshun-beep.github.io/mobinabinshun-beep/
+**Current public Pages URL (still serves the pre-PR default-branch build; candidate not deployed):** https://mobinabinshun-beep.github.io/mobinabinshun-beep/
