@@ -1,0 +1,27 @@
+name: N.U Generation 1 HUD layout regression
+
+on:
+  pull_request:
+    paths:
+      - "index.html"
+      - "nu-world.css"
+      - "nu-games.js"
+      - "tests/nu-hud-layout.test.js"
+      - ".github/workflows/hud-layout-regression.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hud-layout:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check game runtime syntax
+        run: node --check nu-games.js
+      - name: Run HUD layout regression
+        run: node --test tests/nu-hud-layout.test.js tests/nu-hp-pill-interaction.test.js
