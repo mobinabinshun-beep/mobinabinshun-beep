@@ -96,7 +96,7 @@ test("human review can compare age, stats, lock and card-privacy alternatives", 
 });
 
 test("private access, recovery and sharing are explicit local-only simulations", () => {
-  for (const id of ["demo-passphrase-test","demo-private-yes","demo-private-no","demo-auth-state","demo-recovery-mode","demo-recovery-preview","demo-share-consent","demo-share-preview","demo-share-state"]) assert.ok(html.includes('id="'+id+'"'));
+  for (const id of ["demo-passphrase-test","demo-private-yes","demo-private-no","demo-auth-model","demo-auth-state","demo-recovery-mode","demo-recovery-preview","demo-share-consent","demo-share-preview","demo-share-state"]) assert.ok(html.includes('id="'+id+'"'));
   assert.match(html,/Never enter a real password or passphrase/);
   assert.match(playerUi,/NO DATA WAS SAVED OR RECOVERED/);
   assert.match(playerUi,/NO DATA SENT/);
@@ -110,7 +110,7 @@ test("image fit and placement alternatives remain editable after full preview lo
 });
 
 test("full review matrix includes security, storage, sharing and placement simulations", () => {
-  for (const id of ["demo-save-preview","demo-export-preview","demo-import-preview","demo-sync-preview","demo-storage-state","demo-stats-card-preview","demo-image-fit","demo-placement-mode"]) {
+  for (const id of ["demo-save-preview","demo-export-preview","demo-import-preview","demo-sync-preview","demo-storage-state","demo-storage-options-preview","demo-platform-target","demo-launcher-model","demo-save-model","demo-export-model","demo-import-model","demo-sync-model","demo-stats-card-preview","demo-image-fit","demo-placement-mode","demo-reduced-effects","demo-high-contrast"]) {
     assert.ok(html.includes('id="'+id+'"'), "missing "+id);
   }
   assert.match(playerUi,/NO FILE, SAVE OR NETWORK REQUEST CREATED/);
