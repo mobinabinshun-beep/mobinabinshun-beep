@@ -3,8 +3,20 @@
 "use strict";
 const $=id=>document.getElementById(id);
 const canvas=$("pixel-canvas"),ctx=canvas.getContext("2d",{willReadFrequently:true});
+const blueprintCanvas=document.createElement("canvas"),blueprintContext=blueprintCanvas.getContext("2d");
+blueprintCanvas.id="blueprint-overlay";blueprintCanvas.setAttribute("aria-hidden","true");
+blueprintCanvas.style.cssText="position:absolute;pointer-events:none;z-index:3;display:block";
+$("workspace-frame").appendChild(blueprintCanvas);
+let blueprintEnabled=false,blueprintDivisions=4;
+function drawBlueprintOverlay(){
+ if(!blueprintContext||!window.NUStudioBlueprint)return;
+ blueprintCanvas.width=width;blueprintCanvas.height=height;
+ blueprintCanvas.style.left=canvas.offsetLeft+"px";blueprintCanvas.style.top=canvas.offsetTop+"px";
+ blueprintCanvas.style.width=canvas.style.width;blueprintCanvas.style.height=canvas.style.height;
+ window.NUStudioBlueprint.draw(blueprintContext,width,height,{enabled:blueprintEnabled,divisions:blueprintDivisions});
+}
 const defaults=["#111827","#243447","#3e596b","#78909c","#d8e2e8","#ffffff","#a63c50","#e45b63","#f29c67","#e8b94f","#f8dc86","#76a86c","#3f795e","#4b9cba","#5577b8","#8a6bb5"];
-let width=32,height=32,pixels=Array(width*height).fill(null),palette=defaults.slice(),color="#e8b94f",tool="pencil",drawing=false,strokeSnapshot=null,undoStack=[],redoStack=[],imageImported=false,qualityProfile=null,workspace={zoom:100},resizeLock=true,lastDimension="width",brushSize=1,strokeStart=null,sourcePreviewUrl=null,originalImportFile=null;
+let width=3,height=3,pixels=Array(width*height).fill(null),palette=defaults.slice(),color="#e8b94f",tool="pencil",drawing=false,strokeSnapshot=null,undoStack=[],redoStack=[],imageImported=false,qualityProfile=null,workspace={zoom:100},resizeLock=true,lastDimension="width",brushSize=1,strokeStart=null,sourcePreviewUrl=null,originalImportFile=null;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function announce(msg){$("studio-status").textContent=msg;}
 function snapshot(){return {width,height,pixels:pixels.slice()};}
@@ -14,6 +26,7 @@ function commitHistory(before){if(!before)return;undoStack.push(before);trimHist
 function restore(s){width=s.width;height=s.height;pixels=s.pixels.slice();$("image-width").value=width;$("image-height").value=height;updateCanvasDisplay();render();}
 function historyButtons(){$("undo").disabled=!undoStack.length;$("redo").disabled=!redoStack.length;}
 function cellLimit(){const b=qualityProfile&&qualityProfile.budget;return b?Math.min(3000000,Math.max(4096,Math.floor(b.maxCanvasPixels||520000))):520000;}
+function oddDimension(value){let n=clamp(Math.round(Number(value)||3),1,361);if(n%2===0)n=n===361?359:n+1;return n;}
 function updateCounters(){const count=pixels.reduce((n,p)=>n+(p?1:0),0);$("canvas-size").textContent=width+" × "+height+" px";$("pixel-count").textContent=count+" painted pixels";$("zoom-note").textContent=workspace.zoom+"% view · "+(qualityProfile?qualityProfile.tier:"balanced");}
 function updateCanvasDisplay(){
  if(canvas.width!==width)canvas.width=width;if(canvas.height!==height)canvas.height=height;
@@ -23,6 +36,7 @@ function updateCanvasDisplay(){
  canvas.style.width=fitted.width+"px";canvas.style.height=fitted.height+"px";
  frame.style.alignItems=workspace.zoom>100?"flex-start":"center";
  frame.style.justifyContent=workspace.zoom>100?"flex-start":"center";
+ drawBlueprintOverlay();
  $("workspace-zoom").value=workspace.zoom;$("workspace-zoom-value").textContent=workspace.zoom+"%";
 }
 const renderColorCache=new Map();
@@ -58,7 +72,7 @@ function observeWorkspace(){
 }
 observeWorkspace();
 $("image-lock").addEventListener("change",e=>{resizeLock=e.target.checked;});
-$("image-width").addEventListener("input",()=>{lastDimension="width";});$("image-height").addEventListener("input",()=>{lastDimension="height";});$("apply-image-size").addEventListener("click",()=>{let w=clamp(Number($("image-width").value)||width,1,2048),h=clamp(Number($("image-height").value)||height,1,2048);if(resizeLock){const ratio=width/height;if(lastDimension==="width")h=Math.max(1,Math.round(w/ratio));else w=Math.max(1,Math.round(h*ratio));}$("image-width").value=w;$("image-height").value=h;resizeArtwork(w,h,"nearest-neighbor");});
+$("image-width").addEventListener("input",()=>{lastDimension="width";});$("image-height").addEventListener("input",()=>{lastDimension="height";});$("apply-image-size").addEventListener("click",()=>{let w=oddDimension($("image-width").value||width),h=oddDimension($("image-height").value||height);if(resizeLock){const ratio=width/height;if(lastDimension==="width")h=oddDimension(Math.round(w/ratio));else w=oddDimension(Math.round(h*ratio));}$("image-width").value=w;$("image-height").value=h;resizeArtwork(w,h,"nearest-neighbor");});
 function renderPalette(){const root=$("palette");root.innerHTML="";palette.forEach((c,i)=>{const b=document.createElement("button");b.type="button";b.className="swatch";b.style.background=c;b.title=c;b.setAttribute("aria-label","Palette color "+c);b.setAttribute("aria-pressed",String(c.toLowerCase()===color.toLowerCase()));b.addEventListener("click",()=>{color=c;$("custom-color").value=c;renderPalette();});root.appendChild(b);});const transparent=document.createElement("button");transparent.type="button";transparent.className="swatch";transparent.setAttribute("aria-label","Transparent");transparent.title="Transparent / eraser";transparent.addEventListener("click",()=>setTool("eraser"));root.appendChild(transparent);}
 function setTool(next){tool=next;document.querySelectorAll("[data-tool]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tool===tool)));canvas.style.cursor=tool==="picker"?"copy":tool==="eraser"?"cell":tool==="fill"?"copy":"crosshair";}
 function coords(e){const r=canvas.getBoundingClientRect();return window.NUStudioLayout.pixelAt(e.clientX,e.clientY,r,width,height);}
@@ -136,7 +150,8 @@ $("image-file").addEventListener("change",async e=>{
  importButton.disabled=true;
  try{
   announce("Reading image dimensions and preparing the original-size working canvas…");
-  bitmap=await decodeImage(file);
+  const decodeSource=window.NUSVGImport&&window.NUSVGImport.isSVGFile(file)?await window.NUSVGImport.toRasterBlob(file):file;
+  bitmap=await decodeImage(decodeSource);
   const sourceWidth=bitmap.naturalWidth||bitmap.width,sourceHeight=bitmap.naturalHeight||bitmap.height;
   if(!sourceWidth||!sourceHeight)throw new Error("The image decoder returned invalid dimensions.");
   const requested=String($("import-resolution").value||"original");
@@ -309,6 +324,8 @@ $("export-png").addEventListener("click",()=>{
  }catch(err){button.disabled=false;announce("PNG export failed: "+err.message);if(source)source.width=source.height=1;if(out)out.width=out.height=1;}
 });
 $("show-grid")?.addEventListener("change",render);
+$("blueprint-enabled")?.addEventListener("change",e=>{blueprintEnabled=e.target.checked;drawBlueprintOverlay();});
+$("blueprint-divisions")?.addEventListener("change",e=>{blueprintDivisions=Number(e.target.value)||4;drawBlueprintOverlay();});
 renderPalette();updateCanvasDisplay();render();setTool("pencil");historyButtons();initAdaptive();
 document.addEventListener("keydown",e=>{
  const tag=(e.target&&e.target.tagName||"").toLowerCase();
