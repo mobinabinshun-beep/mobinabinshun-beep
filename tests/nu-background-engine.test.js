@@ -37,10 +37,12 @@ test("demo page loads the image-first engine and the engine points to the local 
   assert.match(css, /\.world\.calibrated\{opacity:1/);
 });
 
-test("background image paints above the decorative sky but below foreground content", () => {
-  assert.match(engine, /z-index:-3/);
+test("background image is the deepest world layer while scene layers remain available above it", () => {
+  assert.match(engine, /z-index:-5/);
+  assert.match(engine, /world\.insertBefore\(node,world\.firstChild\)/);
   assert.match(css, /\.sky\{z-index:-4!important\}/);
   assert.match(html, /<div class="sky"><\/div>/);
+  assert.doesNotMatch(css, /world\.nu-image-scene-active[\s\S]{0,180}display:none!important/);
 });
 
 test("procedural visual overlays remain quarantined from the public runtime", () => {
