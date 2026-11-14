@@ -451,3 +451,13 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 #game-view.active #level-chip{padding:3px 5px;font-size:8px;}
 #game-view.active .bar-label{font-size:6px;letter-spacing:0;}
 }
+
+
+/* N.U Wallet card tabs — compact holographic pull-out navigation. */
+.wallet-card-tabs{display:flex;direction:ltr;justify-content:flex-start;align-items:flex-start;gap:8px;margin:-22px -22px 22px;padding:0 14px;min-height:40px;overflow:visible}
+.wallet-card-tab{position:relative;top:0;min-width:94px;padding:10px 13px 9px;border:1px solid rgba(113,224,255,.32);border-top:0;border-radius:0 0 11px 11px;background:linear-gradient(180deg,rgba(84,190,224,.13),rgba(8,27,42,.48));color:#bcefff;font:800 9px/1 ui-monospace,monospace;letter-spacing:.12em;text-shadow:0 0 9px rgba(91,220,255,.42);backdrop-filter:blur(12px) saturate(145%);-webkit-backdrop-filter:blur(12px) saturate(145%);cursor:pointer;transform:translateY(-5px);transition:transform .24s cubic-bezier(.2,.8,.2,1),background .24s ease,border-color .24s ease,box-shadow .24s ease}
+.wallet-card-tab:hover,.wallet-card-tab:focus-visible,.wallet-card-tab.is-active{transform:translateY(0);background:linear-gradient(180deg,rgba(75,202,239,.24),rgba(9,35,53,.74));border-color:rgba(133,236,255,.76);box-shadow:0 7px 20px rgba(30,181,225,.13),inset 0 1px rgba(255,255,255,.12);outline:none}
+.wallet-card-tab:focus-visible{outline:2px solid #a9f3ff;outline-offset:2px}
+.wallet-tab-content[hidden]{display:none!important}
+@media(max-width:520px){.wallet-card-tabs{gap:5px;margin:-18px -14px 18px;padding:0 8px}.wallet-card-tab{min-width:0;flex:1;padding:10px 7px;font-size:8px;letter-spacing:.08em}}
+@media(prefers-reduced-motion:reduce){.wallet-card-tab{transition:none}}
