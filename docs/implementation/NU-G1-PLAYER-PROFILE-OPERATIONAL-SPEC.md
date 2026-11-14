@@ -22,7 +22,7 @@ The appearance controls belong in a separate bordered panel directly below the p
 
 ## 3. Three appearance axes
 
-The separate appearance panel contains exactly three independent controls:
+The separate appearance panel contains three core independent controls plus an optional fourth comparison control:
 
 1. **Color spectrum / hue:** choose the card's base color.
 2. **White ↔ dark neutral tone:** apply a neutral white or black tint independently of the selected hue.
