@@ -9,7 +9,7 @@
  const ATTRS=new Set(["id","x","y","x1","y1","x2","y2","cx","cy","r","rx","ry","width","height","viewBox","preserveAspectRatio","d","points","fill","stroke","stroke-width","stroke-linecap","stroke-linejoin","fill-rule","clip-rule","opacity","fill-opacity","stroke-opacity","transform","offset","stop-color","stop-opacity","gradientUnits","gradientTransform","spreadMethod","clipPathUnits","maskUnits","maskContentUnits","version","xmlns","xmlns:xlink","href","xlink:href","vector-effect","shape-rendering"]);
  const STYLE_PROPS=new Set(["fill","stroke","stroke-width","stroke-linecap","stroke-linejoin","fill-rule","clip-rule","opacity","fill-opacity","stroke-opacity","stop-color","stop-opacity","transform","clip-path","mask"]);
  function isSVGFile(file){
-  return !!file&&((file.type||"").toLowerCase()==="image/svg+xml"||/\.svgz?$/i.test(file.name||""));
+  return !!file&&((file.type||"").toLowerCase()==="image/svg+xml"||/\.svg?$/i.test(file.name||""));
  }
  function safeReference(value){
   return /^url\(\s*#[-\w:.]+\s*\)$/i.test(value)||/^#[\w:.-]+$/.test(value);
@@ -32,19 +32,23 @@
   if(doc.querySelector("parsererror"))throw new TypeError("The selected file is not valid SVG/XML.");
   const root=doc.documentElement;
   if(!root||root.localName!=="svg")throw new TypeError("The selected XML document does not have an SVG root.");
+  function cleanAttributes(node){
+   for(const attr of Array.from(node.attributes)){
+    const name=attr.name,value=attr.value.trim();
+    if(name.toLowerCase().startsWith("on")||(!ATTRS.has(name)&&name!=="style")){node.removeAttribute(name);continue;}
+    if(name==="style"){const v=safeStyle(value);if(v)node.setAttribute("style",v);else node.removeAttribute(name);continue;}
+    if(name==="href"||name==="xlink:href"){if(!value.startsWith("#")||!/^#[\\w:.-]+$/.test(value))node.removeAttribute(name);continue;}
+    if(/javascript:|data:|https?:|\\/\\/|expression\\s*\\(/i.test(value)&&name!=="xmlns"&&name!=="xmlns:xlink")node.removeAttribute(name);
+    if(/url\\s*\\(/i.test(value)&&!safeReference(value))node.removeAttribute(name);
+   }
+  }
   function clean(parent){
+   cleanAttributes(parent);
    for(const node of Array.from(parent.childNodes)){
     if(node.nodeType===8||node.nodeType===7){node.remove();continue;}
     if(node.nodeType!==1){if(node.nodeType!==3)node.remove();continue;}
     if(!ELEMENTS.has(node.localName)){node.remove();continue;}
-    for(const attr of Array.from(node.attributes)){
-     const name=attr.name,value=attr.value.trim();
-     if(name.toLowerCase().startsWith("on")||(!ATTRS.has(name)&&name!=="style")){node.removeAttribute(name);continue;}
-     if(name==="style"){const v=safeStyle(value);if(v)node.setAttribute("style",v);else node.removeAttribute(name);continue;}
-     if(name==="href"||name==="xlink:href"){if(!value.startsWith("#")||!/^#[\w:.-]+$/.test(value))node.removeAttribute(name);continue;}
-     if(/javascript:|data:|https?:|\/\/|expression\s*\(/i.test(value)&&name!=="xmlns"&&name!=="xmlns:xlink")node.removeAttribute(name);
-     if(/url\s*\(/i.test(value)&&!safeReference(value))node.removeAttribute(name);
-    }
+    cleanAttributes(node);
     clean(node);
    }
   }
