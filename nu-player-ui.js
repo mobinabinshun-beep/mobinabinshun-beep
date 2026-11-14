@@ -40,7 +40,7 @@
       });
     }
     const summary=$("wallet-asset-summary");
-    if(summary){const currencies=rows.filter(row=>row.group==="currency"||row.group==="games").length;summary.textContent=rows.length+" OWNED ASSET TYPES · "+currencies+" GAME / CREDIT TYPES";}
+    if(summary){const currencies=rows.filter(row=>row.group==="currency"||row.group==="games").length;summary.hidden=rows.length===0;summary.textContent=rows.length?[rows.length+" OWNED ASSET TYPES",...(currencies>0?[currencies+" GAME / CREDIT TYPES"]:[])].join(" · "):"";}
     history.replaceChildren();
     const tx=s.transactions.slice(-24).reverse();
     if(!tx.length){const empty=document.createElement("p");empty.className="wallet-muted";empty.textContent="No recorded wallet transactions yet.";history.appendChild(empty);return;}
