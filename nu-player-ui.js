@@ -135,6 +135,9 @@
   function setAppearanceLock(locked){
     appearanceLocked=locked;
     Object.values(appearanceControls).forEach(control=>{if(control)control.disabled=locked;});
+    demoFields.forEach(id=>{const field=$(id);if(field)field.disabled=locked;});
+    publicToggles.forEach(toggle=>{toggle.disabled=locked;});
+    if(demoPrivatePreview)demoPrivatePreview.disabled=locked;
     if(appearanceConfirm)appearanceConfirm.disabled=locked;
     if(appearanceState)appearanceState.textContent=locked?"STAGE B COMPLETE · APPEARANCE LOCK SIMULATED · IMAGE AND POSITION REMAIN EDITABLE":"STAGE A · APPEARANCE IS NOT CONFIRMED";
   }
