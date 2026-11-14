@@ -198,11 +198,16 @@
     const mode=$("demo-stats-location")?.value||"separate",preview=$("demo-stats-preview");
     const labels={card:"CITIZEN CARD PREVIEW · HP / XP / MANA (GAME DATA ONLY)",separate:"SEPARATE GAME HUD PREVIEW · HP / XP / MANA",wallet:"WALLET PROJECTION PREVIEW · GAME ASSET VIEW",hidden:"STATS HIDDEN FROM PROFILE"};
     if(preview)preview.textContent=labels[mode]+" · NO SAMPLE VALUES OR FABRICATED STATS";
+    const onCard=$("demo-stats-card-preview");if(onCard)onCard.hidden=mode!=="card";
   }
   $("demo-age-model")?.addEventListener("change",applyAgeModel);applyAgeModel();
   $("demo-stats-location")?.addEventListener("change",applyStatsLocation);applyStatsLocation();
   $("demo-lock-policy")?.addEventListener("change",()=>{if(appearanceLocked)setAppearanceLock(true);});
   $("demo-image-fit")?.addEventListener("change",()=>{if(avatarEl)avatarEl.style.backgroundSize=$("demo-image-fit").value;});
+  $("demo-placement-mode")?.addEventListener("change",()=>{
+    const active=document.querySelector('[data-demo-placement][aria-pressed="true"]');
+    if(active)active.click();
+  });
   $("demo-share-preview")?.addEventListener("click",()=>{
     const consent=$("demo-share-consent")?.checked;
     const state=$("demo-share-state");
