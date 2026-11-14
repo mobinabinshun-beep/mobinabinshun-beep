@@ -464,3 +464,10 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 
 ## Generation 1 player profile workshop — human review candidate
 The experimental profile keeps the restored historical four-field card as its base. The separate workshop exposes alternatives for human comparison before any product decision: three core color axes plus optional saturation; exact age, age band, both or no age; optional Bio and Interests; public-card/local-identity models; field privacy and share-consent preview; simulated private access and recovery; three appearance-lock policies; platform, launcher, save/export/import and future sync comparisons; reduced-effects and high-contrast previews; stats placement on card, HUD, Wallet projection or hidden; holographic material/type/geometry/effects; local image fit and 2×4 crop-anchor/photo-slot meanings; and simulated save/export/import/server-sync boundaries. Every control is temporary and resets when the profile closes. The workshop does not authenticate credentials, persist profile data, upload images, transfer public data or synchronize with a server. See the [human QA checklist](docs/qa/NU-G1-PROFILE-APPEARANCE-HUMAN-QA-2026-11-14.md).
+
+
+## Profile workshop refinement — compact demo and asset architecture
+- The profile page is being simplified into collapsed option groups; game HUD/wallet explanation has been removed from the profile page.
+- The player photo control lives inside the photo frame. The browser demo keeps the selected image in IndexedDB for recovery in the same browser profile and offers an explicit download copy. Browsers do not expose the original absolute desktop/gallery path or permit silent writes to arbitrary folders; the user chooses the download destination.
+- Hologram intensity, edge glow and glass transparency use bounded 0–100 numeric controls. Profile layout, card geometry and identity-card design are unchanged.
+- Future execution modes, wallet aggregation semantics, asset-profile types and terminology are archived in `docs/architecture/NU-PLAYER-IDENTITY-ASSETS-AND-EXECUTION-MODES.md`.
