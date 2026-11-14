@@ -19,14 +19,16 @@ test("the original profile uses the 150px image placeholder and two-column field
   assert.match(css, /@media\(max-width:600px\)\{\.demo-profile-card\{grid-template-columns:1fr\}/);
 });
 
-test("the historical profile stays display-only while exposing three temporary appearance controls", () => {
+test("the historical profile stays display-only while exposing four temporary appearance comparison controls", () => {
   assert.doesNotMatch(html, /player-id-number|player-rank-hue|player-identity-save/);
-  for (const id of ["demo-card-hue","demo-card-tone","demo-card-lightness"]) assert.ok(html.includes('id="'+id+'"'));
+  for (const id of ["demo-card-hue","demo-card-tone","demo-card-lightness","demo-card-saturation"]) assert.ok(html.includes('id="'+id+'"'));
   assert.match(html, /CARD APPEARANCE · DEMO CONTROLS/);
   assert.ok(html.indexOf('class="demo-profile-card"') < html.indexOf('class="demo-profile-appearance"'));
   assert.match(css, /#demo-card-hue::-webkit-slider-runnable-track/);
   assert.match(css, /#demo-card-tone::-webkit-slider-runnable-track/);
   assert.match(css, /#demo-card-lightness::-webkit-slider-runnable-track/);
+  assert.match(css, /#demo-card-saturation::-webkit-slider-runnable-track/);
+  assert.match(playerUi, /--demo-card-saturation/);
   assert.match(html, /saved appearance settings are available/);
   assert.match(playerUi, /if\(!\$\("player-id"\)\)return/);
   assert.match(playerUi, /demo-profile-warning/);
@@ -83,4 +85,26 @@ test("extended profile fields and visual controls are disabled after confirmatio
   assert.match(playerUi, /document\.querySelectorAll\("\[data-demo-editable\]"\)/);
   assert.match(playerUi, /demo-age-band","demo-bio","demo-interests/);
   assert.match(playerUi, /demoFields\.forEach\(id=>\{const field=\$\(id\);if\(field\)field\.disabled=locked;\}\)/);
+});
+
+test("human review can compare age, stats, lock and card-privacy alternatives", () => {
+  for (const id of ["demo-age-model","demo-stats-location","demo-lock-policy","demo-card-privacy"]) assert.ok(html.includes('id="'+id+'"'));
+  for (const value of ['value="compare"','value="exact"','value="band"','value="none"','value="appearance"','value="appearance-fields"','value="full"','value="card"','value="separate"','value="wallet"','value="hidden"']) assert.ok(html.includes(value));
+  assert.match(playerUi,/function applyAgeModel/);
+  assert.match(playerUi,/function applyStatsLocation/);
+  assert.match(playerUi,/STAGE B · LOCK SIMULATION ACTIVE/);
+});
+
+test("private access, recovery and sharing are explicit local-only simulations", () => {
+  for (const id of ["demo-passphrase-test","demo-private-yes","demo-private-no","demo-auth-state","demo-recovery-mode","demo-recovery-preview","demo-share-consent","demo-share-preview","demo-share-state"]) assert.ok(html.includes('id="'+id+'"'));
+  assert.match(html,/Never enter a real password or passphrase/);
+  assert.match(playerUi,/NO DATA WAS SAVED OR RECOVERED/);
+  assert.match(playerUi,/NO DATA SENT/);
+  assert.match(playerUi,/NOT AUTHENTICATED/);
+});
+
+test("image fit and placement alternatives remain editable after full preview lock", () => {
+  for (const id of ["demo-image-fit","demo-placement-mode"]) assert.ok(html.includes('id="'+id+'"'));
+  assert.match(playerUi,/photoControl=\["demo-image-fit","demo-placement-mode"\]/);
+  assert.match(playerUi,/applyVisualDesign\(true\);applyAgeModel\(\);applyStatsLocation\(\)/);
 });
