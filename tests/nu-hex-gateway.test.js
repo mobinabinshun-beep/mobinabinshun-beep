@@ -15,8 +15,8 @@ test("Gateway markup remains present while controller activation is limited to g
     assert.match(page, /id="nu-hex-gateway"/);
     assert.match(page, /class="nu-gateway-scrim"/);
   }
-  assert.match(html, /nu-hex-gateway\.css\?v=20261114-wallet-gateway-r1/);
-  assert.match(html, /nu-hex-gateway\.js\?v=20261114-wallet-gateway-r1/);
+  assert.match(html, /nu-hex-gateway\.css\?v=20261114-gameplay-declutter-r2/);
+  assert.match(html, /nu-hex-gateway\.js\?v=20261114-gameplay-declutter-r2/);
   assert.match(js, /if \(!root \|\| !scrim \|\| !gameView \|\| !walletView\) return/);
   assert.match(js, /classList\.toggle\("nu-game-active", gameActive\)/);
   assert.match(js, /classList\.toggle\("nu-main-game-page", gameActive\)/);
@@ -27,10 +27,10 @@ test("Gateway markup remains present while controller activation is limited to g
   assert.match(css, /body\.nu-wallet-active #nu-hex-gateway/);
 });
 
-test("Gateway is available in gameplay and wallet; classic menu is hidden only in wallet", () => {
+test("Gateway replaces the persistent top navigation during gameplay; wallet scope remains unchanged", () => {
   assert.match(js, /gameView\?\.classList\.contains\("active"\)/);
   assert.match(js, /MutationObserver/);
-  assert.match(css, /body\.nu-wallet-active #menu-open\{display:none!important\}/);
+  assert.match(css, /body\.nu-wallet-active #menu-open,body\.nu-game-active \.topbar\{display:none!important\}/);
   assert.doesNotMatch(css, /#finish-round[^{}]*display:none/);
   assert.match(html, /id="menu-open"/);
   assert.match(html, /id="finish-round"/);
@@ -51,15 +51,17 @@ test("outside exit uses the 10px tolerance and returns gameplay to its prior sta
   assert.match(js, /performance\.now\(\) - outsideSince > 110/);
   assert.match(js, /pauseGame\(\)/);
   assert.match(js, /resumeGame\(\)/);
-  assert.match(css, /backdrop-filter:blur\(6px\)/);
+  assert.match(css, /background:rgba\(3,12,20,\.28\)/);
+  assert.doesNotMatch(css, /body\.nu-gateway-open \.world[^{}]*filter:blur/);
 });
 
 test("Gateway is compact, fixed, responsive and does not create boxed menu cards", () => {
   assert.match(css, /position:fixed/);
-  assert.match(css, /top:clamp\(118px,17vh,154px\)/);
-  assert.match(css, /right:clamp\(12px,2\.4vw,28px\)/);
+  assert.match(css, /top:14px;right:14px;width:48px;height:48px/);
+  assert.match(css, /right:14px;width:48px;height:48px/);
   assert.match(css, /scale\(1\.2\)/);
   assert.match(css, /prefers-reduced-motion/);
+  assert.match(js, /const radius = compact \? 82 : 94/);
   assert.match(js, /function layoutItems\(\)/);
   assert.match(js, /window\.addEventListener\("resize",layoutItems/);
   assert.match(js, /window\.addEventListener\("orientationchange",layoutItems/);
