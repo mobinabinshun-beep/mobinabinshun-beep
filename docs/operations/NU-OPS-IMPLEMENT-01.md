@@ -20,13 +20,13 @@ For every instruction such as «اعمال کن»، «پیاده کن»، «فی
 
 ## 3. Explicit freeze lock — Gateway icon
 **LOCK ID:** NU-LOCK-GATEWAY-ICON-01  
-**Status:** FROZEN — owner approval required to unfreeze.
+**Status:** SCOPED UNFREEZE APPROVED — 2026-11-14; main game page only.
 
-- The shared hexagonal Gateway icon and its scrim must remain hidden on the main menu, game/tool views, Creative Studio (drawing tool), Casino and Launcher/internal pages.
-- Do not add, expose, relocate, restyle, reconnect or otherwise alter Gateway visibility or behavior while this lock is active.
-- Do not interpret a general request to improve, optimize or fix the project as permission to modify this frozen feature.
-- Only a direct, explicit owner instruction that identifies the Gateway lock and authorizes unfreezing permits work on it.
-- Before making any Gateway change after such an instruction, ask the owner to confirm the exact target pages and intended behavior. Do not assume permission from an ambiguous request.
+- The owner explicitly authorized unfreezing the Gateway for the main game page (index.html, including its home/library and active game views).
+- Gateway must remain hidden and behaviorally inactive on Casino, Launcher, Creative Studio, and all other internal pages until separate owner approval.
+- Keep the legacy main MENU and in-game PAUSE/RESUME controls visible and operable; Gateway is additive navigation, not a replacement for those controls.
+- Do not change Gateway destinations, shared game rules, wallet/save data, or unrelated pages as part of this scoped unfreeze.
+- Any further page expansion requires a new explicit owner approval identifying the target pages and behavior.
 
 ## 4. Shield visibility
 - Do not display a shield meter, charge bar, shield capsule or shield status when the player has no shield item/state.
