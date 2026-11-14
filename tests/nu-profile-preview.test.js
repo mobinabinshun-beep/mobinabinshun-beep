@@ -114,6 +114,9 @@ test("full review matrix includes security, storage, sharing and placement simul
     assert.ok(html.includes('id="'+id+'"'), "missing "+id);
   }
   assert.match(playerUi,/NO FILE, SAVE OR NETWORK REQUEST CREATED/);
+  assert.match(playerUi,/demo-platform-target/);
+  assert.match(playerUi,/demo-high-contrast/);
+  assert.match(playerUi,/demo-reduced-effects/);
   assert.match(playerUi,/PHOTO SLOT /);
   assert.match(playerUi,/IMAGE ANCHOR /);
   assert.match(playerUi,/demo-stats-card-preview/);
