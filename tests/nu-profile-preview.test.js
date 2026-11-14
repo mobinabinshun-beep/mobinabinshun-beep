@@ -67,3 +67,20 @@ test("final preview lock leaves only image replacement and placement controls ed
   assert.match(playerUi, /imageInput\.addEventListener\("change"/);
   assert.match(playerUi, /\[data-demo-placement\]/);
 });
+
+test("extended operational profile concepts and visual design controls are present", () => {
+  for (const id of ["demo-age-band","demo-bio","demo-interests","demo-frame-material","demo-card-font","demo-corners","demo-holo","demo-glow","demo-glass","demo-scanlines","demo-data-texture","demo-motion","demo-quality"]) {
+    assert.ok(html.includes('id="'+id+'"'), "missing "+id);
+  }
+  assert.match(html, /LOCAL SAVE, SECURITY &amp; FUTURE NETWORK/);
+  assert.match(html, /ENCRYPTED EXPORT \/ VALIDATED IMPORT/);
+  assert.match(playerUi, /applyVisualDesign\(true\)/);
+  assert.match(css, /\.demo-profile-card\.has-scanlines/);
+  assert.match(css, /\.demo-profile-card\.has-data-texture/);
+});
+
+test("extended profile fields and visual controls are disabled after confirmation", () => {
+  assert.match(playerUi, /document\.querySelectorAll\("\[data-demo-editable\]"\)/);
+  assert.match(playerUi, /demo-age-band","demo-bio","demo-interests/);
+  assert.match(playerUi, /demoFields\.forEach\(id=>\{const field=\$\(id\);if\(field\)field\.disabled=locked;\}\)/);
+});
