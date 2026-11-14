@@ -154,6 +154,7 @@
     });
     if(demoPrivatePreview)demoPrivatePreview.disabled=locked&&policy==="full";
     if(appearanceConfirm)appearanceConfirm.disabled=locked;
+    if(appearanceReset)appearanceReset.disabled=locked;
     if(appearanceState)appearanceState.textContent=locked?"STAGE B · LOCK SIMULATION ACTIVE · "+policy.toUpperCase()+" · PHOTO / POSITION REMAIN EDITABLE":"STAGE A · APPEARANCE IS NOT CONFIRMED";
   }
   if(appearanceConfirm)appearanceConfirm.addEventListener("click",()=>setAppearanceLock(true));
