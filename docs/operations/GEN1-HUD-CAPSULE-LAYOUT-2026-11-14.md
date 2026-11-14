@@ -2,7 +2,7 @@
 
 **Date:** 2026-11-14  
 **Protocol:** NU-OPS-IMPLEMENT-01  
-**Status:** Candidate only; focused CI passed; public demo and human QA pending
+**Status:** Merged to public demo; focused CI and Pages deployment passed; human QA pending
 
 ## Request and acceptance criteria
 - Move LV to the lower-left of the gameplay resource rail.
@@ -26,11 +26,14 @@
 
 ## Verification
 - Dedicated HUD layout regression: PASS.
-- Existing Gateway regression: PASS.
+- Existing HP capsule interaction tests: PASS.
+- Gateway regression: PASS.
 - Graphics integrity: PASS.
-- Graphics preview smoke and Studio export regression: pending final PR run at record creation.
+- Graphics preview smoke: PASS.
+- Studio export regression: PASS.
+- Pull Request #78 merged as source commit d2ec0d322d3b84b248dedcb2939fa2876bb4e554.
+- GitHub Pages build and deploy: PASS for that merged demo revision.
 - Human desktop/mobile browser QA: PENDING.
-- Public Pages deployment: NOT DEPLOYED from this candidate.
 
 ## Human QA checklist
 1. Verify LV appears at lower-left beside the XP and Mana rails.
