@@ -7,7 +7,7 @@
 "use strict";
 const checks=[];
 function check(name,condition){if(!condition)throw new Error("FAILED: "+name);checks.push("PASS: "+name);}
-const source='<svg xmlns="http://www.w3.org/2000/svg" width="12" height="8" onload="alert(1)"><scr"+"ipt>alert(1)</scr"+"ipt><foreignObject><div>unsafe</div></foreignObject><path id="shape" d="M0 0h4v4z" fill="#ff0000"/><image href="https://example.com/a.png" width="2" height="2"/></svg>';
+const source='<svg xmlns="http://www.w3.org/2000/svg" width="12" height="8" onload="alert(1)"><'+'script>alert(1)</'+'script><foreignObject><div>unsafe</div></foreignObject><path id="shape" d="M0 0h4v4z" fill="#ff0000"/><image href="https://example.com/a.png" width="2" height="2"/></svg>';
 const safe=NUSVGImport.sanitize(source);
 check("valid SVG root retained",safe.includes("<svg"));
 check("safe vector geometry retained",safe.includes("<path"));
