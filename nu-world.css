@@ -145,7 +145,7 @@ body.article-mode #game-view .hud,body.article-mode #game-view .bars{opacity:.9}
 
 
 /* N.U Modular Graphics Runtime — image-first background and layered compositing */
-#nu-background-image{position:fixed;inset:0;z-index:-5;overflow:hidden;pointer-events:none;background:#080b12}
+
 #nu-background-image img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 52%;opacity:var(--nu-bg-opacity,.72);filter:saturate(.88) contrast(1.06);transform:scale(1.015)}
 #nu-background-image.asset-missing{background:radial-gradient(ellipse at 50% 45%,#30271f 0%,#141923 44%,#070b12 100%)}
 #nu-background-image.asset-missing:after{content:"N.U BACKGROUND ART · ASSET PENDING";position:absolute;left:12px;bottom:12px;color:#d2a36c88;font:9px ui-monospace,monospace;letter-spacing:.14em}
@@ -169,7 +169,7 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 /* N.U image-first celestial scene — v0.3.
    Original archived artwork remains intact at every device tier. */
 .world{background:#080b12}
-#nu-background-image{position:fixed;inset:-1.4%;z-index:-5;overflow:hidden;pointer-events:none;background:#080b12;opacity:1}
+
 #nu-background-image img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 52%;opacity:1!important;filter:none!important;transform:translate3d(calc(var(--camera-x,0px)*-.16),calc(var(--camera-y,0px)*-.14),0) scale(1.035);transform-origin:center center;transition:transform .32s ease-out;will-change:transform}
 #nu-background-image:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,6,12,.10),transparent 34%,rgba(3,6,12,.08) 68%,rgba(3,6,12,.34)),radial-gradient(ellipse at center,transparent 46%,rgba(2,5,10,.32) 100%);pointer-events:none}
 #nu-dynamic-layers{position:fixed!important;inset:0!important;width:100%!important;height:100%!important;z-index:-2!important;opacity:1!important;mix-blend-mode:screen;pointer-events:none}
@@ -612,3 +612,22 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 /* Compact profile workshop and in-card photo controls */
 .demo-profile-lab{padding:10px;margin-top:10px}.demo-lab-block{margin-top:7px;padding:9px 11px}.demo-lab-block>summary{cursor:pointer;list-style:none;color:#aeeaff;font:800 10px/1.5 ui-monospace,monospace;letter-spacing:.07em}.demo-lab-block>summary::-webkit-details-marker{display:none}.demo-lab-block>summary:after{content:"＋";float:right;color:#8edfff}.demo-lab-block[open]>summary:after{content:"−"}.demo-lab-block[open]>summary{margin-bottom:8px}
 .demo-avatar{width:150px;min-height:205px;padding:8px;gap:6px;align-content:center;background-position:center;background-repeat:no-repeat;background-size:cover}.demo-avatar-placeholder{font-size:11px;text-shadow:0 1px 5px #001}.demo-avatar-change,.demo-avatar-save{display:block;padding:6px 8px;border:1px solid #79dfff88;border-radius:7px;background:rgba(3,15,25,.82);color:#c8f4ff;font:700 9px/1.3 ui-monospace,monospace;cursor:pointer;text-align:center}.demo-avatar-input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}.demo-avatar-save:disabled{opacity:.35;cursor:not-allowed}.demo-photo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;width:100%}.demo-photo-grid button{min-height:22px;padding:2px;border:1px solid #79dfff66;border-radius:4px;background:#071522d9;color:#c8f4ff;font-size:9px;cursor:pointer}.demo-photo-grid button[aria-pressed=true]{background:#287f9a;color:#fff;border-color:#b7f4ff}.demo-avatar small{font-size:7px;line-height:1.3;letter-spacing:.02em;overflow-wrap:anywhere}.demo-extra-field input[type=number]{width:64px;max-width:64px;padding:5px;border:1px solid var(--line);border-radius:7px;background:#071522;color:#eaf6ff;font:700 11px ui-monospace,monospace}@media(max-width:600px){.demo-avatar{width:100%;max-width:180px;min-height:210px}.demo-profile-lab{padding:8px}.demo-lab-block{padding:8px}}
+
+
+/* Explicit world-scene stack: artwork bottom, sky and effects above it. */
+.world{position:relative;isolation:isolate;overflow:hidden}
+.world>.nu-world-background{
+ position:absolute!important;inset:0!important;z-index:0!important;
+ display:block!important;opacity:1!important;visibility:visible!important;
+ pointer-events:none!important;overflow:hidden!important;
+}
+.world>.nu-world-background>img{
+ position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+ display:block!important;object-fit:contain!important;object-position:center!important;
+ transform:translate3d(var(--camera-x,0px),var(--camera-y,0px),0) scale(var(--nu-camera-zoom,1))!important;
+ transform-origin:center center!important;filter:none!important;opacity:1!important;
+}
+.world>.sky{position:absolute;z-index:1!important;pointer-events:none}
+.world>#world-canvas,.world>#pixel-world,.world>.horizon,.world>.world-effects{
+ position:absolute;z-index:2;pointer-events:none
+}
