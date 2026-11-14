@@ -1,6 +1,9 @@
 name: N.U wallet and profile regression
 
 on:
+  push:
+    branches:
+      - "fix/player-card-id-and-bottom-wallet-tabs-*"
   pull_request:
     paths:
       - "index.html"
