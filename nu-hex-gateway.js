@@ -4,9 +4,9 @@
   const root = document.getElementById("nu-hex-gateway");
   const scrim = document.querySelector(".nu-gateway-scrim");
   const gameView = document.getElementById("game-view");
-  // The owner approved Gateway only for the main game page. Other internal
-  // pages keep their legacy navigation and remain untouched by this controller.
-  if (!root || !scrim || !gameView) return;
+  const walletView = document.getElementById("wallet-view");
+  // Gateway is enabled on gameplay and the wallet only; other pages keep existing navigation.
+  if (!root || !scrim || !gameView || !walletView) return;
 
   const trigger = root.querySelector(".nu-gateway-trigger");
   const items = [...root.querySelectorAll(".nu-gateway-item")];
@@ -22,12 +22,15 @@
 
   function syncGatewayScope() {
     const gameActive = Boolean(gameView?.classList.contains("active"));
-    document.body.classList.toggle("nu-gateway-enabled", gameActive);
+    const walletActive = Boolean(walletView?.classList.contains("active"));
+    document.body.classList.toggle("nu-gateway-enabled", gameActive || walletActive);
     document.body.classList.toggle("nu-main-game-page", gameActive);
     document.body.classList.toggle("nu-game-active", gameActive);
+    document.body.classList.toggle("nu-wallet-active", walletActive);
   }
   syncGatewayScope();
   if (gameView) new MutationObserver(syncGatewayScope).observe(gameView, {attributes:true,attributeFilter:["class"]});
+  new MutationObserver(syncGatewayScope).observe(walletView, {attributes:true,attributeFilter:["class"]});
 
   function layoutItems() {
     const compact = window.matchMedia("(max-width: 600px)").matches;
@@ -59,8 +62,8 @@
   }
   const routes = {
     back: goHome,
-    menu: () => document.getElementById("menu-open")?.click(),
-    settings: () => { window.location.href = "./launcher.html"; }
+    profile: () => document.getElementById("menu-profile")?.click(),
+    settings: () => document.getElementById("menu-store")?.click()
   };
 
   function pauseGame() {
