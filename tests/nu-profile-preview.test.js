@@ -43,8 +43,8 @@ test("unified workshop exposes explicit privacy, private-view simulation and sta
   for (const marker of ["demo-public-preview","demo-private-preview","demo-appearance-confirm","demo-appearance-reset"]) assert.ok(html.includes('id="'+marker+'"'));
   for (const field of ["demo-name","demo-call","demo-family","demo-age"]) assert.ok(html.includes('data-demo-public="'+field+'"'));
   assert.match(html, /All fields start private/);
-  assert.match(playerUi, /STAGE B COMPLETE/);
-  assert.match(playerUi, /control.disabled=locked/);
+  assert.match(playerUi, /STAGE B · LOCK SIMULATION ACTIVE/);
+  assert.match(playerUi, /appearanceEditableIds\.forEach\(id=>\{const control=\$\(id\);if\(control\)control\.disabled=locked;\}\)/);
   assert.match(playerUi, /resetWorkshop\(\)/);
 });
 
@@ -64,8 +64,8 @@ test("profile keeps game stats and wallet outside the historical display card", 
 
 test("final preview lock leaves only image replacement and placement controls editable", () => {
   assert.match(playerUi, /demoFields\.forEach\(id=>\{const field=\$\(id\);if\(field\)field\.disabled=lockFields;\}\)/);
-  assert.match(playerUi, /publicToggles\.forEach\(toggle=>\{toggle\.disabled=locked;\}\)/);
-  assert.match(playerUi, /demoPrivatePreview\.disabled=locked/);
+  assert.match(playerUi, /publicToggles\.forEach\(toggle=>\{toggle\.disabled=locked&&policy===\"full\";\}\)/);
+  assert.match(playerUi, /demoPrivatePreview\.disabled=locked&&policy===\"full\"/);
   assert.match(playerUi, /imageInput\.addEventListener\("change"/);
   assert.match(playerUi, /\[data-demo-placement\]/);
 });
