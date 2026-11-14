@@ -50,3 +50,12 @@ The candidate gallery is not selected as an alternate runtime background because
 ## Scope of this change
 
 This audit does not delete source files, alter the canonical artwork, merge a pull request, or lock the graphics core. The public copy already matches the private source exactly. The change adds regression checks and removes a stale CI warning that referred to an unrelated legacy PNG filename.
+
+
+## Full-frame visual review candidate
+
+- Initial rendering uses `object-fit: contain` so the entire 1536 × 1024 source artwork remains visible without cropping or stretching.
+- Neutral side/top margins may appear when the viewport aspect ratio differs from the artwork; this is necessary to preserve the complete image.
+- Camera zoom is bounded to 1×–3× and pan is clamped to the fitted artwork bounds.
+- The SVG source remains byte-identical; this candidate is for visual review only and is not a permanent locked core layer.
+- Human visual approval is required before any final pixel-lock/core integration.
