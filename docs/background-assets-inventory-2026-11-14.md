@@ -39,13 +39,21 @@ The SVG is already public and the active engine requests its local path. A succe
 4. No canvas, overlay, stacking context, or stale cache hides the artwork
 5. Desktop and mobile layouts both show the intended composition
 
+## Pixel-faithful review framing (human approval pending)
+
+- Review framing uses `object-fit: contain`; no source corners are cropped.
+- The artwork is centered over the neutral scene background. With differing screen/image aspect ratios, letterboxing is intentional: filling every screen pixel and showing every source pixel simultaneously is geometrically impossible without distortion or cropping.
+- Camera exploration is opt-in through `NUBackgroundEngine.setCamera(x, y, zoom)`. Zoom is bounded from 1× to 3×, and pan is constrained to the zoomed viewport so the camera does not reveal empty margins.
+- Default zoom is 1×, so the complete original image is visible for first-pass review. No blur, color filter, gradient vignette, or extra dark overlay is applied to the artwork.
+- The canonical SVG and embedded PNG bytes remain unchanged. This is a framing/camera presentation change, not a repaint or pixel edit.
+
 ## Only approved test candidate
 
 **Candidate A — canonical SVG image-first scene**
 - Asset: `assets/backgrounds/niroo-universe-background.svg`
 - Engine: `nu-background-engine.js`
 - Entry point: `index.html`
-- Status: ready for public-demo visual acceptance; not approved for permanent engine lock.
+- Status: full-frame review candidate; waiting for human visual approval; not approved for permanent engine lock.
 
 Do not promote or lock the graphics core until human visual testing is recorded and explicitly approved.
 
