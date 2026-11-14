@@ -14,6 +14,8 @@
  ];
  const BASE_INDEX=100,MAX_CANDLES=24,MAX_EVENTS=24;
  const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
+ function hashSeed(value){let h=2166136261;for(const c of String(value||"")){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;}
+ function seededUnit(seed){let x=seed>>>0;x^=x<<13;x^=x>>>17;x^=x<<5;return (x>>>0)/4294967295;}
  function build(raw,key){
   if(!ASSETS.some(a=>a.key===key))return {asset:null,steps:[],candles:[],index:BASE_INDEX,changePct:0,volume:0,demand:0,supply:0,events:0,baseline:BASE_INDEX};
   const txs=Array.isArray(raw&&raw.transactions)?raw.transactions.slice(-MAX_EVENTS):[];
@@ -26,7 +28,7 @@
    const magnitude=Math.abs(e.delta),isDemand=e.delta<0,intensity=magnitude/(magnitude+10);
    const move=(isDemand?1:-1)*0.025*intensity,next=clamp(price*(1+move),50,200);
    const date=new Date(e.tx.at||0),time=Number.isNaN(date.getTime())?"Recorded activity":date.toISOString();
-   const candle={time,open:price,high:Math.max(price,next),low:Math.min(price,next),close:next,volume:magnitude,demand:isDemand?magnitude:0,supply:isDemand?0:magnitude,events:1};
+   const candle={time,open:price,high,low,close:next,volume:magnitude,demand:isDemand?magnitude:0,supply:isDemand?0:magnitude,events:1};
    if(isDemand)totalDemand+=magnitude;else totalSupply+=magnitude;
    totalVolume+=magnitude;price=next;
    steps.push({id:String(e.tx.id||("step-"+e.i)),time,title:String(e.tx.title||e.tx.kind||"Player asset activity"),delta:e.delta,index:price,changePct:(price/BASE_INDEX-1)*100,volume:magnitude,demand:candle.demand,supply:candle.supply,open:candle.open,high:candle.high,low:candle.low,close:candle.close});
