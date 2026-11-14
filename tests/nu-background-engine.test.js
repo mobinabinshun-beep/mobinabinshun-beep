@@ -27,7 +27,7 @@ test("public runtime ships the byte-identical canonical Material background", ()
 });
 
 test("demo page loads the image-first engine and the engine points to the local public asset", () => {
-  assert.match(html, /<script src="\.\/nu-background-engine\.js"><\/script>/);
+  assert.match(html, /<script src="\.\/nu-background-engine\.js(?:\?[^"]*)?"><\/script>/);
   assert.match(engine, /const ASSET="\.\/assets\/backgrounds\/niroo-universe-background\.svg"/);
   assert.match(engine, /img\.onload=/);
   assert.match(engine, /nu-image-scene-active/);
