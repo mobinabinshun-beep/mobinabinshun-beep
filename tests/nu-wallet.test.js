@@ -57,8 +57,9 @@ test("wallet lists only implemented assets and excludes undefined Lore",()=>{
 });
 test("transaction history remains bounded",()=>{
   const s=wallet.normalizeSave({transactions:Array.from({length:50},(_,i)=>({id:String(i)}))});
-  assert.equal(s.transactions.length,wallet.MAX_TRANSACTIONS);
-  assert.equal(s.transactions[0].id,"10");
+  assert.equal(wallet.MAX_TRANSACTIONS,24);
+  assert.equal(s.transactions.length,24);
+  assert.equal(s.transactions[0].id,"26");
 });
 test("studio XP reward increments shared XP and level with an auditable transaction",()=>{
   const result=wallet.grantXP({xp:98,level:1},5,{id:"studio-art-1",title:"Studio export"});
