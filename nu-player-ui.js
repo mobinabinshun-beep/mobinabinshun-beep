@@ -85,11 +85,194 @@
     if(view===walletView){setWalletTab("balances");renderWallet();}else renderProfile();
     const menu=$("menu");if(menu)menu.classList.remove("open");
   }
-  function close(){if(profileView.classList.contains("active")){["demo-name","demo-call","demo-family","demo-age"].forEach(id=>{const field=$(id);if(field)field.value="";});const warning=$("demo-profile-warning");if(warning)warning.hidden=true;}document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));(previousView&&previousView!==walletView&&previousView!==profileView?previousView:$("home-view")).classList.add("active");previousView=null;window.dispatchEvent(new Event("nu:player-overlay-close"));}
+  function close(){if(profileView.classList.contains("active")){["demo-name","demo-call","demo-family","demo-age","demo-age-band","demo-bio","demo-interests","demo-passphrase-test"].forEach(id=>{const field=$(id);if(field)field.value="";});const warning=$("demo-profile-warning");if(warning)warning.hidden=true;applyAppearance(true);resetWorkshop();}document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));(previousView&&previousView!==walletView&&previousView!==profileView?previousView:$("home-view")).classList.add("active");previousView=null;window.dispatchEvent(new Event("nu:player-overlay-close"));}
   $("wallet-back").addEventListener("click",close);
   $("profile-back").addEventListener("click",close);
-  const demoFields=["demo-name","demo-call","demo-family","demo-age"];
-  demoFields.forEach(id=>{const field=$(id);if(field)field.addEventListener("input",()=>{$("demo-profile-warning").hidden=false;});});
+  const demoFields=["demo-name","demo-call","demo-family","demo-age","demo-age-band","demo-bio","demo-interests"];
+  demoFields.forEach(id=>{const field=$(id);if(field){["input","change"].forEach(type=>field.addEventListener(type,()=>{$("demo-profile-warning").hidden=false;}));}});
+  const appearanceDefaults={hue:205,tone:0,lightness:48,saturation:72};
+  const appearanceCard=$("profile-view").querySelector(".demo-profile-card");
+  const appearancePanel=$("profile-view").querySelector(".demo-profile-appearance");
+  const appearanceControls={hue:$("demo-card-hue"),tone:$("demo-card-tone"),lightness:$("demo-card-lightness"),saturation:$("demo-card-saturation")};
+  function applyAppearance(reset){
+    if(!appearanceCard)return;
+    Object.entries(appearanceControls).forEach(([key,control])=>{
+      if(!control)return;
+      if(reset)control.value=String(appearanceDefaults[key]);
+    });
+    const hue=Number(appearanceControls.hue&&appearanceControls.hue.value||appearanceDefaults.hue);
+    const tone=Number(appearanceControls.tone&&appearanceControls.tone.value||0);
+    const lightness=Number(appearanceControls.lightness&&appearanceControls.lightness.value||appearanceDefaults.lightness);
+    const saturation=Number(appearanceControls.saturation&&appearanceControls.saturation.value||appearanceDefaults.saturation);
+    appearanceCard.style.setProperty("--demo-card-hue",String(hue));
+    if(appearancePanel)appearancePanel.style.setProperty("--demo-card-hue",String(hue));
+    appearanceCard.style.setProperty("--demo-card-lightness",lightness+"%");
+    appearanceCard.style.setProperty("--demo-card-saturation",saturation+"%");
+    appearanceCard.style.setProperty("--demo-neutral-rgb",tone>=0?"255,255,255":"0,0,0");
+    appearanceCard.style.setProperty("--demo-neutral-alpha",String(Math.abs(tone)/100*(tone>=0?.42:.52)));
+    const hueValue=$("demo-card-hue-value"),toneValue=$("demo-card-tone-value"),lightValue=$("demo-card-lightness-value"),satValue=$("demo-card-saturation-value");
+    if(hueValue)hueValue.textContent=hue+"°";
+    if(toneValue)toneValue.textContent=tone===0?"NEUTRAL":tone>0?"WHITE "+tone+"%":"DARK "+Math.abs(tone)+"%";
+    if(lightValue)lightValue.textContent=lightness+"%";
+    if(satValue)satValue.textContent=saturation+"%";
+  }
+  Object.values(appearanceControls).forEach(control=>{if(control)control.addEventListener("input",()=>applyAppearance(false));});
+  applyAppearance(false);
+  const demoPublicPreview=$("demo-public-preview"),demoPrivatePreview=$("demo-private-preview"),demoPrivateState=$("demo-private-state");
+  const publicToggles=[...document.querySelectorAll("[data-demo-public]")];
+  function renderPublicPreview(){
+    if(!demoPublicPreview)return;
+    const privateMode=!!(demoPrivatePreview&&demoPrivatePreview.checked);
+    if(demoPrivateState)demoPrivateState.textContent=privateMode?"OPEN · SIMULATED":"CLOSED";
+    const selected=publicToggles.filter(toggle=>toggle.checked).map(toggle=>{
+      const field=$(toggle.dataset.demoPublic),value=field&&field.value.trim();
+      const label=field&&(field.closest("label")?.childNodes[0]?.textContent||field.previousElementSibling?.textContent||toggle.dataset.demoPublic);
+      return value?label.replace(/\s+/g," ").trim()+": "+value:null;
+    }).filter(Boolean);
+    const cardMode=$("demo-card-privacy")?.value||"optional";
+    const prefix=cardMode==="required"?"REQUIRED CARD CONCEPT · ":cardMode==="local-required"?"LOCAL IDENTITY REQUIRED · PUBLIC CARD OPTIONAL · ":"OPTIONAL PUBLIC CARD · ";
+    demoPublicPreview.textContent=privateMode?"PRIVATE VIEW PREVIEW · This is only a visual simulation.":prefix+(selected.length?selected.join(" · "):"No public fields selected.");
+  }
+  publicToggles.forEach(toggle=>toggle.addEventListener("change",renderPublicPreview));
+  demoFields.forEach(id=>{const field=$(id);if(field)field.addEventListener("input",renderPublicPreview);});
+  if(demoPrivatePreview)demoPrivatePreview.addEventListener("change",renderPublicPreview);
+  const appearanceConfirm=$("demo-appearance-confirm"),appearanceReset=$("demo-appearance-reset"),appearanceState=$("demo-appearance-state");
+  const lockPolicy=$("demo-lock-policy");
+  const appearanceEditableIds=["demo-card-hue","demo-card-tone","demo-card-lightness","demo-card-saturation","demo-frame-material","demo-card-font","demo-corners","demo-holo","demo-glow","demo-glass","demo-scanlines","demo-data-texture","demo-motion","demo-reduced-effects","demo-high-contrast","demo-quality"];
+  let appearanceLocked=false;
+  function setAppearanceLock(locked){
+    appearanceLocked=locked;
+    const policy=lockPolicy?lockPolicy.value:"full";
+    const lockFields=locked&&(policy==="full"||policy==="appearance-fields");
+    appearanceEditableIds.forEach(id=>{const control=$(id);if(control)control.disabled=locked;});
+    demoFields.forEach(id=>{const field=$(id);if(field)field.disabled=lockFields;});
+    publicToggles.forEach(toggle=>{toggle.disabled=locked&&policy==="full";});
+    document.querySelectorAll("[data-demo-editable]").forEach(control=>{
+      const photoControl=["demo-image-fit","demo-placement-mode"].includes(control.id);
+      const fieldControl=["demo-age-model","demo-age-band","demo-bio","demo-interests"].includes(control.id);
+      control.disabled=locked&&(policy==="full"||appearanceEditableIds.includes(control.id)||policy==="appearance-fields"&&fieldControl)&&!photoControl;
+    });
+    if(demoPrivatePreview)demoPrivatePreview.disabled=locked&&policy==="full";
+    if(appearanceConfirm)appearanceConfirm.disabled=locked;
+    if(appearanceReset)appearanceReset.disabled=locked;
+    if(appearanceState)appearanceState.textContent=locked?"STAGE B · LOCK SIMULATION ACTIVE · "+policy.toUpperCase()+" · PHOTO / POSITION REMAIN EDITABLE":"STAGE A · APPEARANCE IS NOT CONFIRMED";
+  }
+  if(appearanceConfirm)appearanceConfirm.addEventListener("click",()=>setAppearanceLock(true));
+  if(appearanceReset)appearanceReset.addEventListener("click",()=>{setAppearanceLock(false);applyAppearance(true);applyVisualDesign(true);});
+  const imageInput=$("demo-card-image");
+  const avatarEl=document.querySelector("#profile-view .demo-avatar");
+  if(imageInput)imageInput.addEventListener("change",()=>{
+    const file=imageInput.files&&imageInput.files[0];
+    if(!file)return;
+    if(!file.type.startsWith("image/")||file.size>5*1024*1024){imageInput.value="";const state=$("demo-image-state");if(state)state.textContent="CHOOSE AN IMAGE FILE UP TO 5 MB";return;}
+    const reader=new FileReader();
+    reader.onload=()=>{if(avatarEl){avatarEl.style.backgroundImage="url("+JSON.stringify(String(reader.result))+")";avatarEl.style.backgroundSize=$("demo-image-fit")?.value||"cover";avatarEl.style.backgroundPosition="center";avatarEl.textContent="";}const active=document.querySelector('[data-demo-placement][aria-pressed="true"]')?.dataset.demoPlacement||"1";const mode=$("demo-placement-mode")?.value||"anchor";const state=$("demo-image-state");if(state)state.textContent="LOCAL IMAGE PREVIEW · NOT UPLOADED · "+(mode==="slot"?"PHOTO SLOT ":"IMAGE ANCHOR ")+active+" OF 8";};
+    reader.readAsDataURL(file);
+  });
+  document.querySelectorAll("[data-demo-placement]").forEach(button=>button.addEventListener("click",()=>{
+    document.querySelectorAll("[data-demo-placement]").forEach(item=>{const active=item===button;item.setAttribute("aria-pressed",String(active));});
+    const position=Number(button.dataset.demoPlacement),row=Math.floor((position-1)/4),col=(position-1)%4;
+    const mode=$("demo-placement-mode")?.value||"anchor";
+    if(avatarEl){avatarEl.dataset.placementMode=mode;if(mode==="slot"){avatarEl.dataset.photoSlot=String(position);avatarEl.style.backgroundPosition="center";}else{delete avatarEl.dataset.photoSlot;avatarEl.style.backgroundPosition=(col*33.333)+"% "+(row*100)+"%";}}
+    const state=$("demo-image-state");if(state)state.textContent=(mode==="slot"?"PHOTO SLOT ":"IMAGE ANCHOR ")+position+" OF 8";
+  }));
+  function resetWorkshop(){
+    publicToggles.forEach(toggle=>{toggle.checked=false;});
+    if(demoPrivatePreview)demoPrivatePreview.checked=false;
+    if(imageInput)imageInput.value="";
+    if(avatarEl){avatarEl.style.backgroundImage="";avatarEl.style.backgroundPosition="center";avatarEl.style.backgroundSize="";delete avatarEl.dataset.placementMode;delete avatarEl.dataset.photoSlot;avatarEl.innerHTML="IMAGE<br>PLACEHOLDER<br><small>DEMO ONLY · NO UPLOAD</small>";}
+    document.querySelectorAll("[data-demo-placement]").forEach((button,index)=>button.setAttribute("aria-pressed",String(index===0)));
+    const imageState=$("demo-image-state");if(imageState)imageState.textContent="PLACEHOLDER IMAGE · POSITION 1 OF 8";
+    ["demo-age-model","demo-stats-location","demo-card-privacy","demo-lock-policy","demo-image-fit","demo-placement-mode"].forEach(id=>{const el=$(id);if(el)el.selectedIndex=0;});
+    if($("demo-recovery-mode"))$("demo-recovery-mode").value="compare";
+    ["demo-auth-model","demo-platform-target","demo-launcher-model","demo-save-model","demo-export-model","demo-import-model","demo-sync-model"].forEach(id=>{const el=$(id);if(el)el.selectedIndex=0;});
+    ["demo-share-consent","demo-scanlines","demo-data-texture","demo-motion","demo-reduced-effects","demo-high-contrast"].forEach(id=>{const el=$(id);if(el)el.checked=id==="demo-scanlines";});
+    ["demo-share-state","demo-auth-state","demo-recovery-state","demo-storage-state","demo-storage-options-preview"].forEach((id,index)=>{const el=$(id);if(el)el.textContent=["NO SHARE PREVIEW REQUESTED","PRIVATE ACCESS NOT TESTED · NO AUTHENTICATION","RECOVERY FLOW NOT TESTED · NO DATA RECOVERED","NO SAVE / EXPORT / IMPORT / SYNC PERFORMED","DELIVERY / STORAGE OPTIONS ARE CONCEPTS ONLY · NO BUILD OR SERVICE CREATED"][index];});
+    if($("demo-passphrase-test"))$("demo-passphrase-test").value="";
+    applyAppearance(true);applyVisualDesign(true);applyAgeModel();applyStatsLocation();applyStorageOptions();setAppearanceLock(false);renderPublicPreview();
+  }
+  renderPublicPreview();
+  function applyAgeModel(){
+    const mode=$("demo-age-model")?.value||"compare";
+    const exact=$("demo-age-exact-field"),band=$("demo-age-band")?.closest("label");
+    const exactToggle=publicToggles.find(toggle=>toggle.dataset.demoPublic==="demo-age")?.closest("label");
+    const bandToggle=publicToggles.find(toggle=>toggle.dataset.demoPublic==="demo-age-band")?.closest("label");
+    if(exact)exact.hidden=mode==="band"||mode==="none";
+    if(band)band.hidden=mode==="exact"||mode==="none";
+    if(exactToggle){exactToggle.hidden=mode==="band"||mode==="none";if(exactToggle.hidden){const toggle=exactToggle.querySelector("input");if(toggle)toggle.checked=false;}}
+    if(bandToggle){bandToggle.hidden=mode==="exact"||mode==="none";if(bandToggle.hidden){const toggle=bandToggle.querySelector("input");if(toggle)toggle.checked=false;}}
+    renderPublicPreview();
+  }
+  function applyStatsLocation(){
+    const mode=$("demo-stats-location")?.value||"separate",preview=$("demo-stats-preview");
+    const labels={card:"CITIZEN CARD PREVIEW · HP / XP / MANA (GAME DATA ONLY)",separate:"SEPARATE GAME HUD PREVIEW · HP / XP / MANA",wallet:"WALLET PROJECTION PREVIEW · GAME ASSET VIEW",hidden:"STATS HIDDEN FROM PROFILE"};
+    if(preview)preview.textContent=labels[mode]+" · NO SAMPLE VALUES OR FABRICATED STATS";
+    const onCard=$("demo-stats-card-preview");if(onCard)onCard.hidden=mode!=="card";
+  }
+  $("demo-age-model")?.addEventListener("change",applyAgeModel);applyAgeModel();
+  $("demo-stats-location")?.addEventListener("change",applyStatsLocation);applyStatsLocation();
+  function applyStorageOptions(){
+    const ids=["demo-auth-model","demo-platform-target","demo-launcher-model","demo-save-model","demo-export-model","demo-import-model","demo-sync-model"];
+    const values=ids.map(id=>$(id)?.selectedOptions?.[0]?.textContent||"Not selected");
+    const out=$("demo-storage-options-preview");
+    if(out)out.textContent=values.join(" · ")+" · CONCEPT PREVIEW ONLY · NO BUILD / SAVE / EXPORT / IMPORT / SERVER";
+  }
+  ["demo-auth-model","demo-platform-target","demo-launcher-model","demo-save-model","demo-export-model","demo-import-model","demo-sync-model"].forEach(id=>$(id)?.addEventListener("change",applyStorageOptions));
+  applyStorageOptions();
+
+  $("demo-lock-policy")?.addEventListener("change",()=>{if(appearanceLocked)setAppearanceLock(true);});
+  $("demo-image-fit")?.addEventListener("change",()=>{if(avatarEl)avatarEl.style.backgroundSize=$("demo-image-fit").value;});
+  $("demo-placement-mode")?.addEventListener("change",()=>{
+    const active=document.querySelector('[data-demo-placement][aria-pressed="true"]');
+    if(active)active.click();
+  });
+  $("demo-share-preview")?.addEventListener("click",()=>{
+    const consent=$("demo-share-consent")?.checked;
+    const state=$("demo-share-state");
+    if(state)state.textContent=consent?"CONSENT PREVIEW RECORDED LOCALLY FOR THIS SESSION · NO DATA SENT":"NO CONSENT · SHARING PREVIEW BLOCKED";
+  });
+  $("demo-private-yes")?.addEventListener("click",()=>{
+    const pass=$("demo-passphrase-test"),state=$("demo-auth-state"),hasTestText=!!(pass&&pass.value);
+    if(state)state.textContent=hasTestText?"YES FLOW PREVIEW · PRIVATE VIEW SIMULATED · NOT AUTHENTICATED":"ENTER FAKE TEST TEXT FIRST · NEVER USE A REAL PASSPHRASE";
+    if(pass)pass.value="";
+    if(demoPrivatePreview){demoPrivatePreview.checked=hasTestText;renderPublicPreview();}
+  });
+  $("demo-private-no")?.addEventListener("click",()=>{
+    if(demoPrivatePreview){demoPrivatePreview.checked=false;renderPublicPreview();}
+    if($("demo-auth-state"))$("demo-auth-state").textContent="NO FLOW PREVIEW · PRIVATE VIEW REMAINS CLOSED";
+    if($("demo-passphrase-test"))$("demo-passphrase-test").value="";
+  });
+  $("demo-recovery-preview")?.addEventListener("click",()=>{
+    const mode=$("demo-recovery-mode")?.value||"compare";
+    if($("demo-recovery-state"))$("demo-recovery-state").textContent="RECOVERY OPTION PREVIEW · "+mode.toUpperCase()+" · NO DATA WAS SAVED OR RECOVERED";
+  });
+  ["demo-save-preview","demo-export-preview","demo-import-preview","demo-sync-preview"].forEach(id=>$(id)?.addEventListener("click",()=>{
+    const labels={"demo-save-preview":"LOCAL SAVE SIMULATION ONLY","demo-export-preview":"ENCRYPTED EXPORT CONCEPT ONLY","demo-import-preview":"VALIDATED IMPORT CONCEPT ONLY","demo-sync-preview":"FUTURE SERVER SYNC CONCEPT ONLY"};
+    if($("demo-storage-state"))$("demo-storage-state").textContent=labels[id]+" · NO FILE, SAVE OR NETWORK REQUEST CREATED";
+  }));
+  const visualIds=["demo-frame-material","demo-card-font","demo-corners","demo-holo","demo-glow","demo-glass","demo-scanlines","demo-data-texture","demo-motion","demo-reduced-effects","demo-high-contrast","demo-quality"];
+  function applyVisualDesign(reset){
+    const defaults={"demo-frame-material":"glass","demo-card-font":"mono","demo-corners":"soft","demo-holo":"60","demo-glow":"45","demo-glass":"55","demo-scanlines":true,"demo-data-texture":false,"demo-motion":false,"demo-reduced-effects":false,"demo-high-contrast":false,"demo-quality":"balanced"};
+    visualIds.forEach(id=>{const el=$(id);if(el&&reset){if(el.type==="checkbox")el.checked=defaults[id];else el.value=defaults[id];}});
+    const card=appearanceCard;if(!card)return;
+    card.dataset.material=$("demo-frame-material").value;
+    card.dataset.font=$("demo-card-font").value;
+    card.dataset.corners=$("demo-corners").value;
+    card.dataset.quality=$("demo-quality").value;
+    card.style.setProperty("--demo-holo-opacity",String(Number($("demo-holo").value)/100));
+    card.style.setProperty("--demo-glow-strength",String(Number($("demo-glow").value)/100));
+    card.style.setProperty("--demo-glass-alpha",String(Number($("demo-glass").value)/100));
+    card.classList.toggle("has-scanlines",!!$("demo-scanlines").checked);
+    card.classList.toggle("has-data-texture",!!$("demo-data-texture").checked);
+    const reduced=!!$("demo-reduced-effects").checked;
+    card.classList.toggle("reduce-effects",reduced);
+    card.classList.toggle("high-contrast",!!$("demo-high-contrast").checked);
+    card.classList.toggle("has-ambient-motion",!!$("demo-motion").checked&&!reduced);
+    if(reduced){card.classList.remove("has-scanlines","has-data-texture");card.style.setProperty("--demo-glow-strength","0");card.style.setProperty("--demo-holo-opacity","0");}
+    ["holo","glow","glass"].forEach(key=>{const out=$("demo-"+key+"-value");if(out)out.textContent=$("demo-"+key).value+"%";});
+  }
+  visualIds.forEach(id=>{const el=$(id);if(el){el.addEventListener("input",()=>applyVisualDesign(false));el.addEventListener("change",()=>applyVisualDesign(false));}});
+  applyVisualDesign(false);
   const demoClose=$("demo-profile-close"),demoClear=$("demo-profile-clear");
   if(demoClose)demoClose.addEventListener("click",close);
   if(demoClear)demoClear.addEventListener("click",close);
