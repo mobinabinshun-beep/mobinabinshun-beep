@@ -1,0 +1,29 @@
+name: N.U Gateway main-game regression
+
+on:
+  pull_request:
+    paths:
+      - "index.html"
+      - "nu-hex-gateway.js"
+      - "nu-hex-gateway.css"
+      - "tests/nu-hex-gateway.test.js"
+      - ".github/workflows/gateway-main-game.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gateway-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check Gateway controller syntax
+        run: node --check nu-hex-gateway.js
+      - name: Run Gateway main-game regression tests
+        run: node --test tests/nu-hex-gateway.test.js

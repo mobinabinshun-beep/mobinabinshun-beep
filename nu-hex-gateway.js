@@ -3,12 +3,14 @@
   "use strict";
   const root = document.getElementById("nu-hex-gateway");
   const scrim = document.querySelector(".nu-gateway-scrim");
-  if (!root || !scrim) return;
+  const gameView = document.getElementById("game-view");
+  // The owner approved Gateway only for the main game page. Other internal
+  // pages keep their legacy navigation and remain untouched by this controller.
+  if (!root || !scrim || !gameView) return;
 
   const trigger = root.querySelector(".nu-gateway-trigger");
   const items = [...root.querySelectorAll(".nu-gateway-item")];
   const pauseButton = document.getElementById("finish-round");
-  const gameView = document.getElementById("game-view");
   let open = false;
   let pausedByGateway = false;
   let selected = null;
@@ -19,8 +21,10 @@
   let suppressClickUntil = 0;
 
   function syncGatewayScope() {
-    document.body.classList.add("nu-gateway-enabled");
-    document.body.classList.toggle("nu-game-active", Boolean(gameView?.classList.contains("active")));
+    const gameActive = Boolean(gameView?.classList.contains("active"));
+    document.body.classList.toggle("nu-gateway-enabled", gameActive);
+    document.body.classList.toggle("nu-main-game-page", gameActive);
+    document.body.classList.toggle("nu-game-active", gameActive);
   }
   syncGatewayScope();
   if (gameView) new MutationObserver(syncGatewayScope).observe(gameView, {attributes:true,attributeFilter:["class"]});
@@ -55,20 +59,8 @@
   }
   const routes = {
     back: goHome,
-    library: () => {
-      const library = document.getElementById("menu-library");
-      if (library) { goHome(); library.click(); }
-      else window.location.href = "./index.html#library-section";
-    },
-    store: () => openMainView("store"),
-    wallet: () => openMainView("wallet"),
-    profile: () => openMainView("profile"),
-    launcher: () => { window.location.href = "./launcher.html"; },
-    studio: () => { window.location.href = "./pixel-art-studio.html"; },
-    casino: () => { window.location.href = "./casino.html"; },
-    resume: () => {
-      if (!gameView) window.location.href = "./index.html";
-    }
+    menu: () => document.getElementById("menu-open")?.click(),
+    settings: () => { window.location.href = "./launcher.html"; }
   };
 
   function pauseGame() {
