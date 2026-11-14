@@ -77,7 +77,7 @@ No profile/card freeze or lock is authorized by this document. First reconcile t
 
 ## 8. Profile panel inventory audit
 
-The current profile view contains the historical profile card, the separate appearance panel, privacy/public-display workshop, local-identity concept panel, staged-appearance simulation, local image/2×4 placement simulation, game-status/wallet boundary note, personal-data warning, demo limitation note and close action. The following remain operational omissions by design: secure authentication, durable appearance lock, image crop and production upload, profile persistence, secure local save integration and online/server synchronization. Wallet balances and transaction tabs remain separate wallet surfaces, not missing profile panels.
+The current profile view contains the historical profile card, the separate appearance panel, privacy/public-display workshop, local-identity concept panel, staged-appearance simulation, local image/2×4 placement simulation, game-status/wallet boundary note, personal-data warning, demo limitation note and close action. The following remain operational omissions by design: secure authentication, durable appearance lock, image crop and production upload, profile persistence, secure local save/export/import integration and online/server synchronization. The additional profile fields and visual-design controls remain review concepts until their final behavior is approved. Wallet balances and transaction tabs remain separate wallet surfaces, not missing profile panels.
 
 ## 9. Acceptance checklist
 
