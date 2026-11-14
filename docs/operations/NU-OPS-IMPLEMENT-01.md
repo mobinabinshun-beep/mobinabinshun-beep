@@ -44,3 +44,15 @@ For every instruction such as «اعمال کن»، «پیاده کن»، «فی
 
 ## 6. Rollback and evidence
 Rollback by reverting the scoped PR/commit or restoring the exact pre-change backup branch. Never force-push the public default branch. Record CI-PASSED, DEPLOYED, HUMAN-QA-PENDING and HUMAN-QA-PASSED as distinct states; automated CI is not human browser acceptance.
+
+
+## 7. Scoped freeze — Generation 1 player profile appearance
+**LOCK ID:** NU-LOCK-G1-PROFILE-APPEARANCE-01  
+**Status:** PRE-PACKAGING FREEZE REQUESTED — 2026-11-14
+
+- Preserve the restored historical profile card and its four fields.
+- Keep the three appearance axes in a separate panel below the card: hue spectrum, neutral white/dark tint, and selected-color lightness.
+- Do not change the panel structure or the three-axis model before Generation 1 packaging without explicit owner approval.
+- The public demo controls are temporary preview controls only; they reset on close and do not persist.
+- This freeze is not a declaration of operational completion. The operational launcher-mounted downloadable build must implement the two-stage selection, final confirmation lock, image upload, and 2×4 image placement grid described in `docs/implementation/NU-G1-PLAYER-PROFILE-OPERATIONAL-SPEC.md`.
+- At Generation 1 closeout, package the operational build, not the public demo. Server deployment and native platform installers remain separate deliverables with their own acceptance evidence.
