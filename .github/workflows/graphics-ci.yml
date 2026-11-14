@@ -34,7 +34,7 @@ jobs:
           test -s assets/backgrounds/niroo-universe-background.svg
           grep -Fq 'const ASSET="./assets/backgrounds/niroo-universe-background.svg"' nu-background-engine.js
           grep -Fq 'id="nu-background-image"' nu-background-engine.js
-          grep -Fq 'z-index:-3' nu-background-engine.js
+          grep -Fq 'z-index:-1' nu-background-engine.js
           grep -Fq '.sky{z-index:-4!important}' nu-world.css
           ! grep -Fq 'nu-pixel-world.js' index.html
           grep -Fq 'nu-background-engine.js' index.html
