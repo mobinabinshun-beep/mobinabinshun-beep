@@ -123,7 +123,8 @@
     if(demoPrivateState)demoPrivateState.textContent=privateMode?"OPEN · SIMULATED":"CLOSED";
     const selected=publicToggles.filter(toggle=>toggle.checked).map(toggle=>{
       const field=$(toggle.dataset.demoPublic),value=field&&field.value.trim();
-      const label=field&&(field.closest("label")?.childNodes[0]?.textContent||field.previousElementSibling?.textContent||toggle.dataset.demoPublic);\n      return value?label.replace(/\\s+/g," ").trim()+": "+value:null;
+      const label=field&&(field.closest("label")?.childNodes[0]?.textContent||field.previousElementSibling?.textContent||toggle.dataset.demoPublic);
+      return value?label.replace(/\\s+/g," ").trim()+": "+value:null;
     }).filter(Boolean);
     demoPublicPreview.textContent=privateMode?"PRIVATE VIEW PREVIEW · This is only a visual simulation.":selected.length?selected.join(" · "):"Public card preview is empty until you explicitly select fields.";
   }
