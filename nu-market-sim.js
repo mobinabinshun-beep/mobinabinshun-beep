@@ -28,6 +28,7 @@
    const magnitude=Math.abs(e.delta),isDemand=e.delta<0,intensity=magnitude/(magnitude+10);
    const move=(isDemand?1:-1)*0.025*intensity,next=clamp(price*(1+move),50,200);
    const date=new Date(e.tx.at||0),time=Number.isNaN(date.getTime())?"Recorded activity":date.toISOString();
+   const seed=hashSeed(String(e.tx.id||e.tx.at||e.i)+":"+key),wick=(0.0015+seededUnit(seed)*0.004)*Math.max(0.2,intensity),high=Math.min(200,Math.max(price,next)*(1+wick)),low=Math.max(50,Math.min(price,next)*(1-wick*0.82));
    const candle={time,open:price,high,low,close:next,volume:magnitude,demand:isDemand?magnitude:0,supply:isDemand?0:magnitude,events:1};
    if(isDemand)totalDemand+=magnitude;else totalSupply+=magnitude;
    totalVolume+=magnitude;price=next;
