@@ -546,3 +546,5 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 @media(max-width:520px){.wallet-card-tabs{gap:5px;padding:0 8px;min-height:48px;margin-bottom:8px}.wallet-card-tab{flex:0 1 31%;width:31%;max-width:33%;padding:10px 4px;font-size:9px;letter-spacing:.04em}.wallet-card-tab::after{font-size:11px;max-width:90vw}.wallet-panel{padding:16px}.wallet-assets{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.wallet-card-tab,.wallet-card-tab::after{transition:none}}
 .bar-wrap[hidden],.player-stats>div[hidden]{display:none!important}
+
+.mana-capsules[hidden],.wallet-asset-summary[hidden]{display:none!important}
