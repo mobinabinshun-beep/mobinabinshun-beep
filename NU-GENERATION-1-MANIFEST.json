@@ -3,7 +3,7 @@
   "generation": 1,
   "runtime": "N.U Adaptive Runtime",
   "runtimeVersion": "0.1-prototype",
-  "packageVersion": "0.5.7-gen1-exchange-modular-runtime",
+  "packageVersion": "0.5.8-gen1-profile-appearance-preview",
   "entry": "index.html",
   "modules": [
     "index.html",
@@ -50,6 +50,7 @@
     "native": "future adapter required"
   },
   "notes": [
+    "Generation 1 profile appearance preview (2026-11-14): a separate panel below the original display-only profile card exposes hue spectrum, white/dark neutral tint and color lightness controls. The preview is temporary, local to the page and resets on close; it is not a saved player identity or operational account feature.",
     "Generation 1.33 candidate: Exchange now includes a fictional activity-driven virtual market simulator with OHLC candles, volume, demand/supply and N.U-only index; it derives every movement from the local player transaction ledger and never uses real-world financial data.",
     "Generation 1.32.1: remove duplicate legacy menu/back buttons from main-world internal views so the shared hex gateway is the single navigation entry point.",
     "Generation 1.32: calibrates the shared N.U hex gateway across all internal Generation 1 pages with responsive positioning, touch-direct activation, mouse-hover dwell, two-step click/keyboard confirmation, outside-exit tolerance and pause/blur behavior. Navigation only; game rules and wallet/save state are unchanged.",
