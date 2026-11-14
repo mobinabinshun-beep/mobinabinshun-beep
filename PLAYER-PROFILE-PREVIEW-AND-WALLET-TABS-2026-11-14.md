@@ -1,7 +1,7 @@
 # N.U Generation 1 — Classic Player Profile Preview and Wallet Tabs
 
 Date: 2026-11-14
-Status: IMPLEMENTED ON ISOLATED BRANCH; PENDING REVIEW
+Status: MERGED TO PUBLIC DEFAULT BRANCH
 Scope: Wallet tab placement/animation and Player ID profile presentation only.
 
 ## Historical baseline
