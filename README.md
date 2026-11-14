@@ -450,13 +450,13 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 - This is a browser-local demo wallet; it does not imply cloud synchronization or real-money assets.
 
 
-## Generation 1 — player profile appearance preview (2026-11-14)
+## Generation 1 — unified player profile workshop preview (2026-11-14)
 
 - Operational target and lock rules: [Player Profile & Card Appearance Specification](./docs/implementation/NU-G1-PLAYER-PROFILE-OPERATIONAL-SPEC.md).
 - Public demo QA checklist: [Profile Appearance Human QA](./docs/qa/NU-G1-PROFILE-APPEARANCE-HUMAN-QA-2026-11-14.md).
 
 - The restored historical profile remains the base layout: image placeholder plus Name, Callsign, Family Name and Age.
 - A separate card-appearance panel sits directly below the profile card and exposes three preview-only axes: color hue spectrum, neutral white/dark tint, and selected-color lightness.
-- The controls affect only the card preview and reset when the profile closes. They do not save profile data or appearance preferences and do not upload anything.
+- All workshop state is temporary and resets when the profile closes. Public-field selection is only a local preview; private-view is not authentication; image selection uses a local data URL and is not uploaded. No profile data or appearance preference is persisted.
 - This public demo is a visual interaction prototype, not the operational player profile.
 - **Packaging target:** at the end of Generation 1, prepare the operational downloadable/launcher-mounted build—not the public demo—as the distributable release. The operational profile must follow the approved Generation 1 player scenarios and objectives: the player completes the profile fields, chooses and confirms the card appearance, and the confirmed appearance is frozen according to the documented lock rules. Online-server operation and cross-platform installers remain future implementation work, not capabilities of this demo.
