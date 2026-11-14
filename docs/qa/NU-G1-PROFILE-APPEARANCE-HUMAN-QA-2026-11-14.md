@@ -69,3 +69,34 @@ Record browser and OS, device class, viewport, pass/fail per item, console error
 - [ ] Authentication model alternatives are visible without collecting real credentials.
 - [ ] Reduced decorative effects and high-contrast preview work and reset on close.
 - [ ] Browser reduced-motion preference overrides ambient animation.
+
+## Human decision capture
+For each row, record **KEEP / CHANGE / REMOVE / UNDECIDED**, the preferred option, and one short reason.
+
+| Area | Options tested | Decision | Preferred result / observations |
+|---|---|---|---|
+| Color axes | 3 core axes vs optional saturation axis |  |  |
+| Age | Exact / band / both / none |  |  |
+| Bio and interests | Separate optional fields / remove |  |  |
+| Public card | Optional / local identity required / required |  |  |
+| Field privacy | Independent visibility / simpler model |  |  |
+| Public sharing | Explicit opt-in / no sharing |  |  |
+| Private access | Local passphrase / device / server / no gate |  |  |
+| Lock scope | Appearance only / appearance + fields / full |  |  |
+| Stats | Card / HUD / Wallet / hidden |  |  |
+| Frame design | Material / typography / geometry |  |  |
+| Effects | Hologram / glow / transparency / scanlines / texture / motion |  |  |
+| Accessibility | Reduced effects / high contrast / quality preset |  |  |
+| Image | Cover / contain |  |  |
+| 2×4 placement | Crop anchor / photo slot |  |  |
+| Recovery | Owner/admin / local phrase / none |  |  |
+| Delivery | Browser / downloadable / launcher-integrated / standalone |  |  |
+| Local save | Browser / OS-protected / offline launcher |  |  |
+| Export/import | Authenticated encryption / validation / backup / no export |  |  |
+| Network | Offline / optional cloud / cross-device / authoritative server |  |  |
+
+**Test environment:** browser/version, OS, device class, viewport, input method, reduced-motion and contrast preferences.
+
+**Evidence:** screenshots with all personal data excluded, console errors, keyboard/touch findings, and any layout or readability issues.
+
+**Owner review:** no item is final until the owner has reviewed the human report and explicitly approved the resulting scope.
