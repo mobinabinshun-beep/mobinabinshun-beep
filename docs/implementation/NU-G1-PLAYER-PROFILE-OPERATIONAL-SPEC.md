@@ -48,22 +48,23 @@ The demo now includes a local-only image preview and 2×4 placement simulation. 
 
 Implemented in the public demo preview:
 - Original four profile text fields and historical layout.
-- Separate appearance panel below the card.
-- Three live preview controls (hue, neutral white/dark tint, color lightness).
-- Temporary in-page preview only; values reset when the profile closes.
-- Existing privacy warning still appears when personal text fields are edited; appearance controls do not trigger that warning.
+- Separate appearance panel below the card with three independent controls.
+- Temporary appearance preview; values reset when the profile closes.
+- Existing privacy warning on personal/extended profile edits.
 - Explicit public-field selection preview; all fields default to private.
 - Private-view state simulation, clearly marked as non-authenticated.
-- Stage-B appearance confirmation simulation that disables the three appearance sliders until the preview is reset.
-- Local FileReader image preview and eight-cell (2×4) placement simulation; the selected image is not uploaded.
+- Optional Age Band, Bio and Interests concept fields, separate from the historical four.
+- Holographic design preview controls for frame material, typography, corner geometry, hologram intensity, glow, transparency, scan lines, data texture, ambient motion and quality preset.
+- Stage-B appearance confirmation simulation. It disables profile fields, visibility toggles and appearance controls; only image replacement and 2×4 placement remain editable until reset.
+- Local FileReader image preview (up to 5 MB) and eight-cell (2×4) placement simulation; the selected image is not uploaded.
+- Local save/security/network status panel explaining future requirements without implementing them.
 
 Not implemented in the demo:
 - Actual authentication, password/passphrase verification or secure private-view access.
 - Durable/immutable appearance lock across sessions.
 - Image cropping/editing or remote upload.
-- Profile persistence, authenticated player identity, server synchronization or cloud account.
-- Profile persistence, authenticated player identity, server synchronization or cloud account.
-- Online server operation or native/downloadable platform installers.
+- Profile persistence, authenticated player identity, secure save/export/import or recovery.
+- Server synchronization, cloud account or native/downloadable platform installers.
 
 Do not add a password field or imply account security in the public demo. The demo must continue warning users not to enter real or sensitive personal information.
 
