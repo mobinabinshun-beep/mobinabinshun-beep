@@ -13,7 +13,7 @@
   function write(value){try{if(storage)storage.setItem(KEY,String(value));}catch(_){}}
   function state(){
    const until=read(),remaining=Math.max(0,until-now());
-   if(!remaining&&until)write(0);
+   if(!remaining&&until){write(0);successes=0;}
    return {successes,limit:LIMIT,remainingMs:remaining,locked:remaining>0,until:remaining?until:0};
   }
   function beforeAttempt(){
