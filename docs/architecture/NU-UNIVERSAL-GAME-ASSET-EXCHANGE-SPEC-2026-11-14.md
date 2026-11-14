@@ -56,7 +56,7 @@ Every asset manifest must declare one of these valuation classes:
 
 Each quote must show source amount, source asset, destination amount, destination asset, ratio, fee, rounding, daily/transaction caps, expiry, policy version and any irreversible loss. No implied market price may be inferred from the chart.
 
-Do not assume XP in Painting equals XP in Bubble Hunt merely because both are named XP. First decide whether they are one canonical shared resource or separate game-scoped resources (for example `nu.painting.xp` and `nu.bubble.xp`). The owning game economy must explicitly approve the mapping and ratio. Same rule for Mana, capsules, collectibles and future assets.
+XP in Painting/Studio and Bubble Hunt are separate game-scoped resources (`nu.studio.xp` and `nu.bubble_hunt.xp`). Their progression ladders are independent; conversion is possible only through explicitly approved equivalent-asset routes. See Section 12.
 
 ## 6. Safe settlement workflow
 
@@ -74,7 +74,7 @@ Browser localStorage is not authoritative and is not safe for cross-device, mult
 
 - Inventory all existing games and their actual save schemas before mapping assets. Do not infer missing values.
 - Register each current game with a manifest; mark unsupported items non-convertible.
-- Decide explicitly whether Painting XP and Bubble Hunt XP are shared or game-scoped.
+- Keep XP_Studio and XP_Bubble Hunt game-scoped, preserve provenance, and approve any equivalence ratio before enabling a route.
 - Publish an asset catalog with current balance, unit, owning game, valuation class and conversion eligibility.
 - Implement profile bridge in read-only mode first.
 - Implement quote preview with no ledger mutation.
@@ -108,9 +108,79 @@ Human acceptance must follow `docs/operations/NU-OPS-IMPLEMENT-01.md`: verify th
 
 ## 11. Open decisions requiring owner/economy policy
 
-- Are Painting XP and Bubble Hunt XP one shared canonical asset or two game-scoped assets?
+- What owner-approved equivalence ratio, if any, should govern XP_Bubble Hunt ↔ XP_Studio?
 - Which Generation 1 assets are transferable, and which remain game-bound?
 - What is the approved valuation model and who owns/version-controls the rates?
 - Is the intended profile identity local-only for the first release or backed by a central account service?
 
 Until those policy decisions and the authoritative ledger exist, deliver registry, inventory, profile read-only view and quote preview only; do not activate settlement.
+
+
+## 12. Game-scoped XP and independent economy ladders (owner direction, 2026-11-14)
+
+### 12.1 Canonical asset identities
+
+XP must be namespaced by its issuing game; the shared legacy wallet field named `xp` is not proof that game XP units are economically identical. Target asset IDs:
+
+- `nu.bubble_hunt.xp` — **XP_Bubble Hunt**; earned at exactly **1 XP per valid, intentional, game-recognized interaction**. The interaction must pass the owning game's success/anti-automation validation; passive clicks, repeated invalid events and UI-only events do not mint XP.
+- `nu.studio.xp` — **XP_Studio**; earned under Studio's own award formula and progression rules. Owner-stated progression anchor: **50 XP_Studio = 1 Studio level**.
+- `nu.bubble_hunt.capsule` (and separately typed capsule variants if the game defines them) — Bubble Hunt progression item. Owner-stated anchor: **100 XP_Bubble Hunt = 1 capsule**. The remaining capsule ladder (capsules-to-next-tier, rewards and terminal steps) must be imported from Bubble Hunt's authoritative rules; do not invent missing ratios.
+
+The two XP assets are separate units even if their UI labels both contain “XP”. Analytics and charting must preserve asset ID and source game; never aggregate them as one XP series without an explicit normalized index and visible methodology.
+
+### 12.2 Independent progression ladders are not exchange rates
+
+Each game owns its own ladder: XP thresholds, levels, capsules, upgrade tiers, rewards, sinks, caps, reset/season behavior and award validation. A level-up threshold or capsule cost describes progression utility inside that game; it does **not**, by itself, establish a cross-game exchange price. Thus 50 XP_Studio per level and 100 XP_Bubble Hunt per capsule are recorded as distinct in-game anchors, not as a claim that one Studio level equals one Bubble Hunt capsule.
+
+Bubble Hunt's full ladder must be read from its game rules/source before implementation. Preserve every rung and its exact quantity; flag absent or conflicting values as `UNVERIFIED` rather than filling gaps.
+
+### 12.3 Equivalence-only exchange policy
+
+The exchange may quote a conversion only between assets that the economy policy has explicitly classified as equivalent or economically comparable. A route is an allow-listed directed pair (or symmetric pair where explicitly approved), with a versioned ratio, effective date, fee, rounding, limits and owner. No route is inferred merely because assets are both earned through play or both have “XP” in their names.
+
+- `XP_Bubble Hunt -> XP_Studio`: **not enabled by default**. It may be enabled only after the owner/economy policy defines a documented equivalence ratio and the Studio and Bubble Hunt adapters both authorize the route.
+- `XP_Bubble Hunt -> Mana`: **prohibited** under the current policy; no direct conversion route. The same prohibition applies to other unrelated currencies unless a specific approved equivalence path is added.
+- XP must not be silently converted into levels, capsules, HP or other progression objects. A capsule purchase/redemption remains a Bubble Hunt-native ladder operation unless a separately governed route is approved.
+- Every non-allow-listed pair returns `PAIR_NOT_EQUIVALENT` (or an equivalent explicit denial); the UI must explain why rather than showing a misleading quote.
+
+“Equivalent” means policy-approved economic equivalence, not equal numeric quantities. For each approved pair, record the reference anchor, conversion ratio, who approved it, policy version, validity window and impact on both games' sinks/progression.
+
+### 12.4 Price discovery and game-to-game balance
+
+The exchange's purpose is to make unlike game economies comparable through transparent, governed quotes—not to erase their independent economies. Each game may have different earning difficulty and reward cadence. Rate design must therefore consider at minimum:
+
+- validated earning rate and effort/time distribution (not raw click count alone);
+- progression utility and scarcity across the full ladder;
+- sinks, redemption value, caps, season resets and supply concentration;
+- exploit/automation resistance and adapter/source reliability;
+- impact of conversion on both source and destination game balance.
+
+A game where an item is easier to earn must not automatically receive a higher or lower price without evidence and policy review. Dynamic quotes, if later adopted, must come from an authoritative economy service and include a transparent reason/rate version. The chart is analytics only and never sets or executes exchange prices.
+
+### 12.5 Generation 1 asset catalog and current implementation boundary
+
+| Asset | Game / owner | Unit or known anchor | Exchange status |
+|---|---|---|---|
+| XP_Bubble Hunt | Bubble Hunt | 1 valid intentional interaction = 1 XP; 100 XP = 1 capsule | Game-scoped; only approved equivalent routes; no Mana route |
+| XP_Studio | Painting / Studio | 50 XP = 1 Studio level | Game-scoped; cross-game ratio still requires explicit approval |
+| Bubble Hunt capsule | Bubble Hunt | 100 XP_Bubble Hunt per capsule; later ladder rungs pending source verification | Native progression item; no assumed cross-game conversion |
+| Mana | Mana Collector / N.U wallet | Mana resource; current code awards 1 Mana per successful Mana Collector interaction | Separate currency; no XP_Bubble Hunt route |
+| HP | N.U wallet / gameplay | Current wallet field; value/transfer semantics not approved | Non-convertible by default |
+| HP Capsule | N.U wallet | Existing wallet purchase anchor: 10 legacy shared XP per capsule in current code; this legacy rule must be reconciled before mapping to either scoped XP | Do not treat as Bubble Hunt capsule; non-convertible pending policy |
+| Mana Capsule | N.U wallet | Present in wallet; authoritative redemption ladder needs verification | Game-bound pending policy |
+| Casino Credits | N.U wallet / casino module | Present in wallet; rate and sinks require source verification | Game-bound pending policy |
+
+Important migration note: current `nu-wallet.js` has one legacy `xp` field and existing XP grants from multiple games. The implementation must not relabel the entire historical balance as XP_Bubble Hunt or XP_Studio. It needs source provenance for new awards and an owner-approved migration rule for historical, unattributed XP. Until then, legacy XP is a distinct `nu.legacy.unattributed_xp` bucket and is not exchangeable into scoped XP.
+
+### 12.6 Analytics and chart contract
+
+All event records and chart series must carry `gameId`, `assetId`, `unit`, `sourceEvent`, `timestamp`, `amount`, adapter version and provenance. Default charts are per-asset/per-game. Cross-game comparison is allowed only through a published normalized index with its base period, formula and policy version displayed. Raw XP quantities from different ladders must never be plotted as directly comparable prices.
+
+### 12.7 Implementation gates and unresolved inputs
+
+1. Inspect Bubble Hunt's complete capsule ladder and Studio's XP award/level rules from their authoritative game source.
+2. Split new XP grants by game provenance; preserve the legacy unattributed balance without guessing its origin.
+3. Publish the full asset catalog and mark unverified values explicitly.
+4. Define and approve any XP_Bubble Hunt / XP_Studio equivalence ratio before enabling that pair.
+5. Keep XP_Bubble Hunt / Mana disabled and test that all disallowed pairs are rejected.
+6. Keep settlement disabled until the authoritative ledger and all safety requirements in Sections 6 and 9 pass.
