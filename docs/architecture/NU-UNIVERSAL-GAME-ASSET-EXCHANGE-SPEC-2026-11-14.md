@@ -233,3 +233,15 @@ Maintain separate earning, effort, progression, sink, scarcity/supply and integr
 ### 13.5 Implementation boundaries
 
 The current prototype still uses one legacy shared XP balance and browser-local storage. Do not silently split or relabel historical XP. New events require `gameId`, `profileFamily`, `assetId`, `sourceEvent`, amount, timestamp and adapter version. Preserve legacy XP as unattributed until an owner-approved migration exists. No settlement, wallet, ledger, Gateway, merge or deployment behavior is enabled by this specification.
+
+
+## 15. Launcher-core packaging and runtime governance
+
+The exchange is a domain service inside the mandatory, independently versioned Adaptive Runtime & Economic Intelligence Core (AREIC), shipped with the standard N.U Launcher package. The wider core also provides adaptive CPU/GPU/RAM/cache/storage governance, module lifecycle, local package validation, sandboxing and capability-based quality profiles.
+
+Full target architecture, offline installation contract, economic discovery pipeline, trust states (DECLARED / INFERRED / UNVERIFIED), illustrative Economic Profile Manifest, resource budgets, frame-time policy, acceptance criteria and staged implementation are specified in:
+`docs/architecture/NU-ADAPTIVE-RUNTIME-AND-ECONOMIC-INTELLIGENCE-CORE-2026-11-15.md`.
+
+Economic analysis must remain outside the render/input hot path. The engine can infer candidate assets when a manifest is absent, but inferred values are preview-only until reviewed. Every asset and progression rung is evaluated independently. Game modules can be installed, disabled or removed independently; removing a game suspends its routes but preserves shared profile and historical records. The core itself remains part of the standard launcher package.
+
+This section records target architecture only; no runtime implementation, wallet, ledger, Gateway lock, merge, deployment or release was changed.
