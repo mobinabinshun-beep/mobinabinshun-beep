@@ -23,6 +23,7 @@
 - nu-hex-gateway.js
 - nu-hex-gateway.css
 - tests/nu-hex-gateway.test.js
+- .github/workflows/gateway-main-game.yml
 - docs/operations/NU-OPS-IMPLEMENT-01.md
 
 ## Preservation and rollback
@@ -33,7 +34,8 @@
 
 ## Verification
 - Automated regression assertions cover page scope, preserved legacy controls, touch/mouse/keyboard behavior, dismissal, responsive sizing, Casino link and absence of an unsupported N-BI shield meter.
-- Automated CI has not yet been reported; see PR checks.
+- The existing PR-triggered workflow passed its graphics-integrity job, but that job does not execute the Gateway regression suite.
+- A dedicated Gateway regression workflow was added for syntax and Node test execution; its first run is not yet available on this PR.
 - Desktop/mobile human browser acceptance is pending. Do not mark the demo human-tested until the owner tests it on real browsers/devices.
 
 ## Human test checklist
