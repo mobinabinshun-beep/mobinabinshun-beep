@@ -40,6 +40,6 @@ test("personal rank palette is external to the identity card and has a dedicated
 
 test("public demo explicitly disclaims authentication and protected private view", () => {
   assert.match(js, /does not authenticate or secure this view/);
-  assert.match(html, /no authenticated security boundary/);
+  assert.match(html, /not an authenticated security boundary/);
   assert.match(html, /No public upload, account authentication, or secure private storage/);
 });
