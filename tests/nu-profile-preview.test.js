@@ -84,7 +84,7 @@ test("extended operational profile concepts and visual design controls are prese
 test("extended profile fields and visual controls are disabled after confirmation", () => {
   assert.match(playerUi, /document\.querySelectorAll\("\[data-demo-editable\]"\)/);
   assert.match(playerUi, /demo-age-band","demo-bio","demo-interests/);
-  assert.match(playerUi, /demoFields\.forEach\(id=>\{const field=\$\(id\);if\(field\)field\.disabled=locked;\}\)/);
+  assert.match(playerUi, /demoFields\.forEach\(id=>\{const field=\$\(id\);if\(field\)field\.disabled=lockFields;\}\)/);
 });
 
 test("human review can compare age, stats, lock and card-privacy alternatives", () => {
