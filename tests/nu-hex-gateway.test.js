@@ -10,13 +10,13 @@ const studio = read("pixel-art-studio.html");
 const js = read("nu-hex-gateway.js");
 const css = read("nu-hex-gateway.css");
 
-test("Gateway markup remains present while controller activation is limited to the main game", () => {
+test("Gateway markup remains present while controller activation is limited to gameplay and wallet", () => {
   for (const page of [html, casino, launcher, studio]) {
     assert.match(page, /id="nu-hex-gateway"/);
     assert.match(page, /class="nu-gateway-scrim"/);
   }
-  assert.match(html, /nu-hex-gateway\.css\?v=20261114-game-only-menu-r4/);
-  assert.match(html, /nu-hex-gateway\.js\?v=20261114-game-only-menu-r4/);
+  assert.match(html, /nu-hex-gateway\.css\?v=20261114-wallet-gateway-r1/);
+  assert.match(html, /nu-hex-gateway\.js\?v=20261114-wallet-gateway-r1/);
   assert.match(js, /if \(!root \|\| !scrim \|\| !gameView \|\| !walletView\) return/);
   assert.match(js, /classList\.toggle\("nu-game-active", gameActive\)/);
   assert.match(js, /classList\.toggle\("nu-main-game-page", gameActive\)/);
@@ -27,10 +27,10 @@ test("Gateway markup remains present while controller activation is limited to t
   assert.match(css, /body\.nu-wallet-active #nu-hex-gateway/);
 });
 
-test("Gateway is available only in active gameplay and preserves legacy controls", () => {
+test("Gateway is available in gameplay and wallet; classic menu is hidden only in wallet", () => {
   assert.match(js, /gameView\?\.classList\.contains\("active"\)/);
   assert.match(js, /MutationObserver/);
-  assert.doesNotMatch(css, /#menu-open[^{}]*display:none/);
+  assert.match(css, /body\.nu-wallet-active #menu-open\{display:none!important\}/);
   assert.doesNotMatch(css, /#finish-round[^{}]*display:none/);
   assert.match(html, /id="menu-open"/);
   assert.match(html, /id="finish-round"/);
@@ -72,8 +72,8 @@ test("Gateway destinations remain isolated from game rules and Casino stays link
   }
   assert.match(html, /href="\.\/casino\.html"/);
   assert.match(js, /menu-profile.*click/);
-  assert.match(js, /\.\/launcher\.html/);
-  assert.doesNotMatch(html, /data-action="(library|store|wallet|profile|launcher|studio|casino|resume)"/);
+  assert.match(js, /menu-store.*click/);
+  assert.doesNotMatch(html, /data-action="(library|store|wallet|launcher|studio|casino|resume)"/);
   assert.doesNotMatch(js, /nu-engine\.js|nu-games\.js|nu-wallet\.js/);
 });
 
