@@ -183,7 +183,8 @@
     document.querySelectorAll("[data-demo-placement]").forEach((button,index)=>button.setAttribute("aria-pressed",String(index===0)));
     const imageState=$("demo-image-state");if(imageState)imageState.textContent="PLACEHOLDER IMAGE · POSITION 1 OF 8";
     ["demo-age-model","demo-stats-location","demo-card-privacy","demo-lock-policy","demo-image-fit","demo-placement-mode"].forEach(id=>{const el=$(id);if(el)el.selectedIndex=0;});
-    if($("demo-recovery-mode"))$("demo-recovery-mode").value="compare";\n    ["demo-auth-model","demo-platform-target","demo-launcher-model","demo-save-model","demo-export-model","demo-import-model","demo-sync-model"].forEach(id=>{const el=$(id);if(el)el.selectedIndex=0;});
+    if($("demo-recovery-mode"))$("demo-recovery-mode").value="compare";
+    ["demo-auth-model","demo-platform-target","demo-launcher-model","demo-save-model","demo-export-model","demo-import-model","demo-sync-model"].forEach(id=>{const el=$(id);if(el)el.selectedIndex=0;});
     ["demo-share-consent","demo-scanlines","demo-data-texture","demo-motion","demo-reduced-effects","demo-high-contrast"].forEach(id=>{const el=$(id);if(el)el.checked=id==="demo-scanlines";});
     ["demo-share-state","demo-auth-state","demo-recovery-state","demo-storage-state","demo-storage-options-preview"].forEach((id,index)=>{const el=$(id);if(el)el.textContent=["NO SHARE PREVIEW REQUESTED","PRIVATE ACCESS NOT TESTED · NO AUTHENTICATION","RECOVERY FLOW NOT TESTED · NO DATA RECOVERED","NO SAVE / EXPORT / IMPORT / SYNC PERFORMED","DELIVERY / STORAGE OPTIONS ARE CONCEPTS ONLY · NO BUILD OR SERVICE CREATED"][index];});
     if($("demo-passphrase-test"))$("demo-passphrase-test").value="";
