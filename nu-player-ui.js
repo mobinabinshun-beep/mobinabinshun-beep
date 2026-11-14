@@ -145,7 +145,7 @@
   if(imageInput)imageInput.addEventListener("change",()=>{
     const file=imageInput.files&&imageInput.files[0];
     if(!file)return;
-    if(!file.type.startsWith("image/")){imageInput.value="";return;}
+    if(!file.type.startsWith("image/")||file.size>5*1024*1024){imageInput.value="";const state=$("demo-image-state");if(state)state.textContent="CHOOSE AN IMAGE FILE UP TO 5 MB";return;}
     const reader=new FileReader();
     reader.onload=()=>{if(avatarEl){avatarEl.style.backgroundImage="url("+JSON.stringify(String(reader.result))+")";avatarEl.style.backgroundSize="cover";avatarEl.style.backgroundPosition="center";avatarEl.textContent="";}const state=$("demo-image-state");if(state)state.textContent="LOCAL IMAGE PREVIEW · NOT UPLOADED · POSITION "+(document.querySelector('[data-demo-placement][aria-pressed="true"]')?.dataset.demoPlacement||"1")+" OF 8";};
     reader.readAsDataURL(file);
