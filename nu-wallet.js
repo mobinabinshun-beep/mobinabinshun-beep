@@ -106,7 +106,7 @@
       if(assetRegistry.has(key))continue;
       const amount=Number(value);if(Number.isFinite(amount))rows.push({key,label:key.replace(/[-_]/g," ").replace(/\b\w/g,c=>c.toUpperCase()),value:amount,unit:"",group:"game"});
     }
-    return rows.filter(row=>Number.isFinite(Number(row.value))&&Number(row.value)>0);
+    return rows.filter(row=>Number.isFinite(Number(row.value))&&Number(row.value)>0&&(row.key!=="manaCapsules"||Number(row.value)>1||s.mana>0));
   }
   function assetHistory(raw,key){
     const s=normalizeSave(raw),current=Number(s[key]);
