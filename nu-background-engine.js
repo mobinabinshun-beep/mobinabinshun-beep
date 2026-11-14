@@ -32,7 +32,9 @@ function setCamera(x,y,zoom=cameraZoom){
  if(!node)return;
  cameraZoom=Math.max(1,Math.min(3,Number(zoom)||1));
  const width=node.clientWidth||g.innerWidth,height=node.clientHeight||g.innerHeight;
- const fit=Math.min(width/(img.naturalWidth||width),height/(img.naturalHeight||height));\n const artworkWidth=(img.naturalWidth||width)*fit,artworkHeight=(img.naturalHeight||height)*fit;\n const maxX=Math.max(0,(artworkWidth*(cameraZoom-1))/2),maxY=Math.max(0,(artworkHeight*(cameraZoom-1))/2);
+ const fit=Math.min(width/(img.naturalWidth||width),height/(img.naturalHeight||height));
+ const artworkWidth=(img.naturalWidth||width)*fit,artworkHeight=(img.naturalHeight||height)*fit;
+ const maxX=Math.max(0,(artworkWidth*(cameraZoom-1))/2),maxY=Math.max(0,(artworkHeight*(cameraZoom-1))/2);
  const px=Math.max(-maxX,Math.min(maxX,Number(x)||0));
  const py=Math.max(-maxY,Math.min(maxY,Number(y)||0));
  node.style.setProperty("--camera-x",px+"px");
