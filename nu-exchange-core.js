@@ -1,9 +1,9 @@
 /* N.U Exchange core — modular game/asset registry. No provider is assumed. */
 (function(root,factory){
- const api=factory();
+ const api=factory(root);
  if(typeof module==="object"&&module.exports)module.exports=api;
  if(root)root.NUExchangeCore=api;
-})(typeof window!=="undefined"?window:globalThis,function(){
+})(typeof window!=="undefined"?window:globalThis,function(root){
  "use strict";
  const games=new Map();
  function registerGame(adapter){
@@ -13,7 +13,8 @@
   const assets=Array.isArray(adapter.assets)?adapter.assets.filter(a=>a&&a.id&&a.label).map(a=>({id:String(a.id),label:String(a.label),unit:String(a.unit||"")})):[];
   const record={id,name,assets,transferEnabled:adapter.transferEnabled===true,adapter};
   games.set(id,record);
-  return ()=>games.delete(id);
+  try{if(root&&typeof root.dispatchEvent==="function"&&typeof root.CustomEvent==="function")root.dispatchEvent(new root.CustomEvent("nu:exchange:registry-change"));}catch(_){}
+  return ()=>{const removed=games.delete(id);try{if(removed&&root&&typeof root.dispatchEvent==="function"&&typeof root.CustomEvent==="function")root.dispatchEvent(new root.CustomEvent("nu:exchange:registry-change"));}catch(_){}return removed;};
  }
  function listGames(){return Array.from(games.values()).map(g=>({id:g.id,name:g.name,assetCount:g.assets.length,transferEnabled:g.transferEnabled}));}
  function listAssets(gameId){
