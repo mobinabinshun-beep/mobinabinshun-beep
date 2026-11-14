@@ -1,0 +1,33 @@
+name: N.U wallet and profile regression
+
+on:
+  pull_request:
+    paths:
+      - "index.html"
+      - "nu-wallet.js"
+      - "nu-player-ui.js"
+      - "nu-hex-gateway.js"
+      - "nu-hex-gateway.css"
+      - "nu-world.css"
+      - "tests/nu-wallet.test.js"
+      - "tests/nu-hex-gateway.test.js"
+      - ".github/workflows/wallet-regression.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  wallet-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check wallet and navigation syntax
+        run: |
+          node --check nu-wallet.js
+          node --check nu-player-ui.js
+          node --check nu-hex-gateway.js
+      - name: Run wallet and Gateway tests
+        run: node --test tests/nu-wallet.test.js tests/nu-hex-gateway.test.js
