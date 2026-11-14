@@ -92,6 +92,7 @@
   demoFields.forEach(id=>{const field=$(id);if(field)field.addEventListener("input",()=>{$("demo-profile-warning").hidden=false;});});
   const appearanceDefaults={hue:205,tone:0,lightness:48};
   const appearanceCard=$("profile-view").querySelector(".demo-profile-card");
+  const appearancePanel=$("profile-view").querySelector(".demo-profile-appearance");
   const appearanceControls={hue:$("demo-card-hue"),tone:$("demo-card-tone"),lightness:$("demo-card-lightness")};
   function applyAppearance(reset){
     if(!appearanceCard)return;
@@ -103,6 +104,7 @@
     const tone=Number(appearanceControls.tone&&appearanceControls.tone.value||0);
     const lightness=Number(appearanceControls.lightness&&appearanceControls.lightness.value||appearanceDefaults.lightness);
     appearanceCard.style.setProperty("--demo-card-hue",String(hue));
+    if(appearancePanel)appearancePanel.style.setProperty("--demo-card-hue",String(hue));
     appearanceCard.style.setProperty("--demo-card-lightness",lightness+"%");
     appearanceCard.style.setProperty("--demo-neutral-rgb",tone>=0?"255,255,255":"0,0,0");
     appearanceCard.style.setProperty("--demo-neutral-alpha",String(Math.abs(tone)/100*(tone>=0?.42:.52)));
