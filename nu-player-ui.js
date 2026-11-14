@@ -180,7 +180,8 @@
     if(avatarEl){avatarEl.style.backgroundImage="";avatarEl.style.backgroundPosition="center";avatarEl.style.backgroundSize="";delete avatarEl.dataset.placementMode;delete avatarEl.dataset.photoSlot;avatarEl.innerHTML="IMAGE<br>PLACEHOLDER<br><small>DEMO ONLY · NO UPLOAD</small>";}
     document.querySelectorAll("[data-demo-placement]").forEach((button,index)=>button.setAttribute("aria-pressed",String(index===0)));
     const imageState=$("demo-image-state");if(imageState)imageState.textContent="PLACEHOLDER IMAGE · POSITION 1 OF 8";
-    ["demo-age-model","demo-stats-location","demo-card-privacy","demo-lock-policy","demo-image-fit","demo-placement-mode"].forEach(id=>{const el=$(id);if(el)el.selectedIndex=0;});\n    if($("demo-recovery-mode"))$("demo-recovery-mode").value="compare";
+    ["demo-age-model","demo-stats-location","demo-card-privacy","demo-lock-policy","demo-image-fit","demo-placement-mode"].forEach(id=>{const el=$(id);if(el)el.selectedIndex=0;});
+    if($("demo-recovery-mode"))$("demo-recovery-mode").value="compare";
     ["demo-share-consent","demo-scanlines","demo-data-texture","demo-motion"].forEach(id=>{const el=$(id);if(el)el.checked=id==="demo-scanlines";});
     ["demo-share-state","demo-auth-state","demo-recovery-state","demo-storage-state"].forEach((id,index)=>{const el=$(id);if(el)el.textContent=["NO SHARE PREVIEW REQUESTED","PRIVATE ACCESS NOT TESTED · NO AUTHENTICATION","RECOVERY FLOW NOT TESTED · NO DATA RECOVERED","NO SAVE / EXPORT / IMPORT / SYNC PERFORMED"][index];});
     if($("demo-passphrase-test"))$("demo-passphrase-test").value="";
