@@ -33,7 +33,11 @@
 
 ## Validation
 - Regression assertions updated for the classic stacked layout.
-- Awaiting CI workflow result and human desktop/mobile review.
+- Dedicated HUD layout regression: PASS on PR head `dded29eb1b1e3c5264adb85cc5551c8813b1a037`.
+- Graphics integrity: PASS.
+- Graphics preview smoke: PASS.
+- Wallet/profile and Studio export gates: FAIL in existing wallet/profile and Lore-asset assertions; no wallet or Studio files were changed by this candidate.
+- Human desktop/mobile browser review: PENDING.
 - Not merged and not deployed.
 
 ## Rollback
