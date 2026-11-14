@@ -23,7 +23,7 @@
     if(!root||!history)return;
     root.innerHTML=NUWallet.assetRows(s).map(row=>'<div class="wallet-asset"><span>'+row.label+'</span><strong>'+row.value+row.unit+'</strong></div>').join("");
     history.replaceChildren();
-    const tx=s.transactions.slice().reverse();
+    const tx=s.transactions.slice(-24).reverse();
     if(!tx.length){const empty=document.createElement("p");empty.className="wallet-muted";empty.textContent="No recorded wallet transactions yet.";history.appendChild(empty);return;}
     tx.forEach(item=>{
       const row=document.createElement("div"),title=document.createElement("span"),detail=document.createElement("small");
@@ -49,13 +49,18 @@
     $("player-callsign-input").value=s.callsign||"";
   }
   let previousView=null;
+  function setWalletTab(name){
+    document.querySelectorAll("[data-wallet-tab]").forEach(button=>{const active=button.dataset.walletTab===name;button.classList.toggle("is-active",active);button.setAttribute("aria-selected",String(active));});
+    document.querySelectorAll("[data-wallet-panel]").forEach(panel=>{panel.hidden=panel.dataset.walletPanel!==name;});
+    if(name==="transactions")renderWallet();
+  }
   function open(view){
     previousView=document.querySelector(".view.active");
     window.dispatchEvent(new Event("nu:player-overlay-open"));
     document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));
     view.classList.add("active");
     document.body.classList.remove("article-mode");
-    if(view===walletView)renderWallet();else renderProfile();
+    if(view===walletView){setWalletTab("balances");renderWallet();}else renderProfile();
     const menu=$("menu");if(menu)menu.classList.remove("open");
   }
   function close(){document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));(previousView&&previousView!==walletView&&previousView!==profileView?previousView:$("home-view")).classList.add("active");previousView=null;window.dispatchEvent(new Event("nu:player-overlay-close"));}
@@ -63,6 +68,11 @@
   $("profile-back").addEventListener("click",close);
   $("menu-wallet").addEventListener("click",()=>open(walletView));
   $("menu-profile").addEventListener("click",()=>open(profileView));
+  document.querySelectorAll("[data-wallet-tab]").forEach(button=>button.addEventListener("click",()=>{
+    const tab=button.dataset.walletTab;
+    if(tab==="profile"){open(profileView);return;}
+    setWalletTab(tab);
+  }));
   $("player-identity-save").addEventListener("click",()=>{
     const s=ensureIdentity();
     s.displayName=safeText($("player-name-input").value,"");
