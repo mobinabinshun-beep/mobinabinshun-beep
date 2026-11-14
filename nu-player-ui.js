@@ -138,7 +138,7 @@
   if(demoPrivatePreview)demoPrivatePreview.addEventListener("change",renderPublicPreview);
   const appearanceConfirm=$("demo-appearance-confirm"),appearanceReset=$("demo-appearance-reset"),appearanceState=$("demo-appearance-state");
   const lockPolicy=$("demo-lock-policy");
-  const appearanceEditableIds=["demo-card-hue","demo-card-tone","demo-card-lightness","demo-card-saturation","demo-frame-material","demo-card-font","demo-corners","demo-holo","demo-glow","demo-glass","demo-scanlines","demo-data-texture","demo-motion","demo-quality"];
+  const appearanceEditableIds=["demo-card-hue","demo-card-tone","demo-card-lightness","demo-card-saturation","demo-reduced-effects","demo-high-contrast","demo-frame-material","demo-card-font","demo-corners","demo-holo","demo-glow","demo-glass","demo-scanlines","demo-data-texture","demo-motion","demo-reduced-effects","demo-high-contrast","demo-quality"];
   let appearanceLocked=false;
   function setAppearanceLock(locked){
     appearanceLocked=locked;
@@ -183,9 +183,9 @@
     document.querySelectorAll("[data-demo-placement]").forEach((button,index)=>button.setAttribute("aria-pressed",String(index===0)));
     const imageState=$("demo-image-state");if(imageState)imageState.textContent="PLACEHOLDER IMAGE · POSITION 1 OF 8";
     ["demo-age-model","demo-stats-location","demo-card-privacy","demo-lock-policy","demo-image-fit","demo-placement-mode"].forEach(id=>{const el=$(id);if(el)el.selectedIndex=0;});
-    if($("demo-recovery-mode"))$("demo-recovery-mode").value="compare";
-    ["demo-share-consent","demo-scanlines","demo-data-texture","demo-motion"].forEach(id=>{const el=$(id);if(el)el.checked=id==="demo-scanlines";});
-    ["demo-share-state","demo-auth-state","demo-recovery-state","demo-storage-state"].forEach((id,index)=>{const el=$(id);if(el)el.textContent=["NO SHARE PREVIEW REQUESTED","PRIVATE ACCESS NOT TESTED · NO AUTHENTICATION","RECOVERY FLOW NOT TESTED · NO DATA RECOVERED","NO SAVE / EXPORT / IMPORT / SYNC PERFORMED"][index];});
+    if($("demo-recovery-mode"))$("demo-recovery-mode").value="compare";\n    ["demo-auth-model","demo-platform-target","demo-launcher-model","demo-save-model","demo-export-model","demo-import-model","demo-sync-model"].forEach(id=>{const el=$(id);if(el)el.selectedIndex=0;});
+    ["demo-share-consent","demo-scanlines","demo-data-texture","demo-motion","demo-reduced-effects","demo-high-contrast"].forEach(id=>{const el=$(id);if(el)el.checked=id==="demo-scanlines";});
+    ["demo-share-state","demo-auth-state","demo-recovery-state","demo-storage-state","demo-storage-options-preview"].forEach((id,index)=>{const el=$(id);if(el)el.textContent=["NO SHARE PREVIEW REQUESTED","PRIVATE ACCESS NOT TESTED · NO AUTHENTICATION","RECOVERY FLOW NOT TESTED · NO DATA RECOVERED","NO SAVE / EXPORT / IMPORT / SYNC PERFORMED","DELIVERY / STORAGE OPTIONS ARE CONCEPTS ONLY · NO BUILD OR SERVICE CREATED"][index];});
     if($("demo-passphrase-test"))$("demo-passphrase-test").value="";
     applyAppearance(true);applyVisualDesign(true);applyAgeModel();applyStatsLocation();setAppearanceLock(false);renderPublicPreview();
   }
@@ -209,6 +209,15 @@
   }
   $("demo-age-model")?.addEventListener("change",applyAgeModel);applyAgeModel();
   $("demo-stats-location")?.addEventListener("change",applyStatsLocation);applyStatsLocation();
+  function applyStorageOptions(){
+    const ids=["demo-platform-target","demo-launcher-model","demo-save-model","demo-export-model","demo-import-model","demo-sync-model"];
+    const values=ids.map(id=>$(id)?.selectedOptions?.[0]?.textContent||"Not selected");
+    const out=$("demo-storage-options-preview");
+    if(out)out.textContent=values.join(" · ")+" · CONCEPT PREVIEW ONLY · NO BUILD / SAVE / EXPORT / IMPORT / SERVER";
+  }
+  ["demo-auth-model","demo-platform-target","demo-launcher-model","demo-save-model","demo-export-model","demo-import-model","demo-sync-model"].forEach(id=>$(id)?.addEventListener("change",applyStorageOptions));
+  applyStorageOptions();
+
   $("demo-lock-policy")?.addEventListener("change",()=>{if(appearanceLocked)setAppearanceLock(true);});
   $("demo-image-fit")?.addEventListener("change",()=>{if(avatarEl)avatarEl.style.backgroundSize=$("demo-image-fit").value;});
   $("demo-placement-mode")?.addEventListener("change",()=>{
@@ -241,7 +250,7 @@
   }));
   const visualIds=["demo-frame-material","demo-card-font","demo-corners","demo-holo","demo-glow","demo-glass","demo-scanlines","demo-data-texture","demo-motion","demo-quality"];
   function applyVisualDesign(reset){
-    const defaults={"demo-frame-material":"glass","demo-card-font":"mono","demo-corners":"soft","demo-holo":"60","demo-glow":"45","demo-glass":"55","demo-scanlines":true,"demo-data-texture":false,"demo-motion":false,"demo-quality":"balanced"};
+    const defaults={"demo-frame-material":"glass","demo-card-font":"mono","demo-corners":"soft","demo-holo":"60","demo-glow":"45","demo-glass":"55","demo-scanlines":true,"demo-data-texture":false,"demo-motion":false,"demo-reduced-effects":false,"demo-high-contrast":false,"demo-quality":"balanced"};
     visualIds.forEach(id=>{const el=$(id);if(el&&reset){if(el.type==="checkbox")el.checked=defaults[id];else el.value=defaults[id];}});
     const card=appearanceCard;if(!card)return;
     card.dataset.material=$("demo-frame-material").value;
@@ -253,7 +262,11 @@
     card.style.setProperty("--demo-glass-alpha",String(Number($("demo-glass").value)/100));
     card.classList.toggle("has-scanlines",!!$("demo-scanlines").checked);
     card.classList.toggle("has-data-texture",!!$("demo-data-texture").checked);
-    card.classList.toggle("has-ambient-motion",!!$("demo-motion").checked);
+    const reduced=!!$("demo-reduced-effects").checked;
+    card.classList.toggle("reduce-effects",reduced);
+    card.classList.toggle("high-contrast",!!$("demo-high-contrast").checked);
+    card.classList.toggle("has-ambient-motion",!!$("demo-motion").checked&&!reduced);
+    if(reduced){card.classList.remove("has-scanlines","has-data-texture");card.style.setProperty("--demo-glow-strength","0");card.style.setProperty("--demo-holo-opacity","0");}
     ["holo","glow","glass"].forEach(key=>{const out=$("demo-"+key+"-value");if(out)out.textContent=$("demo-"+key).value+"%";});
   }
   visualIds.forEach(id=>{const el=$(id);if(el){el.addEventListener("input",()=>applyVisualDesign(false));el.addEventListener("change",()=>applyVisualDesign(false));}});
