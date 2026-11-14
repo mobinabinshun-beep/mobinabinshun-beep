@@ -39,8 +39,8 @@ test("demo page loads the image-first engine and the engine points to the local 
 
 test("background image is the deepest world layer while scene layers remain available above it", () => {
   assert.match(engine, /z-index:0;overflow:hidden/);
-  assert.match(engine, /world\.insertBefore\(node,world\.firstChild\)/);
-  assert.match(css, /\.sky\{z-index:-4!important\}/);
+  assert.match(engine, /world\.insertBefore\(node,world\.firstChild\)/);\n  assert.match(engine,/className="nu-world-background"/);
+  assert.match(css, /world>\.sky\{position:absolute;z-index:1!important/);
   assert.match(html, /<div class="sky"><\/div>/);
   assert.doesNotMatch(css, /world\.nu-image-scene-active[\s\S]{0,180}display:none!important/);
 });
@@ -63,4 +63,12 @@ test("pixel-faithful review mode shows the full artwork and bounds camera explor
   assert.match(css, /object-fit:contain!important/);
   assert.match(css, /#nu-background-image:after\{display:none!important\}/);
   assert.match(css, /--nu-camera-zoom/);
+});
+
+test("public demo exposes runtime diagnostics for the world background",()=>{
+ assert.match(engine,/dataset.state="loading"/);
+ assert.match(engine,/dataset.state="loaded"/);
+ assert.match(engine,/dataset.state="error"/);
+ assert.match(engine,/naturalWidth:img/);
+ assert.match(html,/id="nu-background-diagnostics"/);
 });
