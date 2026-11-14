@@ -93,11 +93,13 @@ test("human review can compare age, stats, lock and card-privacy alternatives", 
   assert.match(playerUi,/function applyAgeModel/);
   assert.match(playerUi,/function applyStatsLocation/);
   assert.match(playerUi,/STAGE B · LOCK SIMULATION ACTIVE/);
+  assert.match(playerUi,/appearanceReset\.disabled=locked/);
 });
 
 test("private access, recovery and sharing are explicit local-only simulations", () => {
   for (const id of ["demo-passphrase-test","demo-private-yes","demo-private-no","demo-auth-model","demo-auth-state","demo-recovery-mode","demo-recovery-preview","demo-share-consent","demo-share-preview","demo-share-state"]) assert.ok(html.includes('id="'+id+'"'));
   assert.match(html,/Never enter a real password or passphrase/);
+  assert.match(html,/id="demo-passphrase-test" data-demo-editable/);
   assert.match(playerUi,/NO DATA WAS SAVED OR RECOVERED/);
   assert.match(playerUi,/NO DATA SENT/);
   assert.match(playerUi,/NOT AUTHENTICATED/);
