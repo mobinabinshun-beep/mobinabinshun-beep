@@ -5,7 +5,7 @@
  if(root)root.NUSVGImport=api;
 })(typeof globalThis!=="undefined"?globalThis:this,function(){
  "use strict";
- const ELEMENTS=new Set(["svg","g","path","rect","circle","ellipse","line","polyline","polygon","defs","linearGradient","radialGradient","stop","clipPath","mask","use","title","desc"]);
+ const ELEMENTS=new Set(["svg","g","path","rect","circle","ellipse","line","polyline","polygon","defs","linearGradient","radialGradient","stop","clipPath","mask","use","image","title","desc"]);
  const ATTRS=new Set(["id","x","y","x1","y1","x2","y2","cx","cy","r","rx","ry","width","height","viewBox","preserveAspectRatio","d","points","fill","stroke","stroke-width","stroke-linecap","stroke-linejoin","fill-rule","clip-rule","opacity","fill-opacity","stroke-opacity","transform","offset","stop-color","stop-opacity","gradientUnits","gradientTransform","spreadMethod","clipPathUnits","maskUnits","maskContentUnits","version","xmlns","xmlns:xlink","href","xlink:href","vector-effect","shape-rendering"]);
  const STYLE_PROPS=new Set(["fill","stroke","stroke-width","stroke-linecap","stroke-linejoin","fill-rule","clip-rule","opacity","fill-opacity","stroke-opacity","stop-color","stop-opacity","transform","clip-path","mask"]);
  function isSVGFile(file){
@@ -37,7 +37,12 @@
     const name=attr.name,value=attr.value.trim();
     if(name.toLowerCase().startsWith("on")||(!ATTRS.has(name)&&name!=="style")){node.removeAttribute(name);continue;}
     if(name==="style"){const v=safeStyle(value);if(v)node.setAttribute("style",v);else node.removeAttribute(name);continue;}
-    if(name==="href"||name==="xlink:href"){if(!value.startsWith("#")||!/^#[\w:.-]+$/.test(value))node.removeAttribute(name);continue;}
+    if(name==="href"||name==="xlink:href"){
+     const local=value.startsWith("#")&&/^#[\w:.-]+$/.test(value);
+     const embedded=/^data:image\/(?:png|jpeg|webp|gif);base64,[A-Za-z0-9+/=]+$/i.test(value)&&value.length<=12*1024*1024&&/^(?:data:image\/png;base64,iVBORw0KGgo|data:image\/jpeg;base64,\/9j\/|data:image\/gif;base64,R0lGOD|data:image\/webp;base64,UklGR)/i.test(value);
+     if(!local&&!embedded)node.removeAttribute(name);
+     continue;
+    }
     if(/javascript:|data:|https?:|\/\//i.test(value)&&name!=="xmlns"&&name!=="xmlns:xlink")node.removeAttribute(name);
     if(/url\s*\(/i.test(value)&&!safeReference(value))node.removeAttribute(name);
    }
