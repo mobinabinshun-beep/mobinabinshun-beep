@@ -85,15 +85,15 @@
     if(view===walletView){setWalletTab("balances");renderWallet();}else renderProfile();
     const menu=$("menu");if(menu)menu.classList.remove("open");
   }
-  function close(){if(profileView.classList.contains("active")){["demo-name","demo-call","demo-family","demo-age"].forEach(id=>{const field=$(id);if(field)field.value="";});const warning=$("demo-profile-warning");if(warning)warning.hidden=true;applyAppearance(true);resetWorkshop();}document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));(previousView&&previousView!==walletView&&previousView!==profileView?previousView:$("home-view")).classList.add("active");previousView=null;window.dispatchEvent(new Event("nu:player-overlay-close"));}
+  function close(){if(profileView.classList.contains("active")){["demo-name","demo-call","demo-family","demo-age","demo-age-band","demo-bio","demo-interests","demo-passphrase-test"].forEach(id=>{const field=$(id);if(field)field.value="";});const warning=$("demo-profile-warning");if(warning)warning.hidden=true;applyAppearance(true);resetWorkshop();}document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));(previousView&&previousView!==walletView&&previousView!==profileView?previousView:$("home-view")).classList.add("active");previousView=null;window.dispatchEvent(new Event("nu:player-overlay-close"));}
   $("wallet-back").addEventListener("click",close);
   $("profile-back").addEventListener("click",close);
   const demoFields=["demo-name","demo-call","demo-family","demo-age","demo-age-band","demo-bio","demo-interests"];
   demoFields.forEach(id=>{const field=$(id);if(field){["input","change"].forEach(type=>field.addEventListener(type,()=>{$("demo-profile-warning").hidden=false;}));}});
-  const appearanceDefaults={hue:205,tone:0,lightness:48};
+  const appearanceDefaults={hue:205,tone:0,lightness:48,saturation:72};
   const appearanceCard=$("profile-view").querySelector(".demo-profile-card");
   const appearancePanel=$("profile-view").querySelector(".demo-profile-appearance");
-  const appearanceControls={hue:$("demo-card-hue"),tone:$("demo-card-tone"),lightness:$("demo-card-lightness")};
+  const appearanceControls={hue:$("demo-card-hue"),tone:$("demo-card-tone"),lightness:$("demo-card-lightness"),saturation:$("demo-card-saturation")};
   function applyAppearance(reset){
     if(!appearanceCard)return;
     Object.entries(appearanceControls).forEach(([key,control])=>{
@@ -103,15 +103,18 @@
     const hue=Number(appearanceControls.hue&&appearanceControls.hue.value||appearanceDefaults.hue);
     const tone=Number(appearanceControls.tone&&appearanceControls.tone.value||0);
     const lightness=Number(appearanceControls.lightness&&appearanceControls.lightness.value||appearanceDefaults.lightness);
+    const saturation=Number(appearanceControls.saturation&&appearanceControls.saturation.value||appearanceDefaults.saturation);
     appearanceCard.style.setProperty("--demo-card-hue",String(hue));
     if(appearancePanel)appearancePanel.style.setProperty("--demo-card-hue",String(hue));
     appearanceCard.style.setProperty("--demo-card-lightness",lightness+"%");
+    appearanceCard.style.setProperty("--demo-card-saturation",saturation+"%");
     appearanceCard.style.setProperty("--demo-neutral-rgb",tone>=0?"255,255,255":"0,0,0");
     appearanceCard.style.setProperty("--demo-neutral-alpha",String(Math.abs(tone)/100*(tone>=0?.42:.52)));
-    const hueValue=$("demo-card-hue-value"),toneValue=$("demo-card-tone-value"),lightValue=$("demo-card-lightness-value");
+    const hueValue=$("demo-card-hue-value"),toneValue=$("demo-card-tone-value"),lightValue=$("demo-card-lightness-value"),satValue=$("demo-card-saturation-value");
     if(hueValue)hueValue.textContent=hue+"°";
     if(toneValue)toneValue.textContent=tone===0?"NEUTRAL":tone>0?"WHITE "+tone+"%":"DARK "+Math.abs(tone)+"%";
     if(lightValue)lightValue.textContent=lightness+"%";
+    if(satValue)satValue.textContent=saturation+"%";
   }
   Object.values(appearanceControls).forEach(control=>{if(control)control.addEventListener("input",()=>applyAppearance(false));});
   applyAppearance(false);
@@ -132,16 +135,24 @@
   demoFields.forEach(id=>{const field=$(id);if(field)field.addEventListener("input",renderPublicPreview);});
   if(demoPrivatePreview)demoPrivatePreview.addEventListener("change",renderPublicPreview);
   const appearanceConfirm=$("demo-appearance-confirm"),appearanceReset=$("demo-appearance-reset"),appearanceState=$("demo-appearance-state");
+  const lockPolicy=$("demo-lock-policy");
+  const appearanceEditableIds=["demo-card-hue","demo-card-tone","demo-card-lightness","demo-card-saturation","demo-frame-material","demo-card-font","demo-corners","demo-holo","demo-glow","demo-glass","demo-scanlines","demo-data-texture","demo-motion","demo-quality"];
   let appearanceLocked=false;
   function setAppearanceLock(locked){
     appearanceLocked=locked;
-    Object.values(appearanceControls).forEach(control=>{if(control)control.disabled=locked;});
-    demoFields.forEach(id=>{const field=$(id);if(field)field.disabled=locked;});
-    publicToggles.forEach(toggle=>{toggle.disabled=locked;});
-    document.querySelectorAll("[data-demo-editable]").forEach(control=>{control.disabled=locked;});
-    if(demoPrivatePreview)demoPrivatePreview.disabled=locked;
+    const policy=lockPolicy?lockPolicy.value:"full";
+    const lockFields=locked&&(policy==="full"||policy==="appearance-fields");
+    appearanceEditableIds.forEach(id=>{const control=$(id);if(control)control.disabled=locked;});
+    demoFields.forEach(id=>{const field=$(id);if(field)field.disabled=lockFields;});
+    publicToggles.forEach(toggle=>{toggle.disabled=locked&&policy==="full";});
+    document.querySelectorAll("[data-demo-editable]").forEach(control=>{
+      const photoControl=["demo-image-fit","demo-placement-mode"].includes(control.id);
+      const fieldControl=["demo-age-model","demo-age-band","demo-bio","demo-interests"].includes(control.id);
+      control.disabled=locked&&(policy==="full"||appearanceEditableIds.includes(control.id)||policy==="appearance-fields"&&fieldControl)&&!photoControl;
+    });
+    if(demoPrivatePreview)demoPrivatePreview.disabled=locked&&policy==="full";
     if(appearanceConfirm)appearanceConfirm.disabled=locked;
-    if(appearanceState)appearanceState.textContent=locked?"STAGE B COMPLETE · APPEARANCE LOCK SIMULATED · IMAGE AND POSITION REMAIN EDITABLE":"STAGE A · APPEARANCE IS NOT CONFIRMED";
+    if(appearanceState)appearanceState.textContent=locked?"STAGE B · LOCK SIMULATION ACTIVE · "+policy.toUpperCase()+" · PHOTO / POSITION REMAIN EDITABLE":"STAGE A · APPEARANCE IS NOT CONFIRMED";
   }
   if(appearanceConfirm)appearanceConfirm.addEventListener("click",()=>setAppearanceLock(true));
   if(appearanceReset)appearanceReset.addEventListener("click",()=>{setAppearanceLock(false);applyAppearance(true);applyVisualDesign(true);});
@@ -152,7 +163,7 @@
     if(!file)return;
     if(!file.type.startsWith("image/")||file.size>5*1024*1024){imageInput.value="";const state=$("demo-image-state");if(state)state.textContent="CHOOSE AN IMAGE FILE UP TO 5 MB";return;}
     const reader=new FileReader();
-    reader.onload=()=>{if(avatarEl){avatarEl.style.backgroundImage="url("+JSON.stringify(String(reader.result))+")";avatarEl.style.backgroundSize="cover";avatarEl.style.backgroundPosition="center";avatarEl.textContent="";}const state=$("demo-image-state");if(state)state.textContent="LOCAL IMAGE PREVIEW · NOT UPLOADED · POSITION "+(document.querySelector('[data-demo-placement][aria-pressed="true"]')?.dataset.demoPlacement||"1")+" OF 8";};
+    reader.onload=()=>{if(avatarEl){avatarEl.style.backgroundImage="url("+JSON.stringify(String(reader.result))+")";avatarEl.style.backgroundSize=$("demo-image-fit")?.value||"cover";avatarEl.style.backgroundPosition="center";avatarEl.textContent="";}const state=$("demo-image-state");if(state)state.textContent="LOCAL IMAGE PREVIEW · NOT UPLOADED · POSITION "+(document.querySelector('[data-demo-placement][aria-pressed="true"]')?.dataset.demoPlacement||"1")+" OF 8";};
     reader.readAsDataURL(file);
   });
   document.querySelectorAll("[data-demo-placement]").forEach(button=>button.addEventListener("click",()=>{
@@ -168,9 +179,48 @@
     if(avatarEl){avatarEl.style.backgroundImage="";avatarEl.style.backgroundPosition="center";avatarEl.style.backgroundSize="";avatarEl.innerHTML="IMAGE<br>PLACEHOLDER<br><small>DEMO ONLY · NO UPLOAD</small>";}
     document.querySelectorAll("[data-demo-placement]").forEach((button,index)=>button.setAttribute("aria-pressed",String(index===0)));
     const imageState=$("demo-image-state");if(imageState)imageState.textContent="PLACEHOLDER IMAGE · POSITION 1 OF 8";
-    renderPublicPreview();setAppearanceLock(false);
+    ["demo-age-model","demo-stats-location","demo-card-privacy","demo-lock-policy","demo-recovery-mode","demo-image-fit","demo-placement-mode"].forEach(id=>{const el=$(id);if(el)el.selectedIndex=0;});
+    ["demo-share-consent","demo-scanlines","demo-data-texture","demo-motion"].forEach(id=>{const el=$(id);if(el)el.checked=id==="demo-scanlines";});
+    ["demo-share-state","demo-auth-state","demo-recovery-state"].forEach((id,index)=>{const el=$(id);if(el)el.textContent=["NO SHARE PREVIEW REQUESTED","PRIVATE ACCESS NOT TESTED · NO AUTHENTICATION","RECOVERY FLOW NOT TESTED · NO DATA RECOVERED"][index];});
+    if($("demo-passphrase-test"))$("demo-passphrase-test").value="";
+    applyAppearance(true);applyVisualDesign(true);applyAgeModel();applyStatsLocation();setAppearanceLock(false);renderPublicPreview();
   }
   renderPublicPreview();
+  function applyAgeModel(){
+    const mode=$("demo-age-model")?.value||"compare";
+    const exact=$("demo-age-exact-field"),band=$("demo-age-band")?.closest("label");
+    if(exact)exact.hidden=mode==="band"||mode==="none";
+    if(band)band.hidden=mode==="exact"||mode==="none";
+  }
+  function applyStatsLocation(){
+    const mode=$("demo-stats-location")?.value||"separate",preview=$("demo-stats-preview");
+    const labels={card:"CITIZEN CARD PREVIEW · HP / XP / MANA (GAME DATA ONLY)",separate:"SEPARATE GAME HUD PREVIEW · HP / XP / MANA",wallet:"WALLET PROJECTION PREVIEW · GAME ASSET VIEW",hidden:"STATS HIDDEN FROM PROFILE"};
+    if(preview)preview.textContent=labels[mode]+" · NO SAMPLE VALUES OR FABRICATED STATS";
+  }
+  $("demo-age-model")?.addEventListener("change",applyAgeModel);applyAgeModel();
+  $("demo-stats-location")?.addEventListener("change",applyStatsLocation);applyStatsLocation();
+  $("demo-lock-policy")?.addEventListener("change",()=>{if(appearanceLocked)setAppearanceLock(true);});
+  $("demo-image-fit")?.addEventListener("change",()=>{if(avatarEl)avatarEl.style.backgroundSize=$("demo-image-fit").value;});
+  $("demo-share-preview")?.addEventListener("click",()=>{
+    const consent=$("demo-share-consent")?.checked;
+    const state=$("demo-share-state");
+    if(state)state.textContent=consent?"CONSENT PREVIEW RECORDED LOCALLY FOR THIS SESSION · NO DATA SENT":"NO CONSENT · SHARING PREVIEW BLOCKED";
+  });
+  $("demo-private-yes")?.addEventListener("click",()=>{
+    const pass=$("demo-passphrase-test"),state=$("demo-auth-state"),hasTestText=!!(pass&&pass.value);
+    if(state)state.textContent=hasTestText?"YES FLOW PREVIEW · PRIVATE VIEW SIMULATED · NOT AUTHENTICATED":"ENTER FAKE TEST TEXT FIRST · NEVER USE A REAL PASSPHRASE";
+    if(pass)pass.value="";
+    if(demoPrivatePreview){demoPrivatePreview.checked=hasTestText;renderPublicPreview();}
+  });
+  $("demo-private-no")?.addEventListener("click",()=>{
+    if(demoPrivatePreview){demoPrivatePreview.checked=false;renderPublicPreview();}
+    if($("demo-auth-state"))$("demo-auth-state").textContent="NO FLOW PREVIEW · PRIVATE VIEW REMAINS CLOSED";
+    if($("demo-passphrase-test"))$("demo-passphrase-test").value="";
+  });
+  $("demo-recovery-preview")?.addEventListener("click",()=>{
+    const mode=$("demo-recovery-mode")?.value||"compare";
+    if($("demo-recovery-state"))$("demo-recovery-state").textContent="RECOVERY OPTION PREVIEW · "+mode.toUpperCase()+" · NO DATA WAS SAVED OR RECOVERED";
+  });
   const visualIds=["demo-frame-material","demo-card-font","demo-corners","demo-holo","demo-glow","demo-glass","demo-scanlines","demo-data-texture","demo-motion","demo-quality"];
   function applyVisualDesign(reset){
     const defaults={"demo-frame-material":"glass","demo-card-font":"mono","demo-corners":"soft","demo-holo":"60","demo-glow":"45","demo-glass":"55","demo-scanlines":true,"demo-data-texture":false,"demo-motion":false,"demo-quality":"balanced"};
