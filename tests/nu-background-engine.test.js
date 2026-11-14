@@ -64,3 +64,12 @@ test("pixel-faithful review mode shows the full artwork and bounds camera explor
   assert.match(css, /#nu-background-image:after\{display:none!important\}/);
   assert.match(css, /--nu-camera-zoom/);
 });
+
+test("background engine exposes live image state and natural dimensions", () => {
+  assert.match(engine, /dataset\\.state="loading"/);
+  assert.match(engine, /dataset\\.state="loaded"/);
+  assert.match(engine, /dataset\\.state="error"/);
+  assert.match(engine, /naturalWidth:img/);
+  assert.match(html, /id="nu-background-diagnostics"/);
+  assert.match(html, /Open canonical background asset/);
+});
