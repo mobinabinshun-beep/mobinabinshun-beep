@@ -48,3 +48,17 @@
 
 ## Human report
 Record browser and OS, device class, viewport, pass/fail per item, console errors, accessibility issues and screenshots with all personal information excluded.
+
+## Decision variants to compare
+- [ ] Saturation can be adjusted independently as a fourth comparison axis; judge whether it adds value or should be removed.
+- [ ] Age mode switches between exact age, age band, both for comparison, and no age field.
+- [ ] Stats location switches between citizen card, separate HUD, Wallet projection and hidden; no invented values are displayed.
+- [ ] Lock policy can be compared: appearance only; appearance plus profile text; all profile and appearance fields except photo/position.
+- [ ] Public-card availability choices are visible: optional, local-identity-required/public-optional, and required comparison.
+- [ ] Share preview is blocked unless explicit consent is selected; no network transfer occurs.
+- [ ] YES/NO private-access flow is understandable; only fake test text is used and no authentication occurs.
+- [ ] Recovery options can be previewed without recovering or changing data.
+- [ ] Local save, export, import and server-sync buttons clearly report simulation only and create no file, save or network request.
+- [ ] Image fit toggles crop-to-fill / contain.
+- [ ] 2×4 grid can be compared as image anchor or photo slot.
+- [ ] Full lock leaves image fit and placement available; the other two lock policies behave according to their labels.
