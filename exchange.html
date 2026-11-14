@@ -5,14 +5,14 @@
 <title>N.U Virtual Market — Generation 1</title>
 <meta name="description" content="A fictional N.U game-world market simulator driven only by player activity.">
 <meta name="theme-color" content="#071018">
-<link rel="stylesheet" href="./nu-exchange.css?v=20261114-exchange-modular-r1">
+<link rel="stylesheet" href="./nu-exchange.css?v=20261114-exchange-wicks-r2">
 </head>
 <body>
 <main class="exchange-shell">
 <header class="exchange-top"><a href="./index.html" class="back-link">← N.U WORLD</a><span class="eyebrow">GENERATION 01 · FICTIONAL GAME ECONOMY</span></header>
 <section class="exchange-hero">
 <p class="eyebrow">N.U ECONOMY SYSTEM</p><h1>VIRTUAL <em>MARKET</em></h1>
-<p>A fictional market simulation with trading-style charts. Every movement is derived only from your own locally saved wallet and asset activity.</p>
+<p>A fictional market simulation with trading-style charts. Every movement is derived only from your own locally saved wallet and asset activity. No real-world price, order book, or financial forecast is represented.</p>
 <div class="exchange-notice">100% FICTIONAL · N.U ACTIVITY ONLY · NO REAL-WORLD DATA OR VALUE</div>
 </section>
 <section class="market-panel">
@@ -25,6 +25,7 @@
 <article class="exchange-card"><span>SIMULATED DEMAND</span><strong id="market-demand">0</strong></article>
 <article class="exchange-card"><span>SIMULATED SUPPLY</span><strong id="market-supply">0</strong></article><article class="exchange-card behavior-card"><span>PLAYER ACTIVITY TENDENCY</span><strong id="market-bias" class="bias-indicator">BALANCED</strong></article>
 </div>
+<div class="market-view-options" role="group" aria-label="Market chart layers"><label><input id="market-layer-candles" type="checkbox" checked> Candles</label><label><input id="market-layer-wicks" type="checkbox" checked> High/low wicks</label><label><input id="market-layer-line" type="checkbox" checked> Index line</label><label><input id="market-layer-volume" type="checkbox" checked> Activity volume</label><label><input id="market-reduced-motion" type="checkbox"> Reduced motion</label></div>
 <div class="chart-legend"><span><i class="legend-up"></i> Index rising</span><span><i class="legend-down"></i> Index falling</span><span>24 recorded player steps · animated replay</span><span id="replay-mode-label">24 SECONDS · REPLAYING YOUR SAVED ACTIVITY</span><span id="replay-progress">0 / 24</span></div>
 <canvas id="market-chart" role="img" aria-label="Fictional N.U market index candlestick chart"></canvas>
 <div id="market-empty" class="chart-empty">No local activity has been recorded for this asset yet. The simulator will create candles only after in-game wallet activity occurs.</div>
@@ -65,5 +66,5 @@
 </section>
 <footer class="exchange-footer">N.U — NIROO UNIVERSE · GENERATION 1 FICTIONAL ECONOMY</footer>
 </main>
-<script src="./nu-engine.js"></script><script src="./nu-wallet.js"></script><script src="./nu-exchange-core.js?v=20261114-modular-r1"></script><script src="./nu-exchange-guard.js?v=20261114-modular-r1"></script><script src="./nu-exchange-replay.js?v=20261114-modular-r1"></script><script src="./nu-exchange-lock.js?v=20261114-modular-r1"></script><script src="./nu-market-sim.js?v=20261114-exchange-modular-r1"></script><script src="./nu-exchange.js?v=20261114-exchange-modular-r1"></script>
+<script src="./nu-engine.js"></script><script src="./nu-wallet.js"></script><script src="./nu-exchange-core.js?v=20261114-modular-r1"></script><script src="./nu-exchange-guard.js?v=20261114-modular-r1"></script><script src="./nu-exchange-replay.js?v=20261114-modular-r1"></script><script src="./nu-exchange-lock.js?v=20261114-modular-r1"></script><script src="./nu-market-sim.js?v=20261114-exchange-wicks-r2"></script><script src="./nu-exchange.js?v=20261114-exchange-wicks-r2"></script>
 </body></html>
