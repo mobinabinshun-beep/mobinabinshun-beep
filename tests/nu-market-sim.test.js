@@ -49,3 +49,19 @@ test("market simulator retains only the latest 24 activity steps",()=>{
  assert.ok(result.candles.length<=24);
  assert.equal(market.MAX_CANDLES,24);
 });
+
+test("stable transaction IDs produce deterministic wick bounds",()=>{
+ const save={transactions:[{id:"stable-1",at:"2026-11-14T12:00:00.000Z",deltas:{xp:14}}]};
+ const first=market.build(save,"xp").steps[0],second=market.build(save,"xp").steps[0];
+ assert.deepEqual(first,second);
+ assert.ok(first.high>=Math.max(first.open,first.close));
+ assert.ok(first.low<=Math.min(first.open,first.close));
+});
+test("HP is never a market asset and market building is read-only",()=>{
+ const save={hp:8,transactions:[{id:"hp-event",at:"2026-11-14T12:00:00.000Z",deltas:{hp:-1,xp:2}}]};
+ const before=JSON.stringify(save);
+ assert.equal(market.build(save,"hp").asset,null);
+ assert.ok(!market.assets().some(asset=>asset.key==="hp"));
+ market.build(save,"xp");
+ assert.equal(JSON.stringify(save),before);
+});
