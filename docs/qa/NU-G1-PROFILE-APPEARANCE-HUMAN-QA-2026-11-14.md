@@ -61,7 +61,7 @@ Record browser and OS, device class, viewport, pass/fail per item, console error
 - [ ] Local save, export, import and server-sync buttons clearly report simulation only and create no file, save or network request.
 - [ ] Image fit toggles crop-to-fill / contain.
 - [ ] 2×4 grid can be compared as image anchor or photo slot.
-- [ ] Full lock leaves image fit and placement available; the other two lock policies behave according to their labels.
+- [ ] Full lock leaves only image selection, image fit and 2×4 placement editable; confirmation/reset controls and all other profile/workshop inputs are disabled.\n- [ ] The other two lock policies behave according to their labels.
 
 - [ ] Target platform options can be compared: browser, Windows, Linux/macOS, Android and iOS.
 - [ ] Delivery options can be compared: launcher-integrated, standalone and both.
