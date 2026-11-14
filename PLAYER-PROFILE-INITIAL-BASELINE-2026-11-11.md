@@ -3,7 +3,7 @@
 - Historical source branch: `feature/gen1-cleanup-2026-11-11`
 - Source file revision: `eacda8b14264cd06a350b512684d6507943cb3e1`
 - Original profile introduced in commit: `504ccd7d6da7d9df0cf50f38f7fe10873ab4a924`
-- Status: restored to the public demo on an isolated review branch; human browser acceptance pending.
+- Status: merged into the public demo default branch on 2026-11-14; human browser acceptance pending.
 
 ## Original structure
 
