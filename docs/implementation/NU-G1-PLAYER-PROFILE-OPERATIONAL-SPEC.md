@@ -65,9 +65,9 @@ Do not add a password field or imply account security in the public demo. The de
 
 At the end of Generation 1, package the **operational launcher-mounted downloadable build**, not the public demo, as the release candidate. The operational build must implement this specification and the other approved Generation 1 scenarios/objectives before being described as operational. Online server deployment and platform-specific installers require their own implementation and acceptance evidence.
 
-## 7. Freeze boundary
+## 7. Lock decision — pending full audit
 
-After this scoped preview is reviewed, freeze the profile card's structure, the three-axis control model, and the separation between profile fields and appearance panel until Generation 1 packaging. Any change before packaging requires explicit owner approval and a documented reason. This freeze does not claim that the operational workflow is already implemented.
+No profile/card freeze or lock is authorized by this document. First reconcile the historical Generation 1 product specification, Citizen Card architecture, public-demo profile decisions, launcher/downloadable build records, owner handoffs, and team archive/governance records. Record conflicts and obtain explicit owner approval before defining any freeze scope or lock point. This specification is an audit aid, not a unilateral lock instruction.
 
 ## 8. Profile panel inventory audit
 
