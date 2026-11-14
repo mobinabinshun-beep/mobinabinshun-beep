@@ -129,7 +129,9 @@
       const label=field&&(field.closest("label")?.childNodes[0]?.textContent||field.previousElementSibling?.textContent||toggle.dataset.demoPublic);
       return value?label.replace(/\s+/g," ").trim()+": "+value:null;
     }).filter(Boolean);
-    demoPublicPreview.textContent=privateMode?"PRIVATE VIEW PREVIEW · This is only a visual simulation.":selected.length?selected.join(" · "):"Public card preview is empty until you explicitly select fields.";
+    const cardMode=$("demo-card-privacy")?.value||"optional";
+    const prefix=cardMode==="required"?"REQUIRED CARD CONCEPT · ":cardMode==="local-required"?"LOCAL IDENTITY REQUIRED · PUBLIC CARD OPTIONAL · ":"OPTIONAL PUBLIC CARD · ";
+    demoPublicPreview.textContent=privateMode?"PRIVATE VIEW PREVIEW · This is only a visual simulation.":prefix+(selected.length?selected.join(" · "):"No public fields selected.");
   }
   publicToggles.forEach(toggle=>toggle.addEventListener("change",renderPublicPreview));
   demoFields.forEach(id=>{const field=$(id);if(field)field.addEventListener("input",renderPublicPreview);});
@@ -191,8 +193,13 @@
   function applyAgeModel(){
     const mode=$("demo-age-model")?.value||"compare";
     const exact=$("demo-age-exact-field"),band=$("demo-age-band")?.closest("label");
+    const exactToggle=publicToggles.find(toggle=>toggle.dataset.demoPublic==="demo-age")?.closest("label");
+    const bandToggle=publicToggles.find(toggle=>toggle.dataset.demoPublic==="demo-age-band")?.closest("label");
     if(exact)exact.hidden=mode==="band"||mode==="none";
     if(band)band.hidden=mode==="exact"||mode==="none";
+    if(exactToggle){exactToggle.hidden=mode==="band"||mode==="none";if(exactToggle.hidden){const toggle=exactToggle.querySelector("input");if(toggle)toggle.checked=false;}}
+    if(bandToggle){bandToggle.hidden=mode==="exact"||mode==="none";if(bandToggle.hidden){const toggle=bandToggle.querySelector("input");if(toggle)toggle.checked=false;}}
+    renderPublicPreview();
   }
   function applyStatsLocation(){
     const mode=$("demo-stats-location")?.value||"separate",preview=$("demo-stats-preview");
