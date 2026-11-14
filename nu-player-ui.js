@@ -21,7 +21,10 @@
   function renderWallet(){
     const s=load(),root=$("wallet-assets"),history=$("wallet-transactions");
     if(!root||!history)return;
-    root.innerHTML=NUWallet.assetRows(s).map(row=>'<div class="wallet-asset"><span>'+row.label+'</span><strong>'+row.value+row.unit+'</strong></div>').join("");
+    const rows=NUWallet.assetRows(s);
+    root.innerHTML=rows.map(row=>'<div class="wallet-asset" data-asset-group="'+String(row.group||"game").replace(/[^a-z0-9_-]/gi,"")+'"><span>'+row.label+'</span><strong>'+Number(row.value).toLocaleString(undefined,{maximumFractionDigits:8})+row.unit+'</strong></div>').join("");
+    const summary=$("wallet-asset-summary");
+    if(summary){const currencies=rows.filter(row=>row.group==="currency"||row.group==="games").length;summary.textContent=rows.length+" ASSET TYPES · "+currencies+" GAME / CREDIT TYPES";}
     history.replaceChildren();
     const tx=s.transactions.slice(-24).reverse();
     if(!tx.length){const empty=document.createElement("p");empty.className="wallet-muted";empty.textContent="No recorded wallet transactions yet.";history.appendChild(empty);return;}
