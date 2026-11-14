@@ -451,3 +451,19 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 #game-view.active #level-chip{padding:3px 5px;font-size:8px;}
 #game-view.active .bar-label{font-size:6px;letter-spacing:0;}
 }
+
+
+/* N.U pixel-faithful review framing.
+   Show the entire canonical artwork without cropping; camera zoom/pan is opt-in. */
+#nu-background-image{inset:0!important;background:#080b12!important;overflow:hidden!important}
+#nu-background-image img{
+  object-fit:contain!important;
+  object-position:center!important;
+  transform:translate3d(var(--camera-x,0px),var(--camera-y,0px),0) scale(var(--nu-camera-zoom,1))!important;
+  transform-origin:center center!important;
+  filter:none!important;
+  opacity:1!important;
+  transition:none!important;
+  image-rendering:auto;
+}
+#nu-background-image:after{display:none!important}
