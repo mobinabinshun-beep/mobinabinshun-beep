@@ -7,7 +7,7 @@
 
 ## 1. Purpose
 
-The player completes the profile card fields and configures its appearance. The Generation 1 public demo may expose a visual preview of the appearance controls, but the operational profile is to be completed and packaged at the end of Generation 1 as part of the launcher-mounted downloadable release. Server-backed operation and platform installers are future work and must not be implied by the demo.
+The player completes the profile card fields and configures its appearance. The Generation 1 public demo is an experimental human-test workshop for reviewing the unified profile experience, but the operational profile is to be completed and packaged at the end of Generation 1 as part of the launcher-mounted downloadable release. Server-backed operation and platform installers are future work and must not be implied by the demo.
 
 ## 2. Profile surface and fields
 
@@ -42,7 +42,7 @@ After the appearance lock, the only player-editable card elements are:
 - The image inside the card.
 - The image's placement, selected through the documented 2×4 position grid (eight placement cells).
 
-The image upload and 2×4 placement editor are operational requirements, not capabilities of the current public demo.
+The demo now includes a local-only image preview and 2×4 placement simulation. These are not production upload, crop, persistence or secure storage capabilities.
 
 ## 5. Public demo boundary — current implementation
 
@@ -52,10 +52,16 @@ Implemented in the public demo preview:
 - Three live preview controls (hue, neutral white/dark tint, color lightness).
 - Temporary in-page preview only; values reset when the profile closes.
 - Existing privacy warning still appears when personal text fields are edited; appearance controls do not trigger that warning.
+- Explicit public-field selection preview; all fields default to private.
+- Private-view state simulation, clearly marked as non-authenticated.
+- Stage-B appearance confirmation simulation that disables the three appearance sliders until the preview is reset.
+- Local FileReader image preview and eight-cell (2×4) placement simulation; the selected image is not uploaded.
 
 Not implemented in the demo:
-- Image upload, cropping or 2×4 placement.
-- Two-stage confirmation flow or permanent appearance lock.
+- Actual authentication, password/passphrase verification or secure private-view access.
+- Durable/immutable appearance lock across sessions.
+- Image cropping/editing or remote upload.
+- Profile persistence, authenticated player identity, server synchronization or cloud account.
 - Profile persistence, authenticated player identity, server synchronization or cloud account.
 - Online server operation or native/downloadable platform installers.
 
@@ -71,7 +77,7 @@ No profile/card freeze or lock is authorized by this document. First reconcile t
 
 ## 8. Profile panel inventory audit
 
-The current profile view contains the historical profile card, the separate appearance panel, the personal-data warning, the demo limitation note and the close action. The restored four text fields are present. No other profile subpanel is defined by the inspected baseline, manifest, handoff, launcher architecture or profile regression test. The following are known omissions by design—not silently forgotten demo controls: image upload/crop, 2×4 image placement, staged final confirmation, appearance lock, persistent player account and online/server synchronization. Wallet balances and transaction tabs remain separate wallet surfaces, not missing profile panels.
+The current profile view contains the historical profile card, the separate appearance panel, privacy/public-display workshop, local-identity concept panel, staged-appearance simulation, local image/2×4 placement simulation, game-status/wallet boundary note, personal-data warning, demo limitation note and close action. The following remain operational omissions by design: secure authentication, durable appearance lock, image crop and production upload, profile persistence, secure local save integration and online/server synchronization. Wallet balances and transaction tabs remain separate wallet surfaces, not missing profile panels.
 
 ## 9. Acceptance checklist
 
@@ -80,7 +86,11 @@ The current profile view contains the historical profile card, the separate appe
 - [ ] Hue, neutral white/dark tint and color lightness each change only their intended visual dimension.
 - [ ] Demo appearance resets on close and is not persisted.
 - [ ] Editing personal fields still shows the privacy warning.
-- [ ] Mobile layout and keyboard/touch range controls are usable.
+- [ ] Public-field selection defaults to private and updates only the local preview.
+- [ ] Private-view and appearance-lock simulations are clearly distinguished from real security/persistence.
+- [ ] Local image preview and all eight placement cells work without network upload.
+- [ ] Closing the profile resets all workshop state.
+- [ ] Mobile layout and keyboard/touch controls are usable.
 - [ ] Operational build has initial selection, final confirmation and an immutable appearance lock.
 - [ ] Operational build allows only image replacement and 2×4 image placement changes after lock.
 - [ ] Downloadable package is mounted on the launcher and tested on each claimed platform.
