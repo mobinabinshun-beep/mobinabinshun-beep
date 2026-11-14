@@ -9,9 +9,10 @@ let node=null,img=null,loaded=false,mode="ambient",frozen=false,cameraZoom=1;
 function mount(){
  if(node)return node;
  const world=document.querySelector(".world");if(!world)return null;
- node=document.createElement("div");node.id="nu-background-image";node.className="nu-world-background";node.dataset.mode=mode;node.style.cssText="position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none";node.setAttribute("aria-hidden","true");
+ node=document.createElement("div");node.id="nu-background-image";node.className="nu-world-background";node.dataset.state="loading";node.dataset.mode=mode;node.style.cssText="position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none";node.setAttribute("aria-hidden","true");
  img=document.createElement("img");img.alt="";img.style.cssText="display:block;width:100%;height:100%;object-fit:contain;object-position:center;user-select:none";img.decoding="async";img.loading="eager";img.fetchPriority="high";img.draggable=false;
- img.onload=()=>{loaded=true;world.classList.add("nu-image-scene-active");node.classList.add("is-loaded");g.dispatchEvent(new Event("nu:background-ready"));};
+ img.onload=()=>{loaded=true;node.dataset.state="loaded";world.classList.add("nu-image-scene-active");node.classList.add("is-loaded");g.dispatchEvent(new Event("nu:background-ready"));};
+ img.onerror=()=>{loaded=false;node.dataset.state="error";node.classList.add("asset-missing");g.dispatchEvent(new Event("nu:background-missing"));};
  img.onerror=()=>{loaded=false;world.classList.remove("nu-image-scene-active");node.classList.add("asset-missing");g.dispatchEvent(new Event("nu:background-missing"));};
  img.src=new URL(ASSET,document.baseURI).href;node.appendChild(img);world.insertBefore(node,world.firstChild);
  // Reveal the scene immediately; CSS otherwise leaves .world at opacity:0.
@@ -39,7 +40,7 @@ function setCamera(x,y,zoom=cameraZoom){
  node.style.setProperty("--camera-x",px+"px");node.style.setProperty("--camera-y",py+"px");
  node.style.setProperty("--nu-camera-zoom",String(cameraZoom));
 }
-function getStatus(){return {mounted:!!node,loaded,mode,frozen,cameraZoom,fit:"contain",asset:ASSET,source:"assets/backgrounds/niroo-universe-background.svg",layer:"world-background",stacking:"bottom-of-world"};}
+function getStatus(){return {mounted:!!node,loaded,mode,frozen,cameraZoom,fit:"contain",asset:ASSET,source:"assets/backgrounds/niroo-universe-background.svg",layer:"world-background",stacking:"bottom-of-world",naturalWidth:img?.naturalWidth||0,naturalHeight:img?.naturalHeight||0,state:node?.dataset.state||"not-mounted"};}
 g.NUBackgroundEngine={mount,setQuality,setMode,setFrozen,setCamera,getStatus};
-document.addEventListener("DOMContentLoaded",mount,{once:true});
+document.addEventListener("DOMContentLoaded",mount,{once:true});\nif(document.readyState!=="loading")mount();\nnew ResizeObserver(()=>{if(node&&img&&loaded)setCamera(0,0,cameraZoom);}).observe(document.documentElement);
 })(window);
