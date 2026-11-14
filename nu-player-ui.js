@@ -161,12 +161,28 @@
   if(appearanceReset)appearanceReset.addEventListener("click",()=>{setAppearanceLock(false);applyAppearance(true);applyVisualDesign(true);});
   const imageInput=$("demo-card-image");
   const avatarEl=document.querySelector("#profile-view .demo-avatar");
+  let currentProfileImage="";
+  const imageDownload=$("demo-image-download");
+  function withImageStore(mode,callback){
+    if(!("indexedDB" in window))return;
+    const request=indexedDB.open("nu-player-profile-media",1);
+    request.onupgradeneeded=()=>{if(!request.result.objectStoreNames.contains("images"))request.result.createObjectStore("images");};
+    request.onsuccess=()=>{const db=request.result,tx=db.transaction("images",mode);callback(tx.objectStore("images"));tx.oncomplete=()=>db.close();};
+  }
+  function applyStoredProfileImage(dataUrl){
+    if(!dataUrl)return;currentProfileImage=dataUrl;
+    if(avatarEl){avatarEl.style.backgroundImage="url("+JSON.stringify(dataUrl)+")";const placeholder=avatarEl.querySelector(".demo-avatar-placeholder");if(placeholder)placeholder.hidden=true;}
+    if(imageDownload)imageDownload.disabled=false;
+    const state=$("demo-image-state");if(state)state.textContent="SAVED IN THIS BROWSER · DOWNLOAD A COPY FOR DESKTOP / GALLERY";
+  }
+  withImageStore("readonly",store=>{const request=store.get("profile-photo");request.onsuccess=()=>applyStoredProfileImage(request.result?.dataUrl);});
+  if(imageDownload)imageDownload.addEventListener("click",()=>{if(!currentProfileImage)return;const link=document.createElement("a");link.href=currentProfileImage;link.download="nu-player-profile-image";document.body.appendChild(link);link.click();link.remove();});
   if(imageInput)imageInput.addEventListener("change",()=>{
     const file=imageInput.files&&imageInput.files[0];
     if(!file)return;
     if(!file.type.startsWith("image/")||file.size>5*1024*1024){imageInput.value="";const state=$("demo-image-state");if(state)state.textContent="CHOOSE AN IMAGE FILE UP TO 5 MB";return;}
     const reader=new FileReader();
-    reader.onload=()=>{if(avatarEl){avatarEl.style.backgroundImage="url("+JSON.stringify(String(reader.result))+")";avatarEl.style.backgroundSize=$("demo-image-fit")?.value||"cover";avatarEl.style.backgroundPosition="center";avatarEl.textContent="";}const active=document.querySelector('[data-demo-placement][aria-pressed="true"]')?.dataset.demoPlacement||"1";const mode=$("demo-placement-mode")?.value||"anchor";const state=$("demo-image-state");if(state)state.textContent="LOCAL IMAGE PREVIEW · NOT UPLOADED · "+(mode==="slot"?"PHOTO SLOT ":"IMAGE ANCHOR ")+active+" OF 8";};
+    reader.onload=()=>{currentProfileImage=String(reader.result);if(avatarEl){avatarEl.style.backgroundImage="url("+JSON.stringify(currentProfileImage)+")";avatarEl.style.backgroundSize=$("demo-image-fit")?.value||"cover";avatarEl.style.backgroundPosition="center";const placeholder=avatarEl.querySelector(".demo-avatar-placeholder");if(placeholder)placeholder.hidden=true;}if(imageDownload)imageDownload.disabled=false;withImageStore("readwrite",store=>store.put({dataUrl:currentProfileImage,name:file.name,type:file.type,updatedAt:Date.now()},"profile-photo"));const active=document.querySelector('[data-demo-placement][aria-pressed="true"]')?.dataset.demoPlacement||"1";const mode=$("demo-placement-mode")?.value||"anchor";const state=$("demo-image-state");if(state)state.textContent="LOCAL IMAGE PREVIEW · NOT UPLOADED · "+(mode==="slot"?"PHOTO SLOT ":"IMAGE ANCHOR ")+active+" OF 8";};
     reader.readAsDataURL(file);
   });
   document.querySelectorAll("[data-demo-placement]").forEach(button=>button.addEventListener("click",()=>{
@@ -180,7 +196,6 @@
     publicToggles.forEach(toggle=>{toggle.checked=false;});
     if(demoPrivatePreview)demoPrivatePreview.checked=false;
     if(imageInput)imageInput.value="";
-    if(avatarEl){avatarEl.style.backgroundImage="";avatarEl.style.backgroundPosition="center";avatarEl.style.backgroundSize="";delete avatarEl.dataset.placementMode;delete avatarEl.dataset.photoSlot;avatarEl.innerHTML="IMAGE<br>PLACEHOLDER<br><small>DEMO ONLY · NO UPLOAD</small>";}
     document.querySelectorAll("[data-demo-placement]").forEach((button,index)=>button.setAttribute("aria-pressed",String(index===0)));
     const imageState=$("demo-image-state");if(imageState)imageState.textContent="PLACEHOLDER IMAGE · POSITION 1 OF 8";
     ["demo-age-model","demo-stats-location","demo-card-privacy","demo-lock-policy","demo-image-fit","demo-placement-mode"].forEach(id=>{const el=$(id);if(el)el.selectedIndex=0;});
@@ -269,7 +284,7 @@
     card.classList.toggle("high-contrast",!!$("demo-high-contrast").checked);
     card.classList.toggle("has-ambient-motion",!!$("demo-motion").checked&&!reduced);
     if(reduced){card.classList.remove("has-scanlines","has-data-texture");card.style.setProperty("--demo-glow-strength","0");card.style.setProperty("--demo-holo-opacity","0");}
-    ["holo","glow","glass"].forEach(key=>{const out=$("demo-"+key+"-value");if(out)out.textContent=$("demo-"+key).value+"%";});
+    ["holo","glow","glass"].forEach(key=>{const input=$("demo-"+key);const value=Math.max(0,Math.min(100,Math.round(Number(input.value)||0)));input.value=String(value);const out=$("demo-"+key+"-value");if(out)out.textContent=value+"%";});
   }
   visualIds.forEach(id=>{const el=$(id);if(el){el.addEventListener("input",()=>applyVisualDesign(false));el.addEventListener("change",()=>applyVisualDesign(false));}});
   applyVisualDesign(false);

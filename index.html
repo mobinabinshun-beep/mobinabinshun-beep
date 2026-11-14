@@ -34,19 +34,19 @@
 <div class="game-controls"><button class="btn" id="restart-round">NEW ROUND</button><button class="btn" id="finish-round">PAUSE ROUND</button></div>
 </section>
 <section id="wallet-view" class="view"><div class="view-head"><button class="btn" id="wallet-back">← HOME</button><h2>N.U WALLET</h2></div><div class="glass wallet-panel"><nav class="wallet-card-tabs" aria-label="Wallet sections" dir="ltr"><button type="button" class="wallet-card-tab" data-wallet-tab="profile" data-hologram="PLAYER IDENTITY" aria-controls="profile-view" aria-label="Open player profile">PROFILE</button><button type="button" class="wallet-card-tab is-active" data-wallet-tab="balances" data-hologram="ALL GAME ASSETS" aria-controls="wallet-balances" aria-selected="true" aria-label="Show balances">BALANCES</button><button type="button" class="wallet-card-tab" data-wallet-tab="transactions" data-hologram="LEDGER &amp; HISTORY" aria-controls="wallet-ledger" aria-selected="false" aria-label="Show transactions">TRANSACTIONS</button></nav><section id="wallet-balances" class="wallet-tab-content" data-wallet-panel="balances"><p class="wallet-muted">Only assets with a positive owned balance appear here. New game currencies register automatically through the shared wallet.</p><div id="wallet-asset-summary" class="wallet-asset-summary" aria-live="polite"></div><div id="wallet-assets" class="wallet-assets"></div></section><section id="wallet-ledger" class="wallet-tab-content" data-wallet-panel="transactions" hidden><div class="wallet-history-head"><h3>Transaction history</h3><span>LOCAL SAVE · LAST 24</span></div><div id="wallet-transactions" class="wallet-transactions"></div></section></div></section>
-<section id="profile-view" class="view"><div class="view-head"><button class="btn" id="profile-back">← HOME</button><h2>N.U PLAYER PROFILE</h2></div><div class="glass demo-profile"><div class="demo-profile-card"><div class="demo-avatar" aria-label="Image placeholder">IMAGE<br>PLACEHOLDER<br><small>DEMO ONLY · NO UPLOAD</small></div><div class="demo-profile-fields"><div><label for="demo-name">NAME</label><input id="demo-name" autocomplete="off" placeholder="Display name (optional)"></div><div><label for="demo-call">CALLSIGN</label><input id="demo-call" autocomplete="off" placeholder="Nickname (optional)"></div><div><label for="demo-family">FAMILY NAME</label><input id="demo-family" autocomplete="off" placeholder="Family name (optional)"></div><div id="demo-age-exact-field"><label for="demo-age">AGE</label><input id="demo-age" autocomplete="off" placeholder="Age (optional)"></div></div><div id="demo-stats-card-preview" class="demo-stats-card-preview" hidden>GAME STATUS PREVIEW · HP / XP / MANA · REAL GAME DATA ONLY</div></div><section class="demo-profile-appearance" aria-labelledby="demo-profile-appearance-title">
+<section id="profile-view" class="view"><div class="view-head"><button class="btn" id="profile-back">← HOME</button><h2>N.U PLAYER PROFILE</h2></div><div class="glass demo-profile"><div class="demo-profile-card"><div class="demo-avatar" aria-label="Player profile image"><span class="demo-avatar-placeholder">PROFILE IMAGE</span><label class="demo-avatar-change" for="demo-card-image">CHANGE IMAGE</label><input id="demo-card-image" class="demo-avatar-input" type="file" accept="image/jpeg,image/png,image/webp,image/gif"><button class="demo-avatar-save" id="demo-image-download" type="button" disabled>SAVE IMAGE COPY</button><div class="demo-photo-grid" role="group" aria-label="Photo position 2 by 4"><button type="button" data-demo-placement="1" aria-pressed="true">1</button><button type="button" data-demo-placement="2" aria-pressed="false">2</button><button type="button" data-demo-placement="3" aria-pressed="false">3</button><button type="button" data-demo-placement="4" aria-pressed="false">4</button><button type="button" data-demo-placement="5" aria-pressed="false">5</button><button type="button" data-demo-placement="6" aria-pressed="false">6</button><button type="button" data-demo-placement="7" aria-pressed="false">7</button><button type="button" data-demo-placement="8" aria-pressed="false">8</button></div><small id="demo-image-state">IMAGE NOT SELECTED</small></div><div class="demo-profile-fields"><div><label for="demo-name">NAME</label><input id="demo-name" autocomplete="off" placeholder="Display name (optional)"></div><div><label for="demo-call">CALLSIGN</label><input id="demo-call" autocomplete="off" placeholder="Nickname (optional)"></div><div><label for="demo-family">FAMILY NAME</label><input id="demo-family" autocomplete="off" placeholder="Family name (optional)"></div><div id="demo-age-exact-field"><label for="demo-age">AGE</label><input id="demo-age" autocomplete="off" placeholder="Age (optional)"></div></div></div><section class="demo-profile-appearance" aria-labelledby="demo-profile-appearance-title">
 <h3 id="demo-profile-appearance-title">CARD APPEARANCE · DEMO CONTROLS</h3>
-<p class="demo-profile-appearance-note">Adjust the card preview. These settings are temporary and reset when the profile closes.</p>
+<p class="demo-profile-appearance-note">Live preview · confirm once to freeze appearance. Only the profile photo and its position remain changeable.</p>
 <div class="demo-profile-control"><label for="demo-card-hue">COLOR SPECTRUM <output id="demo-card-hue-value" for="demo-card-hue">205°</output></label><input id="demo-card-hue" type="range" min="0" max="359" step="1" value="205"></div>
 <div class="demo-profile-control"><label for="demo-card-tone">WHITE ↔ DARK <output id="demo-card-tone-value" for="demo-card-tone">NEUTRAL</output></label><input id="demo-card-tone" type="range" min="-100" max="100" step="1" value="0"></div>
 <div class="demo-profile-control"><label for="demo-card-lightness">COLOR LIGHT ↔ DARK <output id="demo-card-lightness-value" for="demo-card-lightness">48%</output></label><input id="demo-card-lightness" type="range" min="20" max="80" step="1" value="48"></div>
 <div class="demo-profile-control"><label for="demo-card-saturation">COLOR SATURATION · OPTIONAL FOURTH AXIS <output id="demo-card-saturation-value" for="demo-card-saturation">72%</output></label><input id="demo-card-saturation" type="range" min="0" max="100" step="1" value="72"></div>
 </section>
 <section class="demo-profile-lab" aria-labelledby="demo-profile-lab-title">
-<h3 id="demo-profile-lab-title">IDENTITY &amp; CARD WORKSHOP · EXPERIMENTAL</h3>
+<h3 id="demo-profile-lab-title">MORE PROFILE OPTIONS</h3>
 <p class="demo-profile-appearance-note">A unified concept preview. Controls below simulate future profile behavior; they are not authentication, secure storage or server services.</p>
-<div class="demo-lab-block">
-<h4>PUBLIC DISPLAY &amp; FIELD PRIVACY</h4>
+<details class="demo-lab-block"><summary>
+PRIVACY &amp; PUBLIC DISPLAY</summary>
 <p>Choose which fields may appear on an optional public display card. All fields start private.</p>
 <div class="demo-privacy-grid">
 <label><input type="checkbox" data-demo-public="demo-name"> Name</label>
@@ -57,32 +57,22 @@
 <label class="demo-private-toggle"><input id="demo-private-preview" type="checkbox"> Preview private profile view (simulation only)</label>
 <div id="demo-public-preview" class="demo-public-preview" aria-live="polite">Public card preview is empty until you explicitly select fields.</div>
 <p class="demo-lab-hint">Family Name and Age are private by default. Nothing is uploaded or shared by this demo.</p>
-</div>
-<div class="demo-lab-block">
-<h4>LOCAL PLAYER IDENTITY · CONCEPT</h4>
+</details>
+<details class="demo-lab-block"><summary>
+PLAYER IDENTITY</summary>
 <p>Separate from the optional public display card. In the operational design this identity belongs to the local save, settings and player-owned game state.</p>
 <div class="demo-concept-row"><span>LOCAL PROFILE</span><strong>DEMO SIMULATION · NOT AUTHENTICATED</strong></div>
 <div class="demo-concept-row"><span>PRIVATE VIEW</span><strong id="demo-private-state">CLOSED</strong></div>
 <div class="demo-concept-row"><span>PUBLIC CARD</span><strong>OPTIONAL · EXPLICIT FIELD SELECTION</strong></div>
-</div>
-<div class="demo-lab-block">
-<h4>APPEARANCE CONFIRMATION · TWO STAGES</h4>
+</details>
+<details class="demo-lab-block"><summary>
+APPEARANCE LOCK</summary>
 <p>Stage A: explore the three appearance controls above. Stage B: confirm the preview to simulate the appearance lock.</p>
 <div class="demo-stage-actions"><button class="btn primary" id="demo-appearance-confirm" type="button">CONFIRM APPEARANCE (SIMULATE LOCK)</button><button class="btn" id="demo-appearance-reset" type="button">RESET PREVIEW</button></div>
 <p id="demo-appearance-state" class="demo-lab-hint" aria-live="polite">STAGE A · APPEARANCE IS NOT CONFIRMED</p>
-</div>
-<div class="demo-lab-block">
-<h4>IMAGE &amp; 2 × 4 PLACEMENT GRID · CONCEPT</h4>
-<p>Image selection is local to this page. Choose one of eight placement cells. No image is uploaded or saved.</p>
-<label class="demo-upload-label">Select a test image <input id="demo-card-image" type="file" accept="image/*"></label>
-<div class="demo-placement-grid" role="group" aria-label="Image placement, two rows by four columns">
-<button type="button" data-demo-placement="1" aria-pressed="true">1</button><button type="button" data-demo-placement="2" aria-pressed="false">2</button><button type="button" data-demo-placement="3" aria-pressed="false">3</button><button type="button" data-demo-placement="4" aria-pressed="false">4</button><button type="button" data-demo-placement="5" aria-pressed="false">5</button><button type="button" data-demo-placement="6" aria-pressed="false">6</button><button type="button" data-demo-placement="7" aria-pressed="false">7</button><button type="button" data-demo-placement="8" aria-pressed="false">8</button>
-</div>
-<div class="demo-extra-field"><label for="demo-image-fit">IMAGE FIT</label><select id="demo-image-fit" data-demo-editable><option value="cover">Crop to fill</option><option value="contain">Fit whole image</option></select></div><div class="demo-extra-field"><label for="demo-placement-mode">2×4 GRID MEANING</label><select id="demo-placement-mode" data-demo-editable><option value="anchor">Image crop / anchor position</option><option value="slot">Citizen-card photo slot</option></select></div>
-<p id="demo-image-state" class="demo-lab-hint" aria-live="polite">PLACEHOLDER IMAGE · POSITION 1 OF 8</p>
-</div>
-<div class="demo-lab-block">
-<h4>OPTIONAL OPERATIONAL PROFILE DETAILS · CONCEPT</h4>
+</details>
+<details class="demo-lab-block"><summary>
+OPTIONAL DETAILS</summary>
 <p>Separate from the restored historical four-field card. Temporary review fields only.</p>
 <div class="demo-extra-field"><label for="demo-age-model">AGE REPRESENTATION · COMPARE ALL OPTIONS</label><select id="demo-age-model" data-demo-editable><option value="compare" selected>Compare exact age and age band</option><option value="exact">Exact age only</option><option value="band">Age band only</option><option value="none">No age field</option></select></div>
 <label class="demo-extra-field">AGE BAND (OPTIONAL)
@@ -90,15 +80,15 @@
 <label class="demo-extra-field">BIO (OPTIONAL)<textarea id="demo-bio" data-demo-editable rows="2" maxlength="240" placeholder="Short introduction — test text only"></textarea></label>
 <label class="demo-extra-field">INTERESTS / HOBBIES (OPTIONAL)<input id="demo-interests" data-demo-editable maxlength="160" placeholder="Topics and interests — test text only"></label>
 <p class="demo-lab-hint">Age band is an alternative operational concept to exact age; final field model remains subject to owner review.</p>
-</div>
-<div class="demo-lab-block">
-<h4>HOLOGRAPHIC CARD DESIGN LAB · CONCEPT CONTROLS</h4>
+</details>
+<details class="demo-lab-block"><summary>
+HOLOGRAM EFFECTS</summary>
 <div class="demo-extra-field"><label for="demo-frame-material">FRAME MATERIAL</label><select id="demo-frame-material" data-demo-editable><option value="glass">Holographic glass</option><option value="metal">Brushed metal</option><option value="ceramic">Ceramic composite</option></select></div>
 <div class="demo-extra-field"><label for="demo-card-font">TYPOGRAPHY</label><select id="demo-card-font" data-demo-editable><option value="mono">Technical mono</option><option value="modern">Modern sans</option><option value="serif">Editorial serif</option></select></div>
 <div class="demo-extra-field"><label for="demo-corners">CORNER GEOMETRY</label><select id="demo-corners" data-demo-editable><option value="soft">Soft radius</option><option value="sharp">Angular</option><option value="round">Rounded</option></select></div>
-<div class="demo-extra-field"><label for="demo-holo">HOLOGRAM INTENSITY <output id="demo-holo-value">60%</output></label><input id="demo-holo" data-demo-editable type="range" min="0" max="100" value="60"></div>
-<div class="demo-extra-field"><label for="demo-glow">EDGE GLOW <output id="demo-glow-value">45%</output></label><input id="demo-glow" data-demo-editable type="range" min="0" max="100" value="45"></div>
-<div class="demo-extra-field"><label for="demo-glass">GLASS TRANSPARENCY <output id="demo-glass-value">55%</output></label><input id="demo-glass" data-demo-editable type="range" min="0" max="100" value="55"></div>
+<div class="demo-extra-field"><label for="demo-holo">HOLOGRAM INTENSITY <output id="demo-holo-value">60%</output></label><input id="demo-holo" data-demo-editable type="number" inputmode="numeric" min="0" max="100" step="1" value="60" aria-label="demo-holo percent (0 to 100)" title="0–100. Use arrow keys to change by 1."></div>
+<div class="demo-extra-field"><label for="demo-glow">EDGE GLOW <output id="demo-glow-value">45%</output></label><input id="demo-glow" data-demo-editable type="number" inputmode="numeric" min="0" max="100" step="1" value="45" aria-label="demo-glow percent (0 to 100)" title="0–100. Use arrow keys to change by 1."></div>
+<div class="demo-extra-field"><label for="demo-glass">GLASS TRANSPARENCY <output id="demo-glass-value">55%</output></label><input id="demo-glass" data-demo-editable type="number" inputmode="numeric" min="0" max="100" step="1" value="55" aria-label="demo-glass percent (0 to 100)" title="0–100. Use arrow keys to change by 1."></div>
 <div class="demo-privacy-grid">
 <label><input id="demo-scanlines" data-demo-editable type="checkbox" checked> Scan lines</label>
 <label><input id="demo-data-texture" data-demo-editable type="checkbox"> Data texture</label>
@@ -108,9 +98,9 @@
 </div>
 <div class="demo-extra-field"><label for="demo-quality">DEVICE QUALITY PRESET</label><select id="demo-quality" data-demo-editable><option value="economy">Economy</option><option value="balanced" selected>Balanced</option><option value="enhanced">Enhanced</option></select></div>
 <p class="demo-lab-hint">Visual-only design controls. Reduced-motion preferences and readability must override decorative effects.</p>
-</div>
-<div class="demo-lab-block">
-<h4>LOCAL SAVE, SECURITY &amp; FUTURE NETWORK · STATUS PREVIEW</h4>
+</details>
+<details class="demo-lab-block"><summary>
+SAVE &amp; SECURITY (FUTURE)</summary>
 <div class="demo-concept-row"><span>LOCAL PLAYER SAVE</span><strong>CONCEPT ONLY · NOT CONNECTED</strong></div>
 <div class="demo-concept-row"><span>ENCRYPTED EXPORT / VALIDATED IMPORT</span><strong>NOT IMPLEMENTED IN DEMO</strong></div>
 <div class="demo-concept-row"><span>PUBLIC SHARE</span><strong>NO AUTO-SHARE · EXPLICIT OPT-IN REQUIRED</strong></div>
@@ -118,9 +108,9 @@
 <p class="demo-lab-hint">The operational target requires protected local saves, authenticated private access, safe import/export and recovery. This public preview collects no password and performs no save, import, export or network sync.</p>
 <div class="demo-stage-actions"><button class="btn" id="demo-save-preview" data-demo-editable type="button">SIMULATE LOCAL SAVE</button><button class="btn" id="demo-export-preview" data-demo-editable type="button">SIMULATE EXPORT</button><button class="btn" id="demo-import-preview" data-demo-editable type="button">SIMULATE IMPORT</button><button class="btn" id="demo-sync-preview" data-demo-editable type="button">SIMULATE SERVER SYNC</button></div>
 <p id="demo-storage-state" class="demo-lab-hint" aria-live="polite">NO SAVE / EXPORT / IMPORT / SYNC PERFORMED</p>
-</div>
-<div class="demo-lab-block">
-<h4>OPEN DESIGN DECISIONS · COMPARE OPTIONS</h4>
+</details>
+<details class="demo-lab-block"><summary>
+ADVANCED DESIGN DECISIONS</summary>
 <p>These selectors intentionally expose competing interpretations for human testing. They are review controls, not final product decisions.</p>
 <div class="demo-extra-field"><label for="demo-lock-policy">WHAT SHOULD APPEARANCE CONFIRMATION LOCK?</label><select id="demo-lock-policy" data-demo-editable><option value="full" selected>All profile fields and appearance; only photo and position stay editable</option><option value="appearance">Appearance only; text fields remain editable</option><option value="appearance-fields">Appearance and profile text; public visibility remains editable</option></select></div>
 <div class="demo-extra-field"><label for="demo-stats-location">WHERE SHOULD HP / XP / MANA APPEAR?</label><select id="demo-stats-location" data-demo-editable><option value="separate" selected>Separate game HUD panel</option><option value="card">On the citizen card</option><option value="wallet">Wallet / asset projection</option><option value="hidden">Do not show in profile workshop</option></select></div>
@@ -129,9 +119,9 @@
 <div class="demo-extra-field"><label for="demo-share-consent">PUBLIC SHARING · EXPLICIT OPT-IN</label><label><input id="demo-share-consent" type="checkbox" data-demo-editable> I explicitly opt in to a share-preview test (no upload or sharing occurs)</label></div>
 <button class="btn" id="demo-share-preview" data-demo-editable type="button">PREVIEW SHARING CONSENT</button>
 <p id="demo-share-state" class="demo-lab-hint" aria-live="polite">NO SHARE PREVIEW REQUESTED</p>
-</div>
-<div class="demo-lab-block">
-<h4>PRIVATE ACCESS &amp; YES / NO FLOW · SIMULATION</h4>
+</details>
+<details class="demo-lab-block"><summary>
+PRIVATE ACCESS &amp; RECOVERY (FUTURE)</summary>
 <p>Try the proposed private-view confirmation flow. Never enter a real password or passphrase here.</p>
 <label class="demo-extra-field">TEST PASSPHRASE FIELD · DO NOT USE REAL CREDENTIALS
 <input id="demo-passphrase-test" data-demo-editable type="password" maxlength="32" autocomplete="off" placeholder="Fake test text only"></label>
@@ -148,15 +138,8 @@
 <div class="demo-extra-field"><label for="demo-import-model">IMPORT VALIDATION</label><select id="demo-import-model" data-demo-editable><option value="compare" selected>Compare validation choices</option><option value="versioned">Versioned + schema-validated import</option><option value="backup">Backup before import + rollback</option><option value="full">Version, integrity, compatibility and duplicate-transaction checks</option></select></div>
 <div class="demo-extra-field"><label for="demo-sync-model">FUTURE NETWORK / SYNC MODEL</label><select id="demo-sync-model" data-demo-editable><option value="compare" selected>Compare future sync models</option><option value="offline">Offline-only Generation 1</option><option value="optional-cloud">Optional encrypted cloud sync</option><option value="cross-device">Cross-device profile sync</option><option value="authoritative">Online authoritative server</option></select></div>
 <p id="demo-storage-options-preview" class="demo-lab-hint" aria-live="polite">DELIVERY / STORAGE OPTIONS ARE CONCEPTS ONLY · NO BUILD OR SERVICE CREATED</p>
-</div>
-<div class="demo-lab-block">
-<h4>GAME STATUS &amp; WALLET BOUNDARY</h4>
-<p>HP, XP and Mana belong to the game HUD and shared wallet projection—not to the historical four-field profile card. Real values remain in their game and wallet views; this panel does not invent player statistics.</p>
-<div class="demo-concept-row"><span>GAME HUD</span><strong>HP · XP · MANA</strong></div>
-<div class="demo-concept-row"><span>WALLET</span><strong>OWNED ASSETS &amp; TRANSACTION LEDGER</strong></div>
-<div class="demo-concept-row"><span>PROFILE CARD</span><strong>DISPLAY IDENTITY ONLY</strong></div>
-</div>
-</section><div id="demo-profile-warning" class="demo-profile-warning" role="alert" hidden><strong>DEMO PRIVACY WARNING</strong><p>This public demo cannot protect personal data. Do not enter real or sensitive information. Values are temporary and are not saved.</p><button class="btn danger" id="demo-profile-clear">CLEAR DEMO DATA & CLOSE</button></div><p class="demo-profile-note">Display mock-up only. Local image preview only; no remote image upload, account creation, password authentication, server transfer, profile persistence, or saved appearance settings are available in this demo.</p><button class="btn" id="demo-profile-close">CLOSE PROFILE</button></div></section>
+</details>
+</section><div id="demo-profile-warning" class="demo-profile-warning" role="alert" hidden><strong>DEMO PRIVACY WARNING</strong><p>This public demo cannot protect personal data. Do not enter real or sensitive information. Values are temporary and are not saved.</p><button class="btn danger" id="demo-profile-clear">CLEAR DEMO DATA & CLOSE</button></div><p class="demo-profile-note">Display mock-up only. Images are previewed locally. The browser keeps the selected image in this browser profile; Save Image Copy downloads a separate copy to a location chosen by the browser.</p><button class="btn" id="demo-profile-close">CLOSE PROFILE</button></div></section>
 <section id="shop-view" class="view"><div class="view-head"><button class="btn" id="shop-back">← HOME</button><h2>N.U STORE</h2></div><div id="shop-quest" class="glass shop-quest"><div class="eyebrow">FIRST PURCHASE GUIDE</div><h3>Choose your first step</h3><p>Learn how the in-game wallet works. Purchases use only virtual assets earned in N.U games; no real-money payment is involved.</p><div class="shop-quest-actions"><button class="btn primary" id="quest-open-store">OPEN STORE</button><button class="btn" id="quest-continue">CONTINUE PLAYING</button></div></div><div class="glass shop-empty" id="shop-empty"><h3>Available items & upgrades</h3><p id="shop-status">Only currently affordable items appear here.</p><div id="shop-items" class="shop-items"></div></div></section>
 <section id="article-view" class="view"><div class="view-head"><button class="btn" id="article-back">← HOME</button><h2 id="article-title">PUBLICATION</h2></div><div class="glass article"><p>Original publication opens in a new tab. N.U does not copy or republish the source text here.</p><a id="article-frame-link" class="btn primary" target="_blank" rel="noopener">READ ORIGINAL ↗</a></div></section>
 <footer class="footer">N.U — NIROO UNIVERSE · INTERACTIVE WORLD · GENERATION 01 PROTOTYPE</footer>
