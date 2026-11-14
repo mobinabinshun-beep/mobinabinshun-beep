@@ -62,3 +62,10 @@ Record browser and OS, device class, viewport, pass/fail per item, console error
 - [ ] Image fit toggles crop-to-fill / contain.
 - [ ] 2×4 grid can be compared as image anchor or photo slot.
 - [ ] Full lock leaves image fit and placement available; the other two lock policies behave according to their labels.
+
+- [ ] Target platform options can be compared: browser, Windows, Linux/macOS, Android and iOS.
+- [ ] Delivery options can be compared: launcher-integrated, standalone and both.
+- [ ] Local save, export protection, import validation and future sync models are visible as concepts only.
+- [ ] Authentication model alternatives are visible without collecting real credentials.
+- [ ] Reduced decorative effects and high-contrast preview work and reset on close.
+- [ ] Browser reduced-motion preference overrides ambient animation.
