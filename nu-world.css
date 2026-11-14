@@ -571,3 +571,20 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 .demo-upload-label input{max-width:100%;color:#9fc7d8;font-size:10px}
 .demo-profile-control input:disabled{opacity:.48;cursor:not-allowed}
 @media(max-width:600px){.demo-profile-lab{padding:13px}.demo-lab-block{padding:12px}.demo-concept-row{flex-direction:column;gap:2px}.demo-concept-row strong{text-align:left}.demo-stage-actions .btn{width:100%}}
+
+.demo-extra-field{display:grid;gap:6px;margin:10px 0;color:#c5e6f3;font:700 9px/1.4 ui-monospace,monospace;letter-spacing:.06em}
+.demo-extra-field input:not([type=checkbox]),.demo-extra-field textarea,.demo-extra-field select{width:100%;min-width:0;padding:9px;border:1px solid rgba(113,224,255,.22);border-radius:7px;background:rgba(4,15,25,.82);color:#d9f4ff;font:12px/1.5 inherit}
+.demo-extra-field input[type=range]{width:100%;accent-color:#71dff7}
+.demo-profile-card[data-material=metal]{border-width:2px;border-style:double;background-color:rgba(85,104,119,.12)}
+.demo-profile-card[data-material=ceramic]{border-width:2px;border-style:solid;filter:saturate(.82)}
+.demo-profile-card[data-font=modern]{font-family:Arial,sans-serif}
+.demo-profile-card[data-font=serif]{font-family:Georgia,serif}
+.demo-profile-card[data-corners=sharp]{border-radius:2px}
+.demo-profile-card[data-corners=round]{border-radius:28px}
+.demo-profile-card[data-corners=soft]{border-radius:16px}
+.demo-profile-card{backdrop-filter:blur(calc(var(--demo-glass-alpha,.55)*12px));box-shadow:0 0 calc(var(--demo-glow-strength,.45)*38px) hsl(var(--demo-card-hue) 82% 55% / calc(var(--demo-glow-strength,.45)*.45)),inset 0 0 22px hsl(var(--demo-card-hue) 78% 65% / calc(var(--demo-holo-opacity,.6)*.18))}
+.demo-profile-card.has-scanlines{background-image:repeating-linear-gradient(0deg,transparent 0 5px,rgba(128,220,255,.035) 6px 7px),linear-gradient(rgba(var(--demo-neutral-rgb),var(--demo-neutral-alpha)),rgba(var(--demo-neutral-rgb),var(--demo-neutral-alpha))),linear-gradient(135deg,hsl(var(--demo-card-hue) 72% var(--demo-card-lightness) / .32),rgba(7,21,34,.94))}
+.demo-profile-card.has-data-texture{background-image:radial-gradient(circle at 15% 25%,rgba(120,220,255,.12) 1px,transparent 2px),repeating-linear-gradient(135deg,transparent 0 13px,rgba(113,224,255,.035) 14px 15px),linear-gradient(135deg,hsl(var(--demo-card-hue) 72% var(--demo-card-lightness) / .32),rgba(7,21,34,.94))}
+@keyframes demo-card-drift{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+.demo-profile-card.has-ambient-motion{animation:demo-card-drift 4s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){.demo-profile-card.has-ambient-motion{animation:none}}
