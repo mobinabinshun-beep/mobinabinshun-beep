@@ -34,12 +34,12 @@ function drawMarket(steps){
  if(!steps.length){canvas.hidden=true;$("market-empty").hidden=false;return;}
  canvas.hidden=false;$("market-empty").hidden=true;
  const pad={l:58,r:18,t:20,b:42},pw=w-pad.l-pad.r,ph=h-pad.t-pad.b,lo=Math.min(...steps.map(s=>s.low)),hi=Math.max(...steps.map(s=>s.high)),spread=Math.max(1,hi-lo),min=lo-spread*.15,max=hi+spread*.15,span=max-min;
- const y=v=>pad.t+(max-v)/span*ph,slot=pw/steps.length,cw=Math.max(4,Math.min(18,slot*.52));
+ const y=v=>pad.t+(max-v)/span*ph,slot=pw/steps.length,cw=Math.max(4,Math.min(18,slot*.52));\n const showCandles=$("market-layer-candles").checked,showWicks=$("market-layer-wicks").checked,showLine=$("market-layer-line").checked,showVolume=$("market-layer-volume").checked;
  ctx.font="11px system-ui";ctx.textAlign="right";ctx.textBaseline="middle";
  for(let i=0;i<=4;i++){const v=min+span*i/4,yy=y(v);ctx.strokeStyle="rgba(160,205,224,.18)";ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(w-pad.r,yy);ctx.stroke();ctx.fillStyle="#91aab9";ctx.fillText(v.toFixed(2),pad.l-9,yy);}
  for(let i=0;i<=4;i++){const xx=pad.l+pw*i/4;ctx.strokeStyle="rgba(160,205,224,.09)";ctx.beginPath();ctx.moveTo(xx,pad.t);ctx.lineTo(xx,pad.t+ph);ctx.stroke();}
  const maxVol=Math.max(1,...steps.map(s=>s.volume));
- steps.forEach((s,i)=>{const cx=pad.l+slot*(i+.5),up=s.close>=s.open,color=up?"#70dfaa":"#ff8b91";ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(cx,y(s.high));ctx.lineTo(cx,y(s.low));ctx.stroke();const top=Math.min(y(s.open),y(s.close)),body=Math.max(2,Math.abs(y(s.open)-y(s.close)));ctx.fillStyle=color;ctx.fillRect(cx-cw/2,top,cw,body);ctx.globalAlpha=.35;ctx.fillRect(cx-cw/2,h-pad.b+7,cw,s.volume/maxVol*30);ctx.globalAlpha=1;});
+ steps.forEach((s,i)=>{const cx=pad.l+slot*(i+.5),up=s.close>=s.open,color=up?"#70dfaa":"#ff8b91";if(showWicks){ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(cx,y(s.high));ctx.lineTo(cx,y(s.low));ctx.stroke();}if(showCandles){const top=Math.min(y(s.open),y(s.close)),body=Math.max(2,Math.abs(y(s.open)-y(s.close)));ctx.fillStyle=color;ctx.fillRect(cx-cw/2,top,cw,body);}if(showVolume){ctx.globalAlpha=.35;ctx.fillStyle="#78d7e8";ctx.fillRect(cx-cw/2,h-pad.b+7,cw,s.volume/maxVol*30);ctx.globalAlpha=1;}});\n if(showLine){ctx.strokeStyle="#e8f5fb";ctx.lineWidth=2;ctx.beginPath();steps.forEach((s,i)=>{const cx=pad.l+slot*(i+.5);i?ctx.lineTo(cx,y(s.close)):ctx.moveTo(cx,y(s.close));});ctx.stroke();}
  ctx.textAlign="center";ctx.textBaseline="top";ctx.fillStyle="#91aab9";[...new Set([0,Math.floor((steps.length-1)/2),steps.length-1])].forEach(i=>ctx.fillText(dateLabel(steps[i].time),pad.l+slot*(i+.5),h-pad.b+12));
 }
 function renderHistory(items,id){
@@ -53,7 +53,7 @@ function updateMarket(steps){
  drawMarket(steps);renderHistory(steps.slice(-MAX_TEXT_HISTORY).map(s=>({title:s.title,time:s.time,delta:s.delta,index:s.index})),"market-history");
 }
 function frame(cache,rows){
- const mode=NUExchangeReplay.getMode(replayMode),elapsed=Date.now()-replayStart,asset=cache.assets[selected]||{chart:[],recent:[]},points=asset.chart||[];
+ const mode=NUExchangeReplay.getMode(replayMode),elapsed=$("market-reduced-motion").checked?mode.durationMs-1:Date.now()-replayStart,asset=cache.assets[selected]||{chart:[],recent:[]},points=asset.chart||[];
  const ai=NUExchangeReplay.frameIndex(elapsed,points.length,mode.durationMs),shown=NUExchangeReplay.visibleSteps(points,ai),row=rows.find(r=>r.key===selected);
  $("asset-balance").textContent=format(row?row.value:0)+(row?row.unit:"");
  const net=shown.length>1?shown[shown.length-1].balance-shown[0].balance:0;$("asset-change").textContent=(net>0?"+":"")+format(net);$("asset-change").className=net>0?"positive":net<0?"negative":"";
@@ -89,7 +89,7 @@ function unlockTwo(){const r=maintenance.confirm($("unlock-phrase").value);$("un
 $("asset-select").addEventListener("change",e=>{selected=e.target.value;replayStart=Date.now();refresh();});
 $("market-asset").addEventListener("change",e=>{marketSelected=e.target.value;replayStart=Date.now();refresh();});
 $("chart-time-scale").innerHTML=NUExchangeReplay.MODES.map(m=>'<option value="'+m.id+'">'+m.label+'</option>').join("");
-$("chart-time-scale").value=replayMode;$("chart-time-scale").addEventListener("change",e=>{replayMode=e.target.value;replayStart=Date.now();refresh();});
+$("chart-time-scale").value=replayMode;$("chart-time-scale").addEventListener("change",e=>{replayMode=e.target.value;replayStart=Date.now();refresh();});\n["market-layer-candles","market-layer-wicks","market-layer-line","market-layer-volume","market-reduced-motion"].forEach(id=>$(id).addEventListener("change",()=>{replayStart=Date.now();const cache=readCache();if(cache)frame(cache,NUWallet.assetRows(NU.load()).filter(r=>r.key!=="hp"));}));
 $("unlock-step-one").addEventListener("click",unlockOne);$("unlock-step-two").addEventListener("click",unlockTwo);$("relock-module").addEventListener("click",()=>{maintenance.relock();$("unlock-feedback").textContent="Transfer module re-locked.";updateGuard();});
 window.NUExchangeAttempt=async function(commit){
  if(maintenance.isLocked())return {ok:false,reason:"MODULE_LOCKED"};
