@@ -441,3 +441,9 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 - Casino Credits are shown as a Generation 1 virtual asset, separate from XP, Mana and HP.
 - No conversion pairs, rates, fees, or exchange eligibility are invented. Conversion remains unavailable until the owner approves the pair/rate rules.
 - History is limited to the wallet's retained local transaction window (currently 40 entries). Local browser data is not server-authoritative and does not synchronize across devices.
+
+
+## Launcher core architecture
+- [Adaptive Runtime & Economic Intelligence Core](docs/architecture/NU-ADAPTIVE-RUNTIME-AND-ECONOMIC-INTELLIGENCE-CORE-2026-11-15.md) — target design for the mandatory launcher core, offline module installation, adaptive CPU/GPU/RAM/cache governance, economic discovery and modular exchange.
+- [Generation 1 base economy catalog](docs/economy/NU-GENERATION-1-BASE-ECONOMY-REFERENCE-CATALOG-2026-11-14.md) — benchmark profile and asset matching rules.
+- [Universal Game Asset Exchange architecture](docs/architecture/NU-UNIVERSAL-GAME-ASSET-EXCHANGE-SPEC-2026-11-14.md) — exchange domain design and settlement boundaries.
