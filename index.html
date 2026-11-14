@@ -40,12 +40,58 @@
 <div class="demo-profile-control"><label for="demo-card-hue">COLOR SPECTRUM <output id="demo-card-hue-value" for="demo-card-hue">205°</output></label><input id="demo-card-hue" type="range" min="0" max="359" step="1" value="205"></div>
 <div class="demo-profile-control"><label for="demo-card-tone">WHITE ↔ DARK <output id="demo-card-tone-value" for="demo-card-tone">NEUTRAL</output></label><input id="demo-card-tone" type="range" min="-100" max="100" step="1" value="0"></div>
 <div class="demo-profile-control"><label for="demo-card-lightness">COLOR LIGHT ↔ DARK <output id="demo-card-lightness-value" for="demo-card-lightness">48%</output></label><input id="demo-card-lightness" type="range" min="20" max="80" step="1" value="48"></div>
+</section>
+<section class="demo-profile-lab" aria-labelledby="demo-profile-lab-title">
+<h3 id="demo-profile-lab-title">IDENTITY &amp; CARD WORKSHOP · EXPERIMENTAL</h3>
+<p class="demo-profile-appearance-note">A unified concept preview. Controls below simulate future profile behavior; they are not authentication, secure storage or server services.</p>
+<div class="demo-lab-block">
+<h4>PUBLIC DISPLAY &amp; FIELD PRIVACY</h4>
+<p>Choose which fields may appear on an optional public display card. All fields start private.</p>
+<div class="demo-privacy-grid">
+<label><input type="checkbox" data-demo-public="demo-name"> Name</label>
+<label><input type="checkbox" data-demo-public="demo-call"> Callsign</label>
+<label><input type="checkbox" data-demo-public="demo-family"> Family Name</label>
+<label><input type="checkbox" data-demo-public="demo-age"> Age</label>
+</div>
+<label class="demo-private-toggle"><input id="demo-private-preview" type="checkbox"> Preview private profile view (simulation only)</label>
+<div id="demo-public-preview" class="demo-public-preview" aria-live="polite">Public card preview is empty until you explicitly select fields.</div>
+<p class="demo-lab-hint">Family Name and Age are private by default. Nothing is uploaded or shared by this demo.</p>
+</div>
+<div class="demo-lab-block">
+<h4>LOCAL PLAYER IDENTITY · CONCEPT</h4>
+<p>Separate from the optional public display card. In the operational design this identity belongs to the local save, settings and player-owned game state.</p>
+<div class="demo-concept-row"><span>LOCAL PROFILE</span><strong>DEMO SIMULATION · NOT AUTHENTICATED</strong></div>
+<div class="demo-concept-row"><span>PRIVATE VIEW</span><strong id="demo-private-state">CLOSED</strong></div>
+<div class="demo-concept-row"><span>PUBLIC CARD</span><strong>OPTIONAL · EXPLICIT FIELD SELECTION</strong></div>
+</div>
+<div class="demo-lab-block">
+<h4>APPEARANCE CONFIRMATION · TWO STAGES</h4>
+<p>Stage A: explore the three appearance controls above. Stage B: confirm the preview to simulate the appearance lock.</p>
+<div class="demo-stage-actions"><button class="btn primary" id="demo-appearance-confirm" type="button">CONFIRM APPEARANCE (SIMULATE LOCK)</button><button class="btn" id="demo-appearance-reset" type="button">RESET PREVIEW</button></div>
+<p id="demo-appearance-state" class="demo-lab-hint" aria-live="polite">STAGE A · APPEARANCE IS NOT CONFIRMED</p>
+</div>
+<div class="demo-lab-block">
+<h4>IMAGE &amp; 2 × 4 PLACEMENT GRID · CONCEPT</h4>
+<p>Image selection is local to this page. Choose one of eight placement cells. No image is uploaded or saved.</p>
+<label class="demo-upload-label">Select a test image <input id="demo-card-image" type="file" accept="image/*"></label>
+<div class="demo-placement-grid" role="group" aria-label="Image placement, two rows by four columns">
+<button type="button" data-demo-placement="1" aria-pressed="true">1</button><button type="button" data-demo-placement="2" aria-pressed="false">2</button><button type="button" data-demo-placement="3" aria-pressed="false">3</button><button type="button" data-demo-placement="4" aria-pressed="false">4</button><button type="button" data-demo-placement="5" aria-pressed="false">5</button><button type="button" data-demo-placement="6" aria-pressed="false">6</button><button type="button" data-demo-placement="7" aria-pressed="false">7</button><button type="button" data-demo-placement="8" aria-pressed="false">8</button>
+</div>
+<p id="demo-image-state" class="demo-lab-hint" aria-live="polite">PLACEHOLDER IMAGE · POSITION 1 OF 8</p>
+</div>
+<div class="demo-lab-block">
+<h4>GAME STATUS &amp; WALLET BOUNDARY</h4>
+<p>HP, XP and Mana belong to the game HUD and shared wallet projection—not to the historical four-field profile card. Real values remain in their game and wallet views; this panel does not invent player statistics.</p>
+<div class="demo-concept-row"><span>GAME HUD</span><strong>HP · XP · MANA</strong></div>
+<div class="demo-concept-row"><span>WALLET</span><strong>OWNED ASSETS &amp; TRANSACTION LEDGER</strong></div>
+<div class="demo-concept-row"><span>PROFILE CARD</span><strong>DISPLAY IDENTITY ONLY</strong></div>
+</div>
 </section><div id="demo-profile-warning" class="demo-profile-warning" role="alert" hidden><strong>DEMO PRIVACY WARNING</strong><p>This public demo cannot protect personal data. Do not enter real or sensitive information. Values are temporary and are not saved.</p><button class="btn danger" id="demo-profile-clear">CLEAR DEMO DATA & CLOSE</button></div><p class="demo-profile-note">Display mock-up only. No image upload, account creation, password, server transfer, profile persistence, or saved appearance settings are available in this demo.</p><button class="btn" id="demo-profile-close">CLOSE PROFILE</button></div></section>
 <section id="shop-view" class="view"><div class="view-head"><button class="btn" id="shop-back">← HOME</button><h2>N.U STORE</h2></div><div id="shop-quest" class="glass shop-quest"><div class="eyebrow">FIRST PURCHASE GUIDE</div><h3>Choose your first step</h3><p>Learn how the in-game wallet works. Purchases use only virtual assets earned in N.U games; no real-money payment is involved.</p><div class="shop-quest-actions"><button class="btn primary" id="quest-open-store">OPEN STORE</button><button class="btn" id="quest-continue">CONTINUE PLAYING</button></div></div><div class="glass shop-empty" id="shop-empty"><h3>Available items & upgrades</h3><p id="shop-status">Only currently affordable items appear here.</p><div id="shop-items" class="shop-items"></div></div></section>
 <section id="article-view" class="view"><div class="view-head"><button class="btn" id="article-back">← HOME</button><h2 id="article-title">PUBLICATION</h2></div><div class="glass article"><p>Original publication opens in a new tab. N.U does not copy or republish the source text here.</p><a id="article-frame-link" class="btn primary" target="_blank" rel="noopener">READ ORIGINAL ↗</a></div></section>
 <footer class="footer">N.U — NIROO UNIVERSE · INTERACTIVE WORLD · GENERATION 01 PROTOTYPE</footer>
 </div></div>
-<div class="menu-backdrop" id="menu"><div class="glass menu-panel"><div class="view-head"><h2>N.U NAVIGATION</h2><button class="btn" id="menu-close">CLOSE ×</button></div><p>Choose a destination. The home screen remains a quiet discovery hub; gameplay starts only when you launch a game or open a publication experience.</p><div class="menu-items"><a href="./launcher.html">LAUNCHER CALIBRATION<small>System profile · performance settings</small></a><button id="menu-library">GAME LIBRARY<small>Generation 01</small></button><button id="menu-store">N.U STORE<small>Available purchases</small></button><button id="menu-wallet">◈ WALLET<small>Owned assets & transactions</small></button><a href="./exchange.html">N.U EXCHANGE<small>Generation 1 assets · change chart</small></a><a href="./pixel-art-studio.html">N.U CREATIVE STUDIO<small>Image analysis · pixel art · SVG &amp; GFX-IR</small></a><a href="./casino.html">N.U CASINO<small>Coin Flip · Lucky Dice · Mini Slots · virtual credits</small></a><button id="menu-profile">▣ PLAYER ID CARD<small>Level, progression & identity</small></button><button id="menu-home">HOME WORLD<small>Camera & horizon</small></button><a href="https://medium.com/@The.World.of.Niroo.TWoN.N.C/n-u-bea66efc81e0">N.U PUBLICATION<small>Original source ↗</small></a><a href="https://medium.com/@Black.Fox.writes/niroo-univere-n-u-99081528028d">PUBLISHING NETWORK<small>Original source ↗</small></a></div></div></div>
+<div class="menu-backdrop" id="menu"><div class="glass menu-panel"><div class="view-head"><h2>N.U NAVIGATION</h2><button class="btn" id="menu-close">CLOSE ×</button></div><p>Choose a destination. The home screen remains a quiet discovery hub; gameplay starts only when you launch a game or open a publication experience.</p><div class="menu-items"><a href="./launcher.html">LAUNCHER CALIBRATION<small>System profile · performance settings</small></a><button id="menu-library">GAME LIBRARY<small>Generation 01</small></button><button id="menu-store">N.U STORE<small>Available purchases</small></button><button id="menu-wallet">◈ WALLET<small>Owned assets & transactions</small></button><a href="./exchange.html">N.U EXCHANGE<small>Generation 1 assets · change chart</small></a><a href="./pixel-art-studio.html">N.U CREATIVE STUDIO<small>Image analysis · pixel art · SVG &amp; GFX-IR</small></a><a href="./casino.html">N.U CASINO<small>Coin Flip · Lucky Dice · Mini Slots · virtual credits</small></a><button id="menu-profile">▣ PLAYER PROFILE<small>Historical card & experimental identity workshop</small></button><button id="menu-home">HOME WORLD<small>Camera & horizon</small></button><a href="https://medium.com/@The.World.of.Niroo.TWoN.N.C/n-u-bea66efc81e0">N.U PUBLICATION<small>Original source ↗</small></a><a href="https://medium.com/@Black.Fox.writes/niroo-univere-n-u-99081528028d">PUBLISHING NETWORK<small>Original source ↗</small></a></div></div></div>
 <div class="intro" id="intro"><div class="glass intro-panel"><button class="intro-close" id="intro-close" type="button" aria-label="Close field guide">×</button><div class="eyebrow">FIRST VISIT · FIELD GUIDE</div><h2>WELCOME TO N.U</h2><p>Open the menu to find the game library. Launch a game to begin a round of ten successful interactions. Missed clicks are harmless. Your XP and Mana are saved locally in this browser. The first version is experimental; do not clear browser storage if you want to keep this test save.</p><p id="calibration-status" class="calibration-status">CALIBRATING RENDER & CONNECTION · PLEASE WAIT</p><button class="btn primary" id="intro-start" disabled>CALIBRATING…</button></div></div>
 <script src="./nu-engine.js"></script><script src="./nu-graphics-core.js"></script><script src="./nu-background-engine.js?v=20261114-background-fullframe-r2"></script><script src="./nu-dynamic-layers.js"></script><script src="./nu-game-render-adapter.js"></script><script src="./nu-graphics-runtime.js"></script><script src="./nu-wallet.js?v=20261114-positive-assets-r1"></script><script src="./nu-materials.js?v=20261113-mana-materials-r1"></script><script src="./nu-games.js?v=20261114-zero-economy-display-r1"></script><script src="./nu-player-ui.js?v=20261114-wallet-ui-r1"></script>
 <div class="nu-gateway-scrim" aria-hidden="true"></div>
