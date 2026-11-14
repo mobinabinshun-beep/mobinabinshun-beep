@@ -5,31 +5,23 @@ const html = fs.readFileSync("index.html", "utf8");
 const css = fs.readFileSync("nu-world.css", "utf8");
 const playerUi = fs.readFileSync("nu-player-ui.js", "utf8");
 
-test("wallet tabs remain mounted before wallet panel content", () => {
-  const panel = html.indexOf('<div class="glass wallet-panel">');
-  const tabs = html.indexOf('class="wallet-card-tabs"');
-  const balances = html.indexOf('data-wallet-panel="balances"');
-  assert.ok(panel >= 0 && tabs > panel && balances > tabs);
-  assert.match(css, /\.wallet-card-tabs\{position:relative;z-index:0/);
+test("restores the first Gen1 display-only profile placeholder", () => {
+  assert.match(html, /<h2>N\.U PLAYER PROFILE<\/h2>/);
+  assert.match(html, /class="demo-avatar"/);
+  for (const id of ["demo-name","demo-call","demo-family","demo-age"]) assert.ok(html.includes('id="'+id+'"'));
+  assert.match(html, /DEMO ONLY · NO UPLOAD/);
+  assert.match(html, /Values are temporary and are not saved/);
 });
 
-test("classic Player ID card restores the original identity and progression layout", () => {
-  assert.match(html, /<h2>PLAYER ID CARD<\/h2>/);
-  assert.match(html, /class="wallet-hologram-title">PLAYER PROFILE/);
-  assert.match(html, /id="player-id"/);
-  assert.match(html, /id="player-display-name"/);
-  assert.match(html, /id="player-callsign"/);
-  assert.match(html, /id="player-level"/);
-  assert.match(html, /id="player-xp"/);
-  assert.match(html, /id="player-hp"/);
-  assert.match(html, /id="player-mana"/);
-  assert.match(html, /id="player-xp-progress"/);
-  assert.match(html, /id="player-identity-save"/);
-  assert.match(html, /id="player-identity-reset"/);
-  assert.match(playerUi, /function renderProfile\(\)/);
+test("the original profile uses the 150px image placeholder and two-column field grid", () => {
+  assert.match(css, /\.demo-profile-card\{display:grid;grid-template-columns:150px 1fr/);
+  assert.match(css, /\.demo-profile-fields\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+  assert.match(css, /@media\(max-width:600px\)\{\.demo-profile-card\{grid-template-columns:1fr\}/);
 });
 
-test("restored profile no longer exposes preview-mode or palette controls", () => {
-  assert.doesNotMatch(html, /profile-mode-switch|profile-palette-panel|player-rank-hue/);
-  assert.doesNotMatch(html, /nu-profile-preview\.js/);
+test("the historical profile remains transient and does not expose later identity/palette controls", () => {
+  assert.doesNotMatch(html, /player-id-number|player-rank-hue|profile-palette-panel|player-identity-save/);
+  assert.match(playerUi, /if\(!\$\("player-id"\)\)return/);
+  assert.match(playerUi, /demo-profile-warning/);
+  assert.match(playerUi, /demo-profile-close/);
 });
