@@ -609,3 +609,6 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 .demo-profile-card.high-contrast{background:#05090d!important;border:2px solid #fff;color:#fff;box-shadow:none}
 .demo-profile-card.high-contrast *{color:#fff!important;text-shadow:none!important}
 @media(prefers-reduced-motion:reduce){.demo-profile-card.has-ambient-motion{animation:none!important}}
+
+.demo-avatar[data-placement-mode=slot]::after{content:"PHOTO SLOT " attr(data-photo-slot);position:absolute;left:5px;right:5px;bottom:5px;padding:3px 4px;background:rgba(2,10,16,.78);color:#dff8ff;font:700 8px/1.3 ui-monospace,monospace;text-align:center}
+.demo-avatar{position:relative}
