@@ -1,0 +1,60 @@
+name: N.U graphics integrity
+on:
+  push:
+    paths:
+      - "index.html"
+      - "nu-background-engine.js"
+      - "nu-graphics-runtime.js"
+      - "nu-world.css"
+      - "assets/backgrounds/**"
+      - "archive/visual-layers/**"
+      - ".github/workflows/graphics-ci.yml"
+  pull_request:
+    paths:
+      - "index.html"
+      - "nu-background-engine.js"
+      - "nu-graphics-runtime.js"
+      - "nu-world.css"
+      - "assets/backgrounds/**"
+      - "archive/visual-layers/**"
+      - ".github/workflows/graphics-ci.yml"
+  workflow_dispatch:
+jobs:
+  graphics-integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify canonical background asset and runtime wiring
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s assets/backgrounds/niroo-universe-background.svg
+          grep -Fq 'const ASSET="./assets/backgrounds/niroo-universe-background.svg"' nu-background-engine.js
+          grep -Fq 'id="nu-background-image"' nu-background-engine.js
+          grep -Fq 'z-index:-3' nu-background-engine.js
+          grep -Fq '.sky{z-index:-4!important}' nu-world.css
+          ! grep -Fq 'nu-pixel-world.js' index.html
+          grep -Fq 'nu-background-engine.js' index.html
+          grep -Fq 'visualOverlays:"quarantined"' nu-graphics-runtime.js
+          test -s archive/visual-layers/nu-pixel-world.js
+          test -s archive/visual-layers/nu-dynamic-layers.js
+      - name: Check runtime JavaScript syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in nu-background-engine.js nu-graphics-runtime.js nu-graphics-core.js nu-dynamic-layers.js nu-game-render-adapter.js; do
+            node --check "$file"
+          done
+      - name: Validate canonical SVG wrapper
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const svg = fs.readFileSync('assets/backgrounds/niroo-universe-background.svg', 'utf8');
+          if (!/<svg\b/.test(svg)) throw new Error('Public background is not an SVG document');
+          if (!/data:image\/png;base64,/.test(svg)) throw new Error('Embedded source artwork is missing');
+          console.log('Canonical public SVG is present and contains its embedded artwork.');
+          NODE
