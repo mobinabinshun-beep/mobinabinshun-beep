@@ -171,7 +171,7 @@ $("image-file").addEventListener("change",async e=>{
   const before=snapshot(),previous={width,height,pixels,palette,imageImported,zoom:workspace.zoom,originalImportFile,sourceInfo:$("source-info").textContent,sourcePreviewHidden:$("source-preview-panel").hidden,sourcePreviewSrc:$("source-preview").src};
   let nextPreviewUrl=null;
   try{
-   nextPreviewUrl=URL.createObjectURL(file);
+   nextPreviewUrl=URL.createObjectURL(decodeSource);
    width=nextW;height=nextH;pixels=mapped;palette=extracted;imageImported=true;workspace.zoom=100;
    updateCanvasDisplay();render();
    $("image-width").value=width;$("image-height").value=height;
