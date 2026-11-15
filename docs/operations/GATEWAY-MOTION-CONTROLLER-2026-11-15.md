@@ -13,7 +13,7 @@ The prior controller was selection-first: hovering an option only highlighted it
 - Mouse/pen entering the hex opens Gateway and pauses the active round.
 - Touch contact on the hex opens Gateway immediately and pauses the active round.
 - While open, mouse/pen movement onto Back, Menu or Profile activates the hovered action without click or an intermediate selection.
-- Touch contact/movement onto an option activates it; pointer-up remains a compatibility fallback.
+- Touch contact/movement onto an option activates it; document-level coordinate hit-testing supports finger drags even when the browser implicitly captures the touch pointer; pointer-up remains a compatibility fallback.
 - Keyboard focus plus Enter and ordinary click remain fallback paths; they are not required for mouse/touch.
 - Moving outside the existing Gateway orbit closes it. Escape and scrim close remain available.
 - While open, the scrim intercepts page/game input. The game round, Background Engine, Dynamic Layers and Pixel World retain the existing freeze-event contract.
@@ -32,7 +32,7 @@ The prior controller was selection-first: hovering an option only highlighted it
 
 - `nu-hex-gateway.js` — hover-open trigger, touch-down open, hover/touch option activation, duplicate-activation guard.
 - `index.html` — updated controller cache token and movement-first hint.
-- `tests/nu-hex-gateway.test.js` — assertions for mouse/pen hover, touch contact, click-free activation and scrim blocking.
+- `tests/nu-hex-gateway.test.js` — assertions for mouse/pen hover, touch contact/drag hit-testing, click-free activation and scrim blocking.
 - `docs/operations/NU-OPS-IMPLEMENT-01.md` — authoritative Gateway input contract.
 - `docs/operations/GATEWAY-MENU-EXCHANGE-IMPLEMENTATION-2026-11-15.md` — corrected implementation behavior and test coverage.
 
