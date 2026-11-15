@@ -8,7 +8,9 @@
  function walletReader(){
   if(!root.NU||!root.NUWallet)throw new Error("Canonical N.U wallet is not available");
   const raw=root.NU.load(),save=root.NUWallet.normalizeSave(raw);
-  return {source:"nu-world-save-v1",player:{id:String(save.playerId||"LOCAL-PLAYER"),displayName:String(save.displayName||"N.U Explorer"),callsign:String(save.callsign||""),level:Number(save.level)||1},assets:root.NUWallet.assetRows(save).filter(a=>a.key!=="xCredits"&&a.key!=="nCredits"),unpricedFields:{xCredits:Number(save.xCredits)||0,nCredits:Number(save.nCredits)||0},transactions:Array.isArray(save.transactions)?save.transactions.slice(-10).reverse():[],transactionCount:Array.isArray(save.transactions)?save.transactions.length:0,mode:"LOCAL_READ_ONLY",readAt:new Date().toISOString()};
+  const excluded=new Set(["hp","hpPills","xCredits","nCredits"]),assets=root.NUWallet.exchangeAssetRows(save).filter(a=>!excluded.has(a.key)),eligibleKeys=new Set(assets.map(a=>a.key));
+  const transactions=(Array.isArray(save.transactions)?save.transactions:[]).map(tx=>{if(!tx||!tx.deltas)return null;const deltas={};Object.entries(tx.deltas).forEach(([key,value])=>{if(eligibleKeys.has(key)&&Number.isFinite(Number(value)))deltas[key]=Number(value);});return Object.keys(deltas).length?{...tx,deltas}:null;}).filter(Boolean).slice(-10).reverse();
+  return {source:"nu-world-save-v1",player:{id:String(save.playerId||"LOCAL-PLAYER"),displayName:String(save.displayName||"N.U Explorer"),callsign:String(save.callsign||""),level:Number(save.level)||1},assets,unpricedFields:{xCredits:Number(save.xCredits)||0,nCredits:Number(save.nCredits)||0},transactions,transactionCount:transactions.length,mode:"LOCAL_READ_ONLY",readAt:new Date().toISOString()};
  }
  function walletEngine(){return {read:walletReader,refresh(){const snapshot=walletReader();root.dispatchEvent(new root.CustomEvent("nu:exchange:wallet-refresh",{detail:snapshot}));return snapshot;}}}
  function cleanManifest(m){
