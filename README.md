@@ -493,3 +493,24 @@ The experimental profile keeps the restored historical four-field card as its ba
 
 ## Temporarily locked UI area
 The classic lower-left LV / XP / Mana resource bars are protected from incidental edits. All coding agents and contributors must read [AGENTS.md](./AGENTS.md) and [the lock record](./docs/operations/LOCKED-AREAS.md) before making changes. This area may only be changed after a new, explicit user instruction naming the classic resource bars.
+
+
+## Game notification module — reusable visual contract (2026-11-15)
+
+- Canonical module: `nu-game-notifications.js`, exposed as `window.NUGameNotifications` and loaded before `nu-games.js`.
+- The default visual signature is recovered from the original Generation 1.18 implementation (commit [655418f](https://github.com/mobinabinshun-beep/mobinabinshun-beep/commit/655418f95cd9a33075513cb41defeb0801ee8e7a)): `.floating-change` card geometry, gold loss / green HP tones, glow, shadow, and the `nu-floating-change` 1.75s rise-and-fade curve. The later Generation 1.19 commit [460bc77](https://github.com/mobinabinshun-beep/mobinabinshun-beep/commit/460bc773e1e8a55a04ff42f51c52acceca52ac1d) records the viewport-coordinate correction for overlays.
+- Default presets are: **object interaction** (`showInteraction`, anchored to the game stage/object and using the existing `.hit-progress` / `nu-hit-pop` signature); **bar delta** (`showBarDelta`, positioned at the current fill boundary and using the existing `.capsule-gain` / `capsule-rise` signature); **resource consumption** (`showConsumption`, a paired gold item-cost + green resource-gain card).
+- HP capsule consumption uses the two legacy floating cards, anchored by the live HP rail's viewport rectangle. The pair begins 4px below the rail; the existing 1.75s animation starts 18px below, settles at the rail edge, stays legible through 82%, then rises 22px while fading to zero at 100%. The two messages are `−1 CAPSULE HEAL` and the actual `+N HP` restored by the wallet.
+- The notification overlay is fixed to viewport coordinates so it is not clipped by the game stage. It is pointer-transparent, screen-width constrained, accessible through a polite live region, and honors reduced-motion preferences.
+- API: `NUGameNotifications.showInteraction({container,x,y,text,...})`, `showBarDelta({anchor,fill,text,tone,...})`, `showConsumption({anchor,itemDelta,resourceDelta,...})`, and `showFloating({anchor,text,tone,...})`.
+- Per-game customization is limited to explicit options such as text, tone, anchor, duration and offset. Keep the default motion curve and card styling unless a game-specific design requirement is documented; prefer filling preset data over copying or rewriting notification CSS.
+- Existing XP/Mana bar presentation and fill rules are not changed by this module; the bar-delta preset reuses their established notification classes. The classic resource HUD remains protected by `docs/operations/LOCKED-AREAS.md`.
+- See [the reusable notification system specification](./docs/game-development/GAME-NOTIFICATION-SYSTEM.md) for the full contract and extension examples.
+
+
+## Reusable game notification system (2026-11-15)
+
+- Added `nu-game-notifications.js` as the shared default module for object interactions, bar-boundary increments and resource-consumption feedback across games.
+- Restored the historical floating-card signature for HP capsule use: gold `−1 CAPSULE HEAL` plus green actual `+N HP`, anchored 4px below the HP rail and using the original 1.75s rise/hold/fade animation.
+- The module preserves the established `.hit-progress` and `.capsule-gain` presets for game-object and resource-bar feedback. See [the full module specification](docs/game-development/GAME-NOTIFICATION-SYSTEM.md).
+- Historical visual source: [Generation 1.18](https://github.com/mobinabinshun-beep/mobinabinshun-beep/commit/655418f95cd9a33075513cb41defeb0801ee8e7a); viewport anchoring reference: [Generation 1.19](https://github.com/mobinabinshun-beep/mobinabinshun-beep/commit/460bc773e1e8a55a04ff42f51c52acceca52ac1d).
