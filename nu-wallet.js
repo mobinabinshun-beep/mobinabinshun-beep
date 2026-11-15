@@ -36,7 +36,7 @@
   }
   function transaction(next,kind,title,deltas,meta){
     const details=meta||{};
-    const entry={id:String(details.id||("nu-tx-"+Date.now()+"-"+Math.random().toString(36).slice(2,8))),at:String(details.at||new Date().toISOString()),kind,title,deltas};
+    const entry={id:String(details.id||("nu-tx-"+Date.now()+"-"+Math.random().toString(36).slice(2,8))),at:String(details.at||new Date().toISOString()),kind,title,deltas};if(Array.isArray(details.exchangeExcludedKeys)&&details.exchangeExcludedKeys.length)entry.exchangeExcludedKeys=details.exchangeExcludedKeys.filter(k=>typeof k==="string");
     next.transactions=next.transactions.concat(entry).slice(-MAX_TRANSACTIONS);
     return entry;
   }
@@ -45,7 +45,7 @@
     if(next.xp<HP_PILL_COST)return {ok:false,reason:"INSUFFICIENT_XP",state:next};
     next.xp-=HP_PILL_COST;
     next.hpPills+=1;
-    const entry=transaction(next,"purchase","Golden HP Capsule",{xp:-HP_PILL_COST,hpPills:1},meta);
+    const entry=transaction(next,"purchase","Golden HP Capsule",{xp:-HP_PILL_COST,hpPills:1},Object.assign({},meta||{},{exchangeExcludedKeys:["hpPills"]}));
     return {ok:true,state:next,transaction:entry};
   }
   function useHpPill(raw,meta){
@@ -108,6 +108,16 @@
     }
     return rows.filter(row=>Number.isFinite(Number(row.value))&&Number(row.value)>0&&(row.key!=="manaCapsules"||Number(row.value)>1||s.mana>0));
   }
+  function isExchangeableAsset(raw,key){
+    if(typeof key!=="string"||!key)return false;
+    const s=normalizeSave(raw);
+    return !s.transactions.some(tx=>{
+      if(!tx||!tx.deltas)return false;
+      if(Array.isArray(tx.exchangeExcludedKeys)&&tx.exchangeExcludedKeys.includes(key))return true;
+      return tx.kind==="purchase"&&Number(tx.deltas[key])>0;
+    });
+  }
+  function exchangeAssetRows(raw){return assetRows(raw).filter(row=>isExchangeableAsset(raw,row.key));}
   function assetHistory(raw,key){
     const s=normalizeSave(raw),current=Number(s[key]);
     if(!Number.isFinite(current)||!["xp","mana","hp","hpPills","manaCapsules","casinoCredits"].includes(key))return [];
@@ -123,5 +133,5 @@
     if(!entries.length)points.push({id:"current",at:"",title:"Current balance · no recorded changes",delta:0,balance:current});
     return points;
   }
-  return {MAX_HP,HP_PILL_COST,MAX_TRANSACTIONS,normalizeSave,buyHpPill,useHpPill,grantXP,settleCasinoRound,registerAsset,registerGameAssets,assetRows,gameAssetRows,assetHistory};
+  return {MAX_HP,HP_PILL_COST,MAX_TRANSACTIONS,normalizeSave,buyHpPill,useHpPill,grantXP,settleCasinoRound,registerAsset,registerGameAssets,assetRows,exchangeAssetRows,isExchangeableAsset,gameAssetRows,assetHistory};
 });
