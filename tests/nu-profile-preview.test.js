@@ -13,17 +13,21 @@ test("public profile preview remains available as a separate view", () => {
   assert.match(html, /class="demo-profile-fields"/);
 });
 
-test("profile photo selection is a local preview, not a network upload", () => {
-  assert.match(html, /id="demo-card-image"[^>]*type="file"/);
-  assert.match(html, /id="demo-image-download"/);
-  assert.match(playerUi, /readAsDataURL/);
-  assert.match(playerUi, /NO FILE, SAVE OR NETWORK REQUEST CREATED/);
-  assert.doesNotMatch(playerUi, /fetch\s*\(|XMLHttpRequest/);
+test("profile photo actions remain an explicitly disabled, privacy-safe demo", () => {
+  assert.match(html, /id="demo-image-upload-preview"[^>]*type="button"/);
+  assert.match(html, /id="demo-image-download-preview"[^>]*type="button"/);
+  assert.match(html, /NO IMAGE IS READ, UPLOADED OR SAVED/);
+  assert.doesNotMatch(html, /<input[^>]+type="file"/);
+  assert.match(playerUi, /IMAGE UPLOAD AND RECOVERY ARE DISABLED/);
+  assert.doesNotMatch(playerUi, /readAsDataURL|fetch\s*\(|XMLHttpRequest/);
 });
 
-test("photo placement exposes eight independent positions", () => {
-  assert.equal((html.match(/data-demo-placement=/g) || []).length, 8);
-  assert.match(playerUi, /\[data-demo-placement\]/);
+test("profile preview keeps the compact two-action photo surface", () => {
+  assert.equal((html.match(/id="demo-image-(?:upload|download)-preview"/g) || []).length, 2);
+  assert.doesNotMatch(html, /data-demo-placement=/);
+  assert.doesNotMatch(html, /photo-placement-grid|2x4/);
+  assert.match(playerUi, /demo-image-upload-preview/);
+  assert.match(playerUi, /demo-image-download-preview/);
 });
 
 test("appearance comparison controls are present and explicitly staged", () => {
