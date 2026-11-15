@@ -47,3 +47,25 @@ test("wallet backdrop is one fixed CSS glow with no animation, blur or input cap
   assert.doesNotMatch(glow,/animation\s*:|filter\s*:|canvas|requestAnimationFrame|backdrop-filter\s*:/);
   assert.match(glow,/z-index:-1/);
 });
+
+
+test("Wallet, Profile and Store share the static Exchange-style neutral world backdrop",()=>{
+  assert.match(ui,/classList\\.toggle\\("nu-neutral-view-open",view===walletView\\|\\|view===profileView\\)/);
+  assert.match(ui,/classList\\.remove\\("nu-neutral-view-open"\\)/);
+  assert.match(games,/function showShop\\([\\s\\S]*?classList\\.add\\("nu-neutral-view-open"\\)/);
+  assert.match(games,/function closeShop\\([\\s\\S]*?classList\\.remove\\("nu-neutral-view-open"\\)/);
+  assert.match(games,/function showHome\\([\\s\\S]*?classList\\.remove\\("nu-neutral-view-open"\\)/);
+  assert.match(css,/body\\.nu-neutral-view-open \\.world\\{\\s*background:radial-gradient\\(ellipse at 50% -15%,#163448 0,transparent 55%\\),#071018!important/);
+  assert.match(css,/body\\.nu-neutral-view-open \\.world>#nu-dynamic-layers\\{\\s*display:none!important/);
+  assert.doesNotMatch(css,/nu-wallet-open|nu-neutral-view-open[^}]*animation/);
+});
+
+test("the four section backdrop stays static and does not disable section content",()=>{
+  const neutral=css.slice(css.lastIndexOf("/* N.U neutral scene mode"));
+  assert.doesNotMatch(neutral,/animation\\s*:|requestAnimationFrame|canvas\\s*\\{|filter\\s*:/);
+  assert.match(html,/id="wallet-view"/);
+  assert.match(html,/id="profile-view"/);
+  assert.match(html,/id="shop-view"/);
+  assert.match(html,/id="market-chart"/);
+  assert.match(html,/id="asset-chart"/);
+});
