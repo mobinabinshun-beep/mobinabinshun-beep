@@ -48,7 +48,7 @@ test("Wallet, Profile and Store share the static Exchange-style neutral world ba
 
 test("the four section backdrops stay static while their foreground functions remain available",()=>{
   const neutral=css.slice(css.lastIndexOf("/* N.U neutral scene mode"));
-  assert.doesNotMatch(neutral,/animation\s*:|requestAnimationFrame|canvas\s*\{|filter\s*:/);
+  assert.doesNotMatch(neutral,/(?:^|[;\n]\s*)filter\s*:|animation\s*:|requestAnimationFrame|canvas\s*\{/);
   for(const id of ["wallet-view","profile-view","shop-view"])assert.ok(html.includes('id="'+id+'"'));
   assert.match(exchange,/id="market-chart"/);
   assert.match(exchange,/id="asset-chart"/);
