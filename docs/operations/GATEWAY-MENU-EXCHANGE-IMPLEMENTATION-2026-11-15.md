@@ -181,3 +181,24 @@
 `backup/pre-gateway-menu-exchange-2026-11-15`
 
 هیچ force-push یا تغییری روی شاخهٔ پیش‌فرض انجام نشده است.
+
+
+## 12. تکمیل قفل Dynamic Layers در کاندیدای اصلی — 2026-11-15
+
+**شاخهٔ مبنا:** `feature/nu-exchange-complete-2026-11-15`  
+**شاخهٔ پشتیبان:** `backup/pre-dynamic-layers-freeze-2026-11-15`  
+**شاخهٔ اصلاح:** `fix/dynamic-layers-freeze-2026-11-15`
+
+### مشکل باقیمانده در کاندیدای اصلی
+در کاندیدای فعلی، تابع `resume()` از قبل `frozen` و `document.hidden` را بررسی می‌کرد؛ اما listener تغییر اندازه، `apply()` و `setMode()` هنوز می‌توانستند در زمان توقف، `resize()` و `renderStatic()` را اجرا کنند. بنابراین فریز در همهٔ مسیرهای ورود به رندر کامل نبود.
+
+### اصلاح
+- `renderStatic()` در حالت frozen یا hidden هیچ فریمی رسم نمی‌کند.
+- resize در حالت frozen/hidden به‌صورت pending ثبت می‌شود.
+- `apply()` و `setMode()` در حالت frozen/hidden فقط وضعیت pending را ثبت می‌کنند.
+- پس از unfreeze و visible شدن تب، resize معوق یک‌بار اجرا و سپس رندر از سر گرفته می‌شود.
+- رفتار Gateway، قوانین بازی، داده‌ها و HUD تغییر نمی‌کنند.
+
+### تست
+- تست رگرسیون برای تمام مسیرهای render/resume/resize/apply/mode افزوده شد.
+- CI و آزمون دستی پس از بازشدن PR ثبت خواهند شد.
