@@ -41,7 +41,7 @@ test("Gateway exposes only Back, Menu and Settings destinations", () => {
   assert.doesNotMatch(html, /data-action="(profile|store|wallet|casino|studio|library)"/);
   assert.match(js, /menu-open.*click/);
   assert.match(js, /window\.location\.href = "\.\/launcher\.html"/);
-  assert.match(js, /menu-home.*click/);
+  assert.match(js, /menu-home[\\s\\S]*?home\\.click/);
 });
 
 test("Touch activates on release; mouse hover and click confirmation stay distinct", () => {
