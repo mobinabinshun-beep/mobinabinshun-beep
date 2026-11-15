@@ -15,6 +15,11 @@
 <p>A fictional market simulation with trading-style charts. Every movement is derived only from your own locally saved wallet and asset activity. No real-world price, order book, or financial forecast is represented.</p>
 <div class="exchange-notice">100% FICTIONAL · N.U ACTIVITY ONLY · NO REAL-WORLD DATA OR VALUE</div>
 </section>
+<section class="exchange-panel wallet-bridge-panel">
+<div class="panel-heading"><div><p class="eyebrow">N.U WALLET BRIDGE</p><h2>PLAYER &amp; OWNED ASSETS</h2></div><span class="sim-tag">LIVE LOCAL CONNECTION</span></div>
+<div id="wallet-connection" aria-live="polite"><p class="panel-note">Connecting to the existing N.U wallet…</p></div>
+<p class="panel-note">This panel reads the existing local player save. It does not create a second wallet, modify balances, or enable cross-game settlement. Legacy XP remains unattributed where its source is unknown; X/N Credits are displayed as unpriced fields.</p>
+</section>
 <section class="market-panel">
 <div class="panel-heading"><div><p class="eyebrow">ACTIVITY-DRIVEN SIMULATION</p><h2>MARKET INDEX</h2></div><span class="sim-tag">SIMULATED · NOT A REAL PRICE</span></div>
 <div class="market-controls"><label for="market-asset">SELECT VIRTUAL ASSET</label><select id="market-asset"></select><span id="market-events">0 / 24 PLAYER STEPS</span><label for="chart-time-scale">REPLAY SCALE</label><select id="chart-time-scale"></select></div>
@@ -66,5 +71,5 @@
 </section>
 <footer class="exchange-footer">N.U — NIROO UNIVERSE · GENERATION 1 FICTIONAL ECONOMY</footer>
 </main>
-<script src="./nu-engine.js"></script><script src="./nu-wallet.js"></script><script src="./nu-exchange-core.js?v=20261114-modular-r1"></script><script src="./nu-exchange-guard.js?v=20261114-modular-r1"></script><script src="./nu-exchange-replay.js?v=20261114-modular-r1"></script><script src="./nu-exchange-lock.js?v=20261114-modular-r1"></script><script src="./nu-market-sim.js?v=20261114-exchange-wicks-r2"></script><script src="./nu-exchange.js?v=20261114-exchange-wicks-r2"></script>
+<script src="./nu-engine.js"></script><script src="./nu-wallet.js"></script><script src="./nu-exchange-core.js?v=20261115-wallet-bridge-r1"></script><script src="./nu-exchange-guard.js?v=20261114-modular-r1"></script><script src="./nu-exchange-replay.js?v=20261114-modular-r1"></script><script src="./nu-exchange-lock.js?v=20261114-modular-r1"></script><script src="./nu-market-sim.js?v=20261114-exchange-wicks-r2"></script><script src="./nu-exchange.js?v=20261115-wallet-bridge-r1"></script>
 </body></html>
