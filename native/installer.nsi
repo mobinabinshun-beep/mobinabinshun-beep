@@ -13,9 +13,9 @@ UninstPage instfiles
 Section "Install"
   SetShellVarContext current
   SetOutPath "$INSTDIR"
-  File "dist\NULauncher.exe"
-  File "dist\background.bmp"
-  File "dist\README.txt"
+  File "..\dist\NULauncher.exe"
+  File "..\dist\background.bmp"
+  File "..\dist\README.txt"
   CreateDirectory "$SMPROGRAMS\N.U Launcher"
   CreateShortCut "$SMPROGRAMS\N.U Launcher\N.U Launcher.lnk" "$INSTDIR\NULauncher.exe"
   CreateShortCut "$DESKTOP\N.U Launcher.lnk" "$INSTDIR\NULauncher.exe"
