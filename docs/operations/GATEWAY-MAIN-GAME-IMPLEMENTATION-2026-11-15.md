@@ -1,7 +1,8 @@
 # N.U Generation 1 — Main-game Gateway implementation record
 
 **Record:** NU-G1-GATEWAY-2026-11-15  
-**Status:** CANDIDATE — CI AND HUMAN DEVICE QA PENDING  
+**Status:** CANDIDATE — PR #113 OPEN; CI AND HUMAN DEVICE QA PENDING
+**Pull request:** https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/113  
 **Authorization:** Owner explicitly unlocked the Gateway on 2026-11-15 for the main game pages only.  
 **Target repository:** mobinabinshun-beep/mobinabinshun-beep
 
@@ -58,6 +59,9 @@ No shield meter was added. No shield state is fabricated.
 ## Validation and outstanding checks
 
 - Source-level assertions were updated in `tests/nu-hex-gateway.test.js`.
+- Static JavaScript parse checks passed for `nu-hex-gateway.js`, `nu-games.js`, and the updated test file.
+- Manifest JSON parsing and scoped-source assertions passed in the connector-side review.
+- GitHub Actions has not yet reported a workflow run for the PR head; the Node test suite is therefore still pending.
 - Automated CI result: PENDING — must be read from the candidate PR checks before merge.
 - JavaScript syntax/runtime and real-browser interaction: PENDING.
 - Desktop, Android/iOS touch, responsive layout, keyboard and reduced-motion human QA: PENDING.
