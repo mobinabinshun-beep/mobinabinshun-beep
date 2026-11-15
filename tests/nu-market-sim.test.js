@@ -49,3 +49,14 @@ test("market simulator retains only the latest 24 activity steps",()=>{
  assert.ok(result.candles.length<=24);
  assert.equal(market.MAX_CANDLES,24);
 });
+
+test("display-only candle tolerance is deterministic, bounded to five, and never changes close",()=>{
+ const save={transactions:[{id:"stable-event",at:"2026-11-14T12:00:00.000Z",deltas:{xp:-9}}]};
+ const first=market.build(save,"xp"),second=market.build(save,"xp"),candle=first.candles[0];
+ assert.equal(candle.visualTolerance,second.candles[0].visualTolerance);
+ assert.ok(candle.visualTolerance>=0&&candle.visualTolerance<=5);
+ assert.equal(candle.close,first.index);
+ assert.equal(candle.close,candle.open===candle.close?candle.close:candle.close);
+ assert.ok(candle.high>=Math.max(candle.open,candle.close));
+ assert.ok(candle.low<=Math.min(candle.open,candle.close));
+});
