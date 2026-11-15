@@ -18,7 +18,7 @@ Implementation on an isolated candidate:
 - document-level pointer/keyboard isolation blocks page handlers while open; wheel/context-menu and resize/orientation redraw paths are suppressed without disabling Gateway controls;
 - the existing scrim, pause ownership, route, scope and renderer event contracts are preserved.
 
-Files changed in the product candidate: nu-hex-gateway.js, nu-hex-gateway.css, index.html, tests/nu-hex-gateway.test.js, docs/operations/NU-OPS-IMPLEMENT-01.md, docs/operations/GATEWAY-MENU-EXCHANGE-IMPLEMENTATION-2026-11-15.md, plus the implementation record and this archive. The cross-repository product rationale was also corrected in mobinabinshun-beep/Repository (commit 39bd31f604ddb78b5a78405b0332698c4e5c3049). No game, HUD, wallet, save, economy or non-game runtime was changed.
+Files changed in the product candidate: nu-hex-gateway.js, nu-hex-gateway.css, index.html, tests/nu-hex-gateway.test.js, docs/operations/NU-OPS-IMPLEMENT-01.md, docs/operations/GATEWAY-MENU-EXCHANGE-IMPLEMENTATION-2026-11-15.md, plus the implementation record and this archive. The cross-repository product rationale was also corrected in mobinabinshun-beep/Repository (commit c3f70441d7f84483acf6bf257f1e45eb05715f84). No game, HUD, wallet, save, economy or non-game runtime was changed.
 
 Backup: backup/pre-gateway-motion-controller-2026-11-15  
 Candidate: fix/gateway-motion-controller-2026-11-15
