@@ -37,7 +37,7 @@ test("demo page loads the image-first engine and the engine points to the local 
 });
 
 test("background image is the deepest world layer while scene layers remain available above it", () => {
-  assert.match(engine, /z-index:0;overflow:hidden/);
+  assert.match(engine, /z-index:var\\(\\-\\-nu-layer-world-background,0\\);overflow:hidden/);
   assert.match(engine, /world\.insertBefore\(node,world\.firstChild\)/);
   assert.match(engine,/className="nu-world-background"/);
   assert.match(css, /world>\.sky\{position:absolute;z-index:1!important/);
