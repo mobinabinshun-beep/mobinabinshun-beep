@@ -74,3 +74,14 @@ body[data-palette=aurora]{--accent:#78d7e8;--positive:#70dfaa;--negative:#ff8b91
 body[data-theme=day] .chart-drawing-tools{background:rgba(255,255,255,.6)}
 @media(max-width:650px){.chart-drawing-tools{gap:6px}.chart-drawing-tools .drawing-tools-label{flex-basis:100%}.chart-drawing-tools button{flex:1 1 calc(33.333% - 8px);min-height:36px}.chart-drawing-tools small{font-size:8px}}
 @media(prefers-reduced-motion:reduce){.chart-drawing-tools button{transition:none}.chart-drawing-tools button:hover{transform:none}}
+
+
+/* Read-only bridge to the canonical local N.U wallet. */
+.wallet-bridge-panel{margin-bottom:18px}
+.wallet-connection-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin:8px 0 16px}
+.wallet-connection-head h2{margin:3px 0;font-size:clamp(20px,3vw,28px)}
+.wallet-asset-grid{grid-template-columns:repeat(auto-fit,minmax(135px,1fr));margin:12px 0}
+.wallet-asset-grid .exchange-card{min-height:74px}
+.wallet-unpriced{display:flex;gap:12px;flex-wrap:wrap;padding:12px;margin:12px 0 20px;border:1px dashed var(--line);border-radius:9px;color:var(--muted);font-size:12px}
+.wallet-unpriced strong{width:100%;color:var(--text)}
+@media(max-width:560px){.wallet-connection-head{display:block}.wallet-connection-head .sim-tag{display:inline-block;margin-top:8px}}
