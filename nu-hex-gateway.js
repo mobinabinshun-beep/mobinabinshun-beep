@@ -1,4 +1,4 @@
-/* N.U Hex Gateway — single-gate, single-action navigation for active gameplay */
+/* N.U Hex Gateway — movement-first navigation for active gameplay */
 (() => {
   "use strict";
   const root=document.getElementById("nu-hex-gateway");
@@ -9,7 +9,8 @@
   const trigger=root.querySelector(".nu-gateway-trigger");
   const items=[...root.querySelectorAll(".nu-gateway-item")];
   const pauseButton=document.getElementById("finish-round");
-  let open=false,pausedByGateway=false,selected=null,activationTimer=0,outsideSince=0,suppressClickUntil=0;
+  let open=false,pausedByGateway=false,selected=null,activationTimer=0,outsideSince=0;
+  let suppressClickUntil=0,suppressTriggerClickUntil=0;
 
   function syncGatewayScope(){
     const active=gameView.classList.contains("active");
@@ -26,8 +27,8 @@
     items.forEach((item,index)=>{
       item.tabIndex=open?0:-1;
       const angle=(112+index*step)*Math.PI/180;
-      item.style.setProperty("--gx",`${Math.cos(angle)*radius}px`);
-      item.style.setProperty("--gy",`${Math.sin(angle)*radius}px`);
+      item.style.setProperty("--gx",String(Math.cos(angle)*radius)+"px");
+      item.style.setProperty("--gy",String(Math.sin(angle)*radius)+"px");
     });
   }
   layoutItems();
@@ -84,25 +85,47 @@
   }
   function activate(item){
     const key=item.dataset.action,action=routes[key];
-    if(!action||!open)return;
+    if(!action||!open||item.classList.contains("is-confirming"))return;
     clearTimeout(activationTimer);
     item.classList.add("is-selected","is-confirming");
     activationTimer=window.setTimeout(()=>{
       setOpen(false,false);
       action();
-    },120);
+    },90);
   }
 
-  trigger.addEventListener("click",event=>{
-    event.preventDefault();setOpen(!open);
+  // Primary mode: mouse/pen hover opens the gate; touch contact opens it immediately.
+  trigger.addEventListener("pointerenter",event=>{
+    if(["mouse","pen"].includes(event.pointerType))setOpen(true);
   });
+  trigger.addEventListener("pointerdown",event=>{
+    if(event.pointerType!=="touch")return;
+    event.preventDefault();
+    suppressTriggerClickUntil=Date.now()+900;
+    setOpen(!open);
+  });
+  trigger.addEventListener("click",event=>{
+    event.preventDefault();
+    if(Date.now()<suppressTriggerClickUntil)return;
+    // A pointer click is not needed after hover-open; detail 0 preserves keyboard activation.
+    if(event.detail>0&&open)return;
+    setOpen(!open);
+  });
+
   items.forEach(item=>{
-    item.addEventListener("pointerenter",event=>{if(event.pointerType==="mouse"&&open)select(item);});
+    item.addEventListener("pointerenter",event=>{
+      if(!open)return;
+      if(["mouse","pen","touch"].includes(event.pointerType)){
+        if(event.pointerType==="touch")suppressClickUntil=Date.now()+900;
+        activate(item);
+      }
+    });
     item.addEventListener("focus",()=>select(item));
     item.addEventListener("pointerup",event=>{
       if(event.pointerType!=="touch"||!open)return;
       event.preventDefault();event.stopPropagation();
-      suppressClickUntil=Date.now()+900;activate(item);
+      suppressClickUntil=Date.now()+900;
+      activate(item);
     });
     item.addEventListener("click",event=>{
       event.preventDefault();event.stopPropagation();
@@ -111,6 +134,7 @@
     });
   });
 
+  // The scrim blocks every game/page control while the Gateway is paused.
   scrim.addEventListener("click",()=>setOpen(false));
   document.addEventListener("pointermove",event=>{
     if(!open||!["mouse","touch","pen"].includes(event.pointerType))return;
