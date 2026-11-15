@@ -61,8 +61,10 @@ No shield meter was added. No shield state is fabricated.
 - Source-level assertions were updated in `tests/nu-hex-gateway.test.js`.
 - Static JavaScript parse checks passed for `nu-hex-gateway.js`, `nu-games.js`, and the updated test file.
 - Manifest JSON parsing and scoped-source assertions passed in the connector-side review.
-- GitHub Actions has not yet reported a workflow run for the PR head; the Node test suite is therefore still pending.
-- Automated CI result: PENDING — must be read from the candidate PR checks before merge.
+- GitHub Actions PR checks: Gateway main-game regression PASSED (run #95); graphics preview smoke PASSED (#713); HUD layout regression PASSED (#114); graphics integrity PASSED (#292).
+- Two broader workflows failed outside this Gateway change: wallet/profile regression (#119) and Studio export regression (#524). Both report the same two profile-preview assertions: the old tests expect a file input and eight photo-placement controls, while the inspected base-branch profile markup has no `type="file"` input and no `data-demo-placement` controls. These files/features are outside this authorized scope and were not changed.
+- Overall CI is therefore NOT GREEN. Do not merge until the owner decides whether to leave the unrelated profile-test drift untouched or separately authorizes work on that area.
+- Static JavaScript parsing and scoped-source assertions passed; real browser behavior and human device QA remain pending.
 - JavaScript syntax/runtime and real-browser interaction: PENDING.
 - Desktop, Android/iOS touch, responsive layout, keyboard and reduced-motion human QA: PENDING.
 - GitHub Pages deployment: NOT CLAIMED.
