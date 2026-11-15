@@ -40,7 +40,7 @@ test("background image is the deepest world layer while scene layers remain avai
   assert.match(engine, /z-index:var\(--nu-layer-world-background,0\);overflow:hidden/);
   assert.match(engine, /world\.insertBefore\(node,world\.firstChild\)/);
   assert.match(engine,/className="nu-world-background"/);
-  assert.match(css, /world>\.sky\{position:absolute;z-index:var\\(--nu-layer-world-atmosphere,1\\)!important/);
+  assert.match(css, /world>\.sky\{position:absolute;z-index:var\(--nu-layer-world-atmosphere,1\)!important/);
   assert.match(html, /<div class="sky"><\/div>/);
   assert.doesNotMatch(css, /world\.nu-image-scene-active[\s\S]{0,180}display:none!important/);
 });
@@ -73,7 +73,7 @@ test("public demo exposes runtime diagnostics for the world background",()=>{
 });
 
 test("interactive page content is stacked above the isolated world background", () => {
-  assert.match(css, /\.world>\.nu-world-background\{[\s\S]*?z-index:var\\(--nu-layer-world-background,0\\)!important/);
-  assert.match(css, /\.world>\.shell\{position:relative!important;z-index:var\\(--nu-layer-world-content\\)!important/);
+  assert.match(css, /\.world>\.nu-world-background\{[\s\S]*?z-index:var\(--nu-layer-world-background,0\)!important/);
+  assert.match(css, /\.world>\.shell\{position:relative!important;z-index:var\(--nu-layer-world-content\)!important/);
   assert.match(css, /\.world>\.nu-world-background\{[^}]*pointer-events:none!important/);
 });
