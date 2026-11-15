@@ -45,3 +45,12 @@ test("HP capsule dock remains state-driven and reversibly animated", () => {
 test("no unsupported N-BI shield meter is introduced", () => {
   assert.ok(!html.includes('id="nbi-shield-bar"'));
 });
+
+test("HP HUD stays viewport-centred, top-pinned, bounded and entrance-animated", () => {
+  assert.ok(css.includes("HP HUD responsive anchor contract"));
+  assert.ok(css.includes("inset-inline-start:50%!important"));
+  assert.ok(css.includes("inset-block-start:max(8px,env(safe-area-inset-top,0px))!important"));
+  assert.ok(css.includes("width:min(340px,calc(100vw - 24px))!important"));
+  assert.ok(css.includes("@keyframes nu-hp-hud-enter"));
+  assert.ok(css.includes("@media(prefers-reduced-motion:reduce)"));
+});

@@ -714,3 +714,53 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 .world>.nu-world-background,.world>.sky,.world>#world-canvas,.world>#pixel-world,.world>.horizon,.world>.world-effects,#nu-dynamic-layers{
  pointer-events:none!important;
 }
+
+
+/* HP HUD responsive anchor contract: viewport-centred, top-pinned and bounded. */
+#game-view.active .hp-bar{
+ position:fixed!important;
+ inset-block-start:max(8px,env(safe-area-inset-top,0px))!important;
+ inset-inline-start:50%!important;
+ inset-inline-end:auto!important;
+ width:min(340px,calc(100vw - 24px))!important;
+ min-width:0!important;
+ max-width:calc(100vw - 24px)!important;
+ box-sizing:border-box!important;
+ margin:0!important;
+ transform:translate3d(-50%,0,0)!important;
+ transform-origin:top center;
+ overflow:visible;
+ contain:layout paint;
+ animation:nu-hp-hud-enter .52s cubic-bezier(.2,.8,.2,1) both;
+}
+#game-view.active .hp-bar .hp-track{
+ flex:1 1 auto!important;
+ width:auto!important;
+ min-width:0!important;
+ max-width:112px;
+}
+#game-view.active .hp-bar>span:first-child,
+#game-view.active .hp-bar #hp-value{
+ flex:0 0 auto;
+ font-size:clamp(8px,2.4vw,10px);
+}
+#game-view.active .hp-bar #hp-pill-use{
+ right:6px!important;
+ max-width:42px;
+}
+@keyframes nu-hp-hud-enter{
+ from{opacity:0;transform:translate3d(-50%,-10px,0) scale(.96)}
+ to{opacity:1;transform:translate3d(-50%,0,0) scale(1)}
+}
+@media(max-width:520px){
+ #game-view.active .hp-bar{
+  width:min(340px,calc(100vw - 16px))!important;
+  max-width:calc(100vw - 16px)!important;
+  padding-inline:9px 52px!important;
+  gap:clamp(5px,1.8vw,8px)!important;
+ }
+ #game-view.active .hp-bar .hp-track{min-width:24px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ #game-view.active .hp-bar{animation:none!important;transform:translateX(-50%)!important}
+}
