@@ -1,0 +1,80 @@
+name: N.U XP-first native launcher build
+on:
+  push:
+    paths:
+      - "native/**"
+      - "assets/backgrounds/niroo-universe-background.svg"
+      - ".github/workflows/xp-launcher-build.yml"
+  pull_request:
+    paths:
+      - "native/**"
+      - "assets/backgrounds/niroo-universe-background.svg"
+      - ".github/workflows/xp-launcher-build.yml"
+  workflow_dispatch:
+jobs:
+  build-x86:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install x86 Windows toolchain and NSIS
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-mingw-w64-i686 nsis python3-pil
+      - name: Extract the exact canonical image
+        run: python3 native/build.py
+      - name: Compile XP-subsystem x86 launcher
+        run: |
+          i686-w64-mingw32-gcc -Os -s -mwindows \
+            -DWINVER=0x0501 -D_WIN32_WINNT=0x0501 \
+            -Wl,--subsystem,windows:5.01 \
+            -Wl,--major-os-version,5,--minor-os-version,1 \
+            -static-libgcc native/launcher.c -o dist/NULauncher.exe \
+            -lshell32 -luser32 -lgdi32
+      - name: Verify executable format
+        run: |
+          file dist/NULauncher.exe
+          i686-w64-mingw32-objdump -p dist/NULauncher.exe | grep -E "Subsystem|MajorSubsystemVersion|MinorSubsystemVersion"
+      - name: Build offline per-user installer
+        run: makensis native/installer.nsi
+      - name: Create SHA-256 manifest
+        run: |
+          cd dist
+          sha256sum N.U-Launcher-Setup-x86.exe NULauncher.exe background.bmp README.txt > SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: N.U-XP-first-native-launcher-x86
+          path: |
+            dist/N.U-Launcher-Setup-x86.exe
+            dist/NULauncher.exe
+            dist/background.bmp
+            dist/README.txt
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 30
+
+  windows-smoke:
+    needs: build-x86
+    runs-on: windows-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: N.U-XP-first-native-launcher-x86
+          path: artifact
+      - name: Install, launch and uninstall the native package
+        shell: powershell
+        run: |
+          $setup = Join-Path $env:GITHUB_WORKSPACE "artifact/N.U-Launcher-Setup-x86.exe"
+          $install = Join-Path $env:LOCALAPPDATA "N.U Launcher"
+          if (!(Test-Path $setup)) { throw "Installer artifact is missing." }
+          Start-Process -FilePath $setup -ArgumentList "/S" -Wait
+          $exe = Join-Path $install "NULauncher.exe"
+          if (!(Test-Path $exe)) { throw "Silent install did not create NULauncher.exe." }
+          if (!(Test-Path (Join-Path $install "background.bmp"))) { throw "Canonical background image was not installed." }
+          $process = Start-Process -FilePath $exe -PassThru
+          Start-Sleep -Seconds 3
+          if ($process.HasExited) { throw "Launcher exited during the Windows smoke test." }
+          Stop-Process -Id $process.Id -Force
+          $uninstaller = Join-Path $install "Uninstall.exe"
+          if (!(Test-Path $uninstaller)) { throw "Uninstaller is missing." }
+          Start-Process -FilePath $uninstaller -ArgumentList "/S" -Wait
+          if (Test-Path $install) { throw "Silent uninstall did not remove the application directory." }

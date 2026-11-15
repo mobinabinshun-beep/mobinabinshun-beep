@@ -5,7 +5,7 @@ const fs=require("node:fs");
 const read=name=>fs.readFileSync(name,"utf8");
 const html=read("index.html"),casino=read("casino.html"),launcher=read("launcher.html"),studio=read("pixel-art-studio.html");
 const js=read("nu-hex-gateway.js"),css=read("nu-hex-gateway.css"),worldCss=read("nu-world.css");
-const games=read("nu-games.js"),graphics=read("nu-graphics-runtime.js"),exchange=read("nu-exchange.js"),dynamic=read("nu-dynamic-layers.js");
+const games=read("nu-games.js"),graphics=read("nu-graphics-runtime.js"),exchange=read("nu-exchange.js");
 
 test("Gateway controller is scoped only to active main-game view",()=>{
  assert.match(html,/id="nu-hex-gateway"/);
@@ -25,14 +25,12 @@ test("Gateway exposes exactly Back, Menu and Profile as one-click actions",()=>{
  assert.doesNotMatch(js,/clickArmed|hoverTimer|two-step|confirm\(item\)/);
 });
 
-test("Opening Gateway freezes the game and all ambient renderers until a decision",()=>{
+test("Opening Gateway leaves the static image untouched and keeps foreground navigation active",()=>{
  assert.match(js,/nu:gateway-open/);assert.match(js,/nu:gateway-close/);
- assert.match(games,/state\.engine\[frozen\?"pause":"resume"\]/);
  assert.match(games,/NUBackgroundEngine\.setFrozen/);
- assert.match(games,/NUDynamicLayers\.setFrozen/);
- assert.match(games,/NUPixelWorld\.setEnabled/);
+ assert.doesNotMatch(games,/NUDynamicLayers|NUPixelWorld|NU\.create/);
  assert.match(graphics,/nu-gateway-open/);
- assert.match(graphics,/NUDynamicLayers&&g\.NUDynamicLayers\.setFrozen/);
+ assert.doesNotMatch(graphics,/NUDynamicLayers|NUPixelWorld/);
  assert.match(js,/setOpen\(false,false\)/);
  assert.match(js,/nu:menu-dismissed/);
  assert.match(js,/nu:player-overlay-close/);
@@ -91,7 +89,9 @@ test("Gateway orbit exit bounds include the full vertical fan",()=>{
  assert.match(js,/event\.clientY>=rect\.top-orbit-tolerance&&event\.clientY<=rect\.bottom\+orbit\+tolerance/);
 });
 
-test("A hidden tab cannot restart frozen game or ambient renderers",()=>{
- assert.match(games,/gatewayOpen=document\.body\.classList\.contains\("nu-gateway-open"\)/);
- assert.match(dynamic,/function resume\(\)\{if\(!profile\|\|!active\|\|frozen\|\|document\.hidden\)return/);
+test("A hidden tab does not restart removed decorative background renderers",()=>{
+ assert.match(games,/document\.addEventListener\("visibilitychange"/);
+ assert.doesNotMatch(html,/nu-dynamic-layers\.js|nu-pixel-world\.js/);
+ assert.doesNotMatch(games,/NUDynamicLayers|NUPixelWorld/);
+ assert.doesNotMatch(graphics,/NUDynamicLayers|NUPixelWorld/);
 });

@@ -534,3 +534,14 @@ The three existing casino games now use spendable positive assets from the share
 The existing Coin Flip 2×, Lucky Dice 5×, Mini Slots triple 8× and pair 2× gross payout rules remain unchanged. Mana payouts respect the current storage capacity. Short round feedback respects reduced-motion preferences.
 
 See `docs/architecture/NU-CASINO-WALLET-BETTING-ECONOMY.md`. This is still local virtual demo activity only; no real-money deposits, withdrawals, cash-out or server-backed ledger exist. Add casino checks from `docs/testing/NU-PUBLIC-DEMO-WAVE-WALLET-HUMAN-QA.md` to the manual acceptance run.
+
+
+## Native N.U Launcher — XP-first candidate
+
+- Native x86 Win32 source: `native/launcher.c`
+- Offline per-user installer definition: `native/installer.nsi`
+- Canonical artwork is packaged from `assets/backgrounds/niroo-universe-background.svg` as one static image.
+- The launcher automatically selects a conservative local profile using CPU count and physical-memory signals.
+- The GitHub Actions workflow `.github/workflows/xp-launcher-build.yml` builds a setup executable and uploads a test artifact. [Latest successful build and modern Windows smoke test](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/43745436516).
+- **XP SP3 x86 execution has not yet been certified.** The web game is opened in the system browser and has a separate legacy-browser compatibility requirement.
+- Current implementation review: [PR #145](https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/145).

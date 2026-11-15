@@ -1,21 +1,23 @@
 # N.U approved background artwork
 
 ## Canonical source
-The exact owner-supplied PNG is stored in the private team archive:
-`NU-INGEST-ARCHIVE/ASSETS/NU-Celestial-City/Original reference image file for Niroo Universe (N.U).png`
+- Private source repository: `mobinabinshun-beep/Repository`
+- Source path: `Material/Background.svg`
+- Source Git blob SHA-1: `63dd85a479354406cc5739f4603ccc1d0989e5b0`
+- Artwork canvas: 1536 × 1024
+- Original owner-supplied image is embedded in the SVG source. Preserve the source bytes exactly.
 
-- Archive blob SHA: `d73afd484ef8b459c908c1942ee0f47d27f93aa5`
-- Archive size: 2,467,298 bytes
-- Archive repository visibility: private
+## Active public runtime copy
+- Exact path: `assets/backgrounds/niroo-universe-background.svg`
+- The public runtime copy is byte-identical to the canonical source (same Git blob SHA-1).
+- Active background engine: `nu-background-engine.js`
+- The engine displays this asset as one static image using `object-fit: contain`.
+- No procedural fallback, atmospheric compositor, particles, parallax, glow, blur, shader, or animated background layer is enabled in the XP-first static-image candidate.
 
-## Required public runtime copy
+## Preservation
+- Legacy procedural renderers remain preserved under `archive/visual-layers/`.
+- They are not loaded by the active `index.html` entry point.
+- Do not delete the canonical source or legacy archives.
+- Do not replace the original artwork with an unrelated image, crop, or re-encoded version.
 
-- Exact target path: `assets/nu-celestial-city.png`
-- Use the original PNG without cropping, blurring, palette reduction or lossy conversion.
-- The browser background engine now references this same-origin relative path.
-- Until the binary is uploaded here, the public demo will intentionally fall back to the prior procedural Generation 1 scene. This is why the image-first scene is not yet visible on the public website.
-
-## Upload required
-The original PNG must be uploaded to this public repository through GitHub's **Add file → Upload files** interface. The connected repository tools can update source files but do not provide a binary upload from the local chat attachment. Upload the original image to this folder with the exact filename `nu-celestial-city.png`. After the upload, the existing code will load it automatically on the next Pages deployment.
-
-Do not make the private archive public to solve this. Keep the archive as the canonical source and maintain this one public runtime copy for GitHub Pages.
+The native XP launcher and its installer are separate deliverables and remain unbuilt until the XP compatibility gates are passed.

@@ -3,16 +3,14 @@
   "generation": 1,
   "runtime": "N.U Adaptive Runtime",
   "runtimeVersion": "0.1-prototype",
-  "packageVersion": "0.5.5-gen1-wallet-casino-ladder",
+  "packageVersion": "0.5.6-gen1-static-image-candidate",
   "entry": "index.html",
   "modules": [
     "index.html",
     "nu-world.css",
     "nu-engine.js",
-    "nu-pixel-world.js",
     "nu-graphics-core.js",
     "nu-background-engine.js",
-    "nu-dynamic-layers.js",
     "nu-game-render-adapter.js",
     "nu-graphics-runtime.js",
     "nu-materials.js",
@@ -99,7 +97,8 @@
     "The nine Mana capsule upgrade levels and N-BI shot-cost reduction are not yet implemented; current Chaos shot still costs 10 Mana.",
     "The city layout is an art-direction proposal, not a canonical map. Published sources describe Niroo City as green, engineered, sustainable, and founded by Binam Binshun, but do not establish a definitive skyline layout.",
     "Generation 1.34 candidate: Exchange replay selectors use number-free seconds/minutes/hours/days/weeks/months labels; player controls chart zoom across the retained 24 local steps, grid, candle shadows, volume, moving-average overlays, day/night mode and packaged palettes. Candle wick tolerance is deterministic and display-only (up to ±5 N.U index points).",
-    "Exchange refinement: optional neutral-grey parametric dispersion bands show rolling mean ± one standard deviation from recorded candle closes; a local wallet-ledger change restarts the replay cursor and pulses the chart. Both are presentation-only."
+    "Exchange refinement: optional neutral-grey parametric dispersion bands show rolling mean ± one standard deviation from recorded candle closes; a local wallet-ledger change restarts the replay cursor and pulses the chart. Both are presentation-only.",
+    "Generation 1 static-image candidate (2026-11-15): the active entry page no longer loads the dynamic atmospheric compositor or procedural pixel-world renderer. The background engine loads the canonical public SVG as one static image with contain fitting; decorative layers are disabled. This is a source candidate only; browser visual acceptance and native XP launcher/installer remain separate gates."
   ],
   "rendering": {
     "pixelWorld": {
@@ -314,5 +313,13 @@
       "moduleContent": "rendered-on-destination-pages"
     },
     "future": "Other sections may receive their own access-controlled Gateway analogue only after separate approval."
+  },
+  "background": {
+    "mode": "single-static-image",
+    "asset": "assets/backgrounds/niroo-universe-background.svg",
+    "fit": "contain",
+    "decorativeLayers": 0,
+    "animation": false,
+    "legacyRenderers": "preserved but not loaded"
   }
 }
