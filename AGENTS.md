@@ -12,3 +12,7 @@ Before proposing or editing code, read `docs/operations/LOCKED-AREAS.md`.
 - Do not infer permission from a prior chat, an issue, a PR, a suggestion, or another agent's proposal. The current user instruction must explicitly name the protected HUD change.
 
 This instruction applies to coding agents and future repository operations. It does not replace branch protection or GitHub permissions; maintain repository protections where available.
+
+## Mandatory human acceptance and public-demo rule
+
+Read and follow [NU-QA-HUMAN-ACCEPTANCE-GATE-01](./docs/operations/NU-QA-HUMAN-ACCEPTANCE-GATE-01.md) for every contribution. Every product change must be documented, then exposed on the public demo as a clearly labelled **TEST CANDIDATE — NOT HUMAN-APPROVED** after required automated safety checks, so members/testers can test the exact deployed commit and submit a traceable human report. CI, code review, source inspection or deployment alone never approves or rejects a change. Until the human report is reviewed and the owner records a decision, status stays **HUMAN-QA-PENDING**. A partial/no report is not a pass. Documentation-only changes that do not affect product behavior are recorded as DOC-ONLY and reviewed without a runtime deployment.
