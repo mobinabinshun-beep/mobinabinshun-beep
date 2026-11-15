@@ -25,9 +25,9 @@ test("public runtime targets the documented PNG and validates it if transferred"
     assert.equal(gitBlobSha, "d73afd484ef8b459c908c1942ee0f47d27f93aa5");
   }
 });
-test("demo page loads the image-first engine and the engine points to the local public asset", () => {
+
+test("demo page loads the canonical local image engine", () => {
   assert.match(html, /<script src="\.\/nu-background-engine\.js(?:\?[^"]*)?"><\/script>/);
-  assert.match(engine, /const ASSET="\.\/assets\/nu-celestial-city\.png"/);
   assert.match(engine, /img\.onload=/);
   assert.match(engine, /nu-image-scene-active/);
   assert.match(engine, /img\.onerror=/);
@@ -36,43 +36,38 @@ test("demo page loads the image-first engine and the engine points to the local 
   assert.match(css, /\.world\.calibrated\{opacity:1/);
 });
 
-test("background image is the deepest world layer while scene layers remain available above it", () => {
+test("the canonical image is the only mounted world background element", () => {
   assert.match(engine, /z-index:var\(--nu-layer-world-background,0\);overflow:hidden/);
   assert.match(engine, /world\.insertBefore\(node,world\.firstChild\)/);
-  assert.match(engine,/className="nu-world-background"/);
-  assert.match(css, /world>\.sky\{position:absolute;z-index:var\(--nu-layer-world-atmosphere,1\)!important/);
-  assert.match(html, /<div class="sky"><\/div>/);
-  assert.doesNotMatch(css, /world\.nu-image-scene-active[\s\S]{0,180}display:none!important/);
+  assert.match(engine, /className="nu-world-background"/);
+  assert.doesNotMatch(html, /class="sky"|id="world-canvas"|id="pixel-world"|class="horizon"/);
+  assert.doesNotMatch(html, /nu-dynamic-layers\.js|nu-pixel-world\.js/);
 });
 
-test("procedural world renderer is restored as the failure fallback", () => {
-  assert.match(runtime, /if\(status\.loaded\)/);
-  assert.match(runtime, /NUPixelWorld&&g\.NUPixelWorld\.setEnabled&&g\.NUPixelWorld\.setEnabled\(true\)/);
-  assert.match(runtime, /NUDynamicLayers&&g\.NUDynamicLayers\.apply&&g\.NUDynamicLayers\.apply\(p\)/);
-  assert.match(html, /<script src="\.\/nu-pixel-world\.js"><\/script>/);
-  assert.match(runtime, /visualOverlays:status\.loaded\?"image-first":"procedural-fallback"/);
+test("image failure never starts a procedural fallback or decorative layer", () => {
+  assert.match(runtime, /visualOverlays:\s*"none"/);
+  assert.match(runtime, /imageOnly:\s*true/);
+  assert.match(runtime, /fallback:\s*status\.loaded\s*\?\s*null\s*:\s*"solid-color"/);
+  assert.doesNotMatch(runtime, /NUPixelWorld\.setEnabled\(true\)/);
+  assert.doesNotMatch(runtime, /NUDynamicLayers\.apply/);
+  assert.doesNotMatch(html, /<canvas id="(?:pixel-world|world-canvas)"/);
 });
 
-
-test("pixel-faithful review mode shows the full artwork and bounds camera exploration", () => {
+test("pixel-faithful image fit preserves the complete artwork without cropping", () => {
   assert.match(engine, /object-fit:contain/);
   assert.match(engine, /fit:"contain"/);
-  assert.match(engine, /cameraZoom=Math\.max\(1,Math\.min\(3/);
-  assert.match(engine, /artworkWidth=\(img\.naturalWidth\|\|width\)\*fit/);
   assert.match(css, /object-fit:contain!important/);
-  assert.match(css, /#nu-background-image:after\{display:none!important\}/);
-  assert.match(css, /--nu-camera-zoom/);
 });
 
-test("public demo exposes runtime diagnostics for the world background",()=>{
- assert.match(engine,/dataset.state="loading"/);
- assert.match(engine,/dataset.state="loaded"/);
- assert.match(engine,/dataset.state="error"/);
- assert.match(engine,/naturalWidth:img/);
- assert.doesNotMatch(html,/id="nu-background-diagnostics"/);
+test("public demo exposes image loading diagnostics", () => {
+  assert.match(engine, /dataset\.state="loading"/);
+  assert.match(engine, /dataset\.state="loaded"/);
+  assert.match(engine, /dataset\.state="error"/);
+  assert.match(engine, /naturalWidth:img/);
+  assert.doesNotMatch(html, /id="nu-background-diagnostics"/);
 });
 
-test("interactive page content is stacked above the isolated world background", () => {
+test("interactive page content remains above the isolated image", () => {
   assert.match(css, /\.world>\.nu-world-background\{[\s\S]*?z-index:var\(--nu-layer-world-background,0\)!important/);
   assert.match(css, /\.world>\.shell\{position:relative!important;z-index:var\(--nu-layer-world-content\)!important/);
   assert.match(css, /\.world>\.nu-world-background\{[^}]*pointer-events:none!important/);
