@@ -3,7 +3,7 @@
   "generation": 1,
   "runtime": "N.U Adaptive Runtime",
   "runtimeVersion": "0.1-prototype",
-  "packageVersion": "0.5.10-gen1-exchange-chart-controls",
+  "packageVersion": "0.5.11-gateway-single-gate-menu-exchange",
   "entry": "index.html",
   "modules": [
     "index.html",
@@ -32,7 +32,9 @@
     "nu-exchange-core.js",
     "nu-exchange-guard.js",
     "nu-exchange-replay.js",
-    "nu-exchange-lock.js"
+    "nu-exchange-lock.js",
+    "nu-exchange-visuals.js",
+    "nu-exchange-engines.js"
   ],
   "randomPool": [
     "bubble",
@@ -42,7 +44,8 @@
   "interactionsPerRound": 10,
   "save": {
     "provider": "localStorage",
-    "key": "nu-world-save-v1"
+    "key": "nu-world-save-v1",
+    "nonExchangeableAssets": "Persistent list of store-purchased asset keys that are not eligible for Exchange; retained independently of the rolling transaction history."
   },
   "delivery": {
     "browser": true,
@@ -50,6 +53,9 @@
     "native": "future adapter required"
   },
   "notes": [
+    "Generation 1 Exchange wallet bridge: reads the canonical nu-world-save-v1 profile, asset rows, unpriced X/N fields and recent transactions. Game manifests are discovered on launcher startup and reconciled after wallet saves / module inventory events. Protocol metadata only; no shadow wallet or settlement.",
+    "Generation 1 Exchange visual refinement: adds a restrained ambient background-flow animation derived from recent local economic behavior, bounded to ±3 index points and 3 display-volume units, plus player-drawn trend/horizontal/vertical lines and shaded analysis zones. All ambient pulses and drawings are presentation-only and never write wallet transactions.",
+    "Generation 1.35 candidate (2026-11-15): Gateway is the single in-game navigation gate with Back, Menu and Profile one-click actions. Opening it freezes the game round and all ambient renderers until a decision; duplicate in-game navigation buttons are hidden. The centered menu lists concise module titles with keyboard keycaps: player modules first, then Painting, Random Game and the three core games. Store-purchased assets are durably excluded from Exchange selectors and virtual market charts. Latest Exchange chart controls (zoom, grid, wicks, volume, moving average, themes, palettes and parametric bands) are preserved.",
     "Generation 1 unified profile workshop preview (2026-11-14): preserves the historical four-field card and exposes all current profile design alternatives for human comparison: hue, neutral white/dark tint, selected-color lightness and optional saturation; exact age, age band, both or no age; Bio and Interests; optional/local-identity-required/required public-card models; per-field privacy and share-consent preview; private-view YES/NO and fake passphrase flow; appearance-only, appearance-plus-fields and full lock policies; card/HUD/Wallet/hidden stats placement; holographic materials, typography, geometry, glow, transparency, scanlines, texture, motion, reduced effects, high contrast and device quality; local image fit and 2x4 crop-anchor/photo-slot semantics; recovery choices; platform and launcher delivery alternatives; local save, export protection, import validation and future sync models; reduced-effects and high-contrast accessibility previews. All are temporary preview controls that reset on close. No credentials are authenticated, no data is saved/exported/imported/recovered, no image is uploaded and no network sync/share occurs.",
     "Generation 1.33 candidate: Exchange now includes a fictional activity-driven virtual market simulator with OHLC candles, volume, demand/supply and N.U-only index; it derives every movement from the local player transaction ledger and never uses real-world financial data.",
     "Generation 1.32.1: remove duplicate legacy menu/back buttons from main-world internal views so the shared hex gateway is the single navigation entry point.",
@@ -178,7 +184,9 @@
       "nu-exchange-guard.js",
       "nu-exchange-replay.js",
       "nu-exchange-lock.js",
-      "nu-market-sim.js"
+      "nu-market-sim.js",
+      "nu-exchange-visuals.js",
+      "nu-exchange-engines.js"
     ],
     "assets": "Only wallet-backed Generation 1 assets are listed; no placeholder coin is invented.",
     "crossGameChange": "Prepared registry for Launcher game adapters; transfer settlement remains disabled until two compatible approved game adapters exist.",
@@ -198,7 +206,7 @@
     ],
     "cooldown": "Ten successful operations may complete in one Exchange visit; the 11th attempted operation starts a 120-second cooldown. Leaving before the 11th attempt resets the in-memory visit count.",
     "maintenanceLock": "Cross-game transfer module is locked by default. A two-step local maintenance latch is a UX safeguard only, not authentication or anti-cheat.",
-    "note": "Fictional N.U-only activity visualization. Replay animation changes presentation only and never fabricates wallet events or real-world financial data.",
+    "note": "Fictional N.U-only activity visualization. Replay speed changes presentation only and never fabricates wallet events or real-world financial data. Ambient flow is a bounded, player-behavior-shaped visual layer (±3 index points and at most 3 display-volume units) and is not recorded as transactions. Player chart annotations are local presentation preferences only.",
     "chartControls": {
       "zoomVisibleSteps": {
         "min": 4,
@@ -229,6 +237,80 @@
       "parametricBands": "rolling mean ± one standard deviation; display-only",
       "ledgerChangeResponse": "restart replay cursor and pulse chart on actual local transaction add/remove; no synthetic transactions"
     },
-    "visualWickTolerance": "Deterministic display-only range of up to ±5 N.U index points; it never changes candle close, wallet balances or transactions."
+    "visualWickTolerance": "Deterministic display-only range of up to ±5 N.U index points; it never changes candle close, wallet balances or transactions.",
+    "storePurchasePolicy": "Store-purchased assets are durably marked in save.nonExchangeableAssets and remain non-exchangeable even after the rolling 24-transaction history expires. They are excluded from wallet asset selectors, local balance history charts and the virtual market simulator. The purchased asset remains owned in the Wallet; the purchase currency debit remains an ordinary wallet transaction.",
+    "chartTools": {
+      "playerAnnotations": [
+        "trend-line",
+        "horizontal-line",
+        "vertical-line",
+        "shaded-zone"
+      ],
+      "annotationStorage": "Local chart preference only; keyed per asset; never written to wallet/save ledger.",
+      "ambientFlow": {
+        "source": "Recent local player activity profile",
+        "maxIndexDelta": 3,
+        "maxDisplayVolume": 3,
+        "ledgerWrites": false,
+        "syntheticEventsAreNotTransactions": true
+      }
+    },
+    "walletBridge": {
+      "engine": "nu-exchange-engines.js",
+      "source": "nu-world-save-v1",
+      "mode": "LOCAL_READ_ONLY",
+      "shadowWallet": false,
+      "settlement": false,
+      "refreshTriggers": [
+        "page-entry",
+        "nu:save-updated",
+        "storage",
+        "pageshow"
+      ]
+    },
+    "protocolLifecycle": {
+      "storage": "nu.exchange.protocols.v1",
+      "retentionDays": 30,
+      "launcherHooks": "NUExchangeModuleLifecycle.discover / reconcile; nu:launcher:modules-changed event",
+      "trustDefault": "DECLARED_UNVERIFIED",
+      "settlementEnabled": false
+    }
+  },
+  "navigation": {
+    "gateway": {
+      "scope": "active-main-game-only",
+      "actions": [
+        "back",
+        "menu",
+        "profile"
+      ],
+      "singleClickActivation": true,
+      "freezeOnOpen": [
+        "game-round",
+        "background-engine",
+        "dynamic-layers",
+        "pixel-world"
+      ],
+      "legacyInGameNavigation": "hidden-while-game-active"
+    },
+    "menu": {
+      "layout": "centered-modal-directory",
+      "contentPolicy": "titles-and-keyboard-keycaps-only",
+      "playerModules": [
+        "store",
+        "profile",
+        "exchange",
+        "wallet"
+      ],
+      "gameModules": [
+        "painting",
+        "random",
+        "bubble",
+        "mana",
+        "chaos"
+      ],
+      "moduleContent": "rendered-on-destination-pages"
+    },
+    "future": "Other sections may receive their own access-controlled Gateway analogue only after separate approval."
   }
 }
