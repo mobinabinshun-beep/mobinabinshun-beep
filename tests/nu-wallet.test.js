@@ -144,3 +144,6 @@ test("store-purchased asset exclusion survives the rolling 24-transaction ledger
   assert.ok(save.nonExchangeableAssets.includes("hpPills"));
   assert.ok(!wallet.exchangeAssetRows(save).some(row=>row.key==="hpPills"));
 });
+
+// Keep the Exchange wallet-reader and protocol lifecycle covered by the canonical wallet CI run.
+require("./nu-exchange-engines.test.js");
