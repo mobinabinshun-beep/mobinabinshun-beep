@@ -5,6 +5,7 @@ const fs=require("node:fs");
 const games=fs.readFileSync(require.resolve("../nu-games.js"),"utf8");
 const html=fs.readFileSync(require.resolve("../index.html"),"utf8");
 const css=fs.readFileSync(require.resolve("../nu-world.css"),"utf8");
+const notifications=fs.readFileSync(require.resolve("../nu-game-notifications.js"),"utf8");
 const wallet=require("../nu-wallet.js");
 
 test("HP capsule uses a direct native click listener for pointer, touch and keyboard activation",()=>{
@@ -164,17 +165,17 @@ test("HP pill action has a generous 48px hit target and no extra particle burst 
 });
 
 
-test("successful HP capsule use renders an accessible transaction notice inside the HP bar",()=>{
+test("successful HP capsule use renders accessible legacy transaction cards just below the HP bar",()=>{
   assert.match(games,/function announceHpBarTransaction\(\)/);
   assert.match(games,/itemDelta:"−1 CAPSULE HEAL"/);
   assert.match(games,/resourceDelta:"+10 HP"/);
   assert.match(games,/announceHpBarTransaction\(\)/);
-  assert.match(games,/notice\.setAttribute\("aria-live","polite"\)/);
+  assert.match(notifications,/root\.setAttribute\("aria-live","polite"\)/);
   assert.doesNotMatch(games,/hp-bar-transaction/);
 });
 
 test("HP transaction feedback remains separate from capsule drawer motion",()=>{
   assert.match(games,/function animateHpPillTravel\(direction\)/);
-  assert.match(games,/function announceHpBarTransaction\(restored\)/);
+  assert.match(games,/function announceHpBarTransaction\(\)/);
   assert.match(games,/announceHpBarTransaction\(\)/);
 });
