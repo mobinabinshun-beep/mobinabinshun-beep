@@ -85,3 +85,12 @@ body[data-theme=day] .chart-drawing-tools{background:rgba(255,255,255,.6)}
 .wallet-unpriced{display:flex;gap:12px;flex-wrap:wrap;padding:12px;margin:12px 0 20px;border:1px dashed var(--line);border-radius:9px;color:var(--muted);font-size:12px}
 .wallet-unpriced strong{width:100%;color:var(--text)}
 @media(max-width:560px){.wallet-connection-head{display:block}.wallet-connection-head .sim-tag{display:inline-block;margin-top:8px}}
+
+
+/* Wallet audit trail: restrained event feedback, never a balance mutation. */
+.audit-trail-panel{scroll-margin-top:16px}
+.wallet-audit-subsection{margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
+.audit-trail-panel.audit-updated{animation:wallet-audit-pulse .72s ease-out}
+@keyframes wallet-audit-pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 38%,transparent);border-color:var(--accent)}55%{box-shadow:0 0 0 7px color-mix(in srgb,var(--accent) 12%,transparent)}100%{box-shadow:0 0 0 14px transparent;border-color:var(--line)}}
+@media(max-width:560px){.wallet-audit-subsection{margin-top:16px;padding-top:14px}.audit-trail-panel .panel-heading{align-items:flex-start;gap:8px}.audit-trail-panel .panel-heading>span{font-size:9px;text-align:right}}
+@media(prefers-reduced-motion:reduce){.audit-trail-panel.audit-updated{animation:none;outline:1px solid var(--accent)}}
