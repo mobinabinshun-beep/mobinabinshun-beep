@@ -1,0 +1,25 @@
+name: N.U launcher adaptive startup smoke test
+on:
+  push:
+    paths:
+      - "nu-launcher.js"
+      - "launcher.html"
+      - "tests/nu-launcher-auto-adapt.test.js"
+      - ".github/workflows/launcher-adaptive-smoke.yml"
+  pull_request:
+    paths:
+      - "nu-launcher.js"
+      - "launcher.html"
+      - "tests/nu-launcher-auto-adapt.test.js"
+      - ".github/workflows/launcher-adaptive-smoke.yml"
+  workflow_dispatch:
+jobs:
+  adaptive-startup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --test tests/nu-launcher-auto-adapt.test.js
+      - run: node --check nu-launcher.js
