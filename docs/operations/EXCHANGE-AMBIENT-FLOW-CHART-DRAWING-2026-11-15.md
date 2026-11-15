@@ -66,3 +66,10 @@ Annotations are stored in local browser presentation preferences, keyed by selec
 - The Analysis line (moving average) and Parametric bands remain independently user-toggleable.
 - Trend line, horizontal level, vertical marker, and shaded analysis zone tools remain presentation-only and persist per selected asset in local browser preferences.
 - No annotation or ambient event can create an order, transaction, quote, or settlement.
+
+## Shared chart tape: indicators and event timeline
+- The market chart, indicator panel, and event timeline now consume the same visible candle sequence, including the current replay window and local ambient tail.
+- The live indicator panel calculates SMA 5, EMA 12, RSI 14, MACD (12/26) with a 9-period signal, and two-standard-deviation bands. Values are recalculated as the replay/ambient tape advances.
+- The timeline shows the newest eight events in reverse chronological order, with timestamp, direction, change, volume, close/index, and an explicit RECORDED or SIMULATED label.
+- Synthetic entries are never relabelled as player activity. Both indicators and timeline are descriptive display outputs only; they do not feed the wallet, transaction ledger, order execution, settlement, or price-setting.
+- Added analytics unit tests for indicator calculation, insufficient history handling, event-source separation, and page script ordering.
