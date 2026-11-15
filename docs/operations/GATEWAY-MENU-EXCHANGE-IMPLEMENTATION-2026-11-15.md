@@ -211,3 +211,21 @@
 - تست رگرسیون برای جلوگیری از render در حالت frozen/hidden افزوده شد.
 - workflow اکنون با تغییر renderer lifecycle هم اجرا می‌شود و syntax هر سه فایل را بررسی می‌کند.
 - وضعیت CI این شاخه پس از بازشدن PR باید ثبت شود؛ Human QA همچنان جداگانه در انتظار است.
+
+
+## 10. دیباگ ماژول Visuals در Exchange — 2026-11-15
+
+### خطای مشاهده‌شده در CI
+چهار تست در `tests/nu-exchange-visuals.test.js` با خطای `visuals.ambientMarket is not a function` شکست می‌خوردند. تابع `ambientMarket` در فایل پیاده‌سازی وجود داشت، اما از API ماژول export نشده بود. علاوه بر آن، صفحهٔ `exchange.html` فایل `nu-exchange-visuals.js` را پیش از `nu-exchange.js` بارگذاری نمی‌کرد؛ بنابراین ابزارهای ترسیم و جریان پس‌زمینه در مرورگر نیز به ماژول دسترسی نداشتند.
+
+### اصلاح
+- `ambientMarket` به API عمومی ماژول افزوده شد.
+- `exchange.html` اکنون `nu-exchange-visuals.js` را پیش از `nu-exchange.js` بارگذاری می‌کند.
+- تست API و ترتیب بارگذاری اسکریپت افزوده شد.
+- تابع‌های شبیه‌سازی و قواعد احتمالاتی تغییر نکرده‌اند؛ هیچ داده‌ای در Wallet یا تاریخچهٔ تراکنش نوشته نمی‌شود.
+
+### فایل‌های افزوده‌شده به دامنهٔ این دیباگ
+- `nu-exchange-visuals.js`
+- `exchange.html`
+- `tests/nu-exchange-visuals.test.js`
+- این سند اجرایی
