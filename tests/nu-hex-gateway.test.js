@@ -95,3 +95,13 @@ test("A hidden tab cannot restart frozen game or ambient renderers",()=>{
  assert.match(games,/gatewayOpen=document\.body\.classList\.contains\("nu-gateway-open"\)/);
  assert.match(dynamic,/function resume\(\)\{if\(!profile\|\|!active\|\|frozen\|\|document\.hidden\)return/);
 });
+
+
+test("Dynamic Layers never redraw during Gateway freeze, hidden tabs, resize or mode changes",()=>{
+ assert.match(dynamic,/let canvas=null,ctx=null,profile=null,[\s\S]*?particles=\[\],needsResize=false/);
+ assert.match(dynamic,/function renderStatic\(t\)\{\s*if\(!ctx\|\|!canvas\|\|frozen\|\|document\.hidden\)return/);
+ assert.match(dynamic,/window\.addEventListener\("resize",[\s\S]*?if\(frozen\|\|document.hidden\)\{needsResize=true;return;\}/);
+ assert.match(dynamic,/function apply\(p\)\{profile=p;active=true;mount\(\);if\(frozen\|\|document.hidden\)\{needsResize=true;return;\}/);
+ assert.match(dynamic,/function setMode\(next\)[\s\S]*?if\(frozen\|\|document.hidden\)\{needsResize=true;return;\}/);
+ assert.match(dynamic,/function resume\(\)\{if\(!profile\|\|!active\|\|frozen\|\|document.hidden\)return;if\(needsResize\)\{resize\(\);needsResize=false;\}/);
+});
