@@ -5,6 +5,10 @@
 **Target:** Windows XP compatibility first; broader Windows support where the selected runtime permits  
 **Status:** Image-only visual direction approved. Legacy host/runtime, canonical asset verification, RAM measurements, installer and real-device validation remain open.
 
+## Related implementation record
+
+- [XP host and real installer plan](./WINDOWS-XP-HOST-AND-INSTALLER-PLAN.md) — pinned legacy-runtime proof-of-concept, separate modern Windows lane, NSIS installer direction and explicit release blockers. This is a plan only; no native host or installer has been built.
+
 ## 1. Updated decision
 
 The earlier Windows 10/11 and Tauri 2/WebView2 recommendation is withdrawn as the baseline. Windows XP is now the oldest target and compatibility reference.
