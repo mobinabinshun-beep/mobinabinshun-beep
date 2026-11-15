@@ -9,7 +9,7 @@ let node=null,img=null,loaded=false,mode="ambient",frozen=false,cameraZoom=1;
 function mount(){
  if(node)return node;
  const world=document.querySelector(".world");if(!world)return null;
- node=document.createElement("div");node.id="nu-background-image";node.className="nu-world-background";node.dataset.mode=mode;node.dataset.state="loading";node.style.cssText="position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none";node.setAttribute("aria-hidden","true");
+ node=document.createElement("div");node.id="nu-background-image";node.className="nu-world-background";node.dataset.mode=mode;node.dataset.state="loading";node.style.cssText="position:absolute;inset:0;z-index:var(--nu-layer-world-background,0);overflow:hidden;pointer-events:none";node.setAttribute("aria-hidden","true");
  img=document.createElement("img");img.alt="";img.style.cssText="display:block;width:100%;height:100%;object-fit:contain;object-position:center;user-select:none";img.decoding="async";img.loading="eager";img.fetchPriority="high";img.draggable=false;
  img.onload=()=>{loaded=true;node.dataset.state="loaded";world.classList.add("nu-image-scene-active");node.classList.add("is-loaded");g.dispatchEvent(new Event("nu:background-ready"));};
  img.onerror=()=>{loaded=false;node.dataset.state="error";node.style.display="none";node.classList.add("asset-missing");g.dispatchEvent(new Event("nu:background-missing"));};

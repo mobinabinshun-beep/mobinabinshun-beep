@@ -471,3 +471,14 @@ The experimental profile keeps the restored historical four-field card as its ba
 - The player photo control lives inside the photo frame. The browser demo keeps the selected image in IndexedDB for recovery in the same browser profile and offers an explicit download copy. Browsers do not expose the original absolute desktop/gallery path or permit silent writes to arbitrary folders; the user chooses the download destination.
 - Hologram intensity, edge glow and glass transparency use bounded 0–100 numeric controls. Profile layout, card geometry and identity-card design are unchanged.
 - Future execution modes, wallet aggregation semantics, asset-profile types and terminology are archived in `docs/architecture/NU-PLAYER-IDENTITY-ASSETS-AND-EXECUTION-MODES.md`.
+
+
+## Mandatory UI layer and extension safety law
+
+**Background is background. It is never allowed to cover, move, alter, blur, hide, dim, or intercept interaction with foreground options and content.** This prohibition applies to all image layers, animations, effects, renderers, Gateway features and future extensions.
+
+- Normative protocol: [NU UI Layer, Rendering Isolation & Extension Safety Protocol](./docs/architecture/NU-UI-LAYER-AND-EXTENSION-ISOLATION-PROTOCOL.md)
+- The canonical world stack is background (0), atmosphere (1), decorative world effects (2), foreground page content (3).
+- Foreground safety is enforced by automated regression tests in `tests/nu-layer-contract.test.js` and the graphics CI workflow.
+- Extensions must be isolated, namespaced, budgeted and removable without modifying unrelated systems. Archived/museum features remain preserved and are not auto-loaded.
+- No merge, CI result or deployment is a final lock. Project-owner visual acceptance is required.

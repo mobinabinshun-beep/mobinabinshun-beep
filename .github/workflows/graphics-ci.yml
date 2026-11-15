@@ -6,6 +6,10 @@ on:
       - "nu-background-engine.js"
       - "nu-graphics-runtime.js"
       - "nu-world.css"
+      - "nu-hex-gateway.css"
+      - "tests/nu-layer-contract.test.js"
+      - "tests/nu-background-engine.test.js"
+      - "docs/architecture/NU-UI-LAYER-AND-EXTENSION-ISOLATION-PROTOCOL.md"
       - "assets/backgrounds/**"
       - "assets/nu-celestial-city.png"
       - "archive/visual-layers/**"
@@ -16,6 +20,10 @@ on:
       - "nu-background-engine.js"
       - "nu-graphics-runtime.js"
       - "nu-world.css"
+      - "nu-hex-gateway.css"
+      - "tests/nu-layer-contract.test.js"
+      - "tests/nu-background-engine.test.js"
+      - "docs/architecture/NU-UI-LAYER-AND-EXTENSION-ISOLATION-PROTOCOL.md"
       - "assets/backgrounds/**"
       - "assets/nu-celestial-city.png"
       - "archive/visual-layers/**"
@@ -36,9 +44,9 @@ jobs:
           grep -Fq 'const ASSET="./assets/nu-celestial-city.png"' nu-background-engine.js
           if [ -f assets/nu-celestial-city.png ]; then test -s assets/nu-celestial-city.png; else echo "Canonical PNG not yet transferred; procedural fallback must remain available."; fi
           grep -Fq 'id="nu-background-image"' nu-background-engine.js
-          grep -Fq 'z-index:0;overflow:hidden' nu-background-engine.js
+          grep -Fq 'z-index:var(--nu-layer-world-background,0);overflow:hidden' nu-background-engine.js
           grep -Fq 'world.insertBefore(node,world.firstChild)' nu-background-engine.js
-          grep -Fq 'world>.sky{position:absolute;z-index:1!important' nu-world.css
+          grep -Fq 'world>.sky{position:absolute;z-index:var(--nu-layer-world-atmosphere,1)!important' nu-world.css
           grep -Fq 'nu-pixel-world.js' index.html
           grep -Fq 'nu-background-engine.js' index.html
           grep -Fq 'visualOverlays:status.loaded?"image-first":"procedural-fallback"' nu-graphics-runtime.js
@@ -52,3 +60,5 @@ jobs:
           for file in nu-background-engine.js nu-graphics-runtime.js nu-graphics-core.js nu-dynamic-layers.js nu-game-render-adapter.js; do
             node --check "$file"
           done
+      - name: Enforce UI layer and foreground safety contract
+        run: node --test tests/nu-background-engine.test.js tests/nu-layer-contract.test.js
