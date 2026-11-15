@@ -482,3 +482,10 @@ The experimental profile keeps the restored historical four-field card as its ba
 - Foreground safety is enforced by automated regression tests in `tests/nu-layer-contract.test.js` and the graphics CI workflow.
 - Extensions must be isolated, namespaced, budgeted and removable without modifying unrelated systems. Archived/museum features remain preserved and are not auto-loaded.
 - No merge, CI result or deployment is a final lock. Project-owner visual acceptance is required.
+
+
+## Profile photo controls — demo privacy and future social profiles (2026-11-15)
+- The card's photo frame contains only two actions: Upload Image and Download Previous Image.
+- Both actions are visual-only in the public demo. No file picker, file reading, browser persistence, upload, or download is performed.
+- In an operational build, replacing an image first creates and offers a recoverable copy of the previous image; replacement proceeds only after recovery succeeds.
+- Private player albums and opt-in interactive profiles with other players/community members are archived as future server-backed capabilities, not demo functionality. See [the profile asset and execution architecture](docs/architecture/NU-PLAYER-IDENTITY-ASSETS-AND-EXECUTION-MODES.md).
