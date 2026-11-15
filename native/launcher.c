@@ -40,10 +40,11 @@ static void detect_system(void) {
     ZeroMemory(&os, sizeof(os));
     os.dwOSVersionInfoSize = sizeof(os);
     if (GetVersionExW((OSVERSIONINFOW *)&os)) {
-        wsprintfW(g_os, L"Windows %lu.%lu (build %lu)",
+        wsprintfW(g_os, L"Windows %lu.%lu (build %lu) %s",
                   (unsigned long)os.dwMajorVersion,
                   (unsigned long)os.dwMinorVersion,
-                  (unsigned long)os.dwBuildNumber);
+                  (unsigned long)os.dwBuildNumber,
+                  os.szCSDVersion[0] ? os.szCSDVersion : L"(service pack not reported)");
     }
 
     /* Missing telemetry always stays on the safe profile. */
@@ -152,7 +153,7 @@ static void paint_background(HWND hwnd, HDC dc) {
 static void show_system_info(HWND hwnd) {
     WCHAR message[512];
     wsprintfW(message,
-        L"%s\r\n\r\nProcessor count: %lu\r\nPhysical RAM: %I64u GB\r\nAvailable RAM: %I64u GB\r\nAutomatic profile: %s\r\nBackground image: %s\r\n\r\nThe profile is a conservative local estimate, not a performance guarantee.",
+        L"%s\r\nBuild architecture: x86\r\n\r\nProcessor count: %lu\r\nPhysical RAM: %I64u GB\r\nAvailable RAM: %I64u GB\r\nAutomatic profile: %s\r\nBackground image: %s\r\n\r\nThe profile is a conservative local estimate, not a performance guarantee.",
         g_os, (unsigned long)g_cpu_count, g_total_ram_gb, g_free_ram_gb,
         g_profile, g_image_loaded ? L"loaded" : L"not found (solid fallback)");
     MessageBoxW(hwnd, message, L"N.U System Information", MB_OK | MB_ICONINFORMATION);
