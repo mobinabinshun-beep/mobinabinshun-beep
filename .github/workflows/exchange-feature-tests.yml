@@ -31,6 +31,7 @@ jobs:
           node --check nu-exchange-core.js
           node --check nu-exchange-engines.js
           node --check nu-exchange-visuals.js
+          node --check nu-exchange-analytics.js
           node --check nu-games.js
       - name: Validate Generation 1 manifest
         run: node -e "JSON.parse(require('node:fs').readFileSync('NU-GENERATION-1-MANIFEST.json','utf8'))"
