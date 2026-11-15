@@ -1,152 +1,79 @@
-# N.U Windows Launcher — Visual & Rendering Baseline
+# N.U Windows Launcher — Legacy-First Visual & Runtime Baseline
 
 **Decision record:** NU-WIN-LAUNCHER-VISUAL-001  
 **Date:** 2026-11-15  
-**Target:** Windows 10/11, first downloadable Generation 1 launcher  
-**Status:** Rendering architecture selected from existing source; canonical artwork transfer and native packaging remain release blockers.
+**Target:** Windows XP compatibility first; broader Windows support where the selected runtime permits  
+**Status:** Image-only visual direction approved. Legacy host/runtime, canonical asset verification, RAM measurements, installer and real-device validation remain open.
 
-## 1. Decision summary
+## 1. Updated decision
 
-The first Windows launcher will preserve the existing N.U browser-first rendering stack. It will **not** introduce Three.js, Babylon.js, Unity, Unreal, or a new WebGL scene engine for Generation 1.
+The earlier Windows 10/11 and Tauri 2/WebView2 recommendation is withdrawn as the baseline. Windows XP is now the oldest target and compatibility reference.
 
-The selected visual composition is:
+The launcher visual is intentionally reduced to **one static canonical N.U image**: no animated or procedural background, pixel-world, atmosphere, particles, parallax, glow, camera motion, extra canvas, or decorative overlays. The image must preserve its aspect ratio. Foreground UI, buttons, calibration, text and navigation remain unchanged and interactive.
 
-1. The supplied N.U celestial-city artwork is the canonical, immutable background base.
-2. The existing N.U Background Engine loads that image as a non-interactive image layer.
-3. Existing Canvas 2D world/pixel rendering remains the fallback when the canonical image is unavailable or fails to load.
-4. Atmospheric motion remains a separate, optional Canvas 2D layer and must never replace or reconstruct the canonical artwork.
-5. Existing game rendering and its calibrated budget adapter remain independent of background decoration.
+If the image cannot load, show a neutral solid background and preserve launcher usability. Do not start a second renderer or invent a replacement image.
 
-This is the lowest-risk route because it reuses the actual Generation 1 source, keeps the current visual identity, and avoids a graphics migration during the first desktop packaging milestone.
+## 2. Background resources to disable
 
-## 2. Evidence from the current source
+The launcher image-only build must not start or mount the procedural pixel-world renderer, dynamic atmospheric compositor, particle/cloud/traffic effects, glow/parallax, background animation loops/timers, or background-specific canvases. Do not delete shared game-rendering modules merely to simplify the launcher; disable or exclude only the launcher integration actually used, after checking script references and regression tests.
 
-| Responsibility | Existing source | Observed implementation | Decision |
-|---|---|---|---|
-| Canonical background | `nu-background-engine.js` v0.4 | Loads `./assets/nu-celestial-city.png`; image-first; `object-fit: contain`; non-interactive background layer | Keep as the primary background path |
-| Pixel-world fallback | `nu-pixel-world.js` v0.2 | 480×270 Canvas 2D renderer; city, sky, land, traffic and ambient profiles; 12–24 FPS tiers; reduced-motion and hidden-tab handling | Keep as fallback, not as a second competing full scene |
-| Atmospheric compositor | `nu-dynamic-layers.js` v0.3 | Separate Canvas 2D glow, arcs and particles; budgeted particle count and overlay FPS | Keep optional and isolated; no input handling |
-| Shared graphics budget | `nu-graphics-core.js` | One capability profile; bounded levels; DPR, FPS, particle and canvas-pixel budgets | Keep as the sole shared budget source |
-| Runtime policy | `nu-graphics-runtime.js` | Uses canonical image when loaded; stops fallback renderers; otherwise enables pixel and dynamic fallback | Preserve image-first/fail-safe behavior |
-| Game presentation adapter | `nu-game-render-adapter.js` | Applies presentation-only CSS budgets to the existing game surface | Keep separate from game rules and wallet/save logic |
+The static image must be decorative, pointer-transparent, non-focusable and hidden from assistive technology when it conveys no information. This decision does not authorize edits to the locked classic LV/XP/Mana HUD or game rules.
 
-The launcher archive's browser calibration preview checks WebGL capability/limits, but that is a capability probe. It does not establish that the N.U world is currently rendered by WebGL. The inspected world and atmospheric renderers are Canvas 2D plus a canonical image layer.
+## 3. Canonical image
 
-## 3. Final visual direction for the first Windows build
+The existing Generation 1 background engine references assets/nu-celestial-city.png, but transfer of that asset into the public source tree was not verified. Before implementation, verify that the approved original exists at that path and matches the expected Git blob SHA in tests/nu-background-engine.test.js. Use the exact approved image without repainting or inventing a substitute.
 
-### 3.1 Background identity
+The launcher.html inspected for this decision currently uses a CSS gradient and does not show the canonical image being mounted. Therefore image-only launcher presentation is **not yet implemented** by this documentation update.
 
-- **Base:** N.U celestial-city reference artwork, unchanged and not procedurally repainted.
-- **Fit:** preserve the complete artwork using the current `contain` behavior; do not crop the canonical reference to fill arbitrary aspect ratios.
-- **Palette:** retain the existing restrained dark celestial blue, cool cyan and subdued warm-gold atmospheric accents already present in the project.
-- **Motion:** optional and subtle; the artwork itself remains stable. No permanent neon wash, aggressive camera movement, full-screen blur, or decorative layer over foreground text.
-- **Canon boundary:** the current procedural desert/forest/coast/river/farm arrangement is a visual proposal, not approved canonical geography. It must not be promoted as a definitive Niroo City map.
+## 4. Windows XP compatibility boundary
 
-### 3.2 Fallback scene
+Windows XP is a legacy, unsupported operating system. Lowering graphics settings alone cannot make a modern host compatible. The host, browser engine, JavaScript syntax, CSS features, TLS/network stack, installer format and system APIs must all be checked.
 
-If the canonical PNG is missing, corrupt, or fails to load:
+- Tauri 2 + WebView2 is withdrawn as the XP baseline; do not describe it as XP-compatible.
+- Do not assume current Chromium, Edge WebView2, Electron or modern .NET runtimes run on XP.
+- Select a legacy-compatible host/browser engine only after a proof-of-concept on a clean XP SP3 virtual machine and a representative low-spec device.
+- Any legacy browser/runtime must be isolated from sensitive browsing and must not be presented as secure for general Internet use.
+- Prefer local packaged assets and offline startup. Online features must fail gracefully when modern TLS or certificates are unavailable.
+- Keep a separate modern Windows build possible if the XP-compatible runtime cannot provide equivalent web/network capabilities.
 
-- keep the existing 480×270 pixel-world Canvas 2D renderer as the visible fallback;
-- allow the separate dynamic atmosphere only within the calibrated budget;
-- keep the page usable while fallback initialization occurs;
-- report the asset failure diagnostically without showing a frightening blocking error;
-- do not silently substitute a newly invented background image.
+The current launcher preview uses modern JavaScript syntax and browser APIs. It must not be assumed to parse or run on XP-era browsers without a compatibility audit and an appropriate legacy entry point or transpilation/polyfills.
 
-### 3.3 Foreground safety
+## 5. Provisional RAM target — not certified
 
-The mandatory world stack remains:
+No trustworthy measured RAM requirement or Windows XP installer build exists in the inspected repository. Browser memory hints are not process-level measurements. Use these as initial engineering test goals, not published compatibility guarantees:
 
-- layer 0 — canonical background image;
-- layer 1 — sky/atmosphere;
-- layer 2 — decorative world canvases and effects;
-- layer 3 — normal page shell and foreground content.
+| Metric | Provisional target |
+|---|---:|
+| Total system RAM for minimum test configuration | 512 MB |
+| Total system RAM recommended for XP test configuration | 1 GB |
+| Launcher incremental steady-state working set | <= 120 MB |
+| Launcher incremental startup peak working set | <= 180 MB |
+| Background workload | One static image; zero animation loops/canvases |
 
-All decorative layers must remain pointer-transparent, aria-hidden where appropriate, non-focusable, and isolated from foreground DOM. They must pause when hidden and honor reduced-motion. They may not alter the classic LV/XP/Mana HUD, menus, Gateway, wallet, profile, game controls, text contrast, or gameplay input.
+If the selected XP-compatible host cannot meet these goals, record actual measurements and revise the target rather than claiming success. Measure installer disk footprint separately; RAM and disk size are different requirements.
 
-## 4. Rendering-engine decision
+## 6. Low-resource operating policy
 
-**Selected for Generation 1: existing Canvas 2D + image compositor, with WebGL kept as a capability signal only.**
+Load only the local image and essential launcher UI. Do not create WebGL contexts, animation frames, canvas renderers, particle arrays or recurring background timers for the launcher. Avoid high-resolution image variants; test image decode memory on the minimum device. Do not require network access to display the launcher. Missing hardware information is unknown, not proof of capability or incompatibility. Never reduce foreground readability or hide controls to meet a memory target.
 
-Reasons:
-- It is already implemented and integrated with the existing world.
-- The 480×270 pixel renderer is intentionally low-resolution and inexpensive.
-- The canonical image path avoids reconstructing source artwork.
-- The graphics core already provides a single shared performance budget.
-- A new 3D engine would add package weight, shader/device compatibility work, new failure modes and regression scope without a demonstrated Generation 1 requirement.
+## 7. Required implementation and release gates
 
-No new renderer should be added unless a measured, approved requirement cannot be met by the existing stack. If a later generation needs true 3D scenes, evaluate that as a separate architecture decision and do not migrate Generation 1 as a side effect.
+- [ ] Verify the approved image file and expected blob SHA.
+- [ ] Replace the launcher CSS gradient with the single approved static image, preserving foreground layout and contrast.
+- [ ] Confirm no launcher background canvas, particle engine, parallax, glow or recurring visual timer is loaded.
+- [ ] Audit launcher JavaScript/CSS/APIs for the chosen XP-era runtime.
+- [ ] Produce a proof-of-concept on clean Windows XP SP3 without a modern unsupported WebView.
+- [ ] Measure idle and startup peak working set on 512 MB and 1 GB configurations.
+- [ ] Verify offline startup and graceful failure of unsupported online/TLS features.
+- [ ] Verify on supported newer Windows versions.
+- [ ] Run focused launcher, image, foreground-interaction and regression tests.
+- [ ] Record installer format, artifact hash, signing status, version, actual RAM/disk footprint and rollback path.
+- [ ] Obtain project-owner acceptance before calling any build a release.
 
-## 5. Windows host boundary
+## 8. Scope exclusions
 
-The renderer remains web-technology-based inside the desktop host. The Windows host is a packaging/runtime shell, not a reason to rewrite the game renderer.
+This decision does not authorize changes to the classic LV/XP/Mana HUD or its lock, game mechanics, XP/Mana/HP, wallet, saves or progression, protected capability sampler/network probe, Gateway/menu architecture, Generation 2, archived experiments, canonical artwork, package sandboxing, signed catalog, dependency resolver, auto-update or cloud services.
 
-**Recommended host candidate for implementation:** Tauri 2 using the Windows WebView2 runtime, with an explicit WebView2 bootstrap/availability check and a documented offline/first-run behavior. This is a recommendation for the packaging milestone, not a claim that Tauri, WebView2 deployment, signing, or an installer already exists in this repository.
+## 9. Acceptance statement
 
-The desktop shell must:
-- open the launcher calibration UI first;
-- not start game modules before the calibration gate is complete;
-- load local packaged assets using a stable app origin;
-- preserve the same image-first/fallback rendering policy;
-- avoid requiring an Internet connection merely to display the packaged background and local Generation 1 interface;
-- keep external publication links and online checks clearly separate from local rendering;
-- not grant games or future plugins broad native filesystem/process permissions.
-
-Before release, validate WebView2 availability, WebGL capability reporting, Canvas 2D output, DPI scaling, window resize, multi-monitor movement, sleep/resume, reduced motion, and GPU-driver fallback on real Windows 10/11 devices.
-
-## 6. Current blocker: canonical artwork is referenced but not verified in the public source tree
-
-The runtime points to `assets/nu-celestial-city.png`. The graphics CI workflow explicitly allows for the case where this asset has not yet been transferred, and the background test validates its expected Git blob only if the file exists.
-
-Therefore:
-- the design decision can be fixed now;
-- the exact canonical image cannot be declared packaged or verified from this source review;
-- do not create a replacement image or alter the asset path to conceal the missing transfer;
-- the original approved binary must be transferred into the public source at the expected path and verified against the expected blob SHA recorded by `tests/nu-background-engine.test.js`;
-- only after transfer should the Windows package embed it and the image-load/failure paths be tested.
-
-## 7. Performance policy
-
-Use the existing shared profile. Do not start a second benchmark in the desktop shell.
-
-When performance degrades, reduce optional effects in this order:
-1. decorative particle count;
-2. decorative update frequency;
-3. optional parallax/camera movement;
-4. optional glow/atmosphere;
-5. fallback scene update frequency/resolution within its existing safe policy.
-
-Never reduce foreground readability, change gameplay rules, alter rewards/economy, or change the classic resource HUD to compensate for a graphics budget.
-
-The current browser capability sampler is heuristic. It is not a native CPU/GPU benchmark and does not prove hardware safety. A Windows-native telemetry adapter may be considered separately after the first packaged build; it must not replace or mutate the protected Generation 1 sampler without a dedicated authorization/review.
-
-## 8. Required implementation and release gates
-
-- [ ] Transfer and verify the canonical artwork at `assets/nu-celestial-city.png`.
-- [ ] Build the Windows host around the existing launcher entry point.
-- [ ] Confirm local asset URLs resolve correctly in the packaged app.
-- [ ] Confirm calibration precedes game launch and no game starts automatically.
-- [ ] Confirm canonical image success and missing/corrupt-image fallback.
-- [ ] Run `node --check` on the graphics runtime files.
-- [ ] Run `node --test tests/nu-background-engine.test.js tests/nu-layer-contract.test.js`.
-- [ ] Run the graphics CI workflow.
-- [ ] Manually test Windows 10 and Windows 11, including WebView2, GPU-disabled/restricted mode, DPI scaling, resize, hidden/minimized resume, and reduced-motion.
-- [ ] Confirm foreground controls remain visible and interactive in every test.
-- [ ] Record installer artifact hash, signing status, version and rollback path.
-- [ ] Obtain project-owner visual acceptance before calling the build a release.
-
-## 9. Scope explicitly excluded from this decision
-
-This record does not authorize changes to:
-- the classic LV/XP/Mana HUD or its lock;
-- game mechanics, physics, XP/Mana/HP, wallet, saves or progression;
-- the protected capability sampler/network probe;
-- Gateway/menu architecture;
-- Generation 2 or archived experiments;
-- canonical artwork itself;
-- plugin/package sandboxing, signed catalog, dependency resolver, auto-update or cloud services.
-
-## 10. Acceptance statement
-
-For the first Windows launcher, the visual and rendering baseline is **canonical celestial-city image + existing Canvas 2D pixel-world fallback + optional budgeted Canvas 2D atmosphere**, governed by the existing shared graphics budget and foreground-safety protocol.
-
-The architecture choice is source-grounded. The canonical asset transfer, Windows host implementation, installer, signing, real-device tests and owner acceptance remain separate unfinished work and must be reported as such.
+The new direction is **one static canonical image and no background effects or renderer layers**, with Windows XP as the oldest compatibility target and low-spec Windows hardware as the performance reference. This is a documented design decision only. Image-only launcher CSS, XP-compatible runtime/installer, RAM measurements, compatibility testing and release acceptance remain unimplemented and unverified.
