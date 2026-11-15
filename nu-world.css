@@ -747,6 +747,6 @@ body.nu-neutral-profile .world{background:radial-gradient(ellipse at 50% -15%,rg
 body.nu-neutral-store .world{background:radial-gradient(ellipse at 50% -15%,rgba(190,145,72,.14) 0,transparent 48%),radial-gradient(ellipse at 50% -15%,#163448 0,transparent 55%),#071018!important}
 
 /* One short, three-pulse room-light impression on entry; opacity only, then fully static. */
-body.nu-neutral-view-open::after{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;background:rgba(225,245,255,.18);animation:nu-neutral-lamp-entry 900ms steps(1,end) 1 both}
+body.nu-neutral-view-open .world::after{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;background:rgba(225,245,255,.18);animation:nu-neutral-lamp-entry 900ms steps(1,end) 1 both}
 @keyframes nu-neutral-lamp-entry{0%,7%,16%,25%,34%,43%,100%{opacity:0}8%,15%{opacity:.42}26%,33%{opacity:.25}44%,51%{opacity:.12}}
-@media(prefers-reduced-motion:reduce){body.nu-neutral-view-open::after{animation:none;opacity:0}}
+@media(prefers-reduced-motion:reduce){body.nu-neutral-view-open .world::after{animation:none;opacity:0}}
