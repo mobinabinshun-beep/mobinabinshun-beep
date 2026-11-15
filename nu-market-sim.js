@@ -9,7 +9,7 @@
  "use strict";
  const ASSETS=[
   {key:"xp",label:"XP",unit:"N.U Index"},{key:"mana",label:"Mana",unit:"N.U Index"},
-  {key:"casinoCredits",label:"Casino Credits",unit:"N.U Index"},{key:"hpPills",label:"HP Capsules",unit:"N.U Index"},
+  {key:"casinoCredits",label:"Casino Credits",unit:"N.U Index"},
   {key:"manaCapsules",label:"Mana Capsules",unit:"N.U Index"}
  ];
  const BASE_INDEX=100,MAX_CANDLES=24,MAX_EVENTS=24;
