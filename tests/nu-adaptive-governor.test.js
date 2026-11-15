@@ -62,7 +62,7 @@ test("governor lowers the shared quality profile when frame pacing is poor", fun
 });
 
 test("governor raises quality only after three sustained headroom windows", function () {
-  const h = harness(2);
+  const h = harness(2, { level: 2, stableLevel: 5, calibration: { memoryClassGb: 4 } });
   h.runWindow(16.7);
   h.runWindow(16.7);
   assert.equal(h.win.NUGraphicsProfile.level, 2);
