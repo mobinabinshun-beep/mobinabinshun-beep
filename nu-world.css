@@ -691,7 +691,7 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 
 
 /* NU-UI-LAYER-01: keep the interactive document layer above the isolated world scene. */
-.world>.shell{position:relative!important;z-index:3!important;min-height:100vh}
+.world>.shell{position:relative!important;z-index:var(--nu-layer-world-content)!important;min-height:100vh}
 
 
 /* N.U UI Layer Constitution v1.0 — one shared, documented stacking scale. */
