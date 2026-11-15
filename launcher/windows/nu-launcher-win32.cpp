@@ -25,10 +25,14 @@ static void LoadBackground() {
     g_background = (HBITMAP)LoadImageA(NULL, path, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 }
 static void DetectMachine() {
-    OSVERSIONINFOA os;
+    OSVERSIONINFOEXA os;
     ZeroMemory(&os, sizeof(os));
     os.dwOSVersionInfoSize = sizeof(os);
-    if (GetVersionExA(&os)) {
+    HMODULE ntdll = GetModuleHandleA("ntdll.dll");
+    typedef LONG (WINAPI *RtlGetVersionFn)(OSVERSIONINFOEXA*);
+    RtlGetVersionFn rtlGetVersion = ntdll ? (RtlGetVersionFn)GetProcAddress(ntdll, "RtlGetVersion") : NULL;
+    if (rtlGetVersion) rtlGetVersion(&os); else GetVersionExA((OSVERSIONINFOA*)&os);
+    {
         if (os.dwMajorVersion == 5 && os.dwMinorVersion == 1) lstrcpyA(g_os, "Windows XP");
         else if (os.dwMajorVersion == 5) lstrcpyA(g_os, "Windows XP / Server 2003 family");
         else if (os.dwMajorVersion == 6 && os.dwMinorVersion == 0) lstrcpyA(g_os, "Windows Vista");
