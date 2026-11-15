@@ -181,3 +181,33 @@
 `backup/pre-gateway-menu-exchange-2026-11-15`
 
 هیچ force-push یا تغییری روی شاخهٔ پیش‌فرض انجام نشده است.
+
+
+## 9. دیباگ چرخهٔ توقف Gateway و بازگشت از تب — 2026-11-15
+
+**شاخهٔ پشتیبان:** `backup/pre-debug-gateway-visibility-2026-11-15`  
+**شاخهٔ اصلاح:** `fix/gateway-visibility-freeze-2026-11-15`
+
+### مشکل بازتولیدپذیر از روی کد
+- شنوندهٔ `visibilitychange` در `nu-games.js` هنگام visible شدن تب، موتور بازی را بدون بررسی بازبودن Gateway دوباره `resume()` می‌کرد.
+- `NUDynamicLayers.resume()` در `nu-dynamic-layers.js` حتی در وضعیت `frozen` یا `document.hidden` یک رندر ایستا اجرا می‌کرد.
+- رویداد resize و تغییر mode نیز می‌توانستند هنگام freeze، لایهٔ پویا را دوباره رسم کنند.
+
+### اصلاح محدود
+- بازگشت تب فقط وقتی Gateway بسته است، موتور بازی و حلقهٔ راند را ازسرمی‌گیرد.
+- لایهٔ پویا هنگام freeze/hidden هیچ فریم تازه‌ای رسم نمی‌کند.
+- resize یا mode change در زمان freeze فقط به‌عنوان کار معوق ثبت می‌شود و پس از رفع freeze اعمال می‌گردد.
+- هیچ تغییری در قوانین بازی، XP/Mana/HP، Wallet، save schema، Exchange یا HUD کلاسیک انجام نشده است.
+
+### فایل‌های اصلاح‌شده
+- `nu-games.js`
+- `nu-dynamic-layers.js`
+- `tests/nu-hex-gateway.test.js`
+- `.github/workflows/gateway-main-game.yml`
+- این سند اجرایی
+
+### آزمون‌ها
+- تست رگرسیون برای بازگشت از تب در حالی که Gateway باز است افزوده شد.
+- تست رگرسیون برای جلوگیری از render در حالت frozen/hidden افزوده شد.
+- workflow اکنون با تغییر renderer lifecycle هم اجرا می‌شود و syntax هر سه فایل را بررسی می‌کند.
+- وضعیت CI این شاخه پس از بازشدن PR باید ثبت شود؛ Human QA همچنان جداگانه در انتظار است.
