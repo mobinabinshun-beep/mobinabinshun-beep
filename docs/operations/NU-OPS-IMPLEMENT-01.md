@@ -15,8 +15,9 @@ For every instruction such as «اعمال کن»، «پیاده کن»، «فی
 5. Before editing, list the intended files and observable effects. If the request could change unrelated screens or behavior, ask one clarification before proceeding.
 6. Run syntax checks and relevant regression tests. Review the complete diff for unrelated changes, accidental formatting/reflow, cache/version mistakes and documentation drift.
 7. Record the request, exact files, decisions, backup ref, candidate ref, tests, limitations and rollback method in a dated conversation archive and implementation record.
-8. Open a PR with a narrow scope and test evidence. Merge/deploy only after the requested scope and required CI checks are satisfied. Label human QA separately from CI.
-9. Preserve candidate branches, CI evidence and rollback information after merge.
+8. Open a PR with a narrow scope and test evidence. After required automated safety checks pass, publish the exact candidate commit to the public demo/preview as **TEST CANDIDATE — NOT HUMAN-APPROVED**, with version/commit visible and a human report route. Do not treat this test deployment as approval or final release.
+9. Collect traceable human reports for the actual deployed commit. Fix failures on a new candidate and repeat affected tests. Keep the state HUMAN-QA-PENDING until the human owner records APPROVED or REJECTED after report review. Only then promote/merge to the stable release path. See [NU-QA-HUMAN-ACCEPTANCE-GATE-01](./NU-QA-HUMAN-ACCEPTANCE-GATE-01.md).
+10. Preserve candidate branches, CI evidence, human reports and rollback information after promotion.
 
 ## 3. Explicit freeze lock — Gateway icon
 **LOCK ID:** NU-LOCK-GATEWAY-ICON-01  
