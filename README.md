@@ -432,6 +432,7 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 
 - [N.U Implementation & Calibration Protocol](./docs/operations/NU-OPS-IMPLEMENT-01.md)
 - [Human-test report template](./docs/operations/HUMAN-TEST-REPORT-TEMPLATE.md)
+- **[MANDATORY: Human Acceptance & Public Demo Test Gate](./docs/operations/NU-QA-HUMAN-ACCEPTANCE-GATE-01.md)** — every product change is documented and exposed as an unapproved public-demo test candidate after automated safety checks; human reports are required before approval/rejection or stable promotion.
 
 
 ## Generation 1 — Exchange and asset-change chart (candidate)
