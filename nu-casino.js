@@ -22,7 +22,7 @@ function render(){
   select.replaceChildren();
   if(!rows.length){const option=document.createElement("option");option.value="";option.textContent="No spendable wallet assets";select.appendChild(option);}
   rows.forEach(row=>{const option=document.createElement("option");option.value=row.key;option.textContent=row.label+" · "+Number(row.value).toLocaleString();select.appendChild(option);});
-  select.value=selectedAsset||"";
+  select.value=selectedAsset||"";select.disabled=busy||!rows.length;
  }
  const row=selected(),available=balance(),max=maximumBase();
  $("casino-balance-label").textContent=row?(row.label.toUpperCase()+" · WALLET BALANCE"):"NO SPENDABLE WALLET ASSETS";
@@ -30,7 +30,7 @@ function render(){
  $("casino-balance-unit").textContent=row?"LOCAL WALLET · "+row.label+" · NO MONETARY VALUE":"Earn or acquire a supported wallet asset in the N.U demo first.";
  $("casino-stake").max=String(Math.max(1,max));$("casino-stake-number").max=String(Math.max(1,max));
  if(max>0)baseStake=Math.max(1,Math.min(baseStake,max));else baseStake=1;
- $("casino-stake").value=String(baseStake);$("casino-stake-number").value=String(baseStake);$("casino-stake").disabled=max<1;$("casino-stake-number").disabled=max<1;
+ $("casino-stake").value=String(baseStake);$("casino-stake-number").value=String(baseStake);$("casino-stake").disabled=busy||max<1;$("casino-stake-number").disabled=busy||max<1;$("dice-guess").disabled=busy;document.querySelectorAll("[data-coin]").forEach(button=>button.disabled=busy);
  $("casino-stake-label").textContent=String(baseStake);
  $("casino-effective-stake").textContent=String(effectiveStake());
  $("casino-effective-unit").textContent=row?row.label:"units";
@@ -42,8 +42,8 @@ function setBaseStake(value){
  const parsed=Math.floor(Number(value));baseStake=Math.max(1,Math.min(max,Number.isFinite(parsed)?parsed:1));render();
 }
 function wager(){return effectiveStake();}
-function settle(game,payout,detail){
- const stake=wager(),asset=selectedAsset,roundId="nu-casino-round-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,8);
+function settle(game,payout,detail,assetOverride,stakeOverride){
+ const stake=Number.isSafeInteger(stakeOverride)?stakeOverride:wager(),asset=assetOverride||selectedAsset,roundId="nu-casino-round-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,8);
  const result=NUWallet.settleWalletBet(save,asset,stake,payout,{roundId,gameId:game,game,detail});
  if(!result.ok){$("casino-status").textContent="Round not settled · "+result.reason+". No wallet balance changed.";return false;}
  if(!persist(result.state))return false;
@@ -63,12 +63,12 @@ function settle(game,payout,detail){
 function runRound(button,resultNode,game,resolve){
  if(busy)return;
  if(!selected()||wager()<1||wager()>balance()){$("casino-status").textContent="Choose a valid base wager within the selected wallet balance.";render();return;}
- busy=true;const card=button.closest(".game-card");card.classList.remove("is-result","is-running");card.classList.add("is-starting");resultNode.textContent="ROUND STARTING…";render();
+ busy=true;const roundAsset=selectedAsset,roundStake=wager(),card=button.closest(".game-card");card.classList.remove("is-result","is-running");card.classList.add("is-starting");resultNode.textContent="ROUND STARTING…";render();
  window.setTimeout(()=>{
   card.classList.remove("is-starting");card.classList.add("is-running");resultNode.textContent="BET IN PLAY…";
   window.setTimeout(()=>{
-   const outcome=resolve();resultNode.textContent=outcome.message;
-   settle(game,outcome.payout,outcome.detail);
+   const outcome=resolve(roundStake);resultNode.textContent=outcome.message;
+   settle(game,outcome.payout,outcome.detail,roundAsset,roundStake);
    card.classList.remove("is-running");card.classList.add("is-result");
    window.setTimeout(()=>card.classList.remove("is-result"),420);
    busy=false;render();
@@ -81,19 +81,19 @@ document.querySelectorAll("[data-coin]").forEach(button=>button.addEventListener
 $("casino-currency").addEventListener("change",event=>{selectedAsset=event.target.value||null;ladderStep=0;baseStake=1;render();});
 $("casino-stake").addEventListener("input",event=>setBaseStake(event.target.value));
 $("casino-stake-number").addEventListener("change",event=>setBaseStake(event.target.value));
-$("coin-play").addEventListener("click",event=>runRound(event.currentTarget,$("coin-result"),"Coin Flip",()=>{
+$("coin-play").addEventListener("click",event=>runRound(event.currentTarget,$("coin-result"),"Coin Flip",stake=>{
  const outcome=Math.random()<.5?"heads":"tails",won=outcome===coinCall;
- return {payout:won?wager()*2:0,detail:"Landed "+outcome.toUpperCase(),message:"🪙 "+outcome.toUpperCase()+" · "+(won?"YOU WIN":"NOT THIS TIME")};
+ return {payout:won?stake*2:0,detail:"Landed "+outcome.toUpperCase(),message:"🪙 "+outcome.toUpperCase()+" · "+(won?"YOU WIN":"NOT THIS TIME")};
 }));
-$("dice-play").addEventListener("click",event=>runRound(event.currentTarget,$("dice-result"),"Lucky Dice",()=>{
+$("dice-play").addEventListener("click",event=>runRound(event.currentTarget,$("dice-result"),"Lucky Dice",stake=>{
  const roll=1+Math.floor(Math.random()*6),guess=Number($("dice-guess").value),won=roll===guess;
- return {payout:won?wager()*5:0,detail:"Rolled "+roll+" · guessed "+guess,message:"🎲 ROLLED "+roll+" · "+(won?"EXACT MATCH":"NO MATCH")};
+ return {payout:won?stake*5:0,detail:"Rolled "+roll+" · guessed "+guess,message:"🎲 ROLLED "+roll+" · "+(won?"EXACT MATCH":"NO MATCH")};
 }));
-$("slot-play").addEventListener("click",event=>runRound(event.currentTarget,$("slot-result"),"Mini Slots",()=>{
+$("slot-play").addEventListener("click",event=>runRound(event.currentTarget,$("slot-result"),"Mini Slots",stake=>{
  const reels=Array.from({length:3},()=>symbols[Math.floor(Math.random()*symbols.length)]);
  $("slot-reels").replaceChildren(...reels.map(symbol=>{const span=document.createElement("span");span.textContent=symbol;return span;}));
  const counts=reels.reduce((acc,symbol)=>(acc[symbol]=(acc[symbol]||0)+1,acc),{}),max=Math.max(...Object.values(counts)),mult=max===3?8:max===2?2:0;
- return {payout:wager()*mult,detail:reels.join(" "),message:mult===8?"THREE OF A KIND · 8×":mult===2?"A PAIR · 2×":"NO MATCH"};
+ return {payout:stake*mult,detail:reels.join(" "),message:mult===8?"THREE OF A KIND · 8×":mult===2?"A PAIR · 2×":"NO MATCH"};
 }));
 function resetLadder(){ladderStep=0;baseStake=1;}
 window.addEventListener("pagehide",resetLadder);
