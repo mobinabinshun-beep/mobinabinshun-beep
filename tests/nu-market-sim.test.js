@@ -84,3 +84,5 @@ test("durable purchase exclusion survives the rolling transaction ledger",()=>{
 
 // Keep ambient Exchange flow and player chart drawing covered by the market-simulation CI run.
 require("./nu-exchange-visuals.test.js");
+
+test("HP and HP capsule changes never enter the Exchange market asset registry",()=>{assert.ok(!market.ASSETS.some(a=>a.key==="hp"||a.key==="hpPills"));for(const key of ["hp","hpPills"]){const result=market.build({transactions:[{id:"health-event",title:"HP change",deltas:{[key]:-3}}]},key);assert.equal(result.asset,null);assert.deepEqual(result.steps,[]);}});
