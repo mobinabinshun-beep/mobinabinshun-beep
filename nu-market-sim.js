@@ -14,8 +14,14 @@
  ];
  const BASE_INDEX=100,MAX_CANDLES=24,MAX_EVENTS=24;
  const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
+ function isStorePurchased(raw,key){
+  const txs=Array.isArray(raw&&raw.transactions)?raw.transactions:[];
+  return txs.some(tx=>tx&&tx.deltas&&(Array.isArray(tx.exchangeExcludedKeys)&&tx.exchangeExcludedKeys.includes(key)||(tx.kind==="purchase"&&Number(tx.deltas[key])>0)));
+ }
+ function assets(raw){return ASSETS.filter(a=>!isStorePurchased(raw,a.key));}
  function build(raw,key){
-  if(!ASSETS.some(a=>a.key===key))return {asset:null,steps:[],candles:[],index:BASE_INDEX,changePct:0,volume:0,demand:0,supply:0,events:0,baseline:BASE_INDEX};
+  const asset=assets(raw).find(a=>a.key===key);
+  if(!asset)return {asset:null,steps:[],candles:[],index:BASE_INDEX,changePct:0,volume:0,demand:0,supply:0,events:0,baseline:BASE_INDEX};
   const txs=Array.isArray(raw&&raw.transactions)?raw.transactions.slice(-MAX_EVENTS):[];
   const events=txs.map((tx,i)=>({tx,i,delta:Number(tx&&tx.deltas&&tx.deltas[key])}))
    .filter(e=>Number.isFinite(e.delta)&&e.delta!==0)
@@ -32,8 +38,7 @@
    steps.push({id:String(e.tx.id||("step-"+e.i)),time,title:String(e.tx.title||e.tx.kind||"Player asset activity"),delta:e.delta,index:price,changePct:(price/BASE_INDEX-1)*100,volume:magnitude,demand:candle.demand,supply:candle.supply,open:candle.open,high:candle.high,low:candle.low,close:candle.close});
   }
   const bounded=steps.slice(-MAX_CANDLES),last=bounded[bounded.length-1];
-  return {asset:ASSETS.find(a=>a.key===key),steps:bounded,candles:bounded,index:last?last.index:BASE_INDEX,changePct:((last?last.index:BASE_INDEX)/BASE_INDEX-1)*100,volume:bounded.reduce((n,s)=>n+s.volume,0),demand:bounded.reduce((n,s)=>n+s.demand,0),supply:bounded.reduce((n,s)=>n+s.supply,0),events:bounded.length,baseline:BASE_INDEX};
+  return {asset,steps:bounded,candles:bounded,index:last?last.index:BASE_INDEX,changePct:((last?last.index:BASE_INDEX)/BASE_INDEX-1)*100,volume:bounded.reduce((n,s)=>n+s.volume,0),demand:bounded.reduce((n,s)=>n+s.demand,0),supply:bounded.reduce((n,s)=>n+s.supply,0),events:bounded.length,baseline:BASE_INDEX};
  }
- function assets(){return ASSETS.slice();}
- return {ASSETS,BASE_INDEX,MAX_CANDLES,MAX_EVENTS,assets,build};
+ return {ASSETS,BASE_INDEX,MAX_CANDLES,MAX_EVENTS,assets,build,isStorePurchased};
 });
