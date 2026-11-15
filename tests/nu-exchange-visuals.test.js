@@ -2,6 +2,7 @@
 const test=require("node:test");
 const assert=require("node:assert/strict");
 const visuals=require("../nu-exchange-visuals.js");
+const fs=require("node:fs");
 
 test("ambient market pulses are deterministic and bounded to three display units",()=>{
  const steps=[{volume:18,demand:14,supply:4},{volume:7,demand:5,supply:2}];
@@ -74,4 +75,17 @@ test("ambient animation is stable between frames and advances only on a new time
  const next=visuals.ambientMarket([],"stable-animation-test",2200*20001);
  assert.equal(next.simulatedCount,24);
  assert.notDeepEqual(next.steps,first.steps);
+});
+
+
+test("ambient market API is exported for the Exchange runtime",()=>{
+ assert.equal(typeof visuals.ambientMarket,"function");
+});
+
+test("Exchange loads the visuals module before the runtime that consumes it",()=>{
+ const html=fs.readFileSync("exchange.html","utf8");
+ const visualsAt=html.indexOf("nu-exchange-visuals.js");
+ const runtimeAt=html.indexOf("nu-exchange.js");
+ assert.ok(visualsAt>=0,"missing Exchange visuals script");
+ assert.ok(runtimeAt>visualsAt,"visuals must load before Exchange runtime");
 });
