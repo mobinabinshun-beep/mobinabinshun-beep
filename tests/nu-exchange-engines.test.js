@@ -6,9 +6,9 @@ const source=fs.readFileSync(require.resolve("../nu-exchange-engines.js"),"utf8"
 function setup(){
  const data=new Map();
  const localStorage={getItem:k=>data.has(k)?data.get(k):null,setItem:(k,v)=>data.set(k,String(v)),removeItem:k=>data.delete(k)};
- const save={playerId:"P-1",displayName:"Tester",level:2,xp:20,mana:4,hp:10,hpPills:1,manaCapsules:1,casinoCredits:50,xCredits:3,nCredits:7,transactions:[{id:"t1",at:"2026-11-15T00:00:00Z",title:"Reward",deltas:{xp:1}}]};
+ const save={playerId:"P-1",displayName:"Tester",level:2,xp:20,mana:4,hp:10,hpPills:1,manaCapsules:1,casinoCredits:50,xCredits:3,nCredits:7,transactions:[{id:"t1",at:"2026-11-15T00:00:00Z",title:"Reward",deltas:{xp:1}},{id:"hp-tx",at:"2026-11-15T00:01:00Z",title:"HP loss",deltas:{hp:-2,hpPills:1}}]};
  const NU={storageKey:"nu-world-save-v1",load:()=>save};
- const NUWallet={normalizeSave:v=>v,assetRows:v=>[{key:"xp",label:"XP",value:v.xp,unit:""},{key:"mana",label:"Mana",value:v.mana,unit:""}]};
+ const NUWallet={normalizeSave:v=>v,assetRows:v=>[{key:"xp",label:"XP",value:v.xp,unit:""},{key:"mana",label:"Mana",value:v.mana,unit:""},{key:"hp",label:"HP",value:v.hp,unit:""},{key:"hpPills",label:"HP Capsules",value:v.hpPills,unit:""}],exchangeAssetRows:v=>[{key:"xp",label:"XP",value:v.xp,unit:""},{key:"mana",label:"Mana",value:v.mana,unit:""}]};
  const context={localStorage,NU,NUWallet,Date,Map,Set,Number,String,Array,Object,TypeError,Error,JSON,Math};
  context.globalThis=context;context.window=context;context.CustomEvent=function(name,opts){this.type=name;this.detail=opts&&opts.detail;};context.dispatchEvent=()=>true;
  vm.runInNewContext(source,context);
@@ -16,7 +16,7 @@ function setup(){
 }
 test("wallet reader returns canonical save data without mutating it",()=>{
  const {api,save}=setup(),before=JSON.stringify(save),s=api.walletEngine.read();
- assert.equal(s.source,"nu-world-save-v1");assert.equal(s.player.id,"P-1");assert.equal(s.assets[0].value,20);assert.ok(!s.assets.some(a=>a.key==="xCredits"||a.key==="nCredits"));
+ assert.equal(s.source,"nu-world-save-v1");assert.equal(s.player.id,"P-1");assert.equal(s.assets[0].value,20);assert.ok(!s.assets.some(a=>["xCredits","nCredits","hp","hpPills"].includes(a.key)));assert.deepEqual(JSON.parse(JSON.stringify(s.transactions)).map(t=>t.id),["t1"]);assert.equal(s.transactionCount,1);
  assert.deepEqual(JSON.parse(JSON.stringify(s.unpricedFields)),{xCredits:3,nCredits:7});assert.equal(JSON.stringify(save),before);
 });
 test("manifest discovery is declarative, unverified and cannot quote",()=>{
@@ -43,3 +43,5 @@ test("wallet refresh event is emitted without mutating the canonical save",()=>{
  assert.equal(snapshot.mode,"LOCAL_READ_ONLY");
  assert.equal(JSON.stringify(save),before);
 });
+
+test("wallet reader strips non-tradable HP deltas even when mixed into a valid transaction",()=>{const {api,save}=setup();save.transactions=[{id:"mixed",deltas:{xp:5,hp:-1,hpPills:1}}];const s=api.walletEngine.read();assert.deepEqual(JSON.parse(JSON.stringify(s.transactions[0].deltas)),{xp:5});});
