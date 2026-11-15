@@ -54,3 +54,8 @@ test("reduced-motion disables only movement, not the notification content",()=>{
   assert.match(css,/@media\(prefers-reduced-motion:reduce\)\{\.nu-notification-pair>\.floating-change\{animation:none;opacity:1\}\}/);
   assert.match(moduleSource,/removeAfter\(root,duration\+80\)/);
 });
+
+test("object-interaction coordinates are written in game-stage CSS pixels",()=>{
+  assert.match(moduleSource,/node\.style\.left=\(Number\(options\.x\)\|\|0\)\+"px"/);
+  assert.match(moduleSource,/node\.style\.top=\(Number\(options\.y\)\|\|0\)\+"px"/);
+});
