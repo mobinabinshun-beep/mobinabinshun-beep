@@ -42,8 +42,8 @@ test("Wallet, Profile and Store share the static Exchange-style neutral world ba
   assert.ok(ui.includes('classList.toggle("nu-neutral-profile",view===profileView)'));
   assert.ok(games.includes('classList.add("nu-neutral-view-open","nu-neutral-store")'));
   assert.ok(ui.includes('classList.remove("nu-neutral-view-open","nu-neutral-wallet"'));
-  assert.ok(games.includes('document.body.classList.add("nu-neutral-view-open")'));
-  assert.ok(games.includes('document.body.classList.remove("nu-neutral-view-open")'));
+  assert.ok(games.includes('document.body.classList.add("nu-neutral-view-open","nu-neutral-store")'));
+  assert.ok(games.includes('document.body.classList.remove("nu-neutral-view-open","nu-neutral-wallet","nu-neutral-profile","nu-neutral-store")'));
   assert.match(css,/body\.nu-neutral-view-open \.world\{\s*background:radial-gradient\(ellipse at 50% -15%,#163448 0,transparent 55%\),#071018!important/);
   assert.match(css,/body\.nu-neutral-view-open \.world>#nu-dynamic-layers\{\s*display:none!important/);
   assert.doesNotMatch(css,/nu-wallet-open/);
