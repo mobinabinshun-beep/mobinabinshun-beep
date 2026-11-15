@@ -10,6 +10,8 @@ The prior controller was selection-first: hovering an option only highlighted it
 
 ## Intended behavior
 
+- Option feedback is a steady, latched illumination: the hovered/touched option visibly lights as the action is entered, without a second selection. The highlight is static rather than a looping pulse; reduced-motion users receive the same clear state.
+
 - Mouse/pen entering the hex opens Gateway and pauses the active round.
 - Touch contact on the hex opens Gateway immediately and pauses the active round.
 - While open, mouse/pen movement onto Back, Menu or Profile activates the hovered action without click or an intermediate selection.
@@ -58,3 +60,11 @@ The prior controller was selection-first: hovering an option only highlighted it
 ## Rollback
 
 Revert the scoped PR/commit or restore the backup branch. Do not force-push the default branch.
+
+## Static highlight refinement (2026-11-15)
+
+- Created a fresh checkpoint from the prior candidate head: `backup/pre-gateway-static-highlight-2026-11-15` (pre-refinement SHA `232e2a2010569b43fee30b5fdb9b1e5a7fe4bcd8`).
+- Archived the exact pre-refinement CSS, Gateway regression test, `index.html`, operating protocol and this implementation record under `archive/pre-change/2026-11-15/gateway-static-highlight/`.
+- Replaced looping option pulse/confirmation keyframes with a stable illuminated selected/confirming state. Bumped both Gateway asset cache tokens to `20261115-motion-gateway-r5`.
+- Added a regression assertion that the selected/confirming visual state remains static and no Gateway pulse keyframes are present.
+- Full browser QA and deployment remain pending; CI must be rechecked on the new head.
