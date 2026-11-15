@@ -57,4 +57,4 @@ Restore the exact pre-change source using `backup/pre-gateway-gameplay-scope-202
 
 No files outside the main game entry and its Gateway controller/styles/tests may be changed without a new explicit owner approval. Any further Gateway destination, Casino/Studio/tool entry, HUD change, or separate page modification requires its own scope confirmation.
 
-**Status:** CANDIDATE IMPLEMENTED · CI PENDING · PUBLIC DEMO / HUMAN QA PENDING · NOT MERGED
+**Status:** CANDIDATE IMPLEMENTED · GATEWAY CI PASS · TWO UNRELATED PROFILE SUITE FAILURES RECORDED · PUBLIC DEMO / HUMAN QA PENDING · NOT MERGED
