@@ -121,3 +121,17 @@ test("casino credits are included as an owned Generation 1 wallet asset",()=>{
   const rows=wallet.assetRows({casinoCredits:77});
   assert.ok(rows.some(row=>row.key==="casinoCredits"&&row.value===77));
 });
+
+test("store-purchased assets remain owned in the wallet but are excluded from Exchange",()=>{
+  const purchase=wallet.buyHpPill({xp:25,hpPills:0},{id:"shop-capsule"});
+  assert.equal(purchase.ok,true);
+  assert.ok(wallet.assetRows(purchase.state).some(row=>row.key==="hpPills"&&row.value===1));
+  assert.ok(!wallet.exchangeAssetRows(purchase.state).some(row=>row.key==="hpPills"));
+  assert.equal(wallet.isExchangeableAsset(purchase.state,"hpPills"),false);
+  assert.equal(wallet.isExchangeableAsset(purchase.state,"xp"),true);
+});
+test("legacy purchase ledger entries also exclude their acquired asset from Exchange",()=>{
+  const save={xp:20,hpPills:2,transactions:[{kind:"purchase",title:"Old shop item",deltas:{xp:-5,hpPills:2}}]};
+  assert.ok(wallet.assetRows(save).some(row=>row.key==="hpPills"));
+  assert.ok(!wallet.exchangeAssetRows(save).some(row=>row.key==="hpPills"));
+});
