@@ -43,3 +43,13 @@ test("Only decorative world layers blur; legacy duplicate navigation is hidden i
  assert.match(css,/body\.nu-game-active #menu-open/);
  assert.match(css,/body\.nu-game-active #back-home/);
 });
+
+test("Hidden-tab visibility changes cannot restart frozen Gateway renderers",()=>{
+ assert.match(games,/gatewayOpen=document\.body\.classList\.contains\("nu-gateway-open"\)/);
+ assert.match(dynamic,/function resume\(\)\{if\(!profile\|\|!active\|\|frozen\|\|document\.hidden\)return/);
+});
+
+test("Leaving gameplay for Home or Store releases the background freeze",()=>{
+ assert.match(games,/function closeGame\(\)\{window\.dispatchEvent\(new Event\("nu:gateway-close"\)\)/);
+ assert.match(games,/function showShop\(\)\{window\.dispatchEvent\(new Event\("nu:gateway-close"\)\)/);
+});
