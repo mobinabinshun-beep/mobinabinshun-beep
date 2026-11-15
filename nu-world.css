@@ -714,3 +714,39 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 .world>.nu-world-background,.world>.sky,.world>#world-canvas,.world>#pixel-world,.world>.horizon,.world>.world-effects,#nu-dynamic-layers{
  pointer-events:none!important;
 }
+
+
+/* N.U neutral scene mode — shared, static Exchange-style backdrop for Wallet, Profile and Store. */
+body.nu-neutral-view-open{
+ background:#071018!important;
+}
+body.nu-neutral-view-open .world{
+ background:radial-gradient(ellipse at 50% -15%,#163448 0,transparent 55%),#071018!important;
+}
+body.nu-neutral-view-open .world>.nu-world-background,
+body.nu-neutral-view-open .world>.sky,
+body.nu-neutral-view-open .world>#world-canvas,
+body.nu-neutral-view-open .world>#pixel-world,
+body.nu-neutral-view-open .world>.horizon,
+body.nu-neutral-view-open .world>.world-effects,
+body.nu-neutral-view-open .world>#nu-dynamic-layers{
+ display:none!important;
+}
+body.nu-neutral-view-open #wallet-view .wallet-panel{
+ background:transparent!important;
+ border-color:transparent!important;
+ box-shadow:none!important;
+ backdrop-filter:none!important;
+ -webkit-backdrop-filter:none!important;
+}
+
+
+/* N.U section identity: quiet, static color cues on the Exchange reference surface. */
+body.nu-neutral-wallet .world{background:radial-gradient(ellipse at 50% -15%,rgba(42,154,164,.16) 0,transparent 48%),radial-gradient(ellipse at 50% -15%,#163448 0,transparent 55%),#071018!important}
+body.nu-neutral-profile .world{background:radial-gradient(ellipse at 50% -15%,rgba(116,105,184,.15) 0,transparent 48%),radial-gradient(ellipse at 50% -15%,#163448 0,transparent 55%),#071018!important}
+body.nu-neutral-store .world{background:radial-gradient(ellipse at 50% -15%,rgba(190,145,72,.14) 0,transparent 48%),radial-gradient(ellipse at 50% -15%,#163448 0,transparent 55%),#071018!important}
+
+/* One short, three-pulse room-light impression on entry; opacity only, then fully static. */
+body.nu-neutral-view-open .world::after{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;background:rgba(225,245,255,.18);animation:nu-neutral-lamp-entry 900ms steps(1,end) 1 both}
+@keyframes nu-neutral-lamp-entry{0%,7%,16%,25%,34%,43%,100%{opacity:0}8%,15%{opacity:.42}26%,33%{opacity:.25}44%,51%{opacity:.12}}
+@media(prefers-reduced-motion:reduce){body.nu-neutral-view-open .world::after{animation:none;opacity:0}}

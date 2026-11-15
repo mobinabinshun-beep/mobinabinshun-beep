@@ -66,3 +66,29 @@ A test report is HUMAN-QA-PASSED only when device, OS, browser, viewport, input 
 | Mobile / accessibility | Chart remains legible; selector and links work with touch and keyboard | | | |
 
 **Exchange chart interpretation:** this candidate plots local asset-balance history, not market prices or exchange rates. Do not report the line as a market valuation or profit/loss curve. The current ledger retains at most 40 transactions, and balances are browser-local.
+
+
+## Change-stage identity (required for each independent stage)
+- Change ID / stage:
+- Repository / branch:
+- Candidate commit SHA:
+- Public Demo URL:
+- Deployed commit/build SHA (must match the candidate):
+- Deployment timestamp:
+- Previous stage human decision / report link:
+- Current decision: HUMAN-QA-PENDING / APPROVED / REJECTED / APPROVED-WITH-LIMITATIONS
+
+## Neutral section background — four-section acceptance
+| Scenario | Expected result | Actual result | Pass / Fail | Reproducible? |
+|---|---|---|---|---|
+| Exchange reference | Existing calm, static dark background remains intact | | | |
+| Wallet backdrop | Same visual language as Exchange; only a subtle static teal cue | | | |
+| Profile backdrop | Same visual language as Exchange; only a subtle static cool-violet cue | | | |
+| Store backdrop | Same visual language as Exchange; only a subtle static muted-amber cue | | | |
+| Entry-light cue | If enabled, exactly three brief pulses once on entry; no loop or lingering overlay | | | |
+| Foreground safety | Text, cards, controls, charts and touch targets remain fully visible and interactive | | | |
+| Performance | No noticeable slowdown, stutter, excess heat or persistent rendering activity | | | |
+| Reduced motion | Entry cue is suppressed; all content and navigation remain usable | | | |
+| Section lifecycle | Entering/leaving sections does not leave stale tint or light effects behind | | | |
+
+**Stage progression rule:** this report belongs to one exact deployed revision. Do not advance to another independent change stage until the project owner records a decision above. Every follow-up revision needs a new report and retest.

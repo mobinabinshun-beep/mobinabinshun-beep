@@ -45,3 +45,17 @@ Owner decision: **Not yet requested**
 Approval/rejection evidence: **To be recorded only after the owner tests the public demo.**
 
 This gate applies to the background/image-first renderer work and subsequent visual-layer integration unless the project owner explicitly changes it.
+
+
+## Every-stage acceptance rule (blocking)
+
+The gate applies to every independent implementation stage and every subsequent fix/revision, not only to a final release candidate.
+
+1. Give each stage a change ID and exact candidate commit/build SHA.
+2. Complete backup/archive, change record and automated checks.
+3. Deploy that exact candidate to the public Demo and verify the deployed revision.
+4. Ask the project owner to test that public Demo revision and record an explicit decision.
+5. Keep the stage pending until the decision is recorded. Do not proceed to the next independent implementation stage, merge, lock or promotion while pending or rejected.
+6. For every follow-up fix, create a fresh backup and repeat the complete gate; acceptance of an earlier revision does not carry forward.
+
+A deliberate multi-part bundle is allowed only when its scope is documented as one stage before testing. Silence, local inspection, screenshots, PR review and CI success are never approval. If Demo deployment is unavailable, record **NOT VERIFIED / HUMAN-QA-PENDING** and stop progression.

@@ -5,6 +5,9 @@ const fs=require("node:fs");
 const html=fs.readFileSync("index.html","utf8");
 const css=fs.readFileSync("nu-world.css","utf8");
 const ui=fs.readFileSync("nu-player-ui.js","utf8");
+const games=fs.readFileSync("nu-games.js","utf8");
+const exchange=fs.readFileSync("exchange.html","utf8");
+const exchangeCss=fs.readFileSync("nu-exchange.css","utf8");
 
 test("wallet tabs are recessed inside the card before their content panels",()=>{
   const walletPanel=html.indexOf('<div class="glass wallet-panel">');
@@ -30,4 +33,33 @@ test("Player ID keeps the original stable local identifier behavior",()=>{
   assert.match(html,/class="demo-profile-card"/);
   for(const id of ["demo-name","demo-call","demo-family","demo-age"])assert.ok(html.includes('id="'+id+'"'));
   assert.doesNotMatch(html,/class="glass player-id-card classic-player-card"/);
+});
+
+
+test("Wallet, Profile and Store share the static Exchange-style neutral world backdrop",()=>{
+  assert.ok(ui.includes('classList.toggle("nu-neutral-view-open",view===walletView||view===profileView)'));
+  assert.ok(ui.includes('classList.toggle("nu-neutral-wallet",view===walletView)'));
+  assert.ok(ui.includes('classList.toggle("nu-neutral-profile",view===profileView)'));
+  assert.ok(games.includes('classList.add("nu-neutral-view-open","nu-neutral-store")'));
+  assert.ok(ui.includes('classList.remove("nu-neutral-view-open","nu-neutral-wallet"'));
+  assert.ok(games.includes('document.body.classList.add("nu-neutral-view-open","nu-neutral-store")'));
+  assert.ok(games.includes('document.body.classList.remove("nu-neutral-view-open","nu-neutral-wallet","nu-neutral-profile","nu-neutral-store")'));
+  assert.match(css,/body\.nu-neutral-view-open \.world\{\s*background:radial-gradient\(ellipse at 50% -15%,#163448 0,transparent 55%\),#071018!important/);
+  assert.match(css,/body\.nu-neutral-view-open \.world>#nu-dynamic-layers\{\s*display:none!important/);
+  assert.doesNotMatch(css,/nu-wallet-open/);
+});
+
+test("the four section backdrops stay static while their foreground functions remain available",()=>{
+  const neutral=css.slice(css.lastIndexOf("/* N.U neutral scene mode"));
+  assert.doesNotMatch(neutral,/(?:^|[;\n]\s*)filter\s*:|requestAnimationFrame|canvas\s*\{/);
+  assert.doesNotMatch(neutral,/infinite/);
+  assert.match(neutral,/animation:nu-neutral-lamp-entry 900ms steps\(1,end\) 1 both/);
+  assert.match(neutral,/prefers-reduced-motion:reduce/);
+  assert.match(neutral,/nu-neutral-wallet \.world/);
+  assert.match(neutral,/nu-neutral-profile \.world/);
+  assert.match(neutral,/nu-neutral-store \.world/);
+  for(const id of ["wallet-view","profile-view","shop-view"])assert.ok(html.includes('id="'+id+'"'));
+  assert.match(exchange,/id="market-chart"/);
+  assert.match(exchange,/id="asset-chart"/);
+  assert.match(exchangeCss,/background:radial-gradient\(ellipse at 50% -15%,#163448 0,transparent 55%\),var\(--bg\)/);
 });
