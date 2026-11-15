@@ -22,8 +22,9 @@ test("leaving before the 11th attempt resets visit count but not an active coold
  const store=memory();let now=500;const g=guard.create({storage:store,now:()=>now});
  for(let i=0;i<10;i++)g.recordSuccess();g.leaveVisit();assert.equal(g.state().successes,0);assert.equal(g.beforeAttempt().allowed,true);
 });
-test("replay modes and looping frame selection use 24 player steps",()=>{
- assert.equal(replay.MODES.length,6);assert.equal(replay.frameIndex(0,24,24000),0);assert.equal(replay.frameIndex(23999,24,24000),23);assert.equal(replay.frameIndex(24000,24,24000),0);
+test("replay modes use number-free second, minute, hour, day, week and month labels",()=>{
+ assert.equal(replay.MODES.length,6);assert.deepEqual(replay.MODES.map(m=>m.label),["Seconds","Minutes","Hours","Days","Weeks","Months"]);assert.ok(replay.MODES.every(m=>!/[0-9]/.test(m.label)));
+ assert.equal(replay.frameIndex(0,24,24000),0);assert.equal(replay.frameIndex(23999,24,24000),23);assert.equal(replay.frameIndex(24000,24,24000),0);
 });
 test("two-step maintenance latch requires phrase and second confirmation",()=>{
  const store=memory(),l=lock.create(store);assert.equal(l.isLocked(),true);
@@ -31,12 +32,15 @@ test("two-step maintenance latch requires phrase and second confirmation",()=>{
  assert.equal(l.confirm(lock.PHRASE,1200).ok,false);assert.equal(l.confirm(lock.PHRASE,1500).ok,true);assert.equal(l.isLocked(),false);l.relock();assert.equal(l.isLocked(),true);
 });
 
-test("Exchange runtime uses purchase-filtered wallet assets and market assets",()=>{
+test("Exchange runtime preserves chart controls while using purchase-filtered assets",()=>{
  const source=fs.readFileSync("nu-exchange.js","utf8");
  assert.match(source,/NUWallet\.exchangeAssetRows\(save\)/);
  assert.match(source,/NUVirtualMarket\.assets\(save\)/);
+ assert.match(source,/chartPrefs\.zoom/);
+ assert.match(source,/chartPrefs\.theme/);
  assert.match(source,/nu_exchange_cache_v3/);
- const purchased=wallet.buyHpPill({xp:20,hpPills:0}).state;
+ let purchased=wallet.buyHpPill({xp:20,hpPills:0}).state;
+ for(let i=0;i<30;i++)purchased=wallet.grantXP(purchased,1,{id:"later-"+i}).state;
  assert.ok(!wallet.exchangeAssetRows(purchased).some(row=>row.key==="hpPills"));
  assert.ok(!market.assets(purchased).some(row=>row.key==="hpPills"));
 });
