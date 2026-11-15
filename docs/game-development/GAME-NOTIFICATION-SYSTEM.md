@@ -92,7 +92,8 @@ Use for a single non-blocking notification when a paired preset is not appropria
 ## Positioning, stacking, and lifecycle
 
 - For fixed HUD elements, always call `getBoundingClientRect()` at the moment the event is accepted and position in viewport coordinates. Do not reuse stale positions captured before state persistence or a rerender.
-- Use the HP rail's lower edge as the consumption pair's origin. Default pair offset is 4px; the cards rise and fade using the legacy curve.
+- Use the visible HP rail's lower edge as the consumption pair's origin. Default pair offset is 4px; the cards rise and fade using the legacy curve. The shared preset returns `null` for a zero-size/hidden anchor so callers can show a visible fallback rather than placing the notice at viewport origin.
+- If an expanded drawer shares the anchor element, provide `anchorCenterX` for the stable core centre; do not centre a HUD notice across the drawer width.
 - Load both shared files on each game entry page: `nu-game-notifications.css` for the visual presets and `nu-game-notifications.js` before the game runtime. The main game hub and Casino page are wired as examples. The overlay is fixed, pointer-transparent, and outside clipping game stages. It must not intercept clicks, alter layout, move the HP rail, or change the capsule drawer width.
 - Notifications are transient and removed after their animation. Do not leave hidden nodes accumulating.
 - Reduced-motion users receive the same message and tone without the movement animation.
