@@ -52,7 +52,7 @@
         return (Number(value)>0?"+":"")+Number(value)+" "+label;
       }).join(" · ");
       const direction=item.direction==="INCOMING"?"RECEIVED":item.direction==="OUTGOING"?"SPENT":"LOCAL OPERATION";
-      const meta=[direction,movement,item.gameId||item.source||"",item.waveId?"WAVE "+item.waveId:"",item.category||"",Number.isFinite(Number(item.successfulInteractionCount))&&item.waveId?(item.successfulInteractionCount+" successful interactions"):"",item.resultingBalance!==undefined?("balance "+item.resultingBalance):""].filter(Boolean);
+      const meta=[direction,movement,item.gameId||item.source||"",item.waveId?"WAVE "+item.waveId:"",item.roundId?"ROUND "+item.roundId:"",item.payoutCapped?"PAYOUT CAPPED":"",item.category||"",Number.isFinite(Number(item.successfulInteractionCount))&&item.waveId?(item.successfulInteractionCount+" successful interactions"):"",item.resultingBalance!==undefined?("balance "+item.resultingBalance):""].filter(Boolean);
       detail.textContent=meta.join(" · ");
       row.append(title,detail);history.appendChild(row);
     });
