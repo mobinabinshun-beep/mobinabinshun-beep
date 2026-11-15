@@ -17,7 +17,7 @@ Implementation on an isolated candidate:
 - click/Enter remain accessible fallback paths;
 - the existing scrim, pause ownership, route, scope and renderer event contracts are preserved.
 
-Files changed: nu-hex-gateway.js, index.html, tests/nu-hex-gateway.test.js, docs/operations/NU-OPS-IMPLEMENT-01.md, plus the implementation record. No game, HUD, wallet, save, economy or non-game runtime was changed.
+Files changed in the product candidate: nu-hex-gateway.js, index.html, tests/nu-hex-gateway.test.js, docs/operations/NU-OPS-IMPLEMENT-01.md, docs/operations/GATEWAY-MENU-EXCHANGE-IMPLEMENTATION-2026-11-15.md, plus the implementation record and this archive. The cross-repository product rationale was also corrected in mobinabinshun-beep/Repository (commit 39bd31f604ddb78b5a78405b0332698c4e5c3049). No game, HUD, wallet, save, economy or non-game runtime was changed.
 
 Backup: backup/pre-gateway-motion-controller-2026-11-15  
 Candidate: fix/gateway-motion-controller-2026-11-15
