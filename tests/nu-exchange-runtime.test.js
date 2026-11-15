@@ -1,6 +1,6 @@
 "use strict";
 const test=require("node:test"),assert=require("node:assert/strict");
-const core=require("../nu-exchange-core.js"),guard=require("../nu-exchange-guard.js"),replay=require("../nu-exchange-replay.js"),lock=require("../nu-exchange-lock.js");
+const core=require("../nu-exchange-core.js"),wallet=require("../nu-wallet.js"),guard=require("../nu-exchange-guard.js"),replay=require("../nu-exchange-replay.js"),lock=require("../nu-exchange-lock.js");
 function memory(){const m=new Map();return {getItem:k=>m.has(k)?m.get(k):null,setItem:(k,v)=>m.set(k,String(v)),removeItem:k=>m.delete(k)};}
 test("registry starts empty and only exposes explicitly registered game assets",()=>{
  core.clear();assert.deepEqual(core.listGames(),[]);assert.deepEqual(core.listAssets(),[]);
@@ -29,4 +29,23 @@ test("two-step maintenance latch requires phrase and second confirmation",()=>{
  const store=memory(),l=lock.create(store);assert.equal(l.isLocked(),true);
  assert.equal(l.begin("wrong",1000).ok,false);assert.equal(l.begin(lock.PHRASE,1000).ok,true);
  assert.equal(l.confirm(lock.PHRASE,1200).ok,false);assert.equal(l.confirm(lock.PHRASE,1500).ok,true);assert.equal(l.isLocked(),false);l.relock();assert.equal(l.isLocked(),true);
+});
+
+test("exchange wallet bridge exposes the canonical local profile and balances read-only",()=>{
+ const raw={playerId:"NU-ABC123",displayName:"Tester",callsign:"Fox",level:3,xp:145,mana:6,hp:8,hpPills:2,manaCapsules:1,casinoCredits:88,xCredits:4,nCredits:9,transactions:[{id:"t1",at:"2026-11-15T05:00:00.000Z",title:"Bubble reward",deltas:{xp:1}}]};
+ const before=JSON.stringify(raw);
+ core.connectWallet({load:()=>raw,wallet});
+ const snap=core.walletSnapshot();
+ assert.equal(snap.source,"nu-world-save-v1");
+ assert.equal(snap.mode,"LOCAL_READ_ONLY");
+ assert.equal(snap.player.id,"NU-ABC123");
+ assert.equal(snap.player.displayName,"Tester");
+ assert.equal(snap.player.level,3);
+ assert.equal(snap.assets.find(a=>a.key==="xp").value,145);
+ assert.equal(snap.assets.find(a=>a.key==="casinoCredits").value,88);
+ assert.deepEqual(snap.unpricedFields,{xCredits:4,nCredits:9});
+ assert.equal(snap.transactions[0].id,"t1");
+ assert.equal(JSON.stringify(raw),before);
+ core.disconnectWallet();
+ assert.equal(core.walletSnapshot(),null);
 });
