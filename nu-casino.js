@@ -17,7 +17,7 @@ function persist(next){
 }
 function render(){
  const rows=spendable(),select=$("casino-currency"),previous=selectedAsset;
- if(!rows.some(row=>row.key===selectedAsset))selectedAsset=rows.length?rows[0].key:null;
+ if(!rows.some(row=>row.key===selectedAsset)){selectedAsset=rows.length?rows[0].key:null;if(previous&&previous!==selectedAsset){ladderStep=0;baseStake=1;}}
  if(select){
   select.replaceChildren();
   if(!rows.length){const option=document.createElement("option");option.value="";option.textContent="No spendable wallet assets";select.appendChild(option);}
@@ -47,7 +47,8 @@ function settle(game,payout,detail){
  const result=NUWallet.settleWalletBet(save,asset,stake,payout,{roundId,gameId:game,game,detail});
  if(!result.ok){$("casino-status").textContent="Round not settled · "+result.reason+". No wallet balance changed.";return false;}
  if(!persist(result.state))return false;
- if(result.net>0||result.net===0)ladderStep=0;
+ if(selectedAsset!==asset){ladderStep=0;baseStake=1;}
+ else if(result.net>0||result.net===0)ladderStep=0;
  else if(ladderStep===ladder.length-1)ladderStep=0;
  else ladderStep+=1;
  const net=result.net,sign=net>0?"+":net<0?"−":"";
