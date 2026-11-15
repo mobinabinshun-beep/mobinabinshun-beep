@@ -135,7 +135,7 @@ test("Mobile HP capsule drawer expands rightward without dropping below the HP r
 
 test("Generation 1.30 refreshes the Store count immediately after Store-side capsule use",()=>{
   assert.match(games,/const isStoreUse=!!\(button&&button\.matches\("\[data-use-hp-pill\]"\)\)/);
-  assert.match(games,/if\(!persistWalletState\(result\.state\)\)return;if\(isStoreUse\)renderShop\("−1 HP Capsule · \+"\+result\.restored\+" HP restored\."\)/);
+  assert.match(games,/if\(!persistWalletState\(result\.state\)\)return;if\(isStoreUse\)renderShop\("−1 CAPSULE HEAL · \+10 HP"\)/);
   assert.match(games,/function renderShop\(feedback=""\)/);
   const result=wallet.useHpPill({hp:3,hpPills:3},{id:"store-refresh-test"});
   assert.equal(result.ok,true);
