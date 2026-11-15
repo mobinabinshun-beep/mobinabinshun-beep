@@ -2,8 +2,8 @@ Unicode true
 !ifndef APP_VERSION
 !define APP_VERSION "0.1.0"
 !endif
-Name "N.U Launcher \${APP_VERSION}"
-OutFile "dist\N.U-Launcher-Setup-\${APP_VERSION}-x86.exe"
+Name "N.U Launcher ${APP_VERSION}"
+OutFile "dist\N.U-Launcher-Setup-${APP_VERSION}-x86.exe"
 InstallDir "$LOCALAPPDATA\N.U Launcher"
 InstallDirRegKey HKCU "Software\N.U Launcher" "InstallDir"
 RequestExecutionLevel user
