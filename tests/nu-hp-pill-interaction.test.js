@@ -165,16 +165,16 @@ test("HP pill action has a generous 48px hit target and no extra particle burst 
 
 
 test("successful HP capsule use renders an accessible transaction notice inside the HP bar",()=>{
-  assert.match(games,/function announceHpBarTransaction\(restored\)/);
-  assert.match(games,/cost\.textContent="−1 CAPSULE HEAL"/);
-  assert.match(games,/gain\.textContent="\+"\+restored\+" HP"/);
+  assert.match(games,/function announceHpBarTransaction\(\)/);
+  assert.match(games,/itemDelta:"−1 CAPSULE HEAL"/);
+  assert.match(games,/resourceDelta:"+10 HP"/);
   assert.match(games,/announceHpBarTransaction\(\)/);
   assert.match(games,/notice\.setAttribute\("aria-live","polite"\)/);
-  assert.match(css,/#game-view\.active \.hp-bar \.hp-bar-transaction\.is-visible/);
+  assert.doesNotMatch(games,/hp-bar-transaction/);
 });
 
 test("HP transaction feedback remains separate from capsule drawer motion",()=>{
   assert.match(games,/function animateHpPillTravel\(direction\)/);
   assert.match(games,/function announceHpBarTransaction\(restored\)/);
-  assert.match(games,/announceHpBarTransaction\(result\.restored\)/);
+  assert.match(games,/announceHpBarTransaction\(\)/);
 });
