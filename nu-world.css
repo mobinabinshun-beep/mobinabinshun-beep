@@ -716,29 +716,26 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 }
 
 
-/* Wallet low-cost scene mode — static decorative glow, no world renderer. */
-body.nu-wallet-open .world>.nu-world-background,
-body.nu-wallet-open .world>.sky,
-body.nu-wallet-open .world>#world-canvas,
-body.nu-wallet-open .world>#pixel-world,
-body.nu-wallet-open .world>.horizon,
-body.nu-wallet-open .world>.world-effects,
-body.nu-wallet-open .world>#nu-dynamic-layers{
+/* N.U neutral scene mode — shared, static Exchange-style backdrop for Wallet, Profile and Store. */
+body.nu-neutral-view-open{
+ background:#071018!important;
+}
+body.nu-neutral-view-open .world{
+ background:radial-gradient(ellipse at 50% -15%,#163448 0,transparent 55%),#071018!important;
+}
+body.nu-neutral-view-open .world>.nu-world-background,
+body.nu-neutral-view-open .world>.sky,
+body.nu-neutral-view-open .world>#world-canvas,
+body.nu-neutral-view-open .world>#pixel-world,
+body.nu-neutral-view-open .world>.horizon,
+body.nu-neutral-view-open .world>.world-effects,
+body.nu-neutral-view-open .world>#nu-dynamic-layers{
  display:none!important;
 }
-body.nu-wallet-open #wallet-view .wallet-panel{
+body.nu-neutral-view-open #wallet-view .wallet-panel{
  background:transparent!important;
  border-color:transparent!important;
  box-shadow:none!important;
  backdrop-filter:none!important;
  -webkit-backdrop-filter:none!important;
-}
-body.nu-wallet-open #wallet-view .wallet-panel::before{
- content:"";
- position:absolute;
- inset:0;
- z-index:-1;
- border-radius:inherit;
- pointer-events:none;
- background:radial-gradient(ellipse at 50% 8%,rgba(83,223,255,.17) 0%,rgba(83,223,255,.07) 34%,rgba(83,223,255,0) 72%);
 }
