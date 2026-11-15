@@ -1,7 +1,7 @@
 (function(){
 "use strict";
 const $=id=>document.getElementById(id),CACHE_KEY="nu_exchange_cache_v2",MAX_CHART_STEPS=24,MAX_TEXT_HISTORY=5;
-let selected="xp",marketSelected="xp",replayMode="24s",replayStart=Date.now(),replayTimer=0;
+let selected="xp",marketSelected="xp",replayMode="24s",replayStart=Date.now(),replayTimer=0,lastLedgerSignature="";
 const PREF_KEY="nu_exchange_chart_preferences_v1";
 let chartPrefs={zoom:24,grid:true,wicks:true,volume:true,average:true,tolerance:true,averagePeriod:5,theme:"night",palette:"aurora"};
 const guard=NUExchangeGuard.create(window.localStorage),maintenance=NUExchangeLock.create(window.localStorage);
@@ -89,6 +89,7 @@ function updateGuard(){
 }
 function refresh(){
  const save=NUWallet.normalizeSave(NU.load()),rows=NUWallet.assetRows(save).filter(r=>r.key!=="hp");
+ lastLedgerSignature=JSON.stringify(save.transactions||[]);
  if(!rows.some(r=>r.key===selected))selected=rows[0]?.key||"xp";
  $("asset-select").innerHTML=rows.map(r=>'<option value="'+r.key+'">'+esc(r.label)+'</option>').join("");$("asset-select").value=selected;
  $("market-asset").innerHTML=NUVirtualMarket.assets().map(a=>'<option value="'+a.key+'">'+esc(a.label)+'</option>').join("");$("market-asset").value=marketSelected;
@@ -143,6 +144,6 @@ window.addEventListener("nu:exchange:registry-change",refresh);
 window.addEventListener("storage",e=>{if(e.key===NU.storageKey)refresh();});
 window.addEventListener("pageshow",()=>{replayStart=Date.now();refresh();});
 window.addEventListener("resize",()=>{const rows=NUWallet.assetRows(NU.load()).filter(r=>r.key!=="hp"),cache=readCache();if(cache)frame(cache,rows);});
-bindChartPreferences();refresh();replayTimer=window.setInterval(()=>{const cache=readCache();if(cache)frame(cache,NUWallet.assetRows(NU.load()).filter(r=>r.key!=="hp"));updateGuard();},250);
+bindChartPreferences();refresh();replayTimer=window.setInterval(()=>{const save=NUWallet.normalizeSave(NU.load()),signature=JSON.stringify(save.transactions||[]);if(signature!==lastLedgerSignature)refresh();else{const cache=readCache();if(cache)frame(cache,NUWallet.assetRows(save).filter(r=>r.key!=="hp"));}updateGuard();},250);
 window.addEventListener("pagehide",()=>{clearInterval(replayTimer);guard.leaveVisit();});
 })();
