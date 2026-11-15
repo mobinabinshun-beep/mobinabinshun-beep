@@ -617,7 +617,7 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 /* Explicit world-scene stack: artwork bottom, sky and effects above it. */
 .world{position:relative;isolation:isolate;overflow:hidden}
 .world>.nu-world-background{
- position:absolute!important;inset:0!important;z-index:0!important;
+ position:absolute!important;inset:0!important;z-index:var(--nu-layer-world-background,0)!important;
  display:block!important;opacity:1!important;visibility:visible!important;
  pointer-events:none!important;overflow:hidden!important;
 }
@@ -627,9 +627,9 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
  transform:translate3d(var(--camera-x,0px),var(--camera-y,0px),0) scale(var(--nu-camera-zoom,1))!important;
  transform-origin:center center!important;filter:none!important;opacity:1!important;
 }
-.world>.sky{position:absolute;z-index:1!important;pointer-events:none}
+.world>.sky{position:absolute;z-index:var(--nu-layer-world-atmosphere,1)!important;pointer-events:none}
 .world>#world-canvas,.world>#pixel-world,.world>.horizon,.world>.world-effects{
- position:absolute;z-index:2;pointer-events:none
+ position:absolute;z-index:var(--nu-layer-world-effects,2);pointer-events:none
 }
 
 
@@ -692,3 +692,25 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 
 /* NU-UI-LAYER-01: keep the interactive document layer above the isolated world scene. */
 .world>.shell{position:relative!important;z-index:3!important;min-height:100vh}
+
+
+/* N.U UI Layer Constitution v1.0 — one shared, documented stacking scale. */
+:root{
+ --nu-layer-world-background:0;
+ --nu-layer-world-atmosphere:1;
+ --nu-layer-world-effects:2;
+ --nu-layer-world-content:3;
+ --nu-layer-menu:10;
+ --nu-layer-intro:20;
+ --nu-layer-critical:30;
+ --nu-layer-gateway-scrim:110;
+ --nu-layer-gateway:120;
+}
+.world>.shell{position:relative!important;z-index:var(--nu-layer-world-content)!important;min-height:100vh}
+.menu-backdrop{z-index:var(--nu-layer-menu)}
+.intro{z-index:var(--nu-layer-intro)}
+.error-view{z-index:var(--nu-layer-critical)}
+/* Background/ambient layers are visual-only: they never receive user input. */
+.world>.nu-world-background,.world>.sky,.world>#world-canvas,.world>#pixel-world,.world>.horizon,.world>.world-effects,#nu-dynamic-layers{
+ pointer-events:none!important;
+}
