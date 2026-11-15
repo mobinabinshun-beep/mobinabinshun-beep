@@ -27,3 +27,20 @@ test("quiet player history still gets restrained ambient motion without inventin
  assert.equal(pulse.volume<=3,true);
  assert.deepEqual(visuals.TOOLS,new Set(["cursor","trend","horizontal","vertical","zone"]));
 });
+
+test("ambient renderer produces a labelled micro-tick tape without throwing",()=>{
+ const oldDocument=global.document,oldStyle=global.getComputedStyle;
+ global.document={body:{}};
+ global.getComputedStyle=()=>({getPropertyValue:()=>"#70dfaa"});
+ const status={textContent:""};
+ const canvas={style:{},clientWidth:400,clientHeight:200,addEventListener(){},getBoundingClientRect(){return {left:0,top:0,width:400,height:200};}};
+ const toolbar={querySelectorAll(){return [];},querySelector(){return status;},addEventListener(){}};
+ const ctx={save(){},restore(){},setLineDash(){},fillRect(){},beginPath(){},arc(){},fill(){},stroke(){},moveTo(){},lineTo(){},strokeRect(){}};
+ try{
+  const drawing=visuals.create({canvas,toolbar,storage:{getItem(){return null;},setItem(){}}});
+  drawing.render(ctx,400,200,[{volume:12,demand:8,supply:3}],"xp");
+  assert.match(status.textContent,/BACKGROUND FLOW/);
+  assert.match(status.textContent,/TICK 1/);
+  assert.match(status.textContent,/±3 INDEX \/ 3 VOL MAX/);
+ }finally{global.document=oldDocument;global.getComputedStyle=oldStyle;}
+});
