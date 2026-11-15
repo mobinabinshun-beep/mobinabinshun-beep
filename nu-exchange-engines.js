@@ -30,8 +30,8 @@
   }
   function reconcile({installedGameIds=[]}={}){
    const installed=new Set(installedGameIds.map(safeId)),store=readStore(),wallet=walletReader(),balances=new Map(wallet.assets.map(a=>[a.key,Number(a.value)||0])),removed=[];
-   Object.keys(store).forEach(id=>{const p=store[id],owns=p.assets.some(a=>a.walletKey&&((balances.get(a.walletKey)||0)>0));
-    if(installed.has(id)||owns){p.installed=installed.has(id);p.status="ACTIVE";p.dormantUntil=null;p.lastSeen=now();}
+   Object.keys(store).forEach(id=>{const p=store[id],owns=p.assets.some(a=>a.walletKey&&((balances.get(a.walletKey)||0)>0)),ownershipUnknown=p.assets.some(a=>!a.walletKey);
+    if(installed.has(id)||owns||ownershipUnknown){p.installed=installed.has(id);p.status="ACTIVE";p.dormantUntil=null;p.lastSeen=now();}
     else if(!p.dormantUntil){p.status="DORMANT";p.dormantUntil=now()+RETENTION_DAYS*86400000;}
     else if(now()>=p.dormantUntil){delete store[id];removed.push(id);}
    });writeStore(store);return {protocols:Object.values(store),removed,retentionDays:RETENTION_DAYS};
@@ -41,7 +41,7 @@
    const p=readStore()[safeId(gameId)],a=p&&p.assets.find(x=>x.assetId===safeId(assetId)),n=Number(amount);
    if(!a)return {ok:false,reason:"ASSET_PROTOCOL_NOT_FOUND"};
    if(!Number.isFinite(n)||n<=0)return {ok:false,reason:"INVALID_AMOUNT"};
-   if(a.tradability==="non-convertible"||a.tradability==="unverified"||!a.ratio)return {ok:false,reason:"VALUATION_NOT_APPROVED",trust:p.trust};
+   if(p.trust!=="VERIFIED"||a.tradability==="non-convertible"||a.tradability==="unverified"||!a.ratio)return {ok:false,reason:"VALUATION_NOT_APPROVED",trust:p.trust};
    return {ok:true,mode:"PREVIEW_ONLY",gameId:p.gameId,assetId:a.assetId,sourceAmount:n,benchmarkAmount:n*a.ratio,ratio:a.ratio,trust:p.trust,settlement:false};
   }
   return {discover,reconcile,list,quotePreview,retentionDays:RETENTION_DAYS};
