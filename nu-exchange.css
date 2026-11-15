@@ -62,3 +62,26 @@ body[data-palette=mono]{--accent:#b9c5cc;--positive:#e2e7eb;--negative:#788792;-
 body[data-palette=aurora]{--accent:#78d7e8;--positive:#70dfaa;--negative:#ff8b91;--analysis:#e7c77a}
 @media(max-width:650px){.chart-tools{align-items:stretch;gap:10px}.chart-tools>label{justify-content:space-between}.chart-tools .chart-range-control{grid-template-columns:1fr minmax(90px,1.2fr) 24px}.chart-tools select{max-width:52vw}}
 @media(prefers-reduced-motion:reduce){.chart-tools *{scroll-behavior:auto}}
+
+
+/* Local chart annotation tools and restrained ambient activity layer. */
+.chart-drawing-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0 12px;padding:12px;border:1px solid var(--line);border-radius:10px;background:rgba(5,15,24,.24)}
+.chart-drawing-tools .drawing-tools-label{font-size:10px;font-weight:900;letter-spacing:.12em;color:var(--muted);margin-right:4px}
+.chart-drawing-tools button{border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--text);padding:7px 10px;font:600 11px/1.2 system-ui,sans-serif;cursor:pointer;transition:background .18s ease,border-color .18s ease,transform .18s ease}
+.chart-drawing-tools button:hover{border-color:var(--accent);transform:translateY(-1px)}
+.chart-drawing-tools button.is-active{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 15%,var(--panel));box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 25%,transparent) inset}
+.chart-drawing-tools small{flex-basis:100%;color:var(--muted);font-size:9px;letter-spacing:.08em;line-height:1.5}
+body[data-theme=day] .chart-drawing-tools{background:rgba(255,255,255,.6)}
+@media(max-width:650px){.chart-drawing-tools{gap:6px}.chart-drawing-tools .drawing-tools-label{flex-basis:100%}.chart-drawing-tools button{flex:1 1 calc(33.333% - 8px);min-height:36px}.chart-drawing-tools small{font-size:8px}}
+@media(prefers-reduced-motion:reduce){.chart-drawing-tools button{transition:none}.chart-drawing-tools button:hover{transform:none}}
+
+
+/* Read-only bridge to the canonical local N.U wallet. */
+.wallet-bridge-panel{margin-bottom:18px}
+.wallet-connection-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin:8px 0 16px}
+.wallet-connection-head h2{margin:3px 0;font-size:clamp(20px,3vw,28px)}
+.wallet-asset-grid{grid-template-columns:repeat(auto-fit,minmax(135px,1fr));margin:12px 0}
+.wallet-asset-grid .exchange-card{min-height:74px}
+.wallet-unpriced{display:flex;gap:12px;flex-wrap:wrap;padding:12px;margin:12px 0 20px;border:1px dashed var(--line);border-radius:9px;color:var(--muted);font-size:12px}
+.wallet-unpriced strong{width:100%;color:var(--text)}
+@media(max-width:560px){.wallet-connection-head{display:block}.wallet-connection-head .sim-tag{display:inline-block;margin-top:8px}}
