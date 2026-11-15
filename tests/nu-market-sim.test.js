@@ -49,3 +49,11 @@ test("market simulator retains only the latest 24 activity steps",()=>{
  assert.ok(result.candles.length<=24);
  assert.equal(market.MAX_CANDLES,24);
 });
+
+test("store-purchased assets are absent from Exchange market choices and simulation",()=>{
+ const save={xp:15,hpPills:1,transactions:[{kind:"purchase",title:"Golden HP Capsule",deltas:{xp:-10,hpPills:1}}]};
+ assert.ok(!market.assets(save).some(asset=>asset.key==="hpPills"));
+ assert.equal(market.build(save,"hpPills").asset,null);
+ assert.deepEqual(market.build(save,"hpPills").steps,[]);
+ assert.ok(market.assets(save).some(asset=>asset.key==="xp"));
+});
