@@ -40,3 +40,13 @@
 .market-view-options label{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
 .market-view-options input{accent-color:var(--accent);width:15px;height:15px}
 @media(prefers-reduced-motion:reduce){.bias-indicator{animation:none!important;transition:none!important}}
+
+/* Read-only bridge to the canonical local N.U wallet */
+.wallet-bridge-panel{margin-bottom:18px}
+.wallet-connection-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin:8px 0 16px}
+.wallet-connection-head h2{margin:3px 0;font-size:clamp(20px,3vw,28px)}
+.wallet-asset-grid{grid-template-columns:repeat(auto-fit,minmax(135px,1fr));margin:12px 0}
+.wallet-asset-grid .exchange-card{min-height:74px}
+.wallet-unpriced{display:flex;gap:12px;flex-wrap:wrap;padding:12px;margin:12px 0 20px;border:1px dashed var(--line);border-radius:9px;color:var(--muted);font-size:12px}
+.wallet-unpriced strong{width:100%;color:var(--text)}
+@media(max-width:560px){.wallet-connection-head{display:block}.wallet-connection-head .sim-tag{display:inline-block;margin-top:8px}}
