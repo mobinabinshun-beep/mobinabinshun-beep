@@ -2,7 +2,7 @@
  * Default geometry and motion recovered from the Generation 1.18/1.19 game HUD.
  */
 .nu-notification-layer{position:fixed;inset:0;z-index:1600;pointer-events:none;overflow:visible}
-.nu-notification-pair{position:fixed;display:flex;align-items:center;justify-content:center;gap:8px;max-width:calc(100vw - 20px);transform:translateX(-50%);pointer-events:none}
+.nu-notification-pair{position:fixed;display:flex;align-items:center;justify-content:center;gap:8px;max-width:calc(100vw - 20px);transform:translateX(-50%);pointer-events:none}.nu-notification-pair.is-centered{transform:translate(-50%,-50%)}
 .nu-notification-pair>.floating-change{flex:0 1 auto;min-width:112px;max-width:calc((100vw - 30px)/2);padding:10px 12px;border:1px solid currentColor;border-radius:12px;background:rgba(7,13,22,.92);font:900 14px/1 ui-monospace,monospace;letter-spacing:.04em;text-align:center;text-shadow:0 0 10px currentColor;box-shadow:0 8px 28px #0008;animation:nu-floating-change var(--nu-notification-duration,1.75s) cubic-bezier(.2,.8,.25,1) forwards}
 .nu-notification-pair>.floating-change.loss{color:#ffca79;border-color:#ffca7980}
 .nu-notification-pair>.floating-change.hp{color:#91ff82;border-color:#91ff8280;font-size:17px}
