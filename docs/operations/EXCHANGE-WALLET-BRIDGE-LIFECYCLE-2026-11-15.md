@@ -1,6 +1,6 @@
 # N.U Exchange — Wallet Bridge and Module Lifecycle
 **Date:** 2026-11-15  
-**Status:** Implemented on the current Gateway / Exchange candidate; CI and human QA pending.
+**Status:** Implemented; wallet/protocol regression passed (44 tests, 0 failures) on candidate head 9913cad6964537e7ef3b52b9617ea3301ca8b0df. Browser/device QA remains pending.
 
 ## Wallet bridge
 - Exchange reads the canonical local save through NU and NUWallet.
@@ -31,4 +31,4 @@
 - tests/nu-exchange-engines.test.js — read-only behavior, trust state, ownership retention, unmapped retention and refresh event tests.
 - NU-GENERATION-1-MANIFEST.json — module and lifecycle registration.
 
-Automated tests are authored but not yet executed on the final PR head. Browser/device QA, public demo verification, merge, and deployment remain pending.
+Wallet/protocol unit tests: PASS (44 tests, 0 failures). Wallet/Profile, Gateway, HUD, Studio export, Graphics Integrity and Graphics Preview Smoke workflows also passed on the candidate head. Browser/device QA, public demo verification, merge, and deployment remain pending.
