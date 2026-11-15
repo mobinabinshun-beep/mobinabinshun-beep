@@ -1,0 +1,32 @@
+name: N.U Gateway regression
+on:
+  pull_request:
+    paths:
+      - "index.html"
+      - "nu-hex-gateway.js"
+      - "nu-hex-gateway.css"
+      - "nu-games.js"
+      - "tests/nu-gateway-scope-regression.test.js"
+      - ".github/workflows/gateway-regression.yml"
+  push:
+    paths:
+      - "index.html"
+      - "nu-hex-gateway.js"
+      - "nu-hex-gateway.css"
+      - "nu-games.js"
+      - "tests/nu-gateway-scope-regression.test.js"
+      - ".github/workflows/gateway-regression.yml"
+jobs:
+  gateway-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check JavaScript syntax
+        run: |
+          node --check nu-hex-gateway.js
+          node --check nu-games.js
+      - name: Run Gateway regression tests
+        run: node --test tests/nu-gateway-scope-regression.test.js
