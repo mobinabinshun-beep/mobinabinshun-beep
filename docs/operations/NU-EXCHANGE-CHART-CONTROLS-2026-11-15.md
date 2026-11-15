@@ -33,6 +33,7 @@
 ## Verification and release
 
 - Source-level changes and regression assertions are committed to this candidate branch.
-- Automated tests, CI, browser/device QA and deployment have **not** been run or independently verified in this session.
-- Do not merge or publish until the Node test suite and relevant CI pass, followed by human browser/mobile acceptance.
+- CI graphics preview smoke checks passed, including JavaScript syntax and market-simulator tests. Both new Exchange regression tests passed.
+- The Studio export regression workflow failed: 151/153 tests passed; two profile-preview assertions in `tests/nu-profile-preview.test.js` failed against unchanged `index.html`, which is outside this PR's diff.
+- Browser/device QA and deployment have **not** been run. Keep the PR in draft until the unrelated failures are triaged and human browser/mobile acceptance passes.
 - Rollback reference: `backup/pre-exchange-chart-upgrade-2026-11-15`.
