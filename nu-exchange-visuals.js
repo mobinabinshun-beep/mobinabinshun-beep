@@ -71,7 +71,7 @@
    const phase=Date.now()/1750,base=ambientPulse(steps,phase,0),bias=base.bias,amplitude=base.amplitude;
    const positive=getComputedStyle(document.body).getPropertyValue("--positive").trim()||"#70dfaa";
    const negative=getComputedStyle(document.body).getPropertyValue("--negative").trim()||"#ff8b91";
-   const baseY=h-14,slot=w/12;
+   const baseY=h-48,slot=w/12;
    ctx.save();
    for(let i=0;i<10;i++){
     const pulse=ambientPulse(steps,phase,i),drift=pulse.delta,volume=pulse.volume;
