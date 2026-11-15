@@ -82,11 +82,11 @@
     document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));
     view.classList.add("active");
     document.body.classList.remove("article-mode");
-    document.body.classList.toggle("nu-wallet-open",view===walletView);
+    document.body.classList.toggle("nu-neutral-view-open",view===walletView||view===profileView);
     if(view===walletView){setWalletTab("balances");renderWallet();}else renderProfile();
     const menu=$("menu");if(menu)menu.classList.remove("open");
   }
-  function close(){document.body.classList.remove("nu-wallet-open");if(profileView.classList.contains("active")){["demo-name","demo-call","demo-family","demo-age","demo-age-band","demo-bio","demo-interests","demo-passphrase-test"].forEach(id=>{const field=$(id);if(field)field.value="";});const warning=$("demo-profile-warning");if(warning)warning.hidden=true;applyAppearance(true);resetWorkshop();}document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));(previousView&&previousView!==walletView&&previousView!==profileView?previousView:$("home-view")).classList.add("active");previousView=null;window.dispatchEvent(new Event("nu:player-overlay-close"));}
+  function close(){document.body.classList.remove("nu-neutral-view-open");if(profileView.classList.contains("active")){["demo-name","demo-call","demo-family","demo-age","demo-age-band","demo-bio","demo-interests","demo-passphrase-test"].forEach(id=>{const field=$(id);if(field)field.value="";});const warning=$("demo-profile-warning");if(warning)warning.hidden=true;applyAppearance(true);resetWorkshop();}document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));(previousView&&previousView!==walletView&&previousView!==profileView?previousView:$("home-view")).classList.add("active");previousView=null;window.dispatchEvent(new Event("nu:player-overlay-close"));}
   $("wallet-back").addEventListener("click",close);
   $("profile-back").addEventListener("click",close);
   const demoFields=["demo-name","demo-call","demo-family","demo-age","demo-age-band","demo-bio","demo-interests"];
