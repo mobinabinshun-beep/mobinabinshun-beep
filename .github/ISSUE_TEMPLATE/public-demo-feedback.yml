@@ -7,6 +7,21 @@ body:
     attributes:
       value: |
         Thanks for testing N.U. Do not include passwords, real names, contact details, account identifiers, financial information or other personal data. Remove personal information from screenshots and recordings.
+  - type: input
+    id: test_date
+    attributes:
+      label: Test date and time (include timezone)
+      placeholder: e.g. 2026-11-15 14:30 UTC
+    validations:
+      required: true
+  - type: input
+    id: candidate_commit
+    attributes:
+      label: Candidate version or full commit SHA
+      description: Use the exact deployed commit where available. If the build does not display one, write "not displayed".
+      placeholder: e.g. 0123456789abcdef...
+    validations:
+      required: true
   - type: dropdown
     id: report_type
     attributes:
@@ -48,14 +63,14 @@ body:
     id: environment
     attributes:
       label: Device, OS, browser and version
-      placeholder: e.g. Pixel 8 / Android 16 / Chrome 130
+      placeholder: e.g. Pixel 8 / Android / Chrome
     validations:
       required: true
   - type: input
     id: viewport
     attributes:
-      label: Viewport and input method
-      placeholder: e.g. 412×915, touch
+      label: Viewport, orientation and input method
+      placeholder: e.g. 412×915 portrait, touch
     validations:
       required: true
   - type: textarea
@@ -76,6 +91,18 @@ body:
       placeholder: |
         Expected:
         Actual:
+    validations:
+      required: true
+  - type: dropdown
+    id: outcome
+    attributes:
+      label: Session or scenario outcome
+      options:
+        - PASS
+        - FAIL
+        - BLOCKED
+        - PARTIAL
+        - NOT APPLICABLE
     validations:
       required: true
   - type: dropdown
