@@ -31,7 +31,7 @@ test("HP pill is the only interactive HUD target and its button remains pointer-
 
 test("HUD markup is a native button and uses the current generation 1.29 assets",()=>{
   assert.match(html,/<button class="hp-pill-use" id="hp-pill-use" type="button"/);
-  assert.match(html,/nu-games\.js\?v=20261115-game-notifications-r7/);
+  assert.match(html,/nu-games\.js\?v=20261115-game-notifications-r8/);
   assert.match(html,/nu-world\.css\?v=[^"]+/);
 });
 
