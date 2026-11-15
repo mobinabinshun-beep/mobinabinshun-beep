@@ -55,10 +55,9 @@ function renderGameAssetProfile(){
  const names={bubble:"BUBBLE HUNT · ASSET PROFILE",mana:"MANA COLLECTOR · ASSET PROFILE",chaos:"CHAOS ATTACK · ASSET PROFILE"};
  const rows=NUWallet.gameAssetRows(state.save,state.game);
  if(!rows.length){root.replaceChildren();root.hidden=true;return;}
- root.hidden=false;
  root.innerHTML='<strong>'+names[state.game]+'</strong><small>SHARED WALLET · GAME-SCOPED VIEW</small><div class="game-asset-rows">'+rows.map(row=>'<span>'+row.label+'</span><b>'+row.value+row.unit+'</b>').join("")+'</div>';
 }
-let assetProfilePinned=false;
+let activeAssetTrigger=null;
 function setAssetProfileExpanded(value){
  document.querySelectorAll(".bar-wrap,#hp-bar").forEach(el=>el.setAttribute("aria-expanded",String(value)));
 }
@@ -72,32 +71,27 @@ function positionGameAssetProfile(trigger){
  root.style.transform="none";
 }
 function showGameAssetProfile(trigger){
- const root=$("game-asset-profile");if(!root)return;
- renderGameAssetProfile();root.hidden=false;setAssetProfileExpanded(true);positionGameAssetProfile(trigger);
+ const root=$("game-asset-profile");if(!root||!trigger)return;
+ renderGameAssetProfile();if(!root.childElementCount)return;
+ activeAssetTrigger=trigger;root.hidden=false;setAssetProfileExpanded(true);positionGameAssetProfile(trigger);
 }
-function toggleGameAssetProfile(trigger){
- assetProfilePinned=!assetProfilePinned;
- if(assetProfilePinned){showGameAssetProfile(trigger);setAssetProfileExpanded(true);}
- else{$("game-asset-profile").hidden=true;setAssetProfileExpanded(false);}
+function hideGameAssetProfile(){
+ const root=$("game-asset-profile");if(root)root.hidden=true;
+ activeAssetTrigger=null;setAssetProfileExpanded(false);
 }
 function bindGameAssetProfiles(){
  const triggers=[...document.querySelectorAll(".bar-wrap"),$("hp-bar")].filter(Boolean),root=$("game-asset-profile");
  triggers.forEach(el=>{
-  el.tabIndex=0;el.setAttribute("role","group");el.setAttribute("aria-label","Show game asset profile");el.setAttribute("aria-describedby","game-asset-profile");el.setAttribute("aria-expanded","false");
-  el.addEventListener("pointerenter",()=>{if(!assetProfilePinned)showGameAssetProfile(el);});
-  el.addEventListener("pointerleave",()=>{if(!assetProfilePinned){root.hidden=true;setAssetProfileExpanded(false);}});
-  el.addEventListener("focus",()=>showGameAssetProfile(el));
-  el.addEventListener("blur",()=>{if(!assetProfilePinned){root.hidden=true;setAssetProfileExpanded(false);}});
-  // Resource bars are HUD controls, never gameplay hit targets or camera gestures.
-  el.addEventListener("pointerdown",e=>e.stopPropagation());
-  el.addEventListener("pointerup",e=>e.stopPropagation());
-  el.addEventListener("click",e=>{e.stopPropagation();if(e.target.closest("#hp-pill-use"))return;toggleGameAssetProfile(el);});
-  el.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();e.stopPropagation();toggleGameAssetProfile(el);}});
+  el.setAttribute("aria-label","Show game asset profile");el.setAttribute("aria-describedby","game-asset-profile");el.setAttribute("aria-expanded","false");
+  el.addEventListener("pointerenter",e=>{if(e.pointerType==="mouse")showGameAssetProfile(el);});
+  el.addEventListener("pointerleave",e=>{if(e.pointerType==="mouse")hideGameAssetProfile();});
+  // Resource bars remain non-gameplay HUD controls. Touch previews exist only for the press.
+  el.addEventListener("pointerdown",e=>{e.stopPropagation();if(e.pointerType==="touch")showGameAssetProfile(el);});
+  el.addEventListener("click",e=>e.stopPropagation());
  });
- document.addEventListener("pointerdown",e=>{
-  if(assetProfilePinned&&!e.target.closest(".bar-wrap,#hp-bar")){assetProfilePinned=false;root.hidden=true;setAssetProfileExpanded(false);}
- });
- window.addEventListener("resize",()=>{if(!root.hidden){const active=document.activeElement;if(active&&active.matches(".bar-wrap,#hp-bar"))positionGameAssetProfile(active);}});
+ window.addEventListener("pointerup",e=>{if(e.pointerType==="touch")hideGameAssetProfile();},true);
+ window.addEventListener("pointercancel",e=>{if(e.pointerType==="touch")hideGameAssetProfile();},true);
+ window.addEventListener("resize",()=>{if(!root.hidden&&activeAssetTrigger&&activeAssetTrigger.isConnected)positionGameAssetProfile(activeAssetTrigger);});
 }
 let lastRenderedHp=null,hpPillTravelAnimation=null,hpPillTravelGhost=null,hpPillTravelLayer=null,hpPillTravelDirection=null,hpPillTravelRun=0;
 function animateHpPillTravel(direction){
