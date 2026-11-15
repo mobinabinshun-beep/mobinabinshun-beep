@@ -16,7 +16,7 @@
   if(!walletProvider)return null;
   const raw=walletProvider.load(),save=walletProvider.wallet.normalizeSave(raw);
   const assets=walletProvider.wallet.assetRows(save);
-  return {source:"nu-world-save-v1",mode:"LOCAL_READ_ONLY",profileFamily:"nu.g1.shared-economy",player:{id:String(save.playerId||"LOCAL-PLAYER"),displayName:String(save.displayName||"N.U Explorer"),callsign:String(save.callsign||""),level:Number(save.level)||1,xp:Number(save.xp)||0},assets,unpricedFields:{xCredits:Number(save.xCredits)||0,nCredits:Number(save.nCredits)||0},transactions:Array.isArray(save.transactions)?save.transactions.slice(-10).reverse():[],transactionCount:Array.isArray(save.transactions)?save.transactions.length:0};
+  return {source:"nu-world-save-v1",mode:"LOCAL_READ_ONLY",profileFamily:"nu.g1.local-player-profile",sharedEconomyFamily:"nu.g1.shared-economy",player:{id:String(save.playerId||"LOCAL-PLAYER"),displayName:String(save.displayName||"N.U Explorer"),callsign:String(save.callsign||""),level:Number(save.level)||1,xp:Number(save.xp)||0},assets,unpricedFields:{xCredits:Number(save.xCredits)||0,nCredits:Number(save.nCredits)||0},transactions:Array.isArray(save.transactions)?save.transactions.slice(-10).reverse():[],transactionCount:Array.isArray(save.transactions)?save.transactions.length:0};
  }
  function registerGame(adapter){
   if(!adapter||typeof adapter!=="object")throw new TypeError("Game adapter required");
