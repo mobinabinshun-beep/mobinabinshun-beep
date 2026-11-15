@@ -88,7 +88,8 @@
 - `nu-games.js` — فریز/ازسرگیری رندرها، انتقال امن viewها، ترتیب کتابخانه و Random Game.
 - `nu-graphics-runtime.js` — هماهنگی freeze برای Background Engine، Dynamic Layers و Pixel World در حالت‌های modal.
 - `nu-wallet.js` — ثبت دارایی‌های غیرقابل‌چنج خریداری‌شده و API فیلتر Exchange.
-- `nu-exchange.js` — استفاده از فهرست فیلترشده و کش v3.
+- `nu-exchange.js` — استفاده از فهرست فیلترشده در refresh/replay و کش v3.
+- `exchange.html` — نسخه‌های cache مربوط به Wallet و Exchange.
 - `nu-market-sim.js` — حذف دارایی خریداری‌شده از انتخاب‌گر و شبیه‌ساز بازار.
 
 ### تست‌ها
@@ -99,6 +100,8 @@
 
 ### پیکربندی و مستندات
 - `NU-GENERATION-1-MANIFEST.json`
+- `docs/operations/NU-OPS-IMPLEMENT-01.md` — به‌روزرسانی قفل Gateway با قرارداد جدید مالک.
+- `README.md` — فهرست‌کردن قرارداد اجرایی جدید.
 - این گزارش اجرایی.
 
 ## 5. بکاپ، شاخه‌ها و آرشیو
@@ -109,7 +112,7 @@
 - شاخهٔ کاندید از همان SHA بکاپ ساخته شد؛ تغییرات فقط روی شاخهٔ کاندید انجام شده‌اند.
 - snapshot فایل‌های اصلی و تست‌های پیش از تغییر در مسیر زیر نگهداری می‌شوند:
   `archive/pre-change/2026-11-15/gateway-menu-exchange/`
-- snapshotها شامل index، Gateway JS/CSS، nu-games، wallet، exchange، market simulator، graphics runtime، تست‌های Gateway/Wallet/Exchange/Market و Generation 1 manifest هستند.
+- snapshotها شامل index، Gateway JS/CSS، nu-world.css، nu-games، wallet، exchange، exchange.html، market simulator، graphics runtime، README، پروتکل اجرایی، تست‌های Gateway/Wallet/Exchange/Market و Generation 1 manifest هستند.
 - شاخهٔ قبلی `feature/gateway-main-game-focused-2026-11-15` دست‌نخورده باقی مانده است.
 
 ## 6. آزمون و وضعیت پذیرش
