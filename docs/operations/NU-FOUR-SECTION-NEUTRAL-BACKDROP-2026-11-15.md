@@ -8,12 +8,13 @@
 
 ## Visual contract
 
-All four sections use the same quiet, static dark-navy surface and restrained top radial gradient. The Exchange page already provides the reference surface: `#071018` with a single CSS radial gradient at the top.
+Exchange remains the visual reference: a quiet `#071018` dark-navy surface with a restrained top radial gradient. Wallet, Profile and Store retain that base treatment but receive only a very faint, static functional tint: teal for Wallet, cool violet for Profile and muted amber for Store.
 
 For Wallet, Player Profile and Store, the shared `nu-neutral-view-open` body state:
 - Hides the world image, sky, horizon, world canvases and dynamic ambient layer.
 - Uses only a static CSS background matching the Exchange surface.
-- Does not mount a new renderer, canvas, particle system, animation, timer, requestAnimationFrame loop, or parallax effect.
+- Does not mount a new renderer, canvas, particle system, timer, requestAnimationFrame loop, or parallax effect.
+- Uses one finite 900 ms CSS opacity-only entry cue with three gentle light pulses; it ends automatically and does not loop. `prefers-reduced-motion` disables it.
 - Leaves foreground content and interactive controls above the background layer.
 
 ## Lifecycle and isolation
@@ -35,7 +36,7 @@ To roll back, create a dedicated rollback branch and restore only the archived s
 
 ## Verification
 
-- Automated regression tests cover view lifecycle, the neutral static background, disabled world background layers, and preservation of Exchange chart markup.
+- Automated regression tests cover view lifecycle, section-specific static tints, the finite three-pulse entry cue and reduced-motion fallback, disabled world background layers, and preservation of Exchange chart markup.
 - Browser/device visual acceptance remains a separate human check.
 
 ## CI result on the current branch head
