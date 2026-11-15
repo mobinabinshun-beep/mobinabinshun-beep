@@ -86,3 +86,12 @@ test("ambient candles stay stable between refreshes and advance on the next micr
  assert.equal(next.simulatedCount,24);
  assert.notDeepEqual(next.steps,first.steps);
 });
+
+test("Exchange page loads the drawing and ambient visuals module before the app controller",()=>{
+ const fs=require("node:fs"),path=require("node:path");
+ const html=fs.readFileSync(path.join(__dirname,"../exchange.html"),"utf8");
+ const visualsAt=html.indexOf("nu-exchange-visuals.js");
+ const appAt=html.indexOf("nu-exchange.js?v=");
+ assert.ok(visualsAt>=0,"visuals module script must be present");
+ assert.ok(appAt>visualsAt,"visuals module must load before the Exchange controller");
+});
