@@ -12,7 +12,7 @@ Implementation on an isolated candidate:
 - mouse/pen pointerenter opens the Gateway;
 - touch pointerdown opens it and freezes the active game;
 - mouse/pen pointerenter on an option activates it directly;
-- touch pointerenter activates an option, with pointerup as fallback;
+- touch pointerenter activates an option; document.elementFromPoint hit-testing supports finger drags under implicit touch pointer capture, with pointerup as fallback;
 - duplicate activation is guarded;
 - click/Enter remain accessible fallback paths;
 - the existing scrim, pause ownership, route, scope and renderer event contracts are preserved.
