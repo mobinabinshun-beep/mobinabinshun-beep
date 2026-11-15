@@ -38,6 +38,17 @@
  <label class="chart-toggle"><input id="chart-bands-toggle" type="checkbox" checked> Parametric bands</label>
  <label class="chart-toggle"><input id="chart-tolerance-toggle" type="checkbox" checked> Visual tolerance ±5</label>
 </div>
+<div id="chart-drawing-tools" class="chart-drawing-tools" aria-label="Chart drawing and analysis tools">
+ <span class="drawing-tools-label">DRAW ON CHART</span>
+ <button type="button" data-draw-tool="cursor" aria-pressed="true" class="is-active">Cursor</button>
+ <button type="button" data-draw-tool="trend" aria-pressed="false">Trend line</button>
+ <button type="button" data-draw-tool="horizontal" aria-pressed="false">Horizontal</button>
+ <button type="button" data-draw-tool="vertical" aria-pressed="false">Vertical</button>
+ <button type="button" data-draw-tool="zone" aria-pressed="false">Shaded zone</button>
+ <button type="button" data-draw-action="undo">Undo</button>
+ <button type="button" data-draw-action="clear">Clear</button>
+ <small data-ambient-status>BACKGROUND FLOW · LOCAL SIMULATION · MAX 3 UNITS · VISUAL ONLY</small>
+</div>
 <canvas id="market-chart" role="img" aria-label="Fictional N.U market index candlestick chart"></canvas>
 <div id="market-empty" class="chart-empty">No local activity has been recorded for this asset yet. The simulator will create candles only after in-game wallet activity occurs.</div>
 <div class="panel-heading"><div><p class="eyebrow">LAST FIVE RECORDED STEPS</p><h2>PLAYER MARKET HISTORY</h2></div><span>LOCAL ACTIVITY ONLY</span></div><div id="market-history" class="asset-transactions"></div><p class="panel-note">Only your own recorded asset changes are replayed. Positive and negative deltas are visual tendencies, not a shared order book, real demand, or real prices. Replay speed changes presentation only; it never creates transactions.</p>
