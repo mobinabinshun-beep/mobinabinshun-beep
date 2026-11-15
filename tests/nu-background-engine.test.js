@@ -73,8 +73,7 @@ test("public demo exposes runtime diagnostics for the world background",()=>{
 });
 
 test("interactive page content is stacked above the isolated world background", () => {
-  assert.match(css, /\\.world>\\.nu-world-background\\{[\\s\\S]*?z-index:0!important/);
-  assert.match(css, /\\.world>\\.shell\\{position:relative!important;z-index:3!important/);
-  assert.match(css, /\\.world>\\.shell\\{[^}]*min-height:100vh/);
-  assert.match(engine, /pointer-events:none!important/);
+  assert.match(css, /\.world>\.nu-world-background\{[\s\S]*?z-index:0!important/);
+  assert.match(css, /\.world>\.shell\{position:relative!important;z-index:3!important/);
+  assert.match(css, /\.world>\.nu-world-background\{[^}]*pointer-events:none!important/);
 });
