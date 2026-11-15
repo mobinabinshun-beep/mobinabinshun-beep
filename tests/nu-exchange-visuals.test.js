@@ -44,3 +44,45 @@ test("ambient renderer produces a labelled micro-tick tape without throwing",()=
   assert.match(status.textContent,/±3 INDEX \/ 3 VOL MAX/);
  }finally{global.document=oldDocument;global.getComputedStyle=oldStyle;}
 });
+
+test("ambient background candles are bounded, local, and never mutate recorded activity",()=>{
+ const source=[{id:"player-1",close:104,index:104,volume:8,demand:6,supply:2}],before=JSON.stringify(source);
+ const flow=visuals.ambientMarket(source,"mana-test",2200*5000);
+ assert.equal(JSON.stringify(source),before);
+ assert.equal(flow.simulatedCount,6);
+ assert.equal(flow.steps.length,7);
+ assert.equal(flow.steps[0].id,"player-1");
+ assert.ok(flow.steps.slice(-6).every(step=>step.simulated&&step.visualOnly&&Math.abs(step.delta)<=3&&step.volume>=0&&step.volume<=3));
+});
+
+test("idle market creates a 24-candle animated tape with the specified probability contract",()=>{
+ const flow=visuals.ambientMarket([],"quiet-player-test",2200*9000);
+ assert.equal(flow.simulatedCount,24);
+ assert.equal(flow.steps.length,24);
+ assert.ok(flow.steps.every(step=>step.simulated&&step.visualOnly&&Math.abs(step.delta)<=3&&step.volume>=0&&step.volume<=3));
+ assert.deepEqual(flow.probabilities,{zero:.10,one:.30,two:.30,three:.30,positive:.50});
+});
+
+test("ambient outcomes follow the requested cumulative movement probabilities and 50/50 direction",()=>{
+ const counts={0:0,1:0,2:0,3:0},directions={positive:0,negative:0};
+ for(let i=0;i<500;i++){
+  const flow=visuals.ambientMarket([],"probability-"+i,2200*12000);
+  for(const step of flow.steps){counts[Math.abs(step.delta)]++;if(step.delta>0)directions.positive++;if(step.delta<0)directions.negative++;}
+ }
+ const total=Object.values(counts).reduce((a,b)=>a+b,0);
+ assert.ok(Math.abs(counts[0]/total-.10)<.025);
+ assert.ok(Math.abs(counts[1]/total-.30)<.035);
+ assert.ok(Math.abs(counts[2]/total-.30)<.035);
+ assert.ok(Math.abs(counts[3]/total-.30)<.035);
+ const directional=directions.positive+directions.negative;
+ assert.ok(Math.abs(directions.positive/directional-.5)<.025);
+});
+
+test("ambient candles stay stable between refreshes and advance on the next micro-tick",()=>{
+ const first=visuals.ambientMarket([],"stable-animation-test",2200*20000);
+ const same=visuals.ambientMarket([],"stable-animation-test",2200*20000);
+ assert.deepEqual(first,same);
+ const next=visuals.ambientMarket([],"stable-animation-test",2200*20001);
+ assert.equal(next.simulatedCount,24);
+ assert.notDeepEqual(next.steps,first.steps);
+});
