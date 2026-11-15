@@ -15,11 +15,6 @@
 <p>A fictional market simulation with trading-style charts. Recorded player activity is shown separately from clearly labelled local background flow. No real trades or wallet changes occur.</p>
 <div class="exchange-notice">100% FICTIONAL · N.U ACTIVITY ONLY · NO REAL-WORLD DATA OR VALUE</div>
 </section>
-<section class="exchange-panel wallet-bridge-panel">
-<div class="panel-heading"><div><p class="eyebrow">N.U WALLET BRIDGE</p><h2>PLAYER &amp; OWNED ASSETS</h2></div><span class="sim-tag">LIVE LOCAL CONNECTION</span></div>
-<div id="wallet-connection" aria-live="polite"><p class="panel-note">Connecting to the existing N.U wallet…</p></div>
-<p class="panel-note">Read-only connection to the canonical local save. No shadow wallet, balance mutation, or cross-game settlement. X/N Credits remain unpriced until reviewed.</p>
-</section>
 <section class="market-panel">
 <div class="panel-heading"><div><p class="eyebrow">ACTIVITY-DRIVEN SIMULATION</p><h2>MARKET INDEX</h2></div><span class="sim-tag">SIMULATED · NOT A REAL PRICE</span></div>
 <div class="market-controls"><label for="market-asset">SELECT VIRTUAL ASSET</label><select id="market-asset"></select><span id="market-events">0 RECORDED · SIMULATION ACTIVE</span><label for="chart-time-scale">REPLAY PERIOD</label><select id="chart-time-scale"></select></div>
@@ -69,9 +64,14 @@
 <canvas id="asset-chart" role="img" aria-label="Selected asset balance history chart"></canvas>
 <div id="chart-empty" class="chart-empty" hidden>No recorded changes for this asset yet. The current balance is shown above.</div>
 </section>
-<section class="exchange-panel">
+<section class="exchange-panel audit-trail-panel" aria-label="Wallet audit trail">
 <div class="panel-heading"><div><p class="eyebrow">AUDIT TRAIL</p><h2>RECENT ASSET MOVEMENTS</h2></div><span>LOCAL SAVE</span></div>
-<div id="asset-transactions" class="asset-transactions"></div>
+<div id="asset-transactions" class="asset-transactions" aria-live="polite"></div>
+<div class="wallet-audit-subsection">
+<div class="panel-heading"><div><p class="eyebrow">CANONICAL PLAYER WALLET · SAME WALLET · NO COPIED BALANCE</p><h2>PLAYER PROFILE &amp; OWNED ASSETS</h2></div><span class="sim-tag">READ ONLY · LOCAL SAVE</span></div>
+<div id="wallet-connection" aria-live="polite"><p class="panel-note">Connecting to the existing N.U wallet…</p></div>
+<p class="panel-note">This audit view reads the same canonical local player save used by the game. No shadow wallet, copied balance, simulated transaction, or cross-game settlement is created here. X/N Credits remain unpriced until reviewed.</p>
+</div>
 </section>
 <section class="exchange-panel conversion-panel">
 <div class="panel-heading"><div><p class="eyebrow">MODULAR CROSS-GAME CHANGE</p><h2>GAME-TO-GAME ASSET TRANSFER</h2></div><span id="exchange-lock-status" class="pending-tag">TRANSFER MODULE LOCKED</span></div>
