@@ -89,6 +89,7 @@
 - `nu-graphics-runtime.js` — هماهنگی freeze برای Background Engine، Dynamic Layers و Pixel World در حالت‌های modal.
 - `nu-wallet.js` — ثبت دارایی‌های غیرقابل‌چنج خریداری‌شده و API فیلتر Exchange.
 - `nu-exchange.js` — استفاده از فهرست فیلترشده در refresh/replay و کش v3.
+- `nu-exchange-replay.js` و `nu-exchange.css` — حفظ برچسب‌های بدون عدد و کنترل‌های نمودار نسخهٔ عمومی جدید.
 - `exchange.html` — نسخه‌های cache مربوط به Wallet و Exchange.
 - `nu-market-sim.js` — حذف دارایی خریداری‌شده از انتخاب‌گر و شبیه‌ساز بازار.
 
@@ -97,10 +98,12 @@
 - `tests/nu-wallet.test.js`
 - `tests/nu-exchange-runtime.test.js`
 - `tests/nu-market-sim.test.js`
+- `tests/nu-hp-pill-interaction.test.js` — همگام‌سازی assertion نسخهٔ cache باندل پس از تغییر نام نسخهٔ nu-games.
 
 ### پیکربندی و مستندات
 - `NU-GENERATION-1-MANIFEST.json`
 - `docs/operations/NU-OPS-IMPLEMENT-01.md` — به‌روزرسانی قفل Gateway با قرارداد جدید مالک.
+- `docs/operations/NU-EXCHANGE-CHART-CONTROLS-2026-11-15.md` — حفظ سند کنترل‌های نمودار Exchange نسخهٔ عمومی.
 - `README.md` — فهرست‌کردن قرارداد اجرایی جدید.
 - این گزارش اجرایی.
 
@@ -116,7 +119,7 @@
   `archive/pre-change/2026-11-15/gateway-menu-exchange/`
 - snapshot فایل‌های نسخهٔ عمومی جدیدتر Exchange پیش از ادغام در مسیر زیر نگهداری می‌شوند:
   `archive/latest-default-before-merge/2026-11-15/`
-- snapshotها شامل index، Gateway JS/CSS، nu-world.css، nu-games، wallet، exchange، exchange.html، market simulator، graphics runtime، README، پروتکل اجرایی، تست‌های Gateway/Wallet/Exchange/Market و Generation 1 manifest هستند. مجموعهٔ latest-default-before-merge نیز نسخهٔ جدید Exchange و تست‌های آن را ثبت می‌کند.
+- snapshotها شامل index، Gateway JS/CSS، nu-world.css، nu-games، wallet، exchange، exchange.html، market simulator، graphics runtime، README، پروتکل اجرایی، تست‌های Gateway/Wallet/Exchange/Market و Generation 1 manifest هستند. مجموعهٔ latest-default-before-merge نیز نسخهٔ جدید Exchange، replay، CSS، manifest، مستندات و تست‌های آن را ثبت می‌کند.
 - شاخهٔ قبلی `feature/gateway-main-game-focused-2026-11-15` دست‌نخورده باقی مانده است.
 
 ## 6. آزمون و وضعیت پذیرش
