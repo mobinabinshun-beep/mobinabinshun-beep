@@ -3,7 +3,7 @@
 **Candidate:** Public browser demo, Generation 1  
 **Date:** 2026-11-15  
 **Status:** Manual acceptance pending  
-**Canonical economy:** [Wave and Wallet Transaction Economy](../architecture/NU-WAVE-AND-WALLET-TRANSACTION-ECONOMY.md)
+**Canonical economy:** [Wave and Wallet Transaction Economy](../architecture/NU-WAVE-AND-WALLET-TRANSACTION-ECONOMY.md) · [Casino Wallet Betting Economy](../architecture/NU-CASINO-WALLET-BETTING-ECONOMY.md)
 
 ## Scope and safety
 
