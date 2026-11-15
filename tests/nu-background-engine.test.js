@@ -1,6 +1,7 @@
 "use strict";
 const test=require("node:test");
 const assert=require("node:assert/strict");
+const crypto=require("node:crypto");
 const fs=require("node:fs");
 const path=require("node:path");
 const root=path.resolve(__dirname,"..");
@@ -11,6 +12,9 @@ const engine=read("nu-background-engine.js");
 const runtime=read("nu-graphics-runtime.js");
 test("background engine loads the canonical public image asset",()=>{
  assert.ok(engine.includes("./assets/backgrounds/niroo-universe-background.svg"));
+ const asset=fs.readFileSync(path.join(root,"assets/backgrounds/niroo-universe-background.svg"));
+ const blobSha=crypto.createHash("sha1").update(Buffer.from("blob "+asset.length+"\\0")).update(asset).digest("hex");
+ assert.equal(blobSha,"63dd85a479354406cc5739f4603ccc1d0989e5b0");
  assert.ok(engine.includes("object-fit:contain"));
  assert.ok(engine.includes("img.onload"));
  assert.ok(engine.includes("img.onerror"));
