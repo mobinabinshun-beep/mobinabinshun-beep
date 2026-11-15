@@ -5,7 +5,19 @@
  if(root)root.NUExchangeCore=api;
 })(typeof window!=="undefined"?window:globalThis,function(root){
  "use strict";
- const games=new Map();\n let walletProvider=null;\n function connectWallet(provider){\n  if(!provider||typeof provider.load!=="function"||!provider.wallet||typeof provider.wallet.normalizeSave!=="function"||typeof provider.wallet.assetRows!=="function")throw new TypeError("Read-only wallet provider is incomplete");\n  walletProvider=provider;return walletSnapshot();\n }\n function disconnectWallet(){walletProvider=null;}\n function walletSnapshot(){\n  if(!walletProvider)return null;\n  const raw=walletProvider.load(),save=walletProvider.wallet.normalizeSave(raw);\n  const assets=walletProvider.wallet.assetRows(save);\n  return {source:"nu-world-save-v1",mode:"LOCAL_READ_ONLY",profileFamily:"nu.g1.shared-economy",player:{id:String(save.playerId||"LOCAL-PLAYER"),displayName:String(save.displayName||"N.U Explorer"),callsign:String(save.callsign||""),level:Number(save.level)||1,xp:Number(save.xp)||0},assets,unpricedFields:{xCredits:Number(save.xCredits)||0,nCredits:Number(save.nCredits)||0},transactions:Array.isArray(save.transactions)?save.transactions.slice(-10).reverse():[],transactionCount:Array.isArray(save.transactions)?save.transactions.length:0};\n }
+ const games=new Map();
+ let walletProvider=null;
+ function connectWallet(provider){
+  if(!provider||typeof provider.load!=="function"||!provider.wallet||typeof provider.wallet.normalizeSave!=="function"||typeof provider.wallet.assetRows!=="function")throw new TypeError("Read-only wallet provider is incomplete");
+  walletProvider=provider;return walletSnapshot();
+ }
+ function disconnectWallet(){walletProvider=null;}
+ function walletSnapshot(){
+  if(!walletProvider)return null;
+  const raw=walletProvider.load(),save=walletProvider.wallet.normalizeSave(raw);
+  const assets=walletProvider.wallet.assetRows(save);
+  return {source:"nu-world-save-v1",mode:"LOCAL_READ_ONLY",profileFamily:"nu.g1.shared-economy",player:{id:String(save.playerId||"LOCAL-PLAYER"),displayName:String(save.displayName||"N.U Explorer"),callsign:String(save.callsign||""),level:Number(save.level)||1,xp:Number(save.xp)||0},assets,unpricedFields:{xCredits:Number(save.xCredits)||0,nCredits:Number(save.nCredits)||0},transactions:Array.isArray(save.transactions)?save.transactions.slice(-10).reverse():[],transactionCount:Array.isArray(save.transactions)?save.transactions.length:0};
+ }
  function registerGame(adapter){
   if(!adapter||typeof adapter!=="object")throw new TypeError("Game adapter required");
   const id=String(adapter.id||"").trim(),name=String(adapter.name||"").trim();
