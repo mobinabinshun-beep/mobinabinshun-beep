@@ -1,0 +1,5 @@
+; N.U Launcher module registry v1
+; Format: id|display name|relative DLL path
+; Only load trusted modules. DLL modules execute inside the launcher process.
+; Example:
+; sample.g1|Generation 1 Sample Module|modules\sample-g1.dll
