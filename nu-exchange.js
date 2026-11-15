@@ -1,7 +1,7 @@
 (function(){
 "use strict";
 const $=id=>document.getElementById(id),CACHE_KEY="nu_exchange_cache_v3",MAX_CHART_STEPS=24,MAX_TEXT_HISTORY=5;
-let selected="xp",marketSelected="xp",replayMode="24s",replayStart=Date.now(),replayTimer=0,lastLedgerSignature="",ledgerPulseTimer=0;
+let selected="xp",marketSelected="xp",replayMode="24s",replayStart=Date.now(),replayTimer=0,lastLedgerSignature="",ledgerPulseTimer=0,syncingProtocols=false;
 const PREF_KEY="nu_exchange_chart_preferences_v1";
 let chartPrefs={zoom:24,grid:true,wicks:true,volume:true,average:true,tolerance:true,bands:true,averagePeriod:5,theme:"night",palette:"aurora"};
 const guard=NUExchangeGuard.create(window.localStorage),maintenance=NUExchangeLock.create(window.localStorage);
@@ -19,7 +19,7 @@ function renderWalletConnection(snapshot){
  host.innerHTML='<div class="wallet-connection-head"><div><p class="eyebrow">CONNECTED LOCAL PLAYER PROFILE</p><h2>'+esc(p.displayName||"N.U Explorer")+'</h2><p class="panel-note">'+esc(p.id||"LOCAL-PLAYER")+(p.callsign?" · "+esc(p.callsign):"")+" · Level "+format(p.level||1)+'</p></div><span class="sim-tag">READ ONLY · LOCAL SAVE</span></div><div class="market-summary wallet-asset-grid">'+assetHtml+'</div><div class="wallet-unpriced"><strong>Unpriced / not enabled for exchange</strong><span>X Credits: '+format(snapshot.unpricedFields&&snapshot.unpricedFields.xCredits)+'</span><span>N Credits: '+format(snapshot.unpricedFields&&snapshot.unpricedFields.nCredits)+'</span></div><div class="panel-heading"><div><p class="eyebrow">SAME WALLET · NO COPIED BALANCE</p><h2>RECENT WALLET TRANSACTIONS</h2></div><span>'+format(snapshot.transactionCount||0)+' RECORDED</span></div><div class="asset-transactions">'+txHtml+'</div>';
 }
 function snapshot(save,rows){
- const out={version:2,updatedAt:new Date().toISOString(),assets:{},market:{}};
+ const out={version:3,updatedAt:new Date().toISOString(),assets:{},market:{}};
  rows.forEach(r=>{const all=NUWallet.assetHistory(save,r.key);out.assets[r.key]={chart:all.slice(-(MAX_CHART_STEPS+1)),recent:all.slice(1).slice(-MAX_TEXT_HISTORY)};});
  NUVirtualMarket.assets(save).forEach(a=>{const steps=NUVirtualMarket.build(save,a.key).steps.slice(-MAX_CHART_STEPS);out.market[a.key]={steps,recent:steps.slice(-MAX_TEXT_HISTORY)};});
  return out;
@@ -110,7 +110,7 @@ function signalLedgerChange(){
  window.clearTimeout(ledgerPulseTimer);ledgerPulseTimer=window.setTimeout(()=>panel.classList.remove("ledger-updated"),720);
 }
 function refresh(){
- const save=NUWallet.normalizeSave(NU.load()),wallet=NUExchangeEngines.walletEngine.read(),rows=NUWallet.exchangeAssetRows(save).filter(r=>r.key!=="hp"),signature=JSON.stringify(save.transactions||[]);renderWalletConnection(wallet);NUExchangeEngines.protocolEngine.list().forEach(p=>{if(!NUExchangeCore.listGames().some(g=>g.id===p.gameId))NUExchangeCore.registerGame({id:p.gameId,name:p.displayName,assets:(p.assets||[]).map(a=>({id:a.assetId,label:a.label,unit:a.unit})),coins:(p.coins||[]).map(a=>({id:a.assetId,label:a.label,unit:a.unit})),transferEnabled:false});});
+ const save=NUWallet.normalizeSave(NU.load()),wallet=NUExchangeEngines.walletEngine.read(),rows=NUWallet.exchangeAssetRows(save).filter(r=>r.key!=="hp"),signature=JSON.stringify(save.transactions||[]);renderWalletConnection(wallet);syncingProtocols=true;try{NUExchangeEngines.protocolEngine.list().forEach(p=>{if(!NUExchangeCore.listGames().some(g=>g.id===p.gameId))NUExchangeCore.registerGame({id:p.gameId,name:p.displayName,assets:(p.assets||[]).map(a=>({id:a.assetId,label:a.label,unit:a.unit})),coins:(p.coins||[]).map(a=>({id:a.assetId,label:a.label,unit:a.unit})),transferEnabled:false});});}finally{syncingProtocols=false;}
  if(lastLedgerSignature&&signature!==lastLedgerSignature){replayStart=Date.now();signalLedgerChange();}
  lastLedgerSignature=signature;
  if(!rows.some(r=>r.key===selected))selected=rows[0]?.key||"xp";
@@ -164,7 +164,7 @@ window.NUExchangeAttempt=async function(commit){
  if(typeof commit!=="function")return {ok:false,reason:"NO_APPROVED_TRANSFER_ADAPTER"};
  const result=await commit();if(result&&result.ok)guard.recordSuccess();updateGuard();return result;
 };
-window.addEventListener("nu:exchange:registry-change",refresh);
+window.addEventListener("nu:exchange:registry-change",()=>{if(!syncingProtocols)refresh();});
 window.addEventListener("nu:save-updated",refresh);
 window.addEventListener("nu:exchange:wallet-refresh",refresh);
 window.addEventListener("storage",e=>{if(e.key===NU.storageKey)refresh();});
