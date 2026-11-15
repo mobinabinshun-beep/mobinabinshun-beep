@@ -146,3 +146,18 @@ If any background/decorative layer covers or alters foreground UI:
 This protocol is mandatory for all contributors, agents, automation, branches, releases and future extensions. The automated checks in tests/nu-layer-contract.test.js and .github/workflows/graphics-ci.yml enforce the source-level invariants. Any future change to the layer model must update this protocol, the tokens, tests and architecture record together.
 
 **No feature priority, visual ambition, schedule pressure or performance tier overrides the foreground-safety law.**
+
+
+## 12. Per-stage human acceptance — mandatory release invariant
+
+Every independently reviewable UI, visual, background, interaction, accessibility or rendering change stage MUST pass the repository's public-Demo human acceptance gate before the next independent stage proceeds.
+
+- Automated tests, source inspection, screenshots, local previews and CI are technical evidence only; none constitutes human acceptance.
+- Human testing is requested only against the exact revision deployed and verified on the public Demo.
+- Record the change ID, candidate SHA, deployed SHA, Demo URL, deployment time, scenarios and the project owner's explicit decision in a dated human-test report.
+- The stage is blocked while its status is HUMAN-QA-PENDING or REJECTED. Do not stack the next independent change, merge, lock or promote it.
+- Every fix or follow-up revision starts a fresh backup/change record and repeats automated checks, Demo deployment and human retest. Acceptance never transfers from an earlier SHA.
+- If the public Demo is unavailable, mark the stage NOT VERIFIED / HUMAN-QA-PENDING and stop progression.
+- Only the project owner can explicitly authorize a documented exception or a pre-declared bundled stage.
+
+This section is enforced together with CHANGE-AND-DEMO-PROTOCOL.md and docs/PUBLIC-DEMO-HUMAN-ACCEPTANCE-GATE.md. No CI status or contributor judgment can waive this requirement.
