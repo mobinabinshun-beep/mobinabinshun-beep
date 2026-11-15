@@ -229,3 +229,22 @@
 - `exchange.html`
 - `tests/nu-exchange-visuals.test.js`
 - این سند اجرایی
+
+
+## 11. نتیجهٔ CI پس از اصلاحات — 2026-11-15
+
+کد اصلاح‌شده روی commit `213739788f215c9ae3932f8a13d9c5f45a4bf574` بررسی شد. چهار workflow زیر با نتیجهٔ موفق پایان یافتند:
+
+| Workflow | نتیجه | Run |
+|---|---|---|
+| Gateway main-game regression | PASS | 174 |
+| Wallet and Profile regression | PASS | 202 |
+| Generation 1 HUD layout regression | PASS | 197 |
+| Studio export regression gates | PASS | 672 |
+
+این نتیجه، خطای قبلی `ambientMarket is not a function` را پس از export کردن API و افزودن script load order برطرف‌شده نشان می‌دهد. همچنین تست Gateway freeze و Dynamic Layers در workflow مربوطه موفق شد.
+
+- Machine CI: **PASSED** برای commit بالا.
+- Human browser/device QA: **PENDING**.
+- Merge به شاخهٔ پیش‌فرض: **NOT PERFORMED**.
+- Public Pages deployment: **NOT PERFORMED**.
