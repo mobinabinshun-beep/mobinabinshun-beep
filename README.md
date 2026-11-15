@@ -534,3 +534,8 @@ The three existing casino games now use spendable positive assets from the share
 The existing Coin Flip 2×, Lucky Dice 5×, Mini Slots triple 8× and pair 2× gross payout rules remain unchanged. Mana payouts respect the current storage capacity. Short round feedback respects reduced-motion preferences.
 
 See `docs/architecture/NU-CASINO-WALLET-BETTING-ECONOMY.md`. This is still local virtual demo activity only; no real-money deposits, withdrawals, cash-out or server-backed ledger exist. Add casino checks from `docs/testing/NU-PUBLIC-DEMO-WAVE-WALLET-HUMAN-QA.md` to the manual acceptance run.
+
+
+## Windows launcher 0.1 candidate
+
+A first native 32-bit Windows launcher and NSIS installer candidate is being prepared separately from the browser-only launcher preview. See [Windows launcher 0.1 build and compatibility notes](launcher/windows/README.md) and the [implementation/acceptance plan](docs/operations/NU-WINDOWS-LAUNCHER-0.1.md). The candidate uses one still background image, checks RAM/CPU locally, and passes a conservative performance ceiling to the browser demo. It is not yet XP- or all-Windows-accepted; download only from a successful CI artifact after the build completes.
