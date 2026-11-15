@@ -50,3 +50,16 @@ For every instruction such as «اعمال کن»، «پیاده کن»، «فی
 
 ## 6. Rollback and evidence
 Rollback by reverting the scoped PR/commit or restoring the exact pre-change backup branch. Never force-push the public default branch. Record CI-PASSED, DEPLOYED, HUMAN-QA-PENDING and HUMAN-QA-PASSED as distinct states; automated CI is not human browser acceptance.
+
+## 7. Mandatory human-acceptance gate — owner rule (2026-11-15)
+
+**Rule:** No implementation, release candidate, feature, or defect is marked APPROVED or REJECTED solely from automated checks, source inspection, or an agent's assessment. A human test and a traceable human report are required first.
+
+- CI-PASSED means only that the recorded automated workflows passed. It is not human acceptance.
+- Before a human report exists, the acceptance state must remain **PENDING HUMAN TEST / PENDING HUMAN REPORT**. Do not convert that state to APPROVED or REJECTED.
+- A failed CI run may be recorded as an automated failure, but it does not by itself constitute the owner's final human acceptance/rejection decision.
+- The human report must identify the candidate commit/build, date, tester (or anonymous tester ID), device, OS, browser, viewport/orientation, input method (mouse/touch/keyboard), test scenario, expected result, actual result, PASS/FAIL, and evidence or reproduction steps. Do not collect passwords, private credentials, or unnecessary personal data.
+- Each reported defect receives a reproducible issue with severity, affected build, steps, expected/actual behavior, and evidence. Fixes require a new candidate build and a repeat human test of the affected scenario.
+- Final acceptance is recorded only after the required human scenarios have reports. A mixed result remains **PARTIALLY TESTED / PENDING**, not globally approved.
+- Merge/deployment must not be used to bypass this gate. If a separate public preview is explicitly prepared for testing, label it **TEST CANDIDATE — NOT APPROVED** and preserve rollback; public availability itself is not acceptance.
+- Keep the following states distinct: **IMPLEMENTED**, **CI-PASSED / CI-FAILED**, **HUMAN-QA-PENDING**, **HUMAN-QA-PASSED / HUMAN-QA-FAILED**, **APPROVED / REJECTED**, **MERGED**, and **DEPLOYED**. No state implies another.
