@@ -15,6 +15,7 @@ test("Gateway is enabled only while the main game view is active",()=>{
 
 test("Gateway exposes exactly Back, Menu and Profile actions",()=>{
  for(const action of ["back","menu","profile"])assert.match(html,new RegExp('data-action="'+action+'"'));
+ assert.equal((html.match(/data-action="/g)||[]).length,3);
  assert.doesNotMatch(html,/data-action="(settings|store|wallet|exchange)"/);
  assert.match(js,/menu:.*menu-open/);
  assert.match(js,/profile:.*menu-profile/);
