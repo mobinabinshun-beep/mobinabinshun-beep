@@ -67,7 +67,8 @@
     const blob=new Blob([buildHumanReport()],{type:"text/plain;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");
     a.href=url;a.download="nu-public-demo-human-test-report-"+new Date().toISOString().slice(0,10)+".txt";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
   }
-  const reportButton=$("wallet-human-report");if(reportButton)reportButton.addEventListener("click",downloadHumanReport);\n  function renderProfile(){
+  const reportButton=$("wallet-human-report");if(reportButton)reportButton.addEventListener("click",downloadHumanReport);
+  function renderProfile(){
     if(!$("player-id"))return;
     const s=ensureIdentity(),name=safeText(s.displayName,"N.U Explorer"),callsign=safeText(s.callsign,"Unassigned");
     $("player-id").textContent=s.playerId;
