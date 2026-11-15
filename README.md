@@ -542,6 +542,6 @@ See `docs/architecture/NU-CASINO-WALLET-BETTING-ECONOMY.md`. This is still local
 - Offline per-user installer definition: `native/installer.nsi`
 - Canonical artwork is packaged from `assets/backgrounds/niroo-universe-background.svg` as one static image.
 - The launcher automatically selects a conservative local profile using CPU count and physical-memory signals.
-- The GitHub Actions workflow `.github/workflows/xp-launcher-build.yml` builds a setup executable and uploads a test artifact.
+- The GitHub Actions workflow `.github/workflows/xp-launcher-build.yml` builds a setup executable and uploads a test artifact. [Latest successful build and modern Windows smoke test](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/43745436516).
 - **XP SP3 x86 execution has not yet been certified.** The web game is opened in the system browser and has a separate legacy-browser compatibility requirement.
 - Current implementation review: [PR #145](https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/145).
