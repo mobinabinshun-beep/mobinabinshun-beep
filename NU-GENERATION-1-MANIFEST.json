@@ -3,7 +3,7 @@
   "generation": 1,
   "runtime": "N.U Adaptive Runtime",
   "runtimeVersion": "0.1-prototype",
-  "packageVersion": "0.5.10-gateway-single-gate-menu-exchange",
+  "packageVersion": "0.5.11-gateway-single-gate-menu-exchange",
   "entry": "index.html",
   "modules": [
     "index.html",
