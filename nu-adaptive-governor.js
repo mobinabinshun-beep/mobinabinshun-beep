@@ -167,6 +167,7 @@
   function start(initial) {
     if (running || !initial || !initial.budget || !g.NUGraphicsCore) return;
     profile = initial;
+    g.NUGraphicsProfile = initial;
     savedProfile = readLauncherProfile();
     ceilingLevel = savedProfile
       ? Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, Number(savedProfile.stableLevel) || Number(savedProfile.level) || initial.level))
