@@ -69,7 +69,7 @@ Use for a confirmed interaction with a bubble, Mana object, mass, target, or oth
 
 Required: `anchor`, `text`.
 
-Optional: `fill`, `tone` (`xp` or `mana`), `boundaryOffset`, `duration`.
+Optional: `fill`, `tone` (a sanitized CSS tone class; built-in defaults are `xp` and `mana`), `boundaryOffset`, `duration`. Games may add a small namespaced tone rule without changing the shared animation.
 
 Use for changes such as `+1` at the current fill boundary. The caller supplies the already-updated fill element and its containing rail. The module only renders the notification.
 
@@ -77,7 +77,7 @@ Use for changes such as `+1` at the current fill boundary. The caller supplies t
 
 Required: `anchor`, `itemDelta`, `resourceDelta`.
 
-Optional: `duration` (default 1750ms), `offset` (default 4px).
+Optional: `duration` (default 1750ms), `offset` (default 4px), `itemTone` (default `loss`), and `resourceTone` (default `hp`). Custom tones may be supplied by a game-specific CSS class while retaining the shared card geometry and motion.
 
 Use for successful consumption or exchange. It creates a paired legacy-style notification: item cost in gold (`.loss`) and resulting resource change in green (`.hp`). For HP capsule use, the exact copy is `−1 CAPSULE HEAL` and `+N HP`, where N must be the actual restored amount returned by the wallet (including any cap). Do not infer, recalculate, or hard-code the amount.
 
