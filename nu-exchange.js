@@ -1,9 +1,9 @@
 (function(){
 "use strict";
 const $=id=>document.getElementById(id),CACHE_KEY="nu_exchange_cache_v2",MAX_CHART_STEPS=24,MAX_TEXT_HISTORY=5;
-let selected="xp",marketSelected="xp",replayMode="24s",replayStart=Date.now(),replayTimer=0,lastLedgerSignature="";
+let selected="xp",marketSelected="xp",replayMode="24s",replayStart=Date.now(),replayTimer=0,lastLedgerSignature="",ledgerPulseTimer=0;
 const PREF_KEY="nu_exchange_chart_preferences_v1";
-let chartPrefs={zoom:24,grid:true,wicks:true,volume:true,average:true,tolerance:true,averagePeriod:5,theme:"night",palette:"aurora"};
+let chartPrefs={zoom:24,grid:true,wicks:true,volume:true,average:true,tolerance:true,bands:true,averagePeriod:5,theme:"night",palette:"aurora"};
 const guard=NUExchangeGuard.create(window.localStorage),maintenance=NUExchangeLock.create(window.localStorage);
 function format(n){return new Intl.NumberFormat(undefined,{maximumFractionDigits:2}).format(Number(n)||0);}
 function dateLabel(value){const d=new Date(value);return Number.isNaN(d.getTime())?"Recorded":new Intl.DateTimeFormat(undefined,{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}).format(d);}
@@ -17,7 +17,7 @@ function snapshot(save,rows){
 }
 function chartColors(){
  const css=getComputedStyle(document.body);
- return {positive:css.getPropertyValue("--positive").trim()||"#70dfaa",negative:css.getPropertyValue("--negative").trim()||"#ff8b91",accent:css.getPropertyValue("--accent").trim()||"#78d7e8",analysis:css.getPropertyValue("--analysis").trim()||"#e7c77a",grid:css.getPropertyValue("--grid").trim()||"rgba(160,205,224,.14)",muted:css.getPropertyValue("--muted").trim()||"#91aab9"};
+ return {positive:css.getPropertyValue("--positive").trim()||"#70dfaa",negative:css.getPropertyValue("--negative").trim()||"#ff8b91",accent:css.getPropertyValue("--accent").trim()||"#78d7e8",analysis:css.getPropertyValue("--analysis").trim()||"#e7c77a",grid:css.getPropertyValue("--grid").trim()||"rgba(160,205,224,.14)",muted:css.getPropertyValue("--muted").trim()||"#91aab9",analysisMuted:css.getPropertyValue("--analysis-muted").trim()||"#8e9aa4"};
 }
 function drawBalance(points){
  const canvas=$("asset-chart"),ctx=canvas.getContext("2d"),w=canvas.clientWidth||600,h=280,dpr=Math.min(window.devicePixelRatio||1,2),visible=points.slice(-chartPrefs.zoom),colors=chartColors();
@@ -46,6 +46,14 @@ function drawMarket(steps){
  ctx.font="11px system-ui";ctx.textAlign="right";ctx.textBaseline="middle";
  for(let i=0;i<=4;i++){const v=min+span*i/4,yy=y(v);if(chartPrefs.grid){ctx.strokeStyle=colors.grid;ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(w-pad.r,yy);ctx.stroke();}ctx.fillStyle=colors.muted;ctx.fillText(v.toFixed(2),pad.l-9,yy);}
  if(chartPrefs.grid){for(let i=0;i<=4;i++){const xx=pad.l+pw*i/4;ctx.strokeStyle=colors.grid;ctx.beginPath();ctx.moveTo(xx,pad.t);ctx.lineTo(xx,pad.t+ph);ctx.stroke();}}
+ if(chartPrefs.bands){
+  const bands=NUVirtualMarket.analysisBands(visible,chartPrefs.averagePeriod);
+  if(bands.length){
+   ctx.strokeStyle=colors.analysisMuted;ctx.lineWidth=1.25;ctx.setLineDash([3,5]);
+   for(const edge of ["upper","lower"]){ctx.beginPath();let started=false;bands.forEach((band,i)=>{if(!Number.isFinite(band[edge]))return;const xx=pad.l+slot*(i+.5),yy=y(band[edge]);if(!started){ctx.moveTo(xx,yy);started=true;}else ctx.lineTo(xx,yy);});ctx.stroke();}
+   ctx.setLineDash([]);
+  }
+ }
  const maxVol=Math.max(1,...visible.map(s=>Number(s.volume)||0));
  visible.forEach((s,i)=>{
   const cx=pad.l+slot*(i+.5),up=s.close>=s.open,color=up?colors.positive:colors.negative;
@@ -87,9 +95,15 @@ function updateGuard(){
  $("exchange-lock-status").textContent=maintenance.isLocked()?"TRANSFER MODULE LOCKED":"TRANSFER MODULE UNLOCKED";
  $("exchange-lock-status").className=maintenance.isLocked()?"pending-tag":"sim-tag";
 }
+function signalLedgerChange(){
+ const panel=document.querySelector(".market-panel");if(!panel)return;
+ panel.classList.remove("ledger-updated");void panel.offsetWidth;panel.classList.add("ledger-updated");
+ window.clearTimeout(ledgerPulseTimer);ledgerPulseTimer=window.setTimeout(()=>panel.classList.remove("ledger-updated"),720);
+}
 function refresh(){
- const save=NUWallet.normalizeSave(NU.load()),rows=NUWallet.assetRows(save).filter(r=>r.key!=="hp");
- lastLedgerSignature=JSON.stringify(save.transactions||[]);
+ const save=NUWallet.normalizeSave(NU.load()),rows=NUWallet.assetRows(save).filter(r=>r.key!=="hp"),signature=JSON.stringify(save.transactions||[]);
+ if(lastLedgerSignature&&signature!==lastLedgerSignature){replayStart=Date.now();signalLedgerChange();}
+ lastLedgerSignature=signature;
  if(!rows.some(r=>r.key===selected))selected=rows[0]?.key||"xp";
  $("asset-select").innerHTML=rows.map(r=>'<option value="'+r.key+'">'+esc(r.label)+'</option>').join("");$("asset-select").value=selected;
  $("market-asset").innerHTML=NUVirtualMarket.assets().map(a=>'<option value="'+a.key+'">'+esc(a.label)+'</option>').join("");$("market-asset").value=marketSelected;
@@ -105,6 +119,7 @@ function loadChartPreferences(){
  try{const saved=JSON.parse(localStorage.getItem(PREF_KEY)||"null");if(saved&&typeof saved==="object")chartPrefs=Object.assign(chartPrefs,saved);}catch(_){}
  chartPrefs.zoom=Math.max(4,Math.min(24,Number(chartPrefs.zoom)||24));
  chartPrefs.averagePeriod=Math.max(3,Math.min(12,Number(chartPrefs.averagePeriod)||5));
+ chartPrefs.bands=chartPrefs.bands!==false;
  chartPrefs.theme=["night","day"].includes(chartPrefs.theme)?chartPrefs.theme:"night";
  chartPrefs.palette=["aurora","emerald","rose","amber","mono"].includes(chartPrefs.palette)?chartPrefs.palette:"aurora";
 }
@@ -114,7 +129,7 @@ function applyChartPreferences(){
  $("chart-zoom").value=String(chartPrefs.zoom);$("chart-zoom-value").textContent=String(chartPrefs.zoom);
  $("chart-grid-toggle").checked=chartPrefs.grid;$("chart-wicks-toggle").checked=chartPrefs.wicks;
  $("chart-volume-toggle").checked=chartPrefs.volume;$("chart-average-toggle").checked=chartPrefs.average;
- $("chart-tolerance-toggle").checked=chartPrefs.tolerance;$("chart-average-period").value=String(chartPrefs.averagePeriod);
+ $("chart-tolerance-toggle").checked=chartPrefs.tolerance;$("chart-bands-toggle").checked=chartPrefs.bands;$("chart-average-period").value=String(chartPrefs.averagePeriod);
  $("chart-theme").value=chartPrefs.theme;$("chart-palette").value=chartPrefs.palette;
 }
 function bindChartPreferences(){
@@ -125,7 +140,7 @@ function bindChartPreferences(){
  bindChange("chart-average-period","averagePeriod",el=>Number(el.value));
  bindChange("chart-theme","theme",el=>el.value);
  bindChange("chart-palette","palette",el=>el.value);
- [["chart-grid-toggle","grid"],["chart-wicks-toggle","wicks"],["chart-volume-toggle","volume"],["chart-average-toggle","average"],["chart-tolerance-toggle","tolerance"]].forEach(([id,key])=>$(id).addEventListener("change",e=>{chartPrefs[key]=e.target.checked;saveChartPreferences();applyChartPreferences();refresh();}));
+ [["chart-grid-toggle","grid"],["chart-wicks-toggle","wicks"],["chart-volume-toggle","volume"],["chart-average-toggle","average"],["chart-tolerance-toggle","tolerance"],["chart-bands-toggle","bands"]].forEach(([id,key])=>$(id).addEventListener("change",e=>{chartPrefs[key]=e.target.checked;saveChartPreferences();applyChartPreferences();refresh();}));
 }
 function unlockOne(){const r=maintenance.begin($("unlock-phrase").value);$("unlock-feedback").textContent=r.ok?"مرحله اول ثبت شد؛ مرحله دوم را تأیید کن.":"عبارت تأیید نادرست است.";}
 function unlockTwo(){const r=maintenance.confirm($("unlock-phrase").value);$("unlock-feedback").textContent=r.ok?"قفل ماژول انتقال باز شد.":"تأیید دوم ناموفق بود؛ از مرحله اول شروع کن.";updateGuard();}

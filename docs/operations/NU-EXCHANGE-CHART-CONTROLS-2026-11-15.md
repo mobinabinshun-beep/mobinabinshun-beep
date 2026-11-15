@@ -11,11 +11,11 @@
 - Replay selector labels are now number-free: Seconds, Minutes, Hours, Days, Weeks, Months.
 - Added a player-controlled visible-history zoom range over the retained local history (4–24 steps).
 - Added independent controls for grid, candle shadows, volume, moving-average analysis line and display-only tolerance.
-- Added configurable moving-average periods.
+- Added configurable moving-average periods and optional parametric dispersion bands (rolling mean ± one standard deviation), drawn as neutral grey dashed lines. These are descriptive overlays only, not forecasts or trade signals.
 - Added Night/Day themes and Aurora, Emerald, Rose, Amber and Monochrome palettes. Preferences are stored locally in a dedicated namespaced key.
 - Positive and negative OHLC candles remain derived from the local player's wallet transactions.
 - Candle wicks receive deterministic visual-only variation of up to ±5 N.U index points. The variation does not change candle open/close, market index, wallet balances or transactions.
-- The chart refresh continues to follow local wallet state and the existing replay timer.
+- The chart refresh continues to follow local wallet state and the existing replay timer. A detected ledger addition/removal restarts the replay cursor and briefly highlights the chart; no animation or counter creates a wallet event.
 
 ## Preserved boundaries
 

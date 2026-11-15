@@ -38,6 +38,19 @@
   const bounded=steps.slice(-MAX_CANDLES),last=bounded[bounded.length-1];
   return {asset:ASSETS.find(a=>a.key===key),steps:bounded,candles:bounded,index:last?last.index:BASE_INDEX,changePct:((last?last.index:BASE_INDEX)/BASE_INDEX-1)*100,volume:bounded.reduce((n,s)=>n+s.volume,0),demand:bounded.reduce((n,s)=>n+s.demand,0),supply:bounded.reduce((n,s)=>n+s.supply,0),events:bounded.length,baseline:BASE_INDEX};
  }
+ function analysisBands(steps,period){
+  if(!Array.isArray(steps))return [];
+  const size=clamp(Math.floor(Number(period)||5),2,MAX_CANDLES);
+  return steps.map((step,index)=>{
+   if(index+1<size)return {index,mean:null,upper:null,lower:null};
+   const sample=steps.slice(index+1-size,index+1).map(item=>Number(item.close)).filter(Number.isFinite);
+   if(sample.length!==size)return {index,mean:null,upper:null,lower:null};
+   const mean=sample.reduce((sum,value)=>sum+value,0)/sample.length;
+   const variance=sample.reduce((sum,value)=>sum+Math.pow(value-mean,2),0)/sample.length;
+   const deviation=Math.sqrt(variance);
+   return {index,mean,upper:mean+deviation,lower:mean-deviation};
+  });
+ }
  function assets(){return ASSETS.slice();}
- return {ASSETS,BASE_INDEX,MAX_CANDLES,MAX_EVENTS,assets,build};
+ return {ASSETS,BASE_INDEX,MAX_CANDLES,MAX_EVENTS,assets,build,analysisBands};
 });
