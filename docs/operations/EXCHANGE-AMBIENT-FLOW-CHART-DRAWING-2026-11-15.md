@@ -1,6 +1,6 @@
 # N.U Exchange — Ambient Flow and Player Chart Drawing
 **Date:** 2026-11-15  
-**Status:** Implemented on candidate head `9f289e1ae5fe9458067ebe206ac6c2af2e68ae82`; Exchange regression 38/38 and all seven GitHub Actions workflows passed. Human browser/touch acceptance remains pending.
+**Status:** Implemented on the current candidate; Exchange regression 40/40 and all seven GitHub Actions workflows passed on the final code/copy candidate (`6b044d7717ad1c6e49e0826f516a8ff2ec406fe1`). Human browser/touch acceptance remains pending.
 
 ## Scope
 This change extends the existing activity-driven fictional market chart without replacing its transaction-backed OHLC history, replay controls, moving average, parametric bands, themes, palettes, volume, or durable Store-purchase exclusion.
@@ -40,7 +40,7 @@ Annotations are stored in local browser presentation preferences, keyed by selec
 - NU-GENERATION-1-MANIFEST.json — module and behavior registration.
 
 ## Validation
-- Automated Exchange regression: PASS (30 tests, 0 failures), including deterministic ambient pulses, ±3 index bound, 3-unit volume bound, player demand/supply direction bias, and ambient renderer/micro-tick output.
+- Automated Exchange regression: PASS (40 tests, 0 failures), including deterministic ambient pulses, ±3 index bound, 3-unit volume bound, cumulative 90/60/30 movement probabilities, 50/50 direction, idle candles, renderer output, and page script integration.
 - Graphics preview smoke and graphics integrity workflows: PASS on the same candidate head.
 - Human acceptance remains required for chart drawing on desktop and touch devices, annotation persistence per asset, resize behavior, and visual balance.
 - No merge, public deployment, or human acceptance is implied by this implementation record.
