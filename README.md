@@ -534,3 +534,8 @@ The three existing casino games now use spendable positive assets from the share
 The existing Coin Flip 2×, Lucky Dice 5×, Mini Slots triple 8× and pair 2× gross payout rules remain unchanged. Mana payouts respect the current storage capacity. Short round feedback respects reduced-motion preferences.
 
 See `docs/architecture/NU-CASINO-WALLET-BETTING-ECONOMY.md`. This is still local virtual demo activity only; no real-money deposits, withdrawals, cash-out or server-backed ledger exist. Add casino checks from `docs/testing/NU-PUBLIC-DEMO-WAVE-WALLET-HUMAN-QA.md` to the manual acceptance run.
+
+
+## Documentation hub
+
+Use the [N.U Documentation Hub](docs/README.md) as the central index for architecture contracts, implementation records, QA procedures, assets, and historical handoffs. It also explains which documents are normative and how the public implementation repository relates to the separate private archive.
