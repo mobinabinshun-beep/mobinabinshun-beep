@@ -4,9 +4,8 @@
   const root = document.getElementById("nu-hex-gateway");
   const scrim = document.querySelector(".nu-gateway-scrim");
   const gameView = document.getElementById("game-view");
-  const walletView = document.getElementById("wallet-view");
-  // Gateway is enabled on gameplay and the wallet only; other pages keep existing navigation.
-  if (!root || !scrim || !gameView || !walletView) return;
+  // The scoped owner unlock applies only while a Generation 1 game is active.
+  if (!root || !scrim || !gameView) return;
 
   const trigger = root.querySelector(".nu-gateway-trigger");
   const items = [...root.querySelectorAll(".nu-gateway-item")];
@@ -22,15 +21,12 @@
 
   function syncGatewayScope() {
     const gameActive = Boolean(gameView?.classList.contains("active"));
-    const walletActive = Boolean(walletView?.classList.contains("active"));
-    document.body.classList.toggle("nu-gateway-enabled", gameActive || walletActive);
+    document.body.classList.toggle("nu-gateway-enabled", gameActive);
     document.body.classList.toggle("nu-main-game-page", gameActive);
     document.body.classList.toggle("nu-game-active", gameActive);
-    document.body.classList.toggle("nu-wallet-active", walletActive);
   }
   syncGatewayScope();
-  if (gameView) new MutationObserver(syncGatewayScope).observe(gameView, {attributes:true,attributeFilter:["class"]});
-  new MutationObserver(syncGatewayScope).observe(walletView, {attributes:true,attributeFilter:["class"]});
+  new MutationObserver(syncGatewayScope).observe(gameView, {attributes:true,attributeFilter:["class"]});
 
   function layoutItems() {
     const compact = window.matchMedia("(max-width: 600px)").matches;
@@ -52,18 +48,10 @@
     if (home) home.click();
     else window.location.href = "./index.html";
   }
-  function openMainView(view) {
-    const target = document.getElementById("menu-" + view);
-    if (target) {
-      const home = document.getElementById("menu-home");
-      if (home && target !== home) home.click();
-      target.click();
-    } else window.location.href = "./index.html?view=" + encodeURIComponent(view);
-  }
   const routes = {
     back: goHome,
-    profile: () => document.getElementById("menu-profile")?.click(),
-    settings: () => document.getElementById("menu-store")?.click()
+    menu: () => document.getElementById("menu-open")?.click(),
+    settings: () => { window.location.href = "./launcher.html"; }
   };
 
   function pauseGame() {
@@ -94,12 +82,14 @@
     items.forEach(item => { item.tabIndex = open ? 0 : -1; });
     if (open) {
       pauseGame();
+      window.dispatchEvent(new Event("nu:gateway-open"));
       trigger.focus({preventScroll:true});
     } else {
       clearPending();
       selected = null;
       clickArmed = null;
       items.forEach(item => item.classList.remove("is-selected","is-confirming"));
+      window.dispatchEvent(new Event("nu:gateway-close"));
       if (shouldResume) resumeGame();
       else pausedByGateway = false;
     }
@@ -116,18 +106,21 @@
     clearPending();
     item.classList.add("is-selected","is-confirming");
     activationTimer = window.setTimeout(() => {
-      setOpen(false, actionKey === "resume");
+      setOpen(false, true);
       action();
-    }, 420);
+    }, 180);
   }
   function confirm(item) {
     if (clickArmed === item) activate(item);
     else { select(item); clickArmed = item; }
   }
 
+  let lastTriggerPointer = "mouse";
+  trigger.addEventListener("pointerdown",event => { lastTriggerPointer = event.pointerType || "mouse"; });
   trigger.addEventListener("click",event => {
     event.preventDefault();
-    setOpen(!open);
+    if (lastTriggerPointer === "touch") setOpen(!open);
+    else if (!open || event.detail === 0) setOpen(!open);
   });
   trigger.addEventListener("pointerenter",event => {
     if (event.pointerType === "mouse") setOpen(true);
@@ -140,7 +133,7 @@
       clearTimeout(hoverTimer);
       hoverTimer = window.setTimeout(() => {
         if (open && clickArmed !== item) activate(item);
-      }, 520);
+      }, 160);
     });
     item.addEventListener("pointerleave",event => {
       clearTimeout(hoverTimer);
@@ -172,11 +165,10 @@
   document.addEventListener("pointermove",event => {
     if (!open || !["mouse","touch","pen"].includes(event.pointerType)) return;
     const tolerance = 10;
-    const inside = [trigger,...items].some(element => {
-      const rect = element.getBoundingClientRect();
-      return event.clientX >= rect.left - tolerance && event.clientX <= rect.right + tolerance &&
-        event.clientY >= rect.top - tolerance && event.clientY <= rect.bottom + tolerance;
-    });
+    const rect = root.getBoundingClientRect();
+    const orbit = window.matchMedia("(max-width: 600px)").matches ? 112 : 126;
+    const inside = event.clientX >= rect.left - orbit - tolerance && event.clientX <= rect.right + tolerance &&
+      event.clientY >= rect.top - tolerance && event.clientY <= rect.bottom + tolerance;
     if (inside) outsideSince = 0;
     else if (!outsideSince) outsideSince = performance.now();
     else if (performance.now() - outsideSince > 110) setOpen(false);
