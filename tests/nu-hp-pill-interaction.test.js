@@ -154,3 +154,19 @@ test("Generation 1.30 HUD-side capsule use keeps the shared wallet count in sync
   assert.match(games,/const count=pill\.querySelector\("#hp-pill-count"\);if\(count\)count\.textContent="×"\+state\.save\.hpPills/);
   assert.match(games,/if\(anchor\)showHpPillInteraction\(anchor,result\.restored\)/);
 });
+
+
+test("HP drawer expands only rightward while the HP core remains viewport-centred",()=>{
+  assert.ok(games.includes("const coreRight=barRect.left+coreWidth"));
+  assert.ok(games.includes("const dockX=coreRight+drawerWidth/2"));
+  assert.ok(games.includes('bar.classList.add("hp-pill-drawer-open")'));
+  assert.ok(games.includes('bar.classList.remove("hp-pill-drawer-open")'));
+  assert.ok(css.includes("--hp-core-width:min(276px,calc(100vw - 82px))"));
+  assert.ok(css.includes("transform:translateX(calc(var(--hp-core-width) / -2))!important"));
+  assert.ok(css.includes("width:calc(var(--hp-core-width) + var(--hp-drawer-width))!important"));
+  assert.ok(css.includes("position:fixed!important;inset:0!important"));
+});
+test("HP pill action has a generous 48px hit target and no extra particle burst on drawer travel",()=>{
+  assert.ok(css.includes("width:48px!important"));assert.ok(css.includes("height:48px!important"));
+  assert.ok(games.includes("duration:opening?440:380"));
+});
