@@ -50,15 +50,33 @@ test("market simulator retains only the latest 24 activity steps",()=>{
  assert.equal(market.MAX_CANDLES,24);
 });
 
-test("store-purchased assets are absent from Exchange market choices and simulation",()=>{
- const save={xp:15,hpPills:1,transactions:[{kind:"purchase",title:"Golden HP Capsule",deltas:{xp:-10,hpPills:1}}]};
- assert.ok(!market.assets(save).some(asset=>asset.key==="hpPills"));
- assert.equal(market.build(save,"hpPills").asset,null);
- assert.deepEqual(market.build(save,"hpPills").steps,[]);
- assert.ok(market.assets(save).some(asset=>asset.key==="xp"));
+test("display-only candle tolerance is deterministic, bounded to five, and never changes close",()=>{
+ const save={transactions:[{id:"stable-event",at:"2026-11-14T12:00:00.000Z",deltas:{xp:-9}}]};
+ const first=market.build(save,"xp"),second=market.build(save,"xp"),candle=first.candles[0];
+ assert.equal(candle.visualTolerance,second.candles[0].visualTolerance);
+ assert.ok(candle.visualTolerance>=0&&candle.visualTolerance<=5);
+ assert.equal(candle.close,first.index);
+ assert.ok(Math.abs(candle.close-(100*(1+0.025*(9/19))))<1e-9);
+ assert.ok(candle.high>=Math.max(candle.open,candle.close));
+ assert.ok(candle.low<=Math.min(candle.open,candle.close));
 });
 
-test("durable non-exchangeable asset flags keep purchased assets out after ledger rollover",()=>{
+test("parametric dispersion bands are rolling, deterministic, and display-only",()=>{
+ const steps=[10,12,14,16].map((close,index)=>({close,open:close-1,high:close+2,low:close-2}));
+ const before=JSON.stringify(steps),bands=market.analysisBands(steps,3),mean=12;
+ assert.equal(bands.length,4);assert.equal(bands[0].upper,null);assert.equal(bands[1].lower,null);
+ assert.ok(Math.abs(bands[2].mean-mean)<1e-9);assert.ok(bands[2].upper>mean);assert.ok(bands[2].lower<mean);
+ assert.deepEqual(market.analysisBands(steps,3),bands);assert.equal(JSON.stringify(steps),before);
+});
+
+test("store-purchased assets are excluded from market choices and chart building",()=>{
+ const legacy={xp:15,hpPills:1,transactions:[{kind:"purchase",title:"Golden HP Capsule",deltas:{xp:-10,hpPills:1}}]};
+ assert.ok(!market.assets(legacy).some(asset=>asset.key==="hpPills"));
+ assert.equal(market.build(legacy,"hpPills").asset,null);
+ assert.deepEqual(market.build(legacy,"hpPills").steps,[]);
+ assert.ok(market.assets(legacy).some(asset=>asset.key==="xp"));
+});
+test("durable purchase exclusion survives the rolling transaction ledger",()=>{
  const save={xp:15,hpPills:1,nonExchangeableAssets:["hpPills"],transactions:[]};
  assert.ok(!market.assets(save).some(asset=>asset.key==="hpPills"));
  assert.equal(market.build(save,"hpPills").asset,null);
