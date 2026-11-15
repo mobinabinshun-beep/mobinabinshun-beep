@@ -27,7 +27,7 @@ The default visual identity is not a new design. It is recovered from the reposi
 - [Generation 1.19 — viewport-coordinate overlay correction](https://github.com/mobinabinshun-beep/mobinabinshun-beep/commit/460bc773e1e8a55a04ff42f51c52acceca52ac1d)
   - Establishes why fixed HUD notifications must be anchored from viewport rectangles rather than game-stage-relative coordinates: the stage may clip overflow while the HP rail is viewport-fixed.
 
-The module reuses these existing CSS signatures. Its standalone stylesheet namespaces the interaction and bar-delta selectors so it can be loaded by any game page without changing the protected classic resource HUD. It must not replace the historical appearance with generic toast styling or a new visual language.
+The module reuses these existing CSS signatures. The current game runtime delegates both object-interaction progress and the existing XP/Mana +1 boundary pop to the shared presets. The standalone stylesheet namespaces the interaction and bar-delta selectors and matches the existing in-game bar placement, so it can be loaded by any game page without changing the protected classic resource HUD structure, values, or fill rules. It must not replace the historical appearance with generic toast styling or a new visual language.
 
 ## Default motion signature
 
