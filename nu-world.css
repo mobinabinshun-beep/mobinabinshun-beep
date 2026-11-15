@@ -714,3 +714,31 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 .world>.nu-world-background,.world>.sky,.world>#world-canvas,.world>#pixel-world,.world>.horizon,.world>.world-effects,#nu-dynamic-layers{
  pointer-events:none!important;
 }
+
+
+/* Wallet low-cost scene mode — static decorative glow, no world renderer. */
+body.nu-wallet-open .world>.nu-world-background,
+body.nu-wallet-open .world>.sky,
+body.nu-wallet-open .world>#world-canvas,
+body.nu-wallet-open .world>#pixel-world,
+body.nu-wallet-open .world>.horizon,
+body.nu-wallet-open .world>.world-effects,
+body.nu-wallet-open .world>#nu-dynamic-layers{
+ display:none!important;
+}
+body.nu-wallet-open #wallet-view .wallet-panel{
+ background:transparent!important;
+ border-color:transparent!important;
+ box-shadow:none!important;
+ backdrop-filter:none!important;
+ -webkit-backdrop-filter:none!important;
+}
+body.nu-wallet-open #wallet-view .wallet-panel::before{
+ content:"";
+ position:absolute;
+ inset:0;
+ z-index:-1;
+ border-radius:inherit;
+ pointer-events:none;
+ background:radial-gradient(ellipse at 50% 8%,rgba(83,223,255,.17) 0%,rgba(83,223,255,.07) 34%,rgba(83,223,255,0) 72%);
+}
