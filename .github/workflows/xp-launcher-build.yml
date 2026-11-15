@@ -1,0 +1,53 @@
+name: N.U XP-first native launcher build
+on:
+  push:
+    paths:
+      - "native/**"
+      - "assets/backgrounds/niroo-universe-background.svg"
+      - ".github/workflows/xp-launcher-build.yml"
+  pull_request:
+    paths:
+      - "native/**"
+      - "assets/backgrounds/niroo-universe-background.svg"
+      - ".github/workflows/xp-launcher-build.yml"
+  workflow_dispatch:
+jobs:
+  build-x86:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install x86 Windows toolchain and NSIS
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-mingw-w64-i686 nsis python3-pil
+      - name: Extract the exact canonical image
+        run: python3 native/build.py
+      - name: Compile XP-subsystem x86 launcher
+        run: |
+          i686-w64-mingw32-gcc -Os -s -mwindows \
+            -DWINVER=0x0501 -D_WIN32_WINNT=0x0501 \
+            -Wl,--subsystem,windows:5.01 \
+            -Wl,--major-os-version,5,--minor-os-version,1 \
+            -static-libgcc native/launcher.c -o dist/NULauncher.exe \
+            -lshell32 -luser32 -lgdi32
+      - name: Verify executable format
+        run: |
+          file dist/NULauncher.exe
+          i686-w64-mingw32-objdump -p dist/NULauncher.exe | grep -E "Subsystem|MajorSubsystemVersion|MinorSubsystemVersion"
+      - name: Build offline per-user installer
+        run: makensis native/installer.nsi
+      - name: Create SHA-256 manifest
+        run: |
+          cd dist
+          sha256sum N.U-Launcher-Setup-x86.exe NULauncher.exe background.bmp README.txt > SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: N.U-XP-first-native-launcher-x86
+          path: |
+            dist/N.U-Launcher-Setup-x86.exe
+            dist/NULauncher.exe
+            dist/background.bmp
+            dist/README.txt
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 30
