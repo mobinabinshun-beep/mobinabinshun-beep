@@ -16,7 +16,7 @@ function setup(){
 }
 test("wallet reader returns canonical save data without mutating it",()=>{
  const {api,save}=setup(),before=JSON.stringify(save),s=api.walletEngine.read();
- assert.equal(s.source,"nu-world-save-v1");assert.equal(s.player.id,"P-1");assert.equal(s.assets[0].value,20);
+ assert.equal(s.source,"nu-world-save-v1");assert.equal(s.player.id,"P-1");assert.equal(s.assets[0].value,20);assert.ok(!s.assets.some(a=>a.key==="xCredits"||a.key==="nCredits"));
  assert.deepEqual(JSON.parse(JSON.stringify(s.unpricedFields)),{xCredits:3,nCredits:7});assert.equal(JSON.stringify(save),before);
 });
 test("manifest discovery is declarative, unverified and cannot quote",()=>{
