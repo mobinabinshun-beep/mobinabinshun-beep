@@ -15,6 +15,7 @@
  const BASE_INDEX=100,MAX_CANDLES=24,MAX_EVENTS=24;
  const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
  function isStorePurchased(raw,key){
+  if(Array.isArray(raw&&raw.nonExchangeableAssets)&&raw.nonExchangeableAssets.includes(key))return true;
   const txs=Array.isArray(raw&&raw.transactions)?raw.transactions:[];
   return txs.some(tx=>tx&&tx.deltas&&(Array.isArray(tx.exchangeExcludedKeys)&&tx.exchangeExcludedKeys.includes(key)||(tx.kind==="purchase"&&Number(tx.deltas[key])>0)));
  }
