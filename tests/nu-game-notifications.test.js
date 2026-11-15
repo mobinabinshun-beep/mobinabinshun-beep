@@ -67,3 +67,9 @@ test("the reusable module stylesheet is loaded by the Casino game entry too",()=
   assert.match(casino,/nu-game-notifications\.css/);
   assert.match(casino,/nu-game-notifications\.js[^<]+<\/script><script src="\.\/nu-casino\.js/);
 });
+
+test("single floating notifications use the same shared card preset and lifecycle",()=>{
+  assert.match(moduleSource,/pair\.className="nu-notification-pair"/);
+  assert.match(moduleSource,/node\.className="floating-change "\+\(options\.tone\|\|"gain"\)/);
+  assert.match(moduleSource,/removeAfter\(pair,duration\+80\)/);
+});
