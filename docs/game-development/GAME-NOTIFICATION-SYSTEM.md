@@ -79,7 +79,7 @@ Required: `anchor`, `itemDelta`, `resourceDelta`.
 
 Optional: `duration` (default 1750ms), `offset` (default 4px), `itemTone` (default `loss`), and `resourceTone` (default `hp`). Custom tones may be supplied by a game-specific CSS class while retaining the shared card geometry and motion.
 
-Use for successful consumption or exchange. It creates a paired legacy-style notification: item cost in gold (`.loss`) and resulting resource change in green (`.hp`). For HP capsule use, the exact copy is `−1 CAPSULE HEAL` and `+N HP`, where N must be the actual restored amount returned by the wallet (including any cap). Do not infer, recalculate, or hard-code the amount.
+Use for successful consumption or exchange. It creates a paired legacy-style notification: item cost in gold (`.loss`) and resulting resource change in green (`.hp`). For HP capsule use, the exact copy is fixed as `−1 CAPSULE HEAL` and `+10 HP`. This is deliberately playful display copy requested by the project owner. Do not alter the wallet or healing logic to match the label; the notification is visual-only.
 
 ### `showFloating(options)`
 
