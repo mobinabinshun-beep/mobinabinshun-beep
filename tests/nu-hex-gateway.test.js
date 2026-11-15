@@ -110,6 +110,8 @@ test("Movement over a Gateway option activates it without a click or second sele
  assert.match(js,/item\.addEventListener\("pointerenter",event=>\{[\s\S]*?activate\(item\)/);
  assert.match(js,/\["mouse","pen","touch"\]\.includes\(event\.pointerType\)/);
  assert.match(js,/item\.addEventListener\("pointerup"/);
+ assert.match(js,/document\.elementFromPoint\(event\.clientX,event\.clientY\)/);
+ assert.match(js,/hit\?\.closest\?\.\("\.nu-gateway-item"\)/);
  assert.match(js,/item\.classList\.contains\("is-confirming"\)/);
  assert.match(js,/event\.key==="Escape"/);
 });
