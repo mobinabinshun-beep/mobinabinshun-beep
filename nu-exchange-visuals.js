@@ -17,7 +17,35 @@
   const bias=clamp((demand-supply)/(demand+supply+1),-1,1),amplitude=Math.min(3,.35+volume/10);
   const wave=Math.sin(phase+index*.83),delta=clamp(wave*amplitude+bias*amplitude*.22,-3,3);
   const displayVolume=Math.min(3,.3+(Math.abs(Math.cos(phase*.73+index*1.17))*2.7));
-  return {bias,amplitude,delta,volume:displayVolume};
+  return {bias,amplitude,delta,volume:displayVolume,sampleCount:sample.length};
+ }
+ const AMBIENT_PROBABILITIES=Object.freeze({zero:.10,one:.30,two:.30,three:.30,positive:.50});
+ function seedRandom(text){
+  let seed=2166136261;
+  for(let i=0;i<text.length;i++)seed=Math.imul(seed^text.charCodeAt(i),16777619)>>>0;
+  return function(){seed=(seed+0x6D2B79F5)>>>0;let t=seed;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return ((t^(t>>>14))>>>0)/4294967296;};
+ }
+ const ambientStates=new Map();
+ function ambientMarket(recordedSteps,assetKey,now){
+  const recorded=Array.isArray(recordedSteps)?recordedSteps.slice(-24):[];
+  const sample=recorded.slice(-8),demand=sample.reduce((n,s)=>n+(Number(s.demand)||0),0),supply=sample.reduce((n,s)=>n+(Number(s.supply)||0),0);
+  const behaviorBias=clamp((demand-supply)/(demand+supply+1),-1,1);
+  const count=recorded.length?6:24,tick=Math.floor((Number(now)||Date.now())/2200),key=String(assetKey||"xp");
+  const last=recorded[recorded.length-1],base=last?Number(last.close??last.index)||100:100,anchor=last?String(last.id||last.time||last.title||"recorded"):"no-player-activity";
+  let state=ambientStates.get(key);
+  if(!state||state.base!==base||state.anchor!==anchor||state.count!==count||tick<state.tick){
+   state={base,anchor,count,price:base,tick:tick-count,steps:[]};
+  }
+  for(let bucket=state.tick+1;bucket<=tick;bucket++){
+   const random=seedRandom(key+"|"+bucket),roll=random(),magnitude=roll<.30?3:roll<.60?2:roll<.90?1:0;
+   const direction=random()<.5?1:-1,delta=magnitude*direction,open=state.price,close=clamp(open+delta,50,200);
+   const behaviorFactor=1+Math.abs(behaviorBias)*.25,volume=Math.min(3,magnitude*behaviorFactor),stamp=new Date(bucket*2200).toISOString();
+   state.steps.push({id:"ambient-"+key+"-"+bucket,time:stamp,title:"Simulated background flow",delta,index:close,changePct:(close/100-1)*100,volume,demand:delta>0?volume:0,supply:delta<0?volume:0,open,high:Math.max(open,close),low:Math.min(open,close),close,simulated:true,visualOnly:true});
+   state.price=close;
+  }
+  state.tick=tick;state.steps=state.steps.slice(-count);ambientStates.set(key,state);
+  const retained=recorded.slice(-Math.max(0,24-state.steps.length));
+  return {steps:retained.concat(state.steps),simulatedCount:state.steps.length,behaviorBias,probabilities:AMBIENT_PROBABILITIES};
  }
  function create(options){
   options=options||{};
@@ -132,5 +160,5 @@
    destroy(){canvas.removeEventListener("pointerdown",()=>{});}
   };
  }
- return {create,TOOLS,STORAGE_KEY,ambientPulse};
+ return {create,TOOLS,STORAGE_KEY,ambientPulse,ambientMarket,AMBIENT_PROBABILITIES};
 });
