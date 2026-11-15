@@ -71,3 +71,9 @@ test("public demo exposes runtime diagnostics for the world background",()=>{
  assert.match(engine,/naturalWidth:img/);
  assert.doesNotMatch(html,/id="nu-background-diagnostics"/);
 });
+
+test("interactive page content is stacked above the isolated world background", () => {
+  assert.match(css, /\.world>\.nu-world-background\{[\s\S]*?z-index:0!important/);
+  assert.match(css, /\.world>\.shell\{position:relative!important;z-index:3!important/);
+  assert.match(css, /\.world>\.nu-world-background\{[^}]*pointer-events:none!important/);
+});
