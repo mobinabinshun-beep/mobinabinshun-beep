@@ -83,9 +83,10 @@ function bindGameAssetProfiles(){
  const triggers=[...document.querySelectorAll(".bar-wrap"),$("hp-bar")].filter(Boolean),root=$("game-asset-profile");
  triggers.forEach(el=>{
   el.setAttribute("aria-label","Show game asset profile");el.setAttribute("aria-describedby","game-asset-profile");el.setAttribute("aria-expanded","false");
-  el.addEventListener("pointerenter",e=>{if(e.pointerType==="mouse")showGameAssetProfile(el);});
+  // Do not activate on initial pointer entry: require deliberate mouse movement over the bar.
+  el.addEventListener("pointermove",e=>{if(e.pointerType==="mouse")showGameAssetProfile(el);});
   el.addEventListener("pointerleave",e=>{if(e.pointerType==="mouse")hideGameAssetProfile();});
-  // Resource bars remain non-gameplay HUD controls. Touch previews exist only for the press.
+  // Touch activates only for the press and is disabled again immediately on release/cancel.
   el.addEventListener("pointerdown",e=>{e.stopPropagation();if(e.pointerType==="touch")showGameAssetProfile(el);});
   el.addEventListener("click",e=>e.stopPropagation());
  });
