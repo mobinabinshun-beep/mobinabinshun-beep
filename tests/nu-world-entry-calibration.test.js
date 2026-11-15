@@ -19,5 +19,5 @@ test("network diagnostics cannot gate entry to the public world", () => {
 });
 
 test("the public page loads the cache-busted non-blocking bootstrap", () => {
-  assert.match(html, /nu-games\.js\?v=20261115-game-notifications-r9/);
+  assert.match(html, /nu-games\.js\?v=20261115-game-notifications-r10/);
 });
