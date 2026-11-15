@@ -1,0 +1,117 @@
+name: Public Demo Feedback
+description: Report a reproducible bug or share feedback about the N.U public demo.
+title: "[Demo feedback]: "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for testing N.U. Do not include passwords, real names, contact details, account identifiers, financial information or other personal data. Remove personal information from screenshots and recordings.
+  - type: dropdown
+    id: report_type
+    attributes:
+      label: Report type
+      options:
+        - Bug / unexpected behavior
+        - Visual or layout issue
+        - Accessibility / input issue
+        - Performance issue
+        - Suggestion / product feedback
+    validations:
+      required: true
+  - type: dropdown
+    id: module
+    attributes:
+      label: Area tested
+      options:
+        - Home / startup
+        - Navigation / Gateway
+        - Bubble Hunt
+        - Mana Collector
+        - Chaos Attack
+        - Wallet / Store / HP Capsule
+        - Casino
+        - Exchange
+        - Player Profile
+        - Creative Studio
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: demo_url
+    attributes:
+      label: Demo page URL
+      placeholder: https://...
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Device, OS, browser and version
+      placeholder: e.g. Pixel 8 / Android 16 / Chrome 130
+    validations:
+      required: true
+  - type: input
+    id: viewport
+    attributes:
+      label: Viewport and input method
+      placeholder: e.g. 412×915, touch
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Number the steps. For suggestions, describe the use case.
+      placeholder: |
+        1. Open ...
+        2. Select ...
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected_actual
+    attributes:
+      label: Expected and actual result
+      placeholder: |
+        Expected:
+        Actual:
+    validations:
+      required: true
+  - type: dropdown
+    id: frequency
+    attributes:
+      label: Frequency
+      options:
+        - Always
+        - Sometimes
+        - Happened once
+        - Not applicable (suggestion)
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - Blocker — prevents core use
+        - Major — important feature broken
+        - Minor — workaround exists
+        - Visual / wording only
+        - Suggestion — no defect
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence (optional)
+      description: Add screenshots/video links only after removing all personal or sensitive information.
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Privacy and reproducibility
+      options:
+        - label: I removed personal/sensitive information from this report and its evidence.
+          required: true
+        - label: I described a reproducible observation or clearly marked this as a suggestion.
+          required: true
