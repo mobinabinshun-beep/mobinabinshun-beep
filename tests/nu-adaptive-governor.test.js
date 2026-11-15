@@ -7,7 +7,7 @@ const path = require("node:path");
 
 const source = fs.readFileSync(path.join(__dirname, "..", "nu-adaptive-governor.js"), "utf8");
 
-function harness(level) {
+function harness(level, savedProfile) {
   let clock = 0;
   const timers = [];
   const frames = [];
@@ -24,6 +24,7 @@ function harness(level) {
     addEventListener: function (name, fn) { listeners[name] = fn; },
     dispatchEvent: function (event) { events.push(event); },
     CustomEvent: function (name, options) { this.type = name; this.detail = options.detail; },
+    localStorage: { getItem: function () { return savedProfile ? JSON.stringify(savedProfile) : null; }, setItem: function (key, value) { savedProfile = JSON.parse(value); } },
     NUGraphicsCore: { budget: function (n) { return { level: n }; } },
     NUGameRenderAdapter: { apply: function (p) { applied.push(p.level); } },
     NUPixelWorld: { setQuality: function (n) { qualities.push(n); } }
@@ -76,4 +77,21 @@ test("governor pauses sampling while the document is hidden", function () {
   h.runWindow(60);
   assert.equal(h.win.NUGraphicsProfile.level, 3);
   assert.deepEqual(h.applied, []);
+});
+
+test("launcher calibration seeds the runtime and remains the automatic quality ceiling", function () {
+  const h = harness(5, { level: 2, stableLevel: 2, calibration: { memoryClassGb: 2 } });
+  assert.equal(h.win.NUGraphicsProfile.level, 2);
+  assert.equal(h.win.NUAdaptiveGovernor.getState().ceilingLevel, 2);
+  assert.equal(h.win.NUAdaptiveGovernor.getState().launcherCalibrated, true);
+  h.runWindow(16.7);
+  h.runWindow(16.7);
+  h.runWindow(16.7);
+  assert.equal(h.win.NUGraphicsProfile.level, 2);
+  assert.deepEqual(h.applied, [2]);
+});
+
+test("launcher calibration auto-applies by default instead of requiring a level click", function () {
+  const launcher = fs.readFileSync(path.join(__dirname, "..", "nu-launcher.js"), "utf8");
+  assert.match(launcher, /calibrate\(!!p\.ask\)\.catch\(fail\)/);
 });
