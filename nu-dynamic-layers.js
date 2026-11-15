@@ -47,7 +47,7 @@ function frame(t){
 }
 function schedule(){cancelAnimationFrame(raf);last=0;if(active&&!frozen&&!document.hidden&&!reduced()&&particles.length)raf=requestAnimationFrame(frame);}
 function pause(){cancelAnimationFrame(raf);}
-function resume(){if(!profile||!active)return;renderStatic();schedule();}
+function resume(){if(!profile||!active||frozen||document.hidden)return;renderStatic();schedule();}
 function apply(p){profile=p;active=true;mount();resize();renderStatic();schedule();}
 function setMode(next){mode=["ambient","sleep","focus","game"].includes(next)?next:"ambient";if(profile){resize();renderStatic();schedule();}}
 function setFrozen(value){frozen=!!value;if(frozen)pause();else resume();}
