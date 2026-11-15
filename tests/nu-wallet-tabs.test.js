@@ -53,7 +53,7 @@ test("the four section backdrops stay static while their foreground functions re
   const neutral=css.slice(css.lastIndexOf("/* N.U neutral scene mode"));
   assert.doesNotMatch(neutral,/(?:^|[;\n]\s*)filter\s*:|requestAnimationFrame|canvas\s*\{/);
   assert.doesNotMatch(neutral,/infinite/);
-  assert.match(neutral,/animation:nu-neutral-lamp-entry 900ms steps\\(1,end\\) 1 both/);
+  assert.match(neutral,/animation:nu-neutral-lamp-entry 900ms steps\(1,end\) 1 both/);
   assert.match(neutral,/prefers-reduced-motion:reduce/);
   assert.match(neutral,/nu-neutral-wallet \.world/);
   assert.match(neutral,/nu-neutral-profile \.world/);
