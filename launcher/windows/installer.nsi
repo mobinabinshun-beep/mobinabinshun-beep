@@ -1,6 +1,6 @@
 Unicode true
 Name "N.U Launcher 0.1"
-OutFile "..\\..\\N.U-Launcher-Setup-0.1.exe"
+OutFile "..\..\N.U-Launcher-Setup-0.1.exe"
 InstallDir "$APPDATA\N.U Launcher"
 RequestExecutionLevel user
 SetCompressor zlib
@@ -14,8 +14,8 @@ UninstPage instfiles
 
 Section "N.U Launcher"
   SetOutPath "$INSTDIR"
-  File "build\NULauncher.exe"
-  File "build\launcher-background.bmp"
+  File "..\..\build\NULauncher.exe"
+  File "..\..\build\launcher-background.bmp"
   WriteUninstaller "$INSTDIR\Uninstall.exe"
   CreateDirectory "$SMPROGRAMS\N.U Launcher"
   CreateShortcut "$SMPROGRAMS\N.U Launcher\N.U Launcher.lnk" "$INSTDIR\NULauncher.exe"
