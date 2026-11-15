@@ -184,8 +184,6 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 /* N.U Gen1 demo: consumable HP pill and genuinely available store entries */
 .hp-pill-use{border:1px solid #a7ff6288;border-radius:18px;background:rgba(26,76,35,.82);color:#c8ffb1;padding:5px 9px;font:800 9px/1 ui-monospace,monospace;letter-spacing:.05em;box-shadow:0 0 10px #8dff5833;pointer-events:auto;cursor:pointer}
 .hp-pill-use[hidden]{display:none!important}
-.hp-gain{position:absolute;z-index:15;left:50%;top:-20px;transform:translateX(-50%);color:#8dff62;font:900 12px/1 ui-monospace,monospace;white-space:nowrap;text-shadow:0 0 9px #70ff55;pointer-events:none;animation:nu-hp-gain 1s ease-out forwards}
-@keyframes nu-hp-gain{0%{opacity:0;transform:translate(-50%,6px) scale(.8)}18%{opacity:1}100%{opacity:0;transform:translate(-50%,-17px) scale(1.05)}}
 .shop-items{display:grid;gap:10px;margin-top:14px}
 .shop-item{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px;border:1px solid #83cce833;border-radius:12px;background:rgba(8,25,39,.72)}
 .shop-item p{margin:5px 0 0;color:#a9bdcb;font-size:12px;line-height:1.6}
@@ -248,11 +246,6 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 .player-edit-actions{grid-column:span 2;display:flex;gap:9px;flex-wrap:wrap;margin-top:5px}
 @media(max-width:620px){.wallet-assets{grid-template-columns:1fr}.player-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.player-stats>div:last-child{grid-column:span 2}.floating-notifications{top:14%;right:10px}.wallet-transaction{flex-direction:column}.wallet-transaction small{text-align:left}}
 @media(prefers-reduced-motion:reduce){.floating-change{animation:none;opacity:1}.player-xp-track>div{transition:none}}
-
-/* N.U HP capsule use: red HP-bar pulse plus green restoration cue. */
-.hp-track.hp-restored{animation:nu-hp-track-pulse .52s ease-out 2}
-@keyframes nu-hp-track-pulse{0%,100%{box-shadow:0 0 0 rgba(255,60,90,0)}35%{box-shadow:0 0 16px rgba(255,60,90,.9);border-color:#ff6680}}
-@media(prefers-reduced-motion:reduce){.hp-track.hp-restored{animation:none;box-shadow:0 0 8px rgba(255,60,90,.6)}}
 
 /* Game-scoped asset profile: a hover/focus projection, not a second wallet. */
 #game-view.active .hp-bar{pointer-events:auto}
