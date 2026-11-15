@@ -1,6 +1,6 @@
 # N.U Exchange — Ambient Flow and Player Chart Drawing
 **Date:** 2026-11-15  
-**Status:** Implemented; automated Exchange regression passed on candidate head 9913cad6964537e7ef3b52b9617ea3301ca8b0df. Human browser acceptance remains pending.
+**Status:** Implemented on candidate head `9f289e1ae5fe9458067ebe206ac6c2af2e68ae82`; Exchange regression 38/38 and all seven GitHub Actions workflows passed. Human browser/touch acceptance remains pending.
 
 ## Scope
 This change extends the existing activity-driven fictional market chart without replacing its transaction-backed OHLC history, replay controls, moving average, parametric bands, themes, palettes, volume, or durable Store-purchase exclusion.
