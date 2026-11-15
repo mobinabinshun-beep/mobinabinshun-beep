@@ -81,7 +81,7 @@
       return read()[category].slice(-MAX_EVENTS);
     }
     function getAll(){return read();}
-    return {STORAGE_KEY,MAX_EVENTS,recordMedicationUse,recordDamage,recordHealing,recordDeath,getHistory,getAll};
+    return {STORAGE_KEY,MAX_EVENTS,createHealthStore,recordMedicationUse,recordDamage,recordHealing,recordDeath,getHistory,getAll};
   }
   let storage=null;
   try{storage=root&&root.localStorage?root.localStorage:null;}catch(_){storage=null;}
