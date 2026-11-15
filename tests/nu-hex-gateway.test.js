@@ -74,7 +74,8 @@ test("Gateway keeps responsive geometry, touch, keyboard and reduced-motion supp
  assert.match(js,/function layoutItems\(\)/);
  assert.match(js,/window\.addEventListener\("resize",layoutItems/);
  assert.match(js,/window\.addEventListener\("orientationchange",layoutItems/);
- assert.match(js,/trigger\\.addEventListener\\("pointerenter"/);\n assert.match(js,/trigger\\.addEventListener\\("pointerdown"/);
+ assert.match(js,/trigger\.addEventListener\("pointerenter"/);
+ assert.match(js,/trigger\.addEventListener\("pointerdown"/);
  assert.match(js,/event\.key==="Escape"/);
  assert.match(js,/const tolerance=10/);
 });
@@ -97,22 +98,24 @@ test("A hidden tab cannot restart frozen game or ambient renderers",()=>{
 });
 
 
+
+
 test("Movement mode opens Gateway by mouse/pen hover and touch contact",()=>{
- assert.match(js,/trigger\\.addEventListener\\("pointerenter",event=>\\{[\\s\\S]*?setOpen\\(true\\)/);
- assert.match(js,/trigger\\.addEventListener\\("pointerdown",event=>\\{[\\s\\S]*?event\\.pointerType!==\\"touch\\"[\\s\\S]*?setOpen\\(!open\\)/);
+ assert.match(js,/trigger\.addEventListener\("pointerenter",event=>\{[\s\S]*?setOpen\(true\)/);
+ assert.match(js,/trigger\.addEventListener\("pointerdown",event=>\{[\s\S]*?event\.pointerType!=="touch"[\s\S]*?setOpen\(!open\)/);
  assert.match(js,/suppressTriggerClickUntil/);
 });
 
 test("Movement over a Gateway option activates it without a click or second selection",()=>{
- assert.match(js,/item\\.addEventListener\\("pointerenter",event=>\\{[\\s\\S]*?activate\\(item\\)/);
- assert.match(js,/\\[\\"mouse\\",\\"pen\\",\\"touch\\"\\]\\.includes\\(event\\.pointerType\\)/);
- assert.match(js,/item\\.addEventListener\\("pointerup"/);
- assert.match(js,/item\\.classList\\.contains\\("is-confirming"\\)/);
- assert.match(js,/event\\.key===\\"Escape\\"/);
+ assert.match(js,/item\.addEventListener\("pointerenter",event=>\{[\s\S]*?activate\(item\)/);
+ assert.match(js,/\["mouse","pen","touch"\]\.includes\(event\.pointerType\)/);
+ assert.match(js,/item\.addEventListener\("pointerup"/);
+ assert.match(js,/item\.classList\.contains\("is-confirming"\)/);
+ assert.match(js,/event\.key==="Escape"/);
 });
 
 test("Gateway scrim blocks the rest of the page while the round is paused",()=>{
- assert.match(css,/body\\.nu-gateway-open \\.nu-gateway-scrim\\{opacity:1;visibility:visible;pointer-events:auto\\}/);
- assert.match(js,/scrim\\.addEventListener\\("click"/);
- assert.match(js,/pauseGame\\(\\);[\\s\\S]*?nu:gateway-open/);
+ assert.match(css,/body\.nu-gateway-open \.nu-gateway-scrim\{opacity:1;visibility:visible;pointer-events:auto\}/);
+ assert.match(js,/scrim\.addEventListener\("click"/);
+ assert.match(js,/pauseGame\(\);[\s\S]*?nu:gateway-open/);
 });
