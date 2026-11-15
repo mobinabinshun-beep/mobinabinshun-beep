@@ -489,3 +489,7 @@ The experimental profile keeps the restored historical four-field card as its ba
 - Both actions are visual-only in the public demo. No file picker, file reading, browser persistence, upload, or download is performed.
 - In an operational build, replacing an image first creates and offers a recoverable copy of the previous image; replacement proceeds only after recovery succeeds.
 - Private player albums and opt-in interactive profiles with other players/community members are archived as future server-backed capabilities, not demo functionality. See [the profile asset and execution architecture](docs/architecture/NU-PLAYER-IDENTITY-ASSETS-AND-EXECUTION-MODES.md).
+
+
+## Temporarily locked UI area
+The classic lower-left LV / XP / Mana resource bars are protected from incidental edits. All coding agents and contributors must read [AGENTS.md](./AGENTS.md) and [the lock record](./docs/operations/LOCKED-AREAS.md) before making changes. This area may only be changed after a new, explicit user instruction naming the classic resource bars.
