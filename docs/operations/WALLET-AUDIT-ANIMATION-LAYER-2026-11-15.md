@@ -15,8 +15,10 @@ The Exchange page presents recent asset movements under **AUDIT TRAIL / RECENT A
 - The audit panel uses a restrained visual pulse; reduced-motion preferences disable the animation and retain a non-motion outline cue.
 
 ## Offline and responsive behavior
-- The page continues to use the local browser save and local transaction history; no network round-trip is required to read or display this audit view.
-- A local save remains local-only. Offline mode must not imply remote synchronization or server confirmation.
+- A scoped service worker precaches the Exchange page, styles, wallet runtime, chart engines, indicators, and audit controller after the first successful online visit and service-worker installation.
+- Subsequent visits can reopen the Exchange shell and render the wallet/audit view offline. The page uses the canonical browser-local save and transaction history; reading these values requires no network round-trip.
+- Offline availability is not remote synchronization or server confirmation. The service worker caches application assets only; it does not copy, cache, upload, or reconcile player wallet data.
+- The first visit and initial cache installation still require a working connection. The page exposes an offline-cache status, and reports unsupported/failed service-worker installation rather than claiming offline readiness.
 - The audit section and nested wallet view adapt to narrow screens. Keep the movement list readable and controls usable at mobile widths.
 - If browser storage is unavailable or cleared, existing runtime fallback behavior applies; never fabricate a recovered balance or claim a save was persisted when storage rejected it.
 
