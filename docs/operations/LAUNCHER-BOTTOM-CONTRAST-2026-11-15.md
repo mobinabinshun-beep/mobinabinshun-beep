@@ -3,7 +3,7 @@
 **Date:** 2026-11-15  
 **Change ID:** LAUNCHER-BOTTOM-CONTRAST-02  
 **Issue:** #126  
-**Status:** Draft candidate · CI pending · human visual QA pending
+**Status:** CI-PASSED (graphics preview smoke run 918) · HUMAN-QA-PENDING · not deployed
 
 ## Request and scope
 Correct the near-black lower Launcher background while preserving its existing blue/celestial atmosphere.
