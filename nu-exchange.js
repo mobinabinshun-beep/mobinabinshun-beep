@@ -5,6 +5,7 @@ let selected="xp",marketSelected="xp",replayMode="24s",replayStart=Date.now(),re
 const PREF_KEY="nu_exchange_chart_preferences_v1";
 let chartPrefs={zoom:24,grid:true,wicks:true,volume:true,average:true,tolerance:true,bands:true,averagePeriod:5,theme:"night",palette:"aurora"};
 const guard=NUExchangeGuard.create(window.localStorage),maintenance=NUExchangeLock.create(window.localStorage);
+const drawing=window.NUExchangeVisuals?window.NUExchangeVisuals.create({canvas:$("market-chart"),toolbar:$("chart-drawing-tools"),storage:window.localStorage}):null;
 function format(n){return new Intl.NumberFormat(undefined,{maximumFractionDigits:2}).format(Number(n)||0);}
 function dateLabel(value){const d=new Date(value);return Number.isNaN(d.getTime())?"Recorded":new Intl.DateTimeFormat(undefined,{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}).format(d);}
 function esc(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
@@ -76,7 +77,7 @@ function updateMarket(steps){
  $("market-index").textContent=index.toFixed(2);$("market-change").textContent=(index>100?"+":"")+((index/100-1)*100).toFixed(2)+"%";$("market-change").className=index>100?"positive":index<100?"negative":"";
  $("market-volume").textContent=format(steps.reduce((n,s)=>n+s.volume,0));$("market-demand").textContent=format(demand);$("market-supply").textContent=format(supply);$("market-events").textContent=steps.length+" RECORDED STEPS";
  const bias=supply>demand?"SUPPLY-LEANING":demand>supply?"DEMAND-LEANING":"BALANCED";$("market-bias").textContent=bias;$("market-bias").className="bias-indicator "+(supply>demand?"positive":demand>supply?"negative":"");$("market-bias").dataset.direction=supply>demand?"up":demand>supply?"down":"flat";
- drawMarket(steps);renderHistory(steps.slice(-MAX_TEXT_HISTORY).map(s=>({title:s.title,time:s.time,delta:s.delta,index:s.index})),"market-history");
+ drawMarket(steps);if(drawing){drawing.setAsset(marketSelected);drawing.render($("market-chart").getContext("2d"),$("market-chart").clientWidth||700,330,steps,marketSelected);}renderHistory(steps.slice(-MAX_TEXT_HISTORY).map(s=>({title:s.title,time:s.time,delta:s.delta,index:s.index})),"market-history");
 }
 function frame(cache,rows){
  const mode=NUExchangeReplay.getMode(replayMode),elapsed=Date.now()-replayStart,asset=cache.assets[selected]||{chart:[],recent:[]},points=asset.chart||[];
