@@ -73,3 +73,8 @@ test("single floating notifications use the same shared card preset and lifecycl
   assert.match(moduleSource,/node\.className="floating-change "\+\(options\.tone\|\|"gain"\)/);
   assert.match(moduleSource,/removeAfter\(pair,duration\+80\)/);
 });
+
+test("the existing XP and Mana +1 boundary feedback delegates to the shared bar-delta preset",()=>{
+  assert.match(gameSource,/NUGameNotifications\.showBarDelta\(\{anchor:bar,fill,text,tone:type,duration:1100,boundaryOffset:1\.5\}\)/);
+  assert.match(moduleCss,/\.nu-game-notification-bar-delta\{[^}]*top:-23px[^}]*z-index:12/);
+});
