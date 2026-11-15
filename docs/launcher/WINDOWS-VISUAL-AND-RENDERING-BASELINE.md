@@ -82,7 +82,7 @@ A new isolated module, nu-adaptive-governor.js, is integrated after the shared g
 
 This is an initial runtime governor, not proof of full automatic hardware adaptation. It reacts to frame pacing, but browser-exposed RAM/GPU details remain incomplete, it cannot directly measure total system memory pressure in many browsers, and it does not itself guarantee that every game loop obeys the target FPS. The active index.html no longer mounts the sky element, world canvases, horizon, dynamic-layer script or pixel-world script. The runtime now fails closed to a solid CSS base if the canonical image is unavailable. The legacy renderer source files remain in the repository but are not loaded by the active page. The launcher calibration preview also remains a separate preview and is not a native Windows installer.
 
-The governor has focused Node tests for downshifting under poor frame pacing, delayed upshifting within the calibrated ceiling, applying the saved launcher profile, and pausing while hidden. CI must pass these tests before merge.
+The governor has focused Node tests for downshifting under poor frame pacing, delayed upshifting within the calibrated ceiling, applying the saved launcher profile, and pausing while hidden. The focused graphics-integrity CI job passed after the image-only wiring and governor tests were included. Separate repository workflows still report failures in HP/HUD and Studio regression suites; those areas are outside this change and the classic LV/XP/Mana HUD remains locked.
 
 ## 11. XP compatibility remains a release blocker
 
