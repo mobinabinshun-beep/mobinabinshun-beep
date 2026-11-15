@@ -3,7 +3,7 @@ Unicode true
 !define APP_VERSION "0.1.0"
 !endif
 Name "N.U Launcher ${APP_VERSION}"
-OutFile "dist\N.U-Launcher-Setup-${APP_VERSION}-x86.exe"
+OutFile "..\dist\N.U-Launcher-Setup-${APP_VERSION}-x86.exe"
 InstallDir "$LOCALAPPDATA\N.U Launcher"
 InstallDirRegKey HKCU "Software\N.U Launcher" "InstallDir"
 RequestExecutionLevel user
@@ -16,7 +16,7 @@ UninstPage uninstConfirm
 UninstPage instfiles
 Section "Install"
   SetOutPath "$INSTDIR"
-  File /r "dist\payload\*.*"
+  File /r "..\dist\payload\*.*"
   WriteRegStr HKCU "Software\N.U Launcher" "InstallDir" "$INSTDIR"
   CreateDirectory "$SMPROGRAMS\N.U Launcher"
   CreateShortCut "$SMPROGRAMS\N.U Launcher\N.U Launcher.lnk" "$INSTDIR\N.U Launcher.exe"
