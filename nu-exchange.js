@@ -81,11 +81,18 @@ function renderHistory(items,id){
  $(id).innerHTML=items.slice().reverse().map(p=>'<div class="asset-row"><div><strong>'+esc(p.title)+'</strong><small>'+esc(dateLabel(p.at||p.time))+'</small></div><span class="asset-delta '+(p.delta>0?"positive":p.delta<0?"negative":"")+'">'+(p.delta>0?"+":"")+format(p.delta)+'</span><span class="asset-balance">'+format(p.balance??p.index??0)+'</span></div>').join("")||'<p class="panel-note">No recorded player activity for this asset yet.</p>';
 }
 function updateMarket(steps){
- const last=steps[steps.length-1],index=last?last.index:100,supply=steps.reduce((n,s)=>n+s.supply,0),demand=steps.reduce((n,s)=>n+s.demand,0);
+ const flow=window.NUExchangeVisuals&&typeof window.NUExchangeVisuals.ambientMarket==="function"
+  ?window.NUExchangeVisuals.ambientMarket(steps,marketSelected,Date.now())
+  :{steps,simulatedCount:0,behaviorBias:0};
+ const displaySteps=flow.steps||steps,last=displaySteps[displaySteps.length-1],index=last?Number(last.close??last.index):100;
+ const supply=displaySteps.reduce((n,s)=>n+(Number(s.supply)||0),0),demand=displaySteps.reduce((n,s)=>n+(Number(s.demand)||0),0);
+ const playerSupply=steps.reduce((n,s)=>n+(Number(s.supply)||0),0),playerDemand=steps.reduce((n,s)=>n+(Number(s.demand)||0),0);
  $("market-index").textContent=index.toFixed(2);$("market-change").textContent=(index>100?"+":"")+((index/100-1)*100).toFixed(2)+"%";$("market-change").className=index>100?"positive":index<100?"negative":"";
- $("market-volume").textContent=format(steps.reduce((n,s)=>n+s.volume,0));$("market-demand").textContent=format(demand);$("market-supply").textContent=format(supply);$("market-events").textContent=steps.length+" RECORDED STEPS";
- const bias=supply>demand?"SUPPLY-LEANING":demand>supply?"DEMAND-LEANING":"BALANCED";$("market-bias").textContent=bias;$("market-bias").className="bias-indicator "+(supply>demand?"positive":demand>supply?"negative":"");$("market-bias").dataset.direction=supply>demand?"up":demand>supply?"down":"flat";
- drawMarket(steps);if(drawing){drawing.setAsset(marketSelected);drawing.render($("market-chart").getContext("2d"),$("market-chart").clientWidth||700,330,steps,marketSelected);}renderHistory(steps.slice(-MAX_TEXT_HISTORY).map(s=>({title:s.title,time:s.time,delta:s.delta,index:s.index})),"market-history");
+ $("market-volume").textContent=format(displaySteps.reduce((n,s)=>n+(Number(s.volume)||0),0));$("market-demand").textContent=format(demand);$("market-supply").textContent=format(supply);
+ $("market-events").textContent=steps.length+" RECORDED · "+(flow.simulatedCount||0)+" SIMULATED";
+ const bias=playerSupply>playerDemand?"SUPPLY-LEANING":playerDemand>playerSupply?"DEMAND-LEANING":"BALANCED";$("market-bias").textContent=bias;$("market-bias").className="bias-indicator "+(playerSupply>playerDemand?"positive":playerDemand>playerSupply?"negative":"");$("market-bias").dataset.direction=playerSupply>playerDemand?"up":playerDemand>playerSupply?"down":"flat";
+ drawMarket(displaySteps);if(drawing){drawing.setAsset(marketSelected);drawing.render($("market-chart").getContext("2d"),$("market-chart").clientWidth||700,330,displaySteps,marketSelected);}
+ renderHistory(steps.slice(-MAX_TEXT_HISTORY).map(s=>({title:s.title,time:s.time,delta:s.delta,index:s.index})),"market-history");
 }
 function frame(cache,rows){
  const mode=NUExchangeReplay.getMode(replayMode),elapsed=Date.now()-replayStart,asset=cache.assets[selected]||{chart:[],recent:[]},points=asset.chart||[];
