@@ -1,6 +1,6 @@
 Unicode true
 Name "N.U Launcher — XP-first preview"
-OutFile "dist/N.U-Launcher-Setup-x86.exe"
+OutFile "..\\dist\\N.U-Launcher-Setup-x86.exe"
 InstallDir "$LOCALAPPDATA\N.U Launcher"
 RequestExecutionLevel user
 SetCompressor /SOLID lzma
