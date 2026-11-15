@@ -3,9 +3,18 @@
   "version": "0.1.0-preview",
   "status": "browser-human-test-candidate",
   "entry": "launcher.html",
-  "modules": ["launcher.html", "nu-launcher.css", "nu-launcher.js"],
+  "modules": [
+    "launcher.html",
+    "nu-launcher.css",
+    "nu-launcher.js"
+  ],
   "calibration": {
-    "adapters": ["online-browser-hints", "webgl-capability", "device-memory-hint", "bounded-cpu-sample"],
+    "adapters": [
+      "online-browser-hints",
+      "webgl-capability",
+      "device-memory-hint",
+      "bounded-cpu-sample"
+    ],
     "levels": 10,
     "level10": "calibrated-stable-ceiling",
     "gameExecutionBeforeCalibration": false,
@@ -13,7 +22,14 @@
     "profileStorage": "localStorage",
     "reportExport": "local-json"
   },
-  "preferences": ["remember-hide-chooser", "per-game-calibration-pending", "ask-every-launch", "reuse-saved-profile", "silent-launch-calibration", "automatic-adaptive-pending-game-hook"],
+  "preferences": [
+    "remember-hide-chooser",
+    "per-game-calibration-pending",
+    "ask-every-launch",
+    "reuse-saved-profile",
+    "silent-launch-calibration",
+    "automatic-adaptive-pending-game-hook"
+  ],
   "packageModel": {
     "signedManifests": "required-before-production",
     "contentHashes": "required-before-production",
@@ -34,6 +50,23 @@
     "Browser hardware signals are approximate and privacy-limited.",
     "Network check measures same-origin reachability/round-trip only, not throughput or packet loss.",
     "Per-game calibration integration is pending.",
-    "Human-test reports are exported locally; no server collector exists."
-  ]
+    "Human-test reports are exported locally; no server collector exists.",
+    "The native Windows x86 candidate is not certified on Windows XP SP3 until installed and tested on an XP x86 system."
+  ],
+  "nativeWindowsCandidate": {
+    "status": "source-and-CI-build-candidate",
+    "source": "native/launcher.c",
+    "architecture": "x86",
+    "subsystem": "Windows 5.01",
+    "installer": "offline per-user NSIS setup",
+    "backgroundAsset": "assets/backgrounds/niroo-universe-background.svg",
+    "backgroundMode": "single static image; no decorative layers",
+    "automaticAdaptation": [
+      "processor-count",
+      "physical-memory-total",
+      "physical-memory-available"
+    ],
+    "gameRuntime": "opens the web demo in the system browser; XP browser compatibility is not claimed",
+    "xpSp3RuntimeVerified": false
+  }
 }
