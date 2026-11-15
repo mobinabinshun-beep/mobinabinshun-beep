@@ -791,3 +791,13 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
  #game-view.active .hp-bar{animation:none!important;transition:none!important}
  .hp-pill-travel-ghost{display:none!important}
 }
+
+
+/* HP transaction feedback: independent of capsule drawer presentation. */
+#game-view.active .hp-bar{position:relative}
+#game-view.active .hp-bar .hp-bar-transaction{position:absolute;left:50%;top:calc(100% + 7px);z-index:18;display:flex;align-items:center;justify-content:center;gap:9px;max-width:min(280px,calc(100vw - 24px));padding:6px 10px;border:1px solid #b7ff7566;border-radius:9px;background:#071522ed;color:#f2ffe8;font:700 10px/1.2 ui-monospace,monospace;letter-spacing:.035em;white-space:nowrap;box-shadow:0 4px 14px #0008;opacity:0;visibility:hidden;transform:translate(-50%,-4px);pointer-events:none;transition:opacity .16s ease,transform .16s ease,visibility .16s}
+#game-view.active .hp-bar .hp-bar-transaction.is-visible{opacity:1;visibility:visible;transform:translate(-50%,0)}
+#game-view.active .hp-bar .hp-bar-transaction-cost{color:#ffd98a}
+#game-view.active .hp-bar .hp-bar-transaction-gain{color:#caff9f;font-size:12px}
+@media(max-width:520px){#game-view.active .hp-bar .hp-bar-transaction{top:calc(100% + 5px);gap:7px;padding:6px 8px;font-size:9px}}
+@media(prefers-reduced-motion:reduce){#game-view.active .hp-bar .hp-bar-transaction{transition:none}}
