@@ -1,12 +1,12 @@
 # N.U Exchange — Ambient Flow and Player Chart Drawing
 **Date:** 2026-11-15  
-**Status:** Implemented on the Gateway / Exchange candidate branch; automated CI and human browser acceptance pending.
+**Status:** Implemented; automated Exchange regression passed on candidate head 9913cad6964537e7ef3b52b9617ea3301ca8b0df. Human browser acceptance remains pending.
 
 ## Scope
 This change extends the existing activity-driven fictional market chart without replacing its transaction-backed OHLC history, replay controls, moving average, parametric bands, themes, palettes, volume, or durable Store-purchase exclusion.
 
 ## Ambient background flow
-- A small animated background-flow layer is derived from the most recent eight local player market steps.
+- A small animated background-flow layer and three-item micro-tick tape are derived from the most recent eight local player market steps.
 - Recent demand/supply balance shapes the direction bias; recent activity volume shapes animation intensity.
 - Each ambient index pulse is clamped to at most ±3 N.U index points.
 - Each ambient display-volume pulse is clamped to at most 3 display units.
@@ -40,8 +40,8 @@ Annotations are stored in local browser presentation preferences, keyed by selec
 - NU-GENERATION-1-MANIFEST.json — module and behavior registration.
 
 ## Validation
-- Added automated unit coverage for deterministic ambient pulses, ±3 index bound, 3-unit volume bound, and player demand/supply direction bias.
-- Run the repository Node test suite and the Exchange / graphics GitHub Actions workflows on the final PR head.
+- Automated Exchange regression: PASS (30 tests, 0 failures), including deterministic ambient pulses, ±3 index bound, 3-unit volume bound, player demand/supply direction bias, and ambient renderer/micro-tick output.
+- Graphics preview smoke and graphics integrity workflows: PASS on the same candidate head.
 - Human acceptance remains required for chart drawing on desktop and touch devices, annotation persistence per asset, resize behavior, and visual balance.
 - No merge, public deployment, or human acceptance is implied by this implementation record.
 
