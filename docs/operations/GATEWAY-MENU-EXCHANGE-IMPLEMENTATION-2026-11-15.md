@@ -98,7 +98,7 @@
 - `tests/nu-wallet.test.js`
 - `tests/nu-exchange-runtime.test.js`
 - `tests/nu-market-sim.test.js`
-- `tests/nu-hp-pill-interaction.test.js` — همگام‌سازی assertion نسخهٔ cache باندل پس از تغییر نام نسخهٔ nu-games.
+- `tests/nu-hp-pill-interaction.test.js` و `tests/nu-world-entry-calibration.test.js` — همگام‌سازی assertionهای نسخهٔ cache باندل پس از تغییر نام نسخهٔ nu-games.
 
 ### پیکربندی و مستندات
 - `NU-GENERATION-1-MANIFEST.json`
@@ -119,7 +119,7 @@
   `archive/pre-change/2026-11-15/gateway-menu-exchange/`
 - snapshot فایل‌های نسخهٔ عمومی جدیدتر Exchange پیش از ادغام در مسیر زیر نگهداری می‌شوند:
   `archive/latest-default-before-merge/2026-11-15/`
-- snapshotها شامل index، Gateway JS/CSS، nu-world.css، nu-games، wallet، exchange، exchange.html، market simulator، graphics runtime، README، پروتکل اجرایی، تست‌های Gateway/Wallet/Exchange/Market و Generation 1 manifest هستند. مجموعهٔ latest-default-before-merge نیز نسخهٔ جدید Exchange، replay، CSS، manifest، مستندات و تست‌های آن را ثبت می‌کند.
+- snapshotها شامل index، Gateway JS/CSS، nu-world.css، nu-games، wallet، exchange، exchange.html، market simulator، graphics runtime، README، پروتکل اجرایی، تست‌های Gateway/Wallet/Exchange/Market و Generation 1 manifest هستند؛ snapshot آزمون world-entry نیز پس از کشف وابستگی نسخه‌ای اضافه شد. مجموعهٔ latest-default-before-merge نیز نسخهٔ جدید Exchange، replay، CSS، manifest، مستندات و تست‌های آن را ثبت می‌کند.
 - شاخهٔ قبلی `feature/gateway-main-game-focused-2026-11-15` دست‌نخورده باقی مانده است.
 
 ## 6. آزمون و وضعیت پذیرش
