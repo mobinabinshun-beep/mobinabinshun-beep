@@ -28,6 +28,7 @@ jobs:
       - name: Check changed runtime syntax
         run: |
           node --check nu-exchange.js
+          node --check nu-exchange-sw.js
           node --check nu-exchange-core.js
           node --check nu-exchange-engines.js
           node --check nu-exchange-visuals.js
