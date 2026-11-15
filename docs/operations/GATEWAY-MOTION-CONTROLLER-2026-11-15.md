@@ -34,6 +34,7 @@ The prior controller was selection-first: hovering an option only highlighted it
 - `index.html` — updated controller cache token and movement-first hint.
 - `tests/nu-hex-gateway.test.js` — assertions for mouse/pen hover, touch contact, click-free activation and scrim blocking.
 - `docs/operations/NU-OPS-IMPLEMENT-01.md` — authoritative Gateway input contract.
+- `docs/operations/GATEWAY-MENU-EXCHANGE-IMPLEMENTATION-2026-11-15.md` — corrected implementation behavior and test coverage.
 
 ## Backup and candidate
 
@@ -43,10 +44,13 @@ The prior controller was selection-first: hovering an option only highlighted it
 
 ## Verification
 
-- JavaScript syntax: pending.
-- Gateway regression test: pending.
-- CI workflow: pending.
+- Controller JavaScript syntax: PASS.
+- Test-file JavaScript syntax: PASS.
+- Focused source assertions for hover-open, touch-open, movement activation, duplicate guard, cache token and scrim blocking: PASS.
+- Full Gateway regression execution: pending.
+- GitHub Actions: no workflow runs or commit status checks were returned for the PR head; CI is therefore NOT VERIFIED.
 - Human mouse/touch/keyboard and responsive browser QA: pending.
+- Reference rationale in `mobinabinshun-beep/Repository` was updated to match movement-first activation (commit `39bd31f604ddb78b5a78405b0332698c4e5c3049`).
 - Merge/deployment: not performed.
 
 ## Rollback
