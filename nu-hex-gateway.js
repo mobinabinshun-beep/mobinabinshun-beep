@@ -134,6 +134,22 @@
     });
   });
 
+  // Keep page/game event handlers from receiving input while Gateway owns the paused state.
+  document.addEventListener("pointerdown",event=>{if(open)event.stopPropagation();});
+  document.addEventListener("pointerup",event=>{if(open)event.stopPropagation();});
+  document.addEventListener("wheel",event=>{
+    if(open&&!root.contains(event.target)){event.preventDefault();event.stopPropagation();}
+  },{capture:true,passive:false});
+  document.addEventListener("contextmenu",event=>{
+    if(open&&!root.contains(event.target)){event.preventDefault();event.stopPropagation();}
+  },true);
+  window.addEventListener("resize",event=>{
+    if(open){layoutItems();event.stopImmediatePropagation();}
+  },true);
+  window.addEventListener("orientationchange",event=>{
+    if(open){layoutItems();event.stopImmediatePropagation();}
+  },true);
+
   // The scrim blocks every game/page control while the Gateway is paused.
   scrim.addEventListener("click",()=>setOpen(false));
   document.addEventListener("pointermove",event=>{
@@ -154,15 +170,23 @@
     if(inside)outsideSince=0;
     else if(!outsideSince)outsideSince=performance.now();
     else if(performance.now()-outsideSince>110)setOpen(false);
+    event.stopPropagation();
   },{passive:true});
 
   document.addEventListener("keydown",event=>{
-    if(event.key==="Escape"&&open)setOpen(false);
-    if(event.key==="Tab"&&open){
-      const focusable=items.filter(item=>item.tabIndex===0);
-      if(event.shiftKey&&document.activeElement===focusable[0]){event.preventDefault();trigger.focus();}
+    if(!open)return;
+    if(event.key==="Escape"){event.preventDefault();event.stopPropagation();setOpen(false);return;}
+    if(event.key==="Tab"){
+      const first=items[0],last=items[items.length-1],active=document.activeElement;
+      if(event.shiftKey&&active===trigger){event.preventDefault();last?.focus();}
+      else if(event.shiftKey&&active===first){event.preventDefault();trigger.focus();}
+      else if(!event.shiftKey&&active===last){event.preventDefault();trigger.focus();}
+      else if(!root.contains(active)){event.preventDefault();trigger.focus();}
+      event.stopPropagation();
+      return;
     }
-  });
+    event.stopPropagation();
+  },true);
   window.addEventListener("blur",()=>{if(open)setOpen(false);});
   window.addEventListener("pagehide",()=>{if(open)setOpen(false);});
   window.addEventListener("nu:menu-dismissed",releaseHeldState);
