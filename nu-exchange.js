@@ -83,11 +83,12 @@ function updateGuard(){
  $("exchange-lock-status").className=maintenance.isLocked()?"pending-tag":"sim-tag";
 }
 function refresh(){
- const save=NUWallet.normalizeSave(NU.load()),rows=NUWallet.assetRows(save).filter(r=>r.key!=="hp");
+ const save=NUWallet.normalizeSave(NU.load()),wallet=NUExchangeCore.walletSnapshot(),rows=NUWallet.assetRows(save).filter(r=>r.key!=="hp");
  if(!rows.some(r=>r.key===selected))selected=rows[0]?.key||"xp";
  $("asset-select").innerHTML=rows.map(r=>'<option value="'+r.key+'">'+esc(r.label)+'</option>').join("");$("asset-select").value=selected;
  $("market-asset").innerHTML=NUVirtualMarket.assets().map(a=>'<option value="'+a.key+'">'+esc(a.label)+'</option>').join("");$("market-asset").value=marketSelected;
- renderWalletConnection(wallet);\n const next=snapshot(save,rows);try{localStorage.setItem(CACHE_KEY,JSON.stringify(next));}catch(_){}
+ renderWalletConnection(wallet);
+ const next=snapshot(save,rows);try{localStorage.setItem(CACHE_KEY,JSON.stringify(next));}catch(_){}
  const cache=readCache()||next;frame(cache,rows);
  const games=NUExchangeCore.listGames();$("change-from").innerHTML=games.map(g=>'<option value="'+g.id+'">'+esc(g.name)+'</option>').join("");
  $("change-to").innerHTML=games.map(g=>'<option value="'+g.id+'">'+esc(g.name)+'</option>').join("");
@@ -109,7 +110,11 @@ window.NUExchangeAttempt=async function(commit){
  if(typeof commit!=="function")return {ok:false,reason:"NO_APPROVED_TRANSFER_ADAPTER"};
  const result=await commit();if(result&&result.ok)guard.recordSuccess();updateGuard();return result;
 };
-NUExchangeCore.connectWallet({load:()=>NU.load(),wallet:NUWallet});\nwindow.addEventListener("nu:save-updated",refresh);\nwindow.addEventListener("nu:exchange:registry-change",refresh);
+NUExchangeCore.connectWallet({load:()=>NU.load(),wallet:NUWallet});
+window.addEventListener("nu:save-updated",refresh);
+NUExchangeCore.connectWallet({load:()=>NU.load(),wallet:NUWallet});
+window.addEventListener("nu:save-updated",refresh);
+window.addEventListener("nu:exchange:registry-change",refresh);
 window.addEventListener("storage",e=>{if(e.key===NU.storageKey)refresh();});
 window.addEventListener("pageshow",()=>{replayStart=Date.now();refresh();});
 window.addEventListener("resize",()=>{const rows=NUWallet.assetRows(NU.load()).filter(r=>r.key!=="hp"),cache=readCache();if(cache)frame(cache,rows);});
