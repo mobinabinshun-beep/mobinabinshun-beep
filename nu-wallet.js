@@ -49,22 +49,31 @@
     return entry;
   }
   function buyHpPill(raw,meta){
-    const next=normalizeSave(raw);
+    const next=normalizeSave(raw),details=meta||{};
     if(next.xp<HP_PILL_COST)return {ok:false,reason:"INSUFFICIENT_XP",state:next};
-    next.xp-=HP_PILL_COST;
-    next.hpPills+=1;
-    const entry=transaction(next,"purchase","Golden HP Capsule",{xp:-HP_PILL_COST,hpPills:1},Object.assign({},meta||{},{exchangeExcludedKeys:["hpPills"]}));
-    return {ok:true,state:next,transaction:entry};
+    next.xp-=HP_PILL_COST;next.hpPills+=1;
+    next.nonExchangeableAssets=Array.from(new Set([...(next.nonExchangeableAssets||[]),"hpPills"]));
+    const at=String(details.at||new Date().toISOString()),baseId=String(details.id||("nu-store-"+Date.now()+"-"+Math.random().toString(36).slice(2,8)));
+    const entries=[
+      {id:baseId+"|xp",at,kind:"purchase",title:"Golden HP Capsule · XP spent",direction:"OUTGOING",asset:"xp",signedAmount:-HP_PILL_COST,category:"STORE_PURCHASE",resultingBalance:next.xp,settlementStatus:"SETTLED",idempotencyKey:baseId+"|xp",deltas:{xp:-HP_PILL_COST}},
+      {id:baseId+"|capsule",at,kind:"purchase",title:"Golden HP Capsule · inventory received",direction:"INCOMING",asset:"hpPills",signedAmount:1,category:"STORE_PURCHASE",resultingBalance:next.hpPills,settlementStatus:"SETTLED",idempotencyKey:baseId+"|capsule",exchangeExcludedKeys:["hpPills"],deltas:{hpPills:1}}
+    ];
+    next.transactions=next.transactions.concat(entries).slice(-MAX_TRANSACTIONS);
+    return {ok:true,state:next,transaction:entries[0],transactions:entries};
   }
   function useHpPill(raw,meta){
-    const next=normalizeSave(raw);
+    const next=normalizeSave(raw),details=meta||{};
     if(next.hp>=MAX_HP)return {ok:false,reason:"HP_FULL",state:next};
     if(next.hpPills<1)return {ok:false,reason:"NO_HP_CAPSULE",state:next};
     const restored=Math.min(HP_PILL_COST,MAX_HP-next.hp);
-    next.hpPills-=1;
-    next.hp+=restored;
-    const entry=transaction(next,"consumption","HP Capsule used",{hp:restored,hpPills:-1},meta);
-    return {ok:true,state:next,restored,transaction:entry};
+    next.hpPills-=1;next.hp+=restored;
+    const at=String(details.at||new Date().toISOString()),baseId=String(details.id||("nu-capsule-use-"+Date.now()+"-"+Math.random().toString(36).slice(2,8)));
+    const entries=[
+      {id:baseId+"|hp",at,kind:"consumption",title:"HP Capsule · HP restored",direction:"INCOMING",asset:"hp",signedAmount:restored,category:"CAPSULE_CONSUMPTION",resultingBalance:next.hp,settlementStatus:"SETTLED",idempotencyKey:baseId+"|hp",deltas:{hp:restored}},
+      {id:baseId+"|capsule",at,kind:"consumption",title:"HP Capsule · inventory spent",direction:"OUTGOING",asset:"hpPills",signedAmount:-1,category:"CAPSULE_CONSUMPTION",resultingBalance:next.hpPills,settlementStatus:"SETTLED",idempotencyKey:baseId+"|capsule",deltas:{hpPills:-1}}
+    ];
+    next.transactions=next.transactions.concat(entries).slice(-MAX_TRANSACTIONS);
+    return {ok:true,state:next,restored,transaction:entries[0],transactions:entries};
   }
   function grantXP(raw,amount,meta){
     const next=normalizeSave(raw),details=meta||{},rewardId=String(details.id||"");
