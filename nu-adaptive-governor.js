@@ -8,6 +8,8 @@
   if (g.NUAdaptiveGovernor) return;
 
   var profile = null;
+  var ceilingLevel = 10;
+  var savedProfile = null;
   var running = false;
   var timer = 0;
   var fastWindows = 0;
@@ -40,9 +42,31 @@
     else g.setTimeout(function () { callback(now()); }, 16);
   }
 
+  function readLauncherProfile() {
+    try {
+      if (!g.localStorage) return null;
+      var value = g.localStorage.getItem("nu-launcher-calibration-v1");
+      if (!value) return null;
+      var parsed = JSON.parse(value);
+      return parsed && typeof parsed.level === "number" ? parsed : null;
+    } catch (ignore) {
+      return null;
+    }
+  }
+
+  function persistProfile() {
+    if (!savedProfile || !g.localStorage || !profile) return;
+    try {
+      savedProfile.level = profile.level;
+      savedProfile.adaptive = profile.adaptive;
+      savedProfile.lastAdaptiveAt = new Date().toISOString();
+      g.localStorage.setItem("nu-launcher-calibration-v1", JSON.stringify(savedProfile));
+    } catch (ignore) {}
+  }
+
   function publish(nextLevel, reason, average, slowPercent) {
     if (!profile || !g.NUGraphicsCore || typeof g.NUGraphicsCore.budget !== "function") return;
-    var level = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, nextLevel));
+    var level = Math.max(MIN_LEVEL, Math.min(ceilingLevel, nextLevel));
     if (level === profile.level) {
       lastDecision = "hold";
       return;
@@ -66,6 +90,7 @@
 
     profile = next;
     g.NUGraphicsProfile = next;
+    persistProfile();
     if (g.NUGameRenderAdapter && typeof g.NUGameRenderAdapter.apply === "function") {
       g.NUGameRenderAdapter.apply(next);
     }
@@ -142,6 +167,27 @@
   function start(initial) {
     if (running || !initial || !initial.budget || !g.NUGraphicsCore) return;
     profile = initial;
+    savedProfile = readLauncherProfile();
+    ceilingLevel = savedProfile
+      ? Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, Number(savedProfile.stableLevel) || Number(savedProfile.level) || initial.level))
+      : Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, Number(initial.level) || 3));
+    if (savedProfile) {
+      profile = {};
+      var key;
+      for (key in initial) {
+        if (Object.prototype.hasOwnProperty.call(initial, key)) profile[key] = initial[key];
+      }
+      profile.level = Math.max(MIN_LEVEL, Math.min(ceilingLevel, Number(savedProfile.level) || initial.level));
+      profile.budget = g.NUGraphicsCore.budget(profile.level);
+      profile.launcherCalibrated = true;
+      g.NUGraphicsProfile = profile;
+      if (g.NUGameRenderAdapter && typeof g.NUGameRenderAdapter.apply === "function") {
+        g.NUGameRenderAdapter.apply(profile);
+      }
+      if (g.NUPixelWorld && typeof g.NUPixelWorld.setQuality === "function") {
+        g.NUPixelWorld.setQuality(profile.level);
+      }
+    }
     running = true;
     lastDecision = "monitoring";
     schedule(1500);
@@ -160,6 +206,8 @@
       return {
         running: running,
         level: profile ? profile.level : null,
+        ceilingLevel: ceilingLevel,
+        launcherCalibrated: !!savedProfile,
         windows: windows,
         fastWindows: fastWindows,
         lastDecision: lastDecision
