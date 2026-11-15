@@ -30,7 +30,7 @@ test("HP pill interaction pop uses viewport coordinates and cannot be clipped by
 
 test("HUD markup is a native button and uses the current generation 1.29 assets",()=>{
   assert.match(html,/<button class="hp-pill-use" id="hp-pill-use" type="button"/);
-  assert.match(html,/nu-games\.js\?v=20261115-nonblocking-entry-r1/);
+  assert.match(html,/nu-games\.js\?v=20261115-hp-drawer-r2/);
   assert.match(html,/nu-world\.css\?v=[^"]+/);
 });
 
@@ -67,8 +67,8 @@ test("successful HP capsule use emits a radial interaction burst anchored to the
 test("HP capsule travel enters from the inside-right corner and returns along the same reversible path",()=>{
   assert.ok(games.includes("function animateHpPillTravel(direction)"));
   assert.ok(games.includes("function syncHpPillDock(hp)"));
-  assert.ok(games.includes("const corner={x:barRect.width-4"));
-  assert.ok(games.includes("const dock=mobileDock?"));
+  assert.ok(games.includes("const coreRight=barRect.left+coreWidth"));
+  assert.ok(games.includes("const dockX=coreRight+drawerWidth/2"));
   assert.ok(games.includes("hpPillTravelAnimation.reverse()"));
   assert.ok(games.includes("ghost.animate("));
   assert.ok(css.includes(".hp-pill-travel-layer{position:absolute;inset:0"));
@@ -89,9 +89,9 @@ test("Generation 1.26 widens the HP frame and keeps the pill dock inside its rig
   assert.ok(css.includes("#game-view.active .hp-bar #hp-pill-use{\n position:absolute;"));
   assert.ok(css.includes("right:8px;"));
   assert.ok(css.includes("padding:9px 60px 9px 14px"));
-  assert.ok(games.includes("const corner={x:barRect.width-4"));
-  assert.ok(games.includes("const dock=mobileDock?"));
-  assert.ok(html.includes("20261115-nonblocking-entry-r1"));
+  assert.ok(games.includes("const coreRight=barRect.left+coreWidth"));
+  assert.ok(games.includes("const dockX=coreRight+drawerWidth/2"));
+  assert.ok(html.includes("20261115-hp-drawer-r2"));
 });
 
 test("HP pill stays hidden during repeated damage and reverses the same in-flight animation when HP recovers",()=>{
@@ -99,14 +99,14 @@ test("HP pill stays hidden during repeated damage and reverses the same in-fligh
   assert.ok(games.includes("hpPillTravelAnimation.reverse()"));
   assert.ok(games.includes('hpPillTravelAnimation.playState==="running"?true:next>=10'));
   assert.ok(games.includes('button.hidden=finishedDirection==="out"'));
-  assert.ok(games.includes("if(direction!==hpPillTravelDirection){hpPillTravelDirection=direction;hpPillTravelAnimation.reverse();}"));
+  assert.ok(games.includes("if(direction!==hpPillTravelDirection){hpPillTravelDirection=direction;if(opening)bar.classList.add"));
 });
 
 test("Generation 1.26 reserves a responsive HP frame and an internal 42px capsule dock",()=>{
   assert.ok(css.includes("width:42px;"));
   assert.ok(css.includes("min-width:72px"));
   assert.ok(css.includes("width:calc(100vw - 16px)"));
-  assert.ok(html.includes("20261115-nonblocking-entry-r1"));
+  assert.ok(html.includes("20261115-hp-drawer-r2"));
 });
 
 
@@ -126,7 +126,7 @@ test("Generation 1.28 makes the HP HUD frame visibly more compact on phone scree
   assert.match(css,/@media\(max-width:520px\)\{\s*#game-view\.active \.hp-bar\{\s*width:min\(286px,calc\(100vw - 28px\)\);\s*min-width:0;\s*min-height:44px;/);
   assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use\{right:5px;width:34px;height:34px/);
   assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use img\{width:24px;height:24px/);
-  assert.ok(html.includes("20261115-nonblocking-entry-r1"));
+  assert.ok(html.includes("20261115-hp-drawer-r2"));
 });
 
 
@@ -134,9 +134,9 @@ test("Generation 1.29 places the phone HP capsule below a compact HP rail",()=>{
   assert.match(css,/@media\(max-width:520px\)\{\s*#game-view\.active \.hp-bar\{\s*width:max-content;\s*max-width:calc\(100vw - 24px\);/);
   assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use\{\s*left:50%;\s*right:auto;\s*top:auto;\s*bottom:3px;\s*transform:translateX\(-50%\)/);
   assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use img\{width:27px;height:27px/);
-  assert.ok(games.includes('const mobileDock=window.matchMedia&&window.matchMedia("(max-width:520px)").matches;'));
-  assert.ok(games.includes("y:barRect.height-21"));
-  assert.ok(html.includes("20261115-nonblocking-entry-r1"));
+  assert.ok(css.includes("@media(max-width:520px)"));
+  assert.ok(games.includes("const centerY=barRect.top+barRect.height/2"));
+  assert.ok(html.includes("20261115-hp-drawer-r2"));
 });
 
 
