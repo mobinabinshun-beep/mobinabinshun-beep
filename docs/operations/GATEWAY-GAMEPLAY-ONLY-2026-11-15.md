@@ -44,7 +44,10 @@ Only the Generation 1 main game entry (`index.html`) and its shared Gateway cont
 
 - Source-level scope and route review: completed.
 - Gateway regression assertions updated for gameplay-only activation, route set, protected controls and background-only blur.
-- Automated test execution / CI: pending candidate PR checks; no local runtime was available in this GitHub-only session.
+- Gateway main-game regression workflow #88: PASS (syntax + focused Gateway regression).
+- Graphics integrity #272, Generation 1 HUD layout #99, graphics preview smoke #693, and static validation: PASS.
+- Wallet/Profile workflow #104 and Studio export workflow #490: FAILED on the same two existing profile-preview assertions (`demo-card-image` file-input expectation and eight photo-placement controls). The current privacy-safe profile preview no longer exposes those controls; `index.html` and the profile test are outside this PR's intended changes. No out-of-scope repair was made.
+- No local runtime was available in this GitHub-only session.
 - Browser/device visual QA: pending public-demo deployment.
 - Public deployment: not performed or verified.
 - Merge: not performed.
