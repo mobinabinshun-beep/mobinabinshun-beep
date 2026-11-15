@@ -1,0 +1,234 @@
+{
+  "project": "N.U Interactive World",
+  "generation": 1,
+  "runtime": "N.U Adaptive Runtime",
+  "runtimeVersion": "0.1-prototype",
+  "packageVersion": "0.5.10-gen1-exchange-chart-controls",
+  "entry": "index.html",
+  "modules": [
+    "index.html",
+    "nu-world.css",
+    "nu-engine.js",
+    "nu-pixel-world.js",
+    "nu-graphics-core.js",
+    "nu-background-engine.js",
+    "nu-dynamic-layers.js",
+    "nu-game-render-adapter.js",
+    "nu-graphics-runtime.js",
+    "nu-materials.js",
+    "nu-games.js",
+    "pixel-art-studio.html",
+    "nu-svg-vectorizer.js",
+    "nu-graphics-analysis.js",
+    "nu-raster-import.js",
+    "nu-studio-layout.js",
+    "nu-pixel-art-studio.js",
+    "nu-wallet.js",
+    "nu-player-ui.js",
+    "casino.html",
+    "nu-casino.js",
+    "nu-casino.css",
+    "nu-market-sim.js",
+    "nu-exchange-core.js",
+    "nu-exchange-guard.js",
+    "nu-exchange-replay.js",
+    "nu-exchange-lock.js"
+  ],
+  "randomPool": [
+    "bubble",
+    "mana",
+    "chaos"
+  ],
+  "interactionsPerRound": 10,
+  "save": {
+    "provider": "localStorage",
+    "key": "nu-world-save-v1"
+  },
+  "delivery": {
+    "browser": true,
+    "offline": "after assets are cached; not yet guaranteed",
+    "native": "future adapter required"
+  },
+  "notes": [
+    "Generation 1 unified profile workshop preview (2026-11-14): preserves the historical four-field card and exposes all current profile design alternatives for human comparison: hue, neutral white/dark tint, selected-color lightness and optional saturation; exact age, age band, both or no age; Bio and Interests; optional/local-identity-required/required public-card models; per-field privacy and share-consent preview; private-view YES/NO and fake passphrase flow; appearance-only, appearance-plus-fields and full lock policies; card/HUD/Wallet/hidden stats placement; holographic materials, typography, geometry, glow, transparency, scanlines, texture, motion, reduced effects, high contrast and device quality; local image fit and 2x4 crop-anchor/photo-slot semantics; recovery choices; platform and launcher delivery alternatives; local save, export protection, import validation and future sync models; reduced-effects and high-contrast accessibility previews. All are temporary preview controls that reset on close. No credentials are authenticated, no data is saved/exported/imported/recovered, no image is uploaded and no network sync/share occurs.",
+    "Generation 1.33 candidate: Exchange now includes a fictional activity-driven virtual market simulator with OHLC candles, volume, demand/supply and N.U-only index; it derives every movement from the local player transaction ledger and never uses real-world financial data.",
+    "Generation 1.32.1: remove duplicate legacy menu/back buttons from main-world internal views so the shared hex gateway is the single navigation entry point.",
+    "Generation 1.32: calibrates the shared N.U hex gateway across all internal Generation 1 pages with responsive positioning, touch-direct activation, mouse-hover dwell, two-step click/keyboard confirmation, outside-exit tolerance and pause/blur behavior. Navigation only; game rules and wallet/save state are unchanged.",
+    "Generation 1.31: adds a standalone N.U Casino with playable Coin Flip, Lucky Dice and Mini Slots. The casino uses a separate local virtual-credit balance (100 starting credits), persists in the shared browser save, and never touches XP/Mana or real money. Human browser/device acceptance remains required.",
+    "Generation 1.16: the Mana Collector uses five preserved N.U Material SVG assets as crisp pixel-art glints around interactive Mana targets and emits a short material-based collection burst. Other game mechanics and the adaptive runtime remain unchanged; human visual/touch QA is required.",
+    "Generation 1.15: image analysis now describes the visible four-layer composite; PNG and SVG exports include a companion Markdown human report, SVG embeds the report metadata, and Graphic IR includes the report as humanReport. A direct human-report download is also available. Source image processing remains local.",
+    "Generation 1.14 candidate: Studio workspace uses deterministic fit geometry and ResizeObserver sizing; pointer mapping is centralized; import shows an original-source preview, preserves a separate working copy, offers smooth/nearest resampling and optional Floyd–Steinberg dithering; import size is bounded at 25 MB. Game HUD asset-profile interactions no longer bubble into gameplay pointer handlers and the profile is positioned beside the active resource bar. Browser acceptance remains pending.",
+    "Game HUD now exposes per-game asset profiles on hover/focus; each profile is a filtered projection of the global wallet, not a separate balance store. HP capsule can be purchased or used from the Store and used from the in-game HP icon.",
+    "Generation 1.13 candidate: Studio fixes fit-to-view/zoom/scroll and per-pixel checkerboard; adds pencil, eraser, fill, eyedropper, line, rectangle, ellipse and brush sizing; imports up to 256px longest-edge with up to 32 colors; exports SVG, PNG and NU-GFX-IR/1; unique artwork downloads award a bounded 1–25 shared XP reward once per fingerprint to the same local Generation 1 wallet.",
+    "Generation 1.12 candidate: Pixel Art Studio adds local high-detail aspect-preserving image import, weighted median-cut palette reduction, alpha cutoff, contour-based closed SVG paths with transparent-hole preservation, and pixel-run export. Source images remain local; no upload or server processing.",
+    "Generation 1.11 candidate: adds a local, testable wallet transaction boundary, HP capsule purchase/consumption feedback, owned-asset wallet view and local player identity card; no server account or real-money economy.",
+    "Generation 1.10: Pixel Art Studio now uses N.U graphics capability budgets, independent resizable workspace frame, zoom control, rectangular pixel-art dimensions, aspect-ratio lock, nearest-neighbor artwork resizing, and adaptive editable-pixel limits. Original source files remain untouched; only local working copies are resampled.",
+    "Generation 1.9 candidate: added N.U Pixel Art Studio as a separate creative tool in the main library; it is deliberately excluded from the three-game random gameplay pool.",
+    "Generation 1.8 development: repaired literal newline escaping in the store/game script so the JavaScript parses as source text.",
+    "N.U public-test candidate retains the adaptive/network runtime unchanged and keeps the public default branch untouched until the candidate is merged.",
+    "Generation 1.7 development: added N.U Store navigation and a first-visit two-choice store guide shell; no unavailable/locked upgrades are displayed.",
+    "Generation 1.7 development: removed duplicate persistent round counters; 1/10–10/10 feedback is object-local after successful interaction.",
+    "Generation 1.7 development: removed floating XP/Mana/reward labels from object interactions; +1 capsule-edge feedback remains.",
+    "Generation 1.7 development: online reading layout retains central spawn exclusion; downloadable full-screen builds may set data-delivery=download to remove it.",
+    "This is an experimental browser prototype, not a production game release.",
+    "N-BI consumes 10 Mana per successful Chaos shot in the current prototype; upgrade-based cost reduction is not yet implemented.",
+    "No server account or cloud save exists.",
+    "Random game is selected on each fresh launch; a running round stays fixed until ended or page reload.",
+    "Generation 1.4 adds an independent 320x180 pixel-art city layer with local dawn/day/dusk/night phases and reduced-motion handling.",
+    "The adaptive runtime file remains unchanged; pixel-world quality is adjusted after the existing calibration.",
+    "Pixel skyline is procedural placeholder art and is not yet a canonical, source-confirmed Niroo City illustration.",
+    "Generation 1.5 expands the renderer into a layered, source-neutral landscape with a moving sun arc, night-only stars, river, forest, coast, fields, city terraces and distant traffic.",
+    "Mouse camera follows pointer after first mouse movement; touch camera activates after first touch gesture and uses inverse drag. Drag gestures are excluded from game interactions.",
+    "Chaos targets now advance toward the defensive boundary; each unneutralized mass causes one HP damage and is removed. A successful N-BI interaction neutralizes one mass.",
+    "Generation 1.5 adds separate mouse-follow and inverse touch-drag camera input; drag gestures are excluded from gameplay interactions.",
+    "Unneutralized Chaos masses move toward the defensive boundary; each mass crossing causes one HP damage and then disappears.",
+    "Niroo City terrain geography in the renderer is a non-canonical visual proposal based on published urban descriptions; see NU-WORLD-VISUAL-BIBLE-G1.5.md.",
+    "Generation 1.6: successful object interactions show an exact n/10 marker at the clicked object's location.",
+    "Chaos approach speed doubles by target sequence (1, 2, 4, 8; capped at 8); every mass not neutralized that reaches the boundary causes 1 HP damage.",
+    "Completing a full 10-interaction game round restores 1 HP up to the maximum of 10.",
+    "XP rail spans the bottom edge; Mana capsule rail is placed at the left side above it; HP display now includes a moving ECG-style scanner trace.",
+    "Aircraft are placed in an upper altitude band and road traffic in a ground band to reduce intersections with buildings.",
+    "The nine Mana capsule upgrade levels and N-BI shot-cost reduction are not yet implemented; current Chaos shot still costs 10 Mana.",
+    "The city layout is an art-direction proposal, not a canonical map. Published sources describe Niroo City as green, engineered, sustainable, and founded by Binam Binshun, but do not establish a definitive skyline layout.",
+    "Generation 1.34 candidate: Exchange replay selectors use number-free seconds/minutes/hours/days/weeks/months labels; player controls chart zoom across the retained 24 local steps, grid, candle shadows, volume, moving-average overlays, day/night mode and packaged palettes. Candle wick tolerance is deterministic and display-only (up to ±5 N.U index points).",
+    "Exchange refinement: optional neutral-grey parametric dispersion bands show rolling mean ± one standard deviation from recorded candle closes; a local wallet-ledger change restarts the replay cursor and pulses the chart. Both are presentation-only."
+  ],
+  "rendering": {
+    "pixelWorld": {
+      "file": "nu-pixel-world.js",
+      "version": "0.2",
+      "logicalResolution": "480x270",
+      "frameRateByQuality": "12-24 fps",
+      "timeCycle": "local dawn/day/dusk/night; stars only at night",
+      "layers": [
+        "sky and solar/lunar bodies",
+        "clouds and night-only stars",
+        "left forest / central dry ridges / right tropical coast",
+        "center-origin atmospheric particles with radial depth",
+        "multi-depth city silhouettes",
+        "river and cultivated terraces",
+        "aircraft at upper altitude and road vehicles at ground altitude"
+      ],
+      "weatherModes": {
+        "sleep": "near-static slow orbit",
+        "study": "slow circular drift",
+        "game": "radial particles fast near center and decelerating toward edges"
+      },
+      "reducedMotion": "static scene; redraw only on time phase changes",
+      "independentLayer": true
+    },
+    "gameplay": "transparent full-page overlay"
+  },
+  "graphicsRuntime": {
+    "version": "0.3-preview",
+    "visualBase": "archived-owner-supplied-png",
+    "assetPath": "assets/nu-celestial-city.png",
+    "assetBlobSha": "d73afd484ef8b459c908c1942ee0f47d27f93aa5",
+    "preserveSourcePixels": true,
+    "tiers": [
+      "economy",
+      "balanced",
+      "enhanced",
+      "ultra"
+    ],
+    "modes": [
+      "ambient",
+      "focus",
+      "game",
+      "sleep"
+    ],
+    "layers": [
+      "invariant source artwork",
+      "independent Canvas 2D atmosphere",
+      "camera parallax",
+      "foreground game/UI"
+    ],
+    "fallback": "restore Generation 1 procedural renderer when source image fails",
+    "nativeAndroid": false,
+    "nativeIOS": false,
+    "offlineLauncher": false,
+    "onlineAuthoritativeServices": false,
+    "archiveSource": "NU-INGEST-ARCHIVE/ASSETS/NU-Celestial-City/Original reference image file for Niroo Universe (N.U).png",
+    "publicAssetStatus": "PENDING_UPLOAD_TO_EXECUTION_REPOSITORY"
+  },
+  "libraryTools": [
+    {
+      "id": "pixel-art-studio",
+      "name": "N.U Creative Studio — Pixel Art & Vector Lab",
+      "generation": 1,
+      "entry": "pixel-art-studio.html",
+      "purpose": "Local raster analysis, non-destructive pixel editing, contour SVG, palette-indexed tiles, run-length spans, edge/region maps and machine-readable N.U graphics instructions; downloadable human-readable image report with palette, transparency, connected-region bounds and export notes",
+      "inRandomPool": false
+    },
+    {
+      "id": "nu-casino",
+      "name": "N.U Casino — Mini Games",
+      "generation": 1,
+      "entry": "casino.html",
+      "purpose": "Three playable browser mini-games: Coin Flip, Lucky Dice and Mini Slots. Uses a separate local virtual-credit balance; no real-money deposits, payments or cash-outs.",
+      "inRandomPool": false
+    }
+  ],
+  "generation1Exchange": {
+    "status": "modular-offline-single-player-chart-controls-candidate",
+    "page": "exchange.html",
+    "script": "nu-exchange.js",
+    "modules": [
+      "nu-exchange-core.js",
+      "nu-exchange-guard.js",
+      "nu-exchange-replay.js",
+      "nu-exchange-lock.js",
+      "nu-market-sim.js"
+    ],
+    "assets": "Only wallet-backed Generation 1 assets are listed; no placeholder coin is invented.",
+    "crossGameChange": "Prepared registry for Launcher game adapters; transfer settlement remains disabled until two compatible approved game adapters exist.",
+    "history": {
+      "writtenTransactionsPerAsset": 5,
+      "chartStepsPerAsset": 24,
+      "marketStepsPerAsset": 24,
+      "cache": "Dedicated local exchange cache rebuilt from the local wallet on refresh; underlying wallet ledger is not truncated."
+    },
+    "replayScales": [
+      "seconds",
+      "minutes",
+      "hours",
+      "days",
+      "weeks",
+      "months"
+    ],
+    "cooldown": "Ten successful operations may complete in one Exchange visit; the 11th attempted operation starts a 120-second cooldown. Leaving before the 11th attempt resets the in-memory visit count.",
+    "maintenanceLock": "Cross-game transfer module is locked by default. A two-step local maintenance latch is a UX safeguard only, not authentication or anti-cheat.",
+    "note": "Fictional N.U-only activity visualization. Replay animation changes presentation only and never fabricates wallet events or real-world financial data.",
+    "chartControls": {
+      "zoomVisibleSteps": {
+        "min": 4,
+        "max": 24,
+        "default": 24
+      },
+      "grid": true,
+      "candleShadows": true,
+      "volume": true,
+      "movingAverage": true,
+      "movingAveragePeriods": [
+        3,
+        5,
+        8,
+        12
+      ],
+      "themes": [
+        "night",
+        "day"
+      ],
+      "palettes": [
+        "aurora",
+        "emerald",
+        "rose",
+        "amber",
+        "monochrome"
+      ],
+      "parametricBands": "rolling mean ± one standard deviation; display-only",
+      "ledgerChangeResponse": "restart replay cursor and pulse chart on actual local transaction add/remove; no synthetic transactions"
+    },
+    "visualWickTolerance": "Deterministic display-only range of up to ±5 N.U index points; it never changes candle close, wallet balances or transactions."
+  }
+}
