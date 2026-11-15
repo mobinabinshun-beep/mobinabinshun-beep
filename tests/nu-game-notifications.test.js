@@ -36,7 +36,7 @@ test("HP consumption is anchored below the live viewport HP rail and uses legacy
 });
 
 test("notification module loads before games and keeps overlays pointer-transparent and accessible",()=>{
-  assert.match(html,/nu-game-notifications\.js[^<]+<\/script><script src="\.\/nu-games\.js/);
+  assert.match(html,/nu-game-notifications\.js[^<]+<\/script><script src="\.\/nu-games\.js/);\n  assert.match(html,/nu-game-notifications\.css/);
   assert.match(moduleSource,/aria-live","polite"/);
   assert.match(moduleSource,/aria-atomic","true"/);
   assert.match(css,/\.nu-notification-layer\{[^}]*pointer-events:none/);
@@ -58,4 +58,10 @@ test("reduced-motion disables only movement, not the notification content",()=>{
 test("object-interaction coordinates are written in game-stage CSS pixels",()=>{
   assert.match(moduleSource,/node\.style\.left=\(Number\(options\.x\)\|\|0\)\+"px"/);
   assert.match(moduleSource,/node\.style\.top=\(Number\(options\.y\)\|\|0\)\+"px"/);
+});
+
+test("the reusable module stylesheet is loaded by the Casino game entry too",()=>{
+  const casino=fs.readFileSync(require.resolve("../casino.html"),"utf8");
+  assert.match(casino,/nu-game-notifications\.css/);
+  assert.match(casino,/nu-game-notifications\.js[^<]+<\/script><script src="\.\/nu-casino\.js/);
 });
