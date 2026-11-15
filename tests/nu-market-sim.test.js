@@ -57,3 +57,9 @@ test("store-purchased assets are absent from Exchange market choices and simulat
  assert.deepEqual(market.build(save,"hpPills").steps,[]);
  assert.ok(market.assets(save).some(asset=>asset.key==="xp"));
 });
+
+test("durable non-exchangeable asset flags keep purchased assets out after ledger rollover",()=>{
+ const save={xp:15,hpPills:1,nonExchangeableAssets:["hpPills"],transactions:[]};
+ assert.ok(!market.assets(save).some(asset=>asset.key==="hpPills"));
+ assert.equal(market.build(save,"hpPills").asset,null);
+});
