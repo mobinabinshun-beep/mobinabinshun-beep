@@ -18,15 +18,21 @@ For every instruction such as «اعمال کن»، «پیاده کن»، «فی
 8. Open a PR with a narrow scope and test evidence. Merge/deploy only after the requested scope and required CI checks are satisfied. Label human QA separately from CI.
 9. Preserve candidate branches, CI evidence and rollback information after merge.
 
-## 3. Explicit freeze lock — Gateway icon
+## 3. Explicit freeze lock — Gateway operating gate
 **LOCK ID:** NU-LOCK-GATEWAY-ICON-01  
-**Status:** SCOPED UNFREEZE APPROVED — 2026-11-14; main game page only.
+**Status:** SCOPED UNFREEZE APPROVED — 2026-11-15; Generation 1 main-game pages only.  
+**Owner correction:** This section supersedes the earlier Settings-based three-action description.
 
-- The owner explicitly authorized unfreezing the Gateway only while an actual game is active in index.html. Keep it hidden on the home screen, library, menu, profile, store and all non-game views.
-- Gateway must remain hidden and behaviorally inactive on Casino, Launcher, Creative Studio, and all other internal pages until separate owner approval. Existing legacy navigation remains available.
-- Keep the legacy main MENU and in-game PAUSE/RESUME controls visible and operable; Gateway is additive navigation, not a replacement for those controls.
-- Do not change Gateway destinations, shared game rules, wallet/save data, or unrelated pages as part of this scoped unfreeze.
-- Gateway actions are limited to Back/Home, Menu Options (existing menu), and Settings Options (existing Launcher settings route). Any further page expansion or new destination requires separate explicit owner approval.
+- The Gateway is an operational decluttering gate: it replaces scattered in-game navigation clicks with one entry point.
+- It is visible only while an actual Generation 1 game is active in index.html. Keep it hidden on home/library and all non-game views.
+- The Gateway exposes exactly three one-click actions: **Back, Menu, Profile**. No Settings action is included in the current Gateway.
+- Opening the Gateway freezes the active round and all background rendering/ambient loops until the user decides. This includes the game loop, Background Engine, Dynamic Layers and Pixel World. Closing without a route selection restores only a pause that the Gateway itself initiated.
+- Hide duplicate in-game navigation triggers (the topbar MENU button and the game-view BACK button) while gameplay is active. Keep the actual PAUSE/RESUME and game-specific controls operable; they are not duplicate navigation controls.
+- Menu opens a centered modal directory. Each module entry contains only a concise title and a keyboard keycap. Do not place descriptions, statistics, previews or destination content inside the menu; render content in the destination view/page.
+- Menu order is fixed for this scope: player modules first (Store, Profile, Exchange, Wallet), then games (Painting, Random Game, Bubble Hunt, Mana Collector, Chaos Attack). Random Game selects only from the three core Generation 1 games; Painting is not in the random pool.
+- Store-purchased assets are non-exchangeable. Exclude them from Exchange asset selectors, balance-history charts and virtual market simulation while retaining ownership in the Wallet.
+- The Gateway remains hidden and behaviorally inactive on Casino, Launcher, Creative Studio, Pixel Art Studio, Wallet and Exchange. Future analogous gates for other areas require separate owner approval and their own access rules.
+- Existing game rules, HUD, save schema and wallet balances are preserved except for the explicit Exchange eligibility rule above.
 
 ## 4. Shield visibility
 - Do not display a shield meter, charge bar, shield capsule or shield status when the player has no shield item/state.
