@@ -5,7 +5,7 @@ const fs=require("node:fs");
 const read=name=>fs.readFileSync(name,"utf8");
 const html=read("index.html"),casino=read("casino.html"),launcher=read("launcher.html"),studio=read("pixel-art-studio.html");
 const js=read("nu-hex-gateway.js"),css=read("nu-hex-gateway.css"),worldCss=read("nu-world.css");
-const games=read("nu-games.js"),graphics=read("nu-graphics-runtime.js"),exchange=read("nu-exchange.js");
+const games=read("nu-games.js"),graphics=read("nu-graphics-runtime.js"),exchange=read("nu-exchange.js"),dynamic=read("nu-dynamic-layers.js");
 
 test("Gateway controller is scoped only to active main-game view",()=>{
  assert.match(html,/id="nu-hex-gateway"/);
@@ -86,3 +86,16 @@ test("Legacy in-game navigation duplicates are hidden, not deleted from other vi
 });
 
 test("No unsupported shield meter is introduced",()=>assert.doesNotMatch(html,/id="nbi-shield-bar"/));
+
+
+test("Returning to a hidden tab cannot resume a round while Gateway remains open",()=>{
+ assert.match(games,/const gatewayOpen=document\.body\.classList\.contains\("nu-gateway-open"\)/);
+ assert.match(games,/if\(state\.engine&&!gatewayOpen\)state\.engine\.resume\(\)/);
+ assert.match(games,/if\(!gatewayOpen&&state\.active&&!state\.paused\)state\.raf=requestAnimationFrame\(animateGame\)/);
+});
+
+test("Dynamic layers remain frozen across visibility and resize events until Gateway closes",()=>{
+ assert.match(dynamic,/function resume\(\)\{if\(!profile\|\|!active\|\|frozen\|\|document\.hidden\)return/);
+ assert.match(dynamic,/if\(frozen\|\|document\.hidden\)\{needsResize=true;return;\}/);
+ assert.match(dynamic,/function renderStatic\(t\)\{\s*if\(!ctx\|\|!canvas\|\|frozen\|\|document\.hidden\)return/);
+});

@@ -159,5 +159,5 @@
    destroy(){canvas.removeEventListener("pointerdown",()=>{});}
   };
  }
- return {create,TOOLS,STORAGE_KEY,ambientPulse};
+ return {create,TOOLS,STORAGE_KEY,ambientPulse,ambientMarket};
 });

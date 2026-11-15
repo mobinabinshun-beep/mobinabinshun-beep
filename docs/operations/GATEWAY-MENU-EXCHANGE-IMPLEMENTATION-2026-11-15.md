@@ -181,3 +181,70 @@
 `backup/pre-gateway-menu-exchange-2026-11-15`
 
 هیچ force-push یا تغییری روی شاخهٔ پیش‌فرض انجام نشده است.
+
+
+## 9. دیباگ چرخهٔ توقف Gateway و بازگشت از تب — 2026-11-15
+
+**شاخهٔ پشتیبان:** `backup/pre-debug-gateway-visibility-2026-11-15`  
+**شاخهٔ اصلاح:** `fix/gateway-visibility-freeze-2026-11-15`
+
+### مشکل بازتولیدپذیر از روی کد
+- شنوندهٔ `visibilitychange` در `nu-games.js` هنگام visible شدن تب، موتور بازی را بدون بررسی بازبودن Gateway دوباره `resume()` می‌کرد.
+- `NUDynamicLayers.resume()` در `nu-dynamic-layers.js` حتی در وضعیت `frozen` یا `document.hidden` یک رندر ایستا اجرا می‌کرد.
+- رویداد resize و تغییر mode نیز می‌توانستند هنگام freeze، لایهٔ پویا را دوباره رسم کنند.
+
+### اصلاح محدود
+- بازگشت تب فقط وقتی Gateway بسته است، موتور بازی و حلقهٔ راند را ازسرمی‌گیرد.
+- لایهٔ پویا هنگام freeze/hidden هیچ فریم تازه‌ای رسم نمی‌کند.
+- resize یا mode change در زمان freeze فقط به‌عنوان کار معوق ثبت می‌شود و پس از رفع freeze اعمال می‌گردد.
+- هیچ تغییری در قوانین بازی، XP/Mana/HP، Wallet، save schema، Exchange یا HUD کلاسیک انجام نشده است.
+
+### فایل‌های اصلاح‌شده
+- `nu-games.js`
+- `nu-dynamic-layers.js`
+- `tests/nu-hex-gateway.test.js`
+- `.github/workflows/gateway-main-game.yml`
+- این سند اجرایی
+
+### آزمون‌ها
+- تست رگرسیون برای بازگشت از تب در حالی که Gateway باز است افزوده شد.
+- تست رگرسیون برای جلوگیری از render در حالت frozen/hidden افزوده شد.
+- workflow اکنون با تغییر renderer lifecycle هم اجرا می‌شود و syntax هر سه فایل را بررسی می‌کند.
+- وضعیت CI این شاخه پس از بازشدن PR باید ثبت شود؛ Human QA همچنان جداگانه در انتظار است.
+
+
+## 10. دیباگ ماژول Visuals در Exchange — 2026-11-15
+
+### خطای مشاهده‌شده در CI
+چهار تست در `tests/nu-exchange-visuals.test.js` با خطای `visuals.ambientMarket is not a function` شکست می‌خوردند. تابع `ambientMarket` در فایل پیاده‌سازی وجود داشت، اما از API ماژول export نشده بود. علاوه بر آن، صفحهٔ `exchange.html` فایل `nu-exchange-visuals.js` را پیش از `nu-exchange.js` بارگذاری نمی‌کرد؛ بنابراین ابزارهای ترسیم و جریان پس‌زمینه در مرورگر نیز به ماژول دسترسی نداشتند.
+
+### اصلاح
+- `ambientMarket` به API عمومی ماژول افزوده شد.
+- `exchange.html` اکنون `nu-exchange-visuals.js` را پیش از `nu-exchange.js` بارگذاری می‌کند.
+- تست API و ترتیب بارگذاری اسکریپت افزوده شد.
+- تابع‌های شبیه‌سازی و قواعد احتمالاتی تغییر نکرده‌اند؛ هیچ داده‌ای در Wallet یا تاریخچهٔ تراکنش نوشته نمی‌شود.
+
+### فایل‌های افزوده‌شده به دامنهٔ این دیباگ
+- `nu-exchange-visuals.js`
+- `exchange.html`
+- `tests/nu-exchange-visuals.test.js`
+- این سند اجرایی
+
+
+## 11. نتیجهٔ CI پس از اصلاحات — 2026-11-15
+
+کد اصلاح‌شده روی commit `213739788f215c9ae3932f8a13d9c5f45a4bf574` بررسی شد. چهار workflow زیر با نتیجهٔ موفق پایان یافتند:
+
+| Workflow | نتیجه | Run |
+|---|---|---|
+| Gateway main-game regression | PASS | 174 |
+| Wallet and Profile regression | PASS | 202 |
+| Generation 1 HUD layout regression | PASS | 197 |
+| Studio export regression gates | PASS | 672 |
+
+این نتیجه، خطای قبلی `ambientMarket is not a function` را پس از export کردن API و افزودن script load order برطرف‌شده نشان می‌دهد. همچنین تست Gateway freeze و Dynamic Layers در workflow مربوطه موفق شد.
+
+- Machine CI: **PASSED** برای commit بالا.
+- Human browser/device QA: **PENDING**.
+- Merge به شاخهٔ پیش‌فرض: **NOT PERFORMED**.
+- Public Pages deployment: **NOT PERFORMED**.
