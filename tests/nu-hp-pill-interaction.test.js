@@ -54,7 +54,7 @@ test("HP HUD capsule remains visible at zero inventory and reports unavailable s
 test("successful capsule use avoids redundant floating and particle animations",()=>{
   assert.doesNotMatch(games,/showHpPillInteraction|showFloatingChange\("\+"\+result\.restored|showFloatingChange\("−1 Capsule"/);
   assert.doesNotMatch(css,/nu-hp-burst-particle|nu-hp-burst-ring|\.hp-pill-interaction-burst/);
-  assert.match(games,/showHpGain\(result\.restored\)/);
+  assert.doesNotMatch(games,/showHpGain|void track\.offsetWidth/);
   assert.match(games,/announceTransaction\("HP CAPSULE USED/);
 });
 
