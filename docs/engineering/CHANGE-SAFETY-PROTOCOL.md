@@ -50,7 +50,7 @@ For HP capsule use specifically, the canonical on-HUD display copy is fixed as `
 - Keep presentation code and business/state logic separable.
 - Do not delete a function, DOM node, CSS rule, event listener, toast, live region, or test merely because it appears visually redundant. Trace its callers and purpose first.
 - Prefer removing duplicate decoration over removing semantic feedback.
-- Use actual state/result values; never hard-code an expected reward when the operation can be capped.
+- Use actual state/result values for transactional claims; fixed flavor copy is permitted only when explicitly approved and documented (the HP Capsule `+10 HP` display is such an exception). Never change the underlying wallet calculation to match presentation copy.
 - Preserve keyboard, pointer, touch, focus, and reduced-motion behavior.
 - Avoid unnecessary particles, repeated floating labels, and forced synchronous layout reads; this performance rule does not apply to essential user feedback.
 - If feedback is moved, ensure exactly one clear, accessible destination remains and test it.
