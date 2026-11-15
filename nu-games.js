@@ -64,46 +64,46 @@ let lastRenderedHp=null,hpPillTravelAnimation=null,hpPillTravelGhost=null,hpPill
 function animateHpPillTravel(direction){
  const bar=$("hp-bar"),button=$("hp-pill-use"),source=button&&button.querySelector("img");
  if(!bar||!button)return;
+ const opening=direction==="in";
  button.hidden=true;
+ if(opening)bar.classList.add("hp-pill-drawer-open");
+ if(hpPillTravelAnimation&&hpPillTravelGhost&&hpPillTravelAnimation.playState==="running"){
+  if(direction!==hpPillTravelDirection){hpPillTravelDirection=direction;if(opening)bar.classList.add("hp-pill-drawer-open");hpPillTravelAnimation.reverse();}
+  return;
+ }
  const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
  if(reduced||!source||typeof source.animate!=="function"){
   if(hpPillTravelAnimation){hpPillTravelAnimation.cancel();hpPillTravelAnimation=null;}
   if(hpPillTravelLayer){hpPillTravelLayer.remove();hpPillTravelLayer=null;hpPillTravelGhost=null;}
-  hpPillTravelDirection=null;
-  button.hidden=direction==="out";
-  return;
- }
- // If HP changes again mid-flight, reverse the same animation from its current frame.
- // This prevents a second icon appearing while the travelling visual is still in motion.
- if(hpPillTravelAnimation&&hpPillTravelGhost&&hpPillTravelAnimation.playState==="running"){
-  if(direction!==hpPillTravelDirection){hpPillTravelDirection=direction;hpPillTravelAnimation.reverse();}
+  hpPillTravelDirection=null;button.hidden=!opening;
+  if(!opening)bar.classList.remove("hp-pill-drawer-open");
   return;
  }
  if(hpPillTravelAnimation){hpPillTravelAnimation.cancel();hpPillTravelAnimation=null;}
  if(hpPillTravelLayer){hpPillTravelLayer.remove();hpPillTravelLayer=null;hpPillTravelGhost=null;}
- const run=++hpPillTravelRun;
- hpPillTravelDirection=direction;
- const barRect=bar.getBoundingClientRect();
- // The visual starts just inside the right frame edge and docks in the reserved capsule slot.
- const corner={x:barRect.width-4,y:barRect.height/2};
- const mobileDock=window.matchMedia&&window.matchMedia("(max-width:520px)").matches;
- const dock=mobileDock?{x:barRect.width/2,y:barRect.height-21}:{x:barRect.width-30,y:barRect.height/2};
- const from=direction==="in"?corner:dock,to=direction==="in"?dock:corner;
+ const run=++hpPillTravelRun;hpPillTravelDirection=direction;
+ const barRect=bar.getBoundingClientRect(),styles=window.getComputedStyle(bar);
+ const coreWidth=parseFloat(styles.getPropertyValue("--hp-core-width"))||barRect.width;
+ const coreRight=barRect.left+coreWidth,centerY=barRect.top+barRect.height/2;
+ const drawerWidth=parseFloat(styles.getPropertyValue("--hp-drawer-width"))||60;
+ const dockX=coreRight+drawerWidth/2,fromX=opening?coreRight-5:dockX,toX=opening?dockX:coreRight-5;
  const layer=document.createElement("span");layer.className="hp-pill-travel-layer";layer.setAttribute("aria-hidden","true");
  const ghost=document.createElement("img");ghost.className="hp-pill-travel-ghost";ghost.src=source.src;ghost.alt="";
- ghost.style.left=from.x+"px";ghost.style.top=from.y+"px";layer.appendChild(ghost);bar.appendChild(layer);hpPillTravelLayer=layer;hpPillTravelGhost=ghost;
- const dx=to.x-from.x,dy=to.y-from.y,base="translate(-50%,-50%) translate(";
+ ghost.style.left=fromX+"px";ghost.style.top=centerY+"px";layer.appendChild(ghost);document.body.appendChild(layer);
+ hpPillTravelLayer=layer;hpPillTravelGhost=ghost;
+ const dx=toX-fromX,base="translate(-50%,-50%) translate(";
  const animation=ghost.animate([
-  {opacity:0,transform:base+"0px,0px) scale(.58)"},
-  {offset:.2,opacity:1,transform:base+(dx*.2)+"px,"+(dy*.2)+"px) scale(1.12)"},
-  {opacity:direction==="in"?1:0,transform:base+dx+"px,"+dy+"px) scale("+(direction==="in"?"1":".55")+")"}
- ],{duration:direction==="in"?680:620,easing:"cubic-bezier(.18,.72,.22,1)",fill:"forwards"});
+  {opacity:0,transform:base+"0px,0px) scale(.62)"},
+  {offset:.22,opacity:1,transform:base+(dx*.22)+"px,0px) scale(1.08)"},
+  {opacity:opening?1:0,transform:base+dx+"px,0px) scale("+(opening?"1":".62")+")"}
+ ],{duration:opening?440:380,easing:"cubic-bezier(.2,.72,.24,1)",fill:"forwards"});
  hpPillTravelAnimation=animation;
  animation.onfinish=()=>{
   if(run!==hpPillTravelRun)return;
   const finishedDirection=hpPillTravelDirection;
   layer.remove();hpPillTravelLayer=null;hpPillTravelGhost=null;hpPillTravelAnimation=null;hpPillTravelDirection=null;
   button.hidden=finishedDirection==="out";
+  if(finishedDirection==="out")bar.classList.remove("hp-pill-drawer-open");else bar.classList.add("hp-pill-drawer-open");
  };
  animation.oncancel=()=>{layer.remove();if(run===hpPillTravelRun){hpPillTravelLayer=null;hpPillTravelGhost=null;hpPillTravelAnimation=null;hpPillTravelDirection=null;}};
 }
