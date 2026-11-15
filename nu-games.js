@@ -3,6 +3,8 @@
 "use strict";
 const $=id=>document.getElementById(id);
 const state={save:NUWallet.normalizeSave(NU.load()),game:null,turn:0,active:false,paused:false,quality:5,engine:null,roundSeed:0,targets:[],shots:0,raf:0,lastFrame:0};
+window.addEventListener("nu:gateway-open",()=>{if(state.engine&&typeof state.engine.pause==="function")state.engine.pause();if(window.NUPixelWorld)window.NUPixelWorld.setEnabled(false);});
+window.addEventListener("nu:gateway-close",()=>{if(state.engine&&typeof state.engine.resume==="function")state.engine.resume();if(window.NUPixelWorld)window.NUPixelWorld.setEnabled(true);});
 const games=[
  {id:"bubble",name:"Bubble Hunt",desc:"Find the rain-glass droplets and collect XP.",status:"PLAYABLE"},
  {id:"mana",name:"Mana Collector",desc:"Collect luminous hexagonal Mana particles.",status:"PLAYABLE"},
