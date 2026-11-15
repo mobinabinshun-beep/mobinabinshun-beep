@@ -245,3 +245,16 @@ Full target architecture, offline installation contract, economic discovery pipe
 Economic analysis must remain outside the render/input hot path. The engine can infer candidate assets when a manifest is absent, but inferred values are preview-only until reviewed. Every asset and progression rung is evaluated independently. Game modules can be installed, disabled or removed independently; removing a game suspends its routes but preserves shared profile and historical records. The core itself remains part of the standard launcher package.
 
 This section records target architecture only; no runtime implementation, wallet, ledger, Gateway lock, merge, deployment or release was changed.
+
+
+## 16. Implemented dual-engine decomposition (2026-11-15)
+
+The exchange runtime now has a separate `nu-exchange-engines.js` module exposing:
+- `NUExchangeEngines.walletEngine`: read-only snapshot of canonical `nu-world-save-v1`, profile, asset rows, transaction history and unpriced X/N fields. It emits a refresh event and is consumed by the Exchange page controller.
+- `NUExchangeEngines.protocolEngine`: declarative module manifest validation, asset/coin normalization, trust labeling, metadata persistence, preview-only quote checks and protocol lifecycle retention.
+
+The protocol engine stores no balances. Storage key is `nu.exchange.protocols.v1`. It preserves protocols while modules are installed or while mapped wallet assets remain owned; otherwise it starts a 30-day dormant retention. Unknown ownership mappings are retained conservatively. Launcher must call `discover` on install/update and `reconcile` with the complete installed module ID list after lifecycle changes.
+
+All newly discovered manifests are `DECLARED_UNVERIFIED`. The quote preview requires `VERIFIED` trust and an approved valuation class; the current discovery path cannot promote trust, so no newly discovered asset can be converted. Settlement remains disabled.
+
+Full contract, manifest example, lifecycle, QA checklist and next-step plan: [NU Exchange Dual-Engine Implementation & Handoff](NU-EXCHANGE-DUAL-ENGINE-IMPLEMENTATION-AND-HANDOFF-2026-11-15.md).
