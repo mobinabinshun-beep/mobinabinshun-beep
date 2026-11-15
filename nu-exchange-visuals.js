@@ -21,7 +21,7 @@
  }
  const AMBIENT_PROBABILITIES=Object.freeze({zero:.10,one:.30,two:.30,three:.30,positive:.50});
  function seedRandom(text){
-  let seed=216 with 0;
+  let seed=2166136261;
   for(let i=0;i<text.length;i++)seed=Math.imul(seed^text.charCodeAt(i),16777619)>>>0;
   return function(){seed=(seed+0x6D2B79F5)>>>0;let t=seed;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return ((t^(t>>>14))>>>0)/4294967296;};
  }
