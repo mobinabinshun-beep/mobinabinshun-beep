@@ -156,3 +156,11 @@ NUGameNotifications.showConsumption({
 - [ ] Reduced-motion fallback preserves message content.
 - [ ] Notification nodes are cleaned up.
 - [ ] No game-state or wallet mutation occurs inside the notification module.
+
+
+## Store capsule transaction feedback
+
+- Successful capsule purchases show a paired `−10 XP` / `+1 CAPSULE` notice centred on the purchased Store option.
+- Successful capsule use from the Store shows `−1 CAPSULE HEAL` / `+10 HP` at the exact same option centre, with the same 1750ms paired-card motion. Store use does not also trigger the HUD-anchored HP notice.
+- Successful Store transactions do not add status prose, floating duplicates, or a second transaction toast. The item count and purchase/use controls remain. Default instructional status and redundant capsule description copy are hidden; failure feedback remains available.
+- The same shared `showConsumption` preset supports `placement: "center"`; its default HP HUD placement remains below the HP rail.
