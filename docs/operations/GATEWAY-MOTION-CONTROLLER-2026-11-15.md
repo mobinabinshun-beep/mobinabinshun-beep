@@ -46,7 +46,8 @@ The prior controller was selection-first: hovering an option only highlighted it
 
 - Controller JavaScript syntax: PASS.
 - Test-file JavaScript syntax: PASS.
-- Focused source assertions for hover-open, touch-open, movement activation, duplicate guard, cache token and scrim blocking: PASS.
+- Focused source assertions for hover-open, touch-open, movement activation, touch-drag hit-testing, duplicate guard, cache token and scrim blocking: PASS.
+- Mocked pointer-flow harness: mouse hover-open/action, touch contact-open/drag-action, Menu/Profile pause restoration, and preservation of a pre-existing manual pause: PASS.
 - Full Gateway regression execution: pending.
 - GitHub Actions: no workflow runs or commit status checks were returned for the PR head; CI is therefore NOT VERIFIED.
 - Human mouse/touch/keyboard and responsive browser QA: pending.
