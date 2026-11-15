@@ -57,6 +57,33 @@
       row.append(title,detail);history.appendChild(row);
     });
   }
+  function renderHealth(){
+    if(!window.NUHealth)return;
+    const groups=[
+      {key:"medicationUses",id:"health-medications",empty:"No medicine or health-item uses recorded."},
+      {key:"damage",id:"health-damage",empty:"No damage events recorded."},
+      {key:"healing",id:"health-healing",empty:"No healing events recorded."},
+      {key:"deaths",id:"health-deaths",empty:"No deaths recorded across games."}
+    ];
+    groups.forEach(group=>{
+      const root=$(group.id);if(!root)return;
+      root.replaceChildren();
+      const events=window.NUHealth.getHistory(group.key).slice().reverse();
+      if(!events.length){const empty=document.createElement("p");empty.className="health-history-empty";empty.textContent=group.empty;root.appendChild(empty);return;}
+      events.forEach(item=>{
+        const row=document.createElement("div"),title=document.createElement("strong"),detail=document.createElement("small");
+        row.className="health-history-row";
+        if(group.key==="medicationUses")title.textContent=String(item.itemName||"Health item")+" · "+String(item.effect||"used");
+        else if(group.key==="damage")title.textContent="−"+String(item.amount||0)+" HP · "+String(item.reason||"Damage");
+        else if(group.key==="healing")title.textContent="+"+String(item.amount||0)+" HP · "+String(item.source||"Healing");
+        else title.textContent="DEATH · "+String(item.reason||"Game event");
+        const date=item.at?new Date(item.at):null;
+        const when=date&&!Number.isNaN(date.getTime())?date.toLocaleString():"Time unavailable";
+        detail.textContent=[when,"GAME "+String(item.gameId||"unknown"),item.hpAfter!==undefined&&item.hpAfter!==null?"HP "+item.hpAfter:"",item.effectAmount?"HEAL "+item.effectAmount+" HP":"",item.hpBefore!==undefined&&item.hpBefore!==null?"HP BEFORE "+item.hpBefore:""].filter(Boolean).join(" · ");
+        row.append(title,detail);root.appendChild(row);
+      });
+    });
+  }
   function buildHumanReport(){
     const s=load(),lines=["N.U PUBLIC DEMO · HUMAN TEST REPORT","Generated: "+new Date().toISOString(),"Mode: local browser demo; no online account or cloud ledger.","Player ID: "+(s.playerId||"guest/local"),"Balances: "+NUWallet.assetRows(s).map(x=>x.label+"="+x.value).join(", "),"","RECENT WALLET TRANSACTIONS (last 24)"];
     s.transactions.slice(-24).forEach((tx,i)=>{const deltas=Object.entries(tx.deltas||{}).filter(([,v])=>Number(v)!==0).map(([k,v])=>(Number(v)>0?"+":"")+v+" "+k).join(", ");lines.push((i+1)+". "+(tx.at||"")+" | "+(tx.title||tx.kind||"Transaction")+" | "+(tx.direction||"LOCAL")+" | "+deltas+" | game="+(tx.gameId||tx.source||"-")+" | wave="+(tx.waveId||"-")+" | roundId="+(tx.roundId||"-")+" | category="+(tx.category||"-")+" | successfulInteractions="+(tx.successfulInteractionCount??"-")+" | balance="+(tx.resultingBalance??"-")+" | idempotency="+(tx.idempotencyKey||"-"));});
@@ -89,6 +116,7 @@
     document.querySelectorAll("[data-wallet-tab]").forEach(button=>{const active=button.dataset.walletTab===name;button.classList.toggle("is-active",active);button.setAttribute("aria-selected",String(active));});
     document.querySelectorAll("[data-wallet-panel]").forEach(panel=>{panel.hidden=panel.dataset.walletPanel!==name;});
     if(name==="transactions")renderWallet();
+    if(name==="health")renderHealth();
   }
   function open(view){
     previousView=document.querySelector(".view.active");
@@ -308,6 +336,8 @@
     renderProfile();
   });
   window.addEventListener("nu:save-updated",()=>{if(walletView.classList.contains("active"))renderWallet();if(profileView.classList.contains("active"))renderProfile();});
+  window.addEventListener("nu:health-updated",()=>{if(walletView.classList.contains("active")&&document.querySelector('[data-wallet-panel="health"]')?.hidden===false)renderHealth();});
+  window.addEventListener("storage",e=>{if(e.key==="nu-health-records-v1"&&walletView.classList.contains("active")&&document.querySelector('[data-wallet-panel="health"]')?.hidden===false)renderHealth();});
   window.addEventListener("storage",e=>{if(e.key==="nu-world-save-v1"){if(walletView.classList.contains("active"))renderWallet();if(profileView.classList.contains("active"))renderProfile();}});
   renderWallet();renderProfile();
 })();
