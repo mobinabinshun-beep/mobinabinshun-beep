@@ -447,3 +447,10 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 - [Adaptive Runtime & Economic Intelligence Core](docs/architecture/NU-ADAPTIVE-RUNTIME-AND-ECONOMIC-INTELLIGENCE-CORE-2026-11-15.md) — target design for the mandatory launcher core, offline module installation, adaptive CPU/GPU/RAM/cache governance, economic discovery and modular exchange.
 - [Generation 1 base economy catalog](docs/economy/NU-GENERATION-1-BASE-ECONOMY-REFERENCE-CATALOG-2026-11-14.md) — benchmark profile and asset matching rules.
 - [Universal Game Asset Exchange architecture](docs/architecture/NU-UNIVERSAL-GAME-ASSET-EXCHANGE-SPEC-2026-11-14.md) — exchange domain design and settlement boundaries.
+
+## Dual-engine Exchange implementation and handoff
+- [N.U Exchange Dual-Engine Implementation & Handoff](docs/architecture/NU-EXCHANGE-DUAL-ENGINE-IMPLEMENTATION-AND-HANDOFF-2026-11-15.md) — two-engine design, wallet reader, module manifest discovery, protocol retention, valuation trust, QA gates and continuation steps.
+- Runtime implementation: `nu-exchange-engines.js` (wallet reader + manifest/protocol engine). It stores protocol metadata only; wallet balances remain exclusively in `nu-world-save-v1`.
+- Automated test file: `tests/nu-exchange-engines.test.js`.
+- Launcher integration contract: call `NUExchangeEngines.protocolEngine.discover(manifest,{installed:true})` at module install/update; call `reconcile({installedGameIds:[...]})` with the full installed module list after every install/uninstall.
+- Protocol retention is 30 days after uninstall only when no mapped asset remains owned. Unknown asset ownership mappings are conservatively retained. Settlement remains disabled.
