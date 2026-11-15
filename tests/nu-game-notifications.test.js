@@ -96,7 +96,7 @@ test("Store capsule purchase and use share one centred paired notice and suppres
   assert.match(gameSource,/\$\("shop-status"\)\.textContent=feedback\|\|"";\$\("shop-status"\)\.hidden=!feedback/);
   assert.doesNotMatch(gameSource,/showFloatingChange\("−10 XP"/);
   assert.doesNotMatch(gameSource,/PURCHASE COMPLETE · −10 XP · \+1 CAPSULE/);
-  assert.match(gameSource,/if\(!isStoreUse\)\{announceHpBarTransaction\(\);/);
+  assert.match(gameSource,/if\(!isStoreUse\)\{announceHpBarTransaction\(\);/);\n  assert.match(gameSource,/if\(isStoreUse\)renderShop\(message\);else announceTransaction\(message,"warning"\)/);\n  assert.doesNotMatch(gameSource,/PURCHASE FAILED · NOT ENOUGH XP/);
 });
 
 test("HP consumption falls back instead of placing a toast at viewport origin when the HUD is hidden",()=>{
