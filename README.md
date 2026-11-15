@@ -511,6 +511,6 @@ The classic lower-left LV / XP / Mana resource bars are protected from incidenta
 ## Reusable game notification system (2026-11-15)
 
 - Added `nu-game-notifications.js` as the shared default module for object interactions, bar-boundary increments and resource-consumption feedback across games.
-- Restored the historical floating-card signature for HP capsule use: gold `−1 CAPSULE HEAL` plus green actual `+N HP`, anchored 4px below the HP rail and using the original 1.75s rise/hold/fade animation.
+- Restored the historical floating-card signature for HP capsule use: gold `−1 CAPSULE HEAL` plus green `+10 HP` display copy (the wallet healing calculation remains unchanged), anchored 4px below the HP rail and using the original 1.75s rise/hold/fade animation.
 - The module preserves the established `.hit-progress` and `.capsule-gain` presets for game-object and resource-bar feedback. Its standalone stylesheet is loaded by both the main game hub and the Casino page. See [the full module specification](docs/game-development/GAME-NOTIFICATION-SYSTEM.md).
 - Historical visual source: [Generation 1.18](https://github.com/mobinabinshun-beep/mobinabinshun-beep/commit/655418f95cd9a33075513cb41defeb0801ee8e7a); viewport anchoring reference: [Generation 1.19](https://github.com/mobinabinshun-beep/mobinabinshun-beep/commit/460bc773e1e8a55a04ff42f51c52acceca52ac1d).
