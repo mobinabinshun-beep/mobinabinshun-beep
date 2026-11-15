@@ -688,3 +688,7 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 @media(prefers-reduced-motion:reduce){
  #game-view.active .bars .bar-fill{transition:none}
 }
+
+
+/* NU-UI-LAYER-01: keep the interactive document layer above the isolated world scene. */
+.world>.shell{position:relative!important;z-index:3!important;min-height:100vh}
