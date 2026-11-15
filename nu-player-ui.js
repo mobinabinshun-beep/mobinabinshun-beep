@@ -159,45 +159,18 @@
   }
   if(appearanceConfirm)appearanceConfirm.addEventListener("click",()=>setAppearanceLock(true));
   if(appearanceReset)appearanceReset.addEventListener("click",()=>{setAppearanceLock(false);applyAppearance(true);applyVisualDesign(true);});
-  const imageInput=$("demo-card-image");
   const avatarEl=document.querySelector("#profile-view .demo-avatar");
-  let currentProfileImage="";
-  const imageDownload=$("demo-image-download");
-  function withImageStore(mode,callback){
-    if(!("indexedDB" in window))return;
-    const request=indexedDB.open("nu-player-profile-media",1);
-    request.onupgradeneeded=()=>{if(!request.result.objectStoreNames.contains("images"))request.result.createObjectStore("images");};
-    request.onsuccess=()=>{const db=request.result,tx=db.transaction("images",mode);callback(tx.objectStore("images"));tx.oncomplete=()=>db.close();};
-  }
-  function applyStoredProfileImage(dataUrl){
-    if(!dataUrl)return;currentProfileImage=dataUrl;
-    if(avatarEl){avatarEl.style.backgroundImage="url("+JSON.stringify(dataUrl)+")";const placeholder=avatarEl.querySelector(".demo-avatar-placeholder");if(placeholder)placeholder.hidden=true;}
-    if(imageDownload)imageDownload.disabled=false;
-    const state=$("demo-image-state");if(state)state.textContent="SAVED IN THIS BROWSER · DOWNLOAD A COPY FOR DESKTOP / GALLERY";
-  }
-  withImageStore("readonly",store=>{const request=store.get("profile-photo");request.onsuccess=()=>applyStoredProfileImage(request.result?.dataUrl);});
-  if(imageDownload)imageDownload.addEventListener("click",()=>{if(!currentProfileImage)return;const link=document.createElement("a");link.href=currentProfileImage;link.download="nu-player-profile-image";document.body.appendChild(link);link.click();link.remove();});
-  if(imageInput)imageInput.addEventListener("change",()=>{
-    const file=imageInput.files&&imageInput.files[0];
-    if(!file)return;
-    if(!file.type.startsWith("image/")||file.size>5*1024*1024){imageInput.value="";const state=$("demo-image-state");if(state)state.textContent="CHOOSE AN IMAGE FILE UP TO 5 MB";return;}
-    const reader=new FileReader();
-    reader.onload=()=>{currentProfileImage=String(reader.result);if(avatarEl){avatarEl.style.backgroundImage="url("+JSON.stringify(currentProfileImage)+")";avatarEl.style.backgroundSize=$("demo-image-fit")?.value||"cover";avatarEl.style.backgroundPosition="center";const placeholder=avatarEl.querySelector(".demo-avatar-placeholder");if(placeholder)placeholder.hidden=true;}if(imageDownload)imageDownload.disabled=false;withImageStore("readwrite",store=>store.put({dataUrl:currentProfileImage,name:file.name,type:file.type,updatedAt:Date.now()},"profile-photo"));const active=document.querySelector('[data-demo-placement][aria-pressed="true"]')?.dataset.demoPlacement||"1";const mode=$("demo-placement-mode")?.value||"anchor";const state=$("demo-image-state");if(state)state.textContent="LOCAL IMAGE PREVIEW · NOT UPLOADED · "+(mode==="slot"?"PHOTO SLOT ":"IMAGE ANCHOR ")+active+" OF 8";};
-    reader.readAsDataURL(file);
-  });
-  document.querySelectorAll("[data-demo-placement]").forEach(button=>button.addEventListener("click",()=>{
-    document.querySelectorAll("[data-demo-placement]").forEach(item=>{const active=item===button;item.setAttribute("aria-pressed",String(active));});
-    const position=Number(button.dataset.demoPlacement),row=Math.floor((position-1)/4),col=(position-1)%4;
-    const mode=$("demo-placement-mode")?.value||"anchor";
-    if(avatarEl){avatarEl.dataset.placementMode=mode;if(mode==="slot"){avatarEl.dataset.photoSlot=String(position);avatarEl.style.backgroundPosition="center";}else{delete avatarEl.dataset.photoSlot;avatarEl.style.backgroundPosition=(col*33.333)+"% "+(row*100)+"%";}}
-    const state=$("demo-image-state");if(state)state.textContent=(mode==="slot"?"PHOTO SLOT ":"IMAGE ANCHOR ")+position+" OF 8";
-  }));
+  const imageUploadPreview=$("demo-image-upload-preview");
+  const imageDownloadPreview=$("demo-image-download-preview");
+  const imageState=$("demo-image-state");
+  const demoImageNotice="DEMO ONLY · IMAGE UPLOAD AND RECOVERY ARE DISABLED. NO FILE IS OPENED, READ, UPLOADED OR SAVED.";
+  if(imageUploadPreview)imageUploadPreview.addEventListener("click",()=>{if(imageState)imageState.textContent=demoImageNotice;});
+  if(imageDownloadPreview)imageDownloadPreview.addEventListener("click",()=>{if(imageState)imageState.textContent="DEMO ONLY · THERE IS NO PREVIOUS IMAGE TO DOWNLOAD. OPERATIONAL BUILDS WILL OFFER A RECOVERY COPY BEFORE REPLACEMENT.";});
   function resetWorkshop(){
     publicToggles.forEach(toggle=>{toggle.checked=false;});
     if(demoPrivatePreview)demoPrivatePreview.checked=false;
-    if(imageInput)imageInput.value="";
     document.querySelectorAll("[data-demo-placement]").forEach((button,index)=>button.setAttribute("aria-pressed",String(index===0)));
-    const imageState=$("demo-image-state");if(imageState)imageState.textContent="PLACEHOLDER IMAGE · POSITION 1 OF 8";
+    if(imageState)imageState.textContent="DEMO PREVIEW ONLY · NO IMAGE IS READ, UPLOADED OR SAVED";
     ["demo-age-model","demo-stats-location","demo-card-privacy","demo-lock-policy","demo-image-fit","demo-placement-mode"].forEach(id=>{const el=$(id);if(el)el.selectedIndex=0;});
     if($("demo-recovery-mode"))$("demo-recovery-mode").value="compare";
     ["demo-auth-model","demo-platform-target","demo-launcher-model","demo-save-model","demo-export-model","demo-import-model","demo-sync-model"].forEach(id=>{const el=$(id);if(el)el.selectedIndex=0;});
