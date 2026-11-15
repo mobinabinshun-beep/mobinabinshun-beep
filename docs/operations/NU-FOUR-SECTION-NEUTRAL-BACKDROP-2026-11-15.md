@@ -41,11 +41,11 @@ To roll back, create a dedicated rollback branch and restore only the archived s
 
 ## CI result on the current branch head
 
-- Wallet/Profile workflow: 34 passed, 2 failed. The two failures are the pre-existing profile-preview tests for local photo-input matching and eight photo-placement controls; the new four-section neutral-backdrop tests passed.
-- Studio export workflow: 152 passed, 2 failed, the same two profile-preview tests.
+- Tested head: `199006e4c8137428009baefb899d9e0b5d022830`.
+- Wallet/Profile workflow: 34 passed, 2 failed. Both failures are the existing profile-preview tests for local photo-input matching and eight photo-placement controls. The new section-state and neutral-backdrop tests pass.
+- Studio export workflow: 152 passed, 2 failed, the same two existing profile-preview tests. The new section-state and neutral-backdrop tests pass.
 - Graphics integrity: PASS.
 - Generation 1 HUD layout regression: PASS.
-- Graphics preview smoke checks: PASS.
-- JavaScript syntax checks: PASS.
+- Graphics preview smoke checks: still running when this note was recorded.
 - No changes were made to `index.html` or `tests/nu-profile-preview.test.js` in this operation.
 - Human browser/device visual acceptance is still pending.
