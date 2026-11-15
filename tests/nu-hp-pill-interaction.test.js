@@ -14,15 +14,15 @@ test("HP capsule uses a direct native click listener for pointer, touch and keyb
   assert.doesNotMatch(games,/document\.addEventListener\("click",handleHpPillKeyboardClick/);
 });
 
-test("successful HUD use captures the icon position before wallet rerender can hide it",()=>{
-  assert.match(games,/const anchor=button&&button\.id==="hp-pill-use"\?button\.getBoundingClientRect\(\):null/);
-  assert.match(games,/if\(!persistWalletState\(result\.state\)\)return;[\s\S]*?if\(anchor\)showHpPillInteraction\(anchor,result\.restored\)/);
+test("successful HUD use updates wallet and HP feedback without measuring or spawning extra effects",()=>{
+  assert.doesNotMatch(games,/const anchor=button&&button\.id==="hp-pill-use"/);
+  assert.match(games,/if\(!persistWalletState\(result\.state\)\)return/);
+  assert.doesNotMatch(games,/showHpPillInteraction|showFloatingChange\("\+"\+result\.restored/);
 });
 
-test("HP pill interaction pop uses viewport coordinates and cannot be clipped by game-stage overflow",()=>{
-  assert.match(games,/function showHpPillInteraction\(anchor,amount\)/);
-  assert.match(games,/el\.style\.left=\(anchor\.left\+anchor\.width\/2\)\+"px"/);
-  assert.match(games,/document\.body\.appendChild\(el\)/);
+test("HP pill is the only interactive HUD target and its button remains pointer-accessible",()=>{
+  assert.doesNotMatch(games,/function showHpPillInteraction/);
+  assert.doesNotMatch(css,/\.hp-pill-interaction-burst/);
   assert.match(css,/#game-view\.active \.hp-bar\{pointer-events:auto!important/);
   assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use\{[^}]*pointer-events:auto!important/);
   assert.match(css,/\.hp-pill-hit-progress\{position:fixed!important/);
@@ -51,17 +51,11 @@ test("HP HUD capsule remains visible at zero inventory and reports unavailable s
 });
 
 
-test("successful HP capsule use emits a radial interaction burst anchored to the HUD icon",()=>{
-  assert.match(games,/function showHpPillInteraction\(anchor,amount\)\{[\s\S]*?hp-pill-interaction-burst/);
-  assert.match(games,/hp-pill-burst-ring/);
-  assert.match(games,/for\(let i=0;i<8;i\+\+\)/);
-  assert.match(games,/hp-pill-burst-particle/);
-  assert.match(games,/hp-pill-burst-label/);
-  assert.match(games,/showHpPillInteraction\(anchor,result\.restored\)/);
-  assert.match(css,/@keyframes nu-hp-burst-ring/);
-  assert.match(css,/@keyframes nu-hp-burst-particle/);
-  assert.match(css,/@media\(prefers-reduced-motion:reduce\)\{\.hp-pill-interaction-burst/);
-  assert.match(css,/\.hp-pill-interaction-burst\{position:fixed/);
+test("successful capsule use avoids redundant floating and particle animations",()=>{
+  assert.doesNotMatch(games,/showHpPillInteraction|showFloatingChange\("\+"\+result\.restored|showFloatingChange\("−1 Capsule"/);
+  assert.doesNotMatch(css,/nu-hp-burst-particle|nu-hp-burst-ring|\.hp-pill-interaction-burst/);
+  assert.match(games,/showHpGain\(result\.restored\)/);
+  assert.match(games,/announceTransaction\("HP CAPSULE USED/);
 });
 
 test("HP capsule travel enters from the inside-right corner and returns along the same reversible path",()=>{
