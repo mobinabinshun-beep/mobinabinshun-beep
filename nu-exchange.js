@@ -1,7 +1,7 @@
 (function(){
 "use strict";
 const $=id=>document.getElementById(id),CACHE_KEY="nu_exchange_cache_v3",MAX_CHART_STEPS=24,MAX_TEXT_HISTORY=5;
-let selected="xp",marketSelected="xp",replayMode="24s",replayStart=Date.now(),replayTimer=0,lastLedgerSignature="",ledgerPulseTimer=0,syncingProtocols=false;
+let selected="xp",marketSelected="xp",replayMode="24s",replayStart=Date.now(),replayTimer=0,lastAuditSignature="",auditPulseTimer=0,syncingProtocols=false;
 const PREF_KEY="nu_exchange_chart_preferences_v1";
 let chartPrefs={zoom:24,grid:true,wicks:true,volume:true,average:true,tolerance:true,bands:true,averagePeriod:5,theme:"night",palette:"aurora"};
 const guard=NUExchangeGuard.create(window.localStorage),maintenance=NUExchangeLock.create(window.localStorage);
@@ -113,14 +113,16 @@ function updateGuard(){
  $("exchange-lock-status").className=maintenance.isLocked()?"pending-tag":"sim-tag";
 }
 function signalLedgerChange(){
- const panel=document.querySelector(".market-panel");if(!panel)return;
- panel.classList.remove("ledger-updated");void panel.offsetWidth;panel.classList.add("ledger-updated");
- window.clearTimeout(ledgerPulseTimer);ledgerPulseTimer=window.setTimeout(()=>panel.classList.remove("ledger-updated"),720);
+ const panel=document.querySelector(".audit-trail-panel");if(panel){panel.classList.remove("audit-updated");void panel.offsetWidth;panel.classList.add("audit-updated");window.clearTimeout(auditPulseTimer);auditPulseTimer=window.setTimeout(()=>panel.classList.remove("audit-updated"),720);}
+ window.dispatchEvent(new CustomEvent("nu:wallet:audit-updated",{detail:{source:"canonical-local-save"}}));
+}
+function auditSignature(save){
+ return JSON.stringify({player:{id:save.playerId||"LOCAL-PLAYER",displayName:save.displayName||"N.U Explorer",callsign:save.callsign||"",level:save.level||1},assets:NUWallet.assetRows(save),transactions:save.transactions||[]});
 }
 function refresh(){
- const save=NUWallet.normalizeSave(NU.load()),wallet=NUExchangeEngines.walletEngine.read(),rows=NUWallet.exchangeAssetRows(save).filter(r=>r.key!=="hp"),signature=JSON.stringify(save.transactions||[]);renderWalletConnection(wallet);syncingProtocols=true;try{NUExchangeEngines.protocolEngine.list().forEach(p=>{if(!NUExchangeCore.listGames().some(g=>g.id===p.gameId))NUExchangeCore.registerGame({id:p.gameId,name:p.displayName,assets:(p.assets||[]).map(a=>({id:a.assetId,label:a.label,unit:a.unit})),coins:(p.coins||[]).map(a=>({id:a.assetId,label:a.label,unit:a.unit})),transferEnabled:false});});}finally{syncingProtocols=false;}
- if(lastLedgerSignature&&signature!==lastLedgerSignature){replayStart=Date.now();signalLedgerChange();}
- lastLedgerSignature=signature;
+ const save=NUWallet.normalizeSave(NU.load()),wallet=NUExchangeEngines.walletEngine.read(),rows=NUWallet.exchangeAssetRows(save).filter(r=>r.key!=="hp"),signature=auditSignature(save);renderWalletConnection(wallet);syncingProtocols=true;try{NUExchangeEngines.protocolEngine.list().forEach(p=>{if(!NUExchangeCore.listGames().some(g=>g.id===p.gameId))NUExchangeCore.registerGame({id:p.gameId,name:p.displayName,assets:(p.assets||[]).map(a=>({id:a.assetId,label:a.label,unit:a.unit})),coins:(p.coins||[]).map(a=>({id:a.assetId,label:a.label,unit:a.unit})),transferEnabled:false});});}finally{syncingProtocols=false;}
+ if(lastAuditSignature&&signature!==lastAuditSignature){replayStart=Date.now();signalLedgerChange();}
+ lastAuditSignature=signature;
  if(!rows.some(r=>r.key===selected))selected=rows[0]?.key||"xp";
  $("asset-select").innerHTML=rows.map(r=>'<option value="'+r.key+'">'+esc(r.label)+'</option>').join("");$("asset-select").value=selected;
  const marketAssets=NUVirtualMarket.assets(save);if(!marketAssets.some(a=>a.key===marketSelected))marketSelected=marketAssets[0]?.key||"xp";$("market-asset").innerHTML=marketAssets.map(a=>'<option value="'+a.key+'">'+esc(a.label)+'</option>').join("");$("market-asset").value=marketSelected;
@@ -178,6 +180,6 @@ window.addEventListener("nu:exchange:wallet-refresh",refresh);
 window.addEventListener("storage",e=>{if(e.key===NU.storageKey)refresh();});
 window.addEventListener("pageshow",()=>{replayStart=Date.now();refresh();});
 window.addEventListener("resize",()=>{const rows=NUWallet.exchangeAssetRows(NU.load()).filter(r=>r.key!=="hp"),cache=readCache();if(cache)frame(cache,rows);});
-bindChartPreferences();refresh();replayTimer=window.setInterval(()=>{const save=NUWallet.normalizeSave(NU.load()),signature=JSON.stringify(save.transactions||[]);if(signature!==lastLedgerSignature)refresh();else{const cache=readCache();if(cache)frame(cache,NUWallet.exchangeAssetRows(save).filter(r=>r.key!=="hp"));}updateGuard();},250);
+bindChartPreferences();refresh();replayTimer=window.setInterval(()=>{const save=NUWallet.normalizeSave(NU.load()),signature=auditSignature(save);if(signature!==lastAuditSignature)refresh();else{const cache=readCache();if(cache)frame(cache,NUWallet.exchangeAssetRows(save).filter(r=>r.key!=="hp"));}updateGuard();},250);
 window.addEventListener("pagehide",()=>{clearInterval(replayTimer);guard.leaveVisit();});
 })();
