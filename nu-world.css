@@ -734,3 +734,25 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 .wallet-report-button{margin:0 0 12px;min-height:38px;font-size:10px;letter-spacing:.08em}
 .wallet-transaction{gap:5px}
 .wallet-transaction small{line-height:1.55;overflow-wrap:anywhere}
+
+
+/* N.U XP-FIRST STATIC IMAGE OVERRIDE — all decorative layers are disabled. */
+.world>.sky,
+.world>#world-canvas,
+.world>#pixel-world,
+.world>.horizon,
+.world>.world-effects,
+#nu-dynamic-layers{display:none!important}
+.world>.nu-world-background{
+ position:absolute!important;inset:0!important;
+ z-index:var(--nu-layer-world-background,0)!important;
+ pointer-events:none!important;overflow:hidden!important;
+}
+#nu-background-image img{
+ width:100%!important;height:100%!important;
+ object-fit:contain!important;object-position:center!important;
+ opacity:1!important;filter:none!important;transform:none!important;
+ transition:none!important;animation:none!important;will-change:auto!important;
+}
+#nu-background-image:after,#nu-background-image:before{display:none!important;content:none!important}
+.world>.shell{position:relative!important;z-index:var(--nu-layer-world-content,3)!important}
