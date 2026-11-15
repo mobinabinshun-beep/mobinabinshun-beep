@@ -77,13 +77,22 @@
   options=options||{};
   const root=getOverlay();
   const rect=options.anchor&&options.anchor.getBoundingClientRect?options.anchor.getBoundingClientRect():null;
+  const duration=options.duration==null?DEFAULTS.consumptionDuration:Math.max(0,Number(options.duration)||0);
+  const pair=document.createElement("div");
+  pair.className="nu-notification-pair";
+  pair.setAttribute("role","status");
+  pair.setAttribute("aria-live","polite");
+  pair.setAttribute("aria-atomic","true");
+  pair.style.left=rect?(rect.left+rect.width/2)+"px":"50%";
+  pair.style.top=rect?(rect.bottom+(Number(options.offset)||0))+"px":"50%";
+  pair.style.setProperty("--nu-notification-duration",duration+"ms");
   const node=document.createElement("span");
   node.className="floating-change "+(options.tone||"gain");
   node.textContent=String(options.text==null?"":options.text);
-  if(rect){node.style.position="fixed";node.style.left=(rect.left+rect.width/2)+"px";node.style.top=(rect.bottom+(Number(options.offset)||0))+"px";}
-  root.appendChild(node);
-  removeAfter(node,options.duration==null?DEFAULTS.consumptionDuration:options.duration);
-  return node;
+  pair.appendChild(node);
+  root.appendChild(pair);
+  removeAfter(pair,duration+80);
+  return pair;
  }
  global.NUGameNotifications=Object.freeze({
   version:"1.0.0",
