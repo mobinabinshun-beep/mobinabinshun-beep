@@ -15,6 +15,8 @@ function syncPageState(){
  const frozen=!!(gatewayOpen||(intro&&!intro.classList.contains("hidden"))||(menu&&menu.classList.contains("open"))||activeClass(profile)||activeClass(wallet)||activeClass(shop));
  g.NUBackgroundEngine&&g.NUBackgroundEngine.setFrozen(frozen);
  g.NUDynamicLayers&&g.NUDynamicLayers.setFrozen&&g.NUDynamicLayers.setFrozen(frozen);
+ const background=g.NUBackgroundEngine&&g.NUBackgroundEngine.getStatus?g.NUBackgroundEngine.getStatus():null;
+ g.NUPixelWorld&&g.NUPixelWorld.setEnabled&&g.NUPixelWorld.setEnabled(!frozen&&!(background&&background.loaded));
  g.NUBackgroundEngine&&g.NUBackgroundEngine.setMode(modeFromPage());
 }
 function watchPage(){
