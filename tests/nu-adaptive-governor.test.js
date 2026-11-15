@@ -68,7 +68,7 @@ test("governor raises quality only after three sustained headroom windows", func
   assert.equal(h.win.NUGraphicsProfile.level, 2);
   h.runWindow(16.7);
   assert.equal(h.win.NUGraphicsProfile.level, 3);
-  assert.deepEqual(h.applied, [3]);
+  assert.deepEqual(h.applied, [2, 3]);
 });
 
 test("governor pauses sampling while the document is hidden", function () {
