@@ -14,6 +14,7 @@
   document.body.appendChild(overlay);
   return overlay;
  }
+ function toneClass(value,fallback){return String(value||fallback).replace(/[^a-z0-9_-]/gi,"")||fallback;}
  function removeAfter(node,duration){
   const timer=setTimeout(()=>{if(node&&node.parentNode)node.parentNode.removeChild(node);},Math.max(0,duration));
   return timer;
@@ -36,7 +37,7 @@
   const anchor=options.anchor;
   if(!anchor||!document.createElement)return null;
   const node=document.createElement("span");
-  const tone=options.tone==="mana"?"mana":"xp";
+  const tone=toneClass(options.tone,"xp");
   node.className="nu-game-notification-bar-delta capsule-gain "+tone;
   node.textContent=String(options.text==null?"":options.text);
   const fill=options.fill;
@@ -63,10 +64,10 @@
   root.style.top=(rect.bottom+(Number(options.offset)==null?DEFAULTS.consumptionOffset:Number(options.offset)))+"px";
   root.style.setProperty("--nu-notification-duration",duration+"ms");
   const item=document.createElement("span");
-  item.className="floating-change loss";
+  item.className="floating-change "+toneClass(options.itemTone,"loss");
   item.textContent=String(options.itemDelta==null?"":options.itemDelta);
   const resource=document.createElement("span");
-  resource.className="floating-change hp";
+  resource.className="floating-change "+toneClass(options.resourceTone,"hp");
   resource.textContent=String(options.resourceDelta==null?"":options.resourceDelta);
   root.append(item,resource);
   getOverlay().appendChild(root);
