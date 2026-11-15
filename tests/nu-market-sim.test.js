@@ -49,3 +49,22 @@ test("market simulator retains only the latest 24 activity steps",()=>{
  assert.ok(result.candles.length<=24);
  assert.equal(market.MAX_CANDLES,24);
 });
+
+test("display-only candle tolerance is deterministic, bounded to five, and never changes close",()=>{
+ const save={transactions:[{id:"stable-event",at:"2026-11-14T12:00:00.000Z",deltas:{xp:-9}}]};
+ const first=market.build(save,"xp"),second=market.build(save,"xp"),candle=first.candles[0];
+ assert.equal(candle.visualTolerance,second.candles[0].visualTolerance);
+ assert.ok(candle.visualTolerance>=0&&candle.visualTolerance<=5);
+ assert.equal(candle.close,first.index);
+ assert.ok(Math.abs(candle.close-(100*(1+0.025*(9/19))))<1e-9);
+ assert.ok(candle.high>=Math.max(candle.open,candle.close));
+ assert.ok(candle.low<=Math.min(candle.open,candle.close));
+});
+
+test("parametric dispersion bands are rolling, deterministic, and display-only",()=>{
+ const steps=[10,12,14,16].map((close,index)=>({close,open:close-1,high:close+2,low:close-2}));
+ const before=JSON.stringify(steps),bands=market.analysisBands(steps,3),mean=12;
+ assert.equal(bands.length,4);assert.equal(bands[0].upper,null);assert.equal(bands[1].lower,null);
+ assert.ok(Math.abs(bands[2].mean-mean)<1e-9);assert.ok(bands[2].upper>mean);assert.ok(bands[2].lower<mean);
+ assert.deepEqual(market.analysisBands(steps,3),bands);assert.equal(JSON.stringify(steps),before);
+});

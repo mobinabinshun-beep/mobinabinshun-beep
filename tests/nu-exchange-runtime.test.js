@@ -22,8 +22,9 @@ test("leaving before the 11th attempt resets visit count but not an active coold
  const store=memory();let now=500;const g=guard.create({storage:store,now:()=>now});
  for(let i=0;i<10;i++)g.recordSuccess();g.leaveVisit();assert.equal(g.state().successes,0);assert.equal(g.beforeAttempt().allowed,true);
 });
-test("replay modes and looping frame selection use 24 player steps",()=>{
- assert.equal(replay.MODES.length,6);assert.equal(replay.frameIndex(0,24,24000),0);assert.equal(replay.frameIndex(23999,24,24000),23);assert.equal(replay.frameIndex(24000,24,24000),0);
+test("replay modes use number-free second, minute, hour, day, week and month labels",()=>{
+ assert.equal(replay.MODES.length,6);assert.deepEqual(replay.MODES.map(m=>m.label),["Seconds","Minutes","Hours","Days","Weeks","Months"]);assert.ok(replay.MODES.every(m=>!/[0-9]/.test(m.label)));
+ assert.equal(replay.frameIndex(0,24,24000),0);assert.equal(replay.frameIndex(23999,24,24000),23);assert.equal(replay.frameIndex(24000,24,24000),0);
 });
 test("two-step maintenance latch requires phrase and second confirmation",()=>{
  const store=memory(),l=lock.create(store);assert.equal(l.isLocked(),true);

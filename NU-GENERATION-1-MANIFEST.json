@@ -3,7 +3,7 @@
   "generation": 1,
   "runtime": "N.U Adaptive Runtime",
   "runtimeVersion": "0.1-prototype",
-  "packageVersion": "0.5.9-gen1-unified-profile-workshop-preview",
+  "packageVersion": "0.5.10-gen1-exchange-chart-controls",
   "entry": "index.html",
   "modules": [
     "index.html",
@@ -89,7 +89,9 @@
     "XP rail spans the bottom edge; Mana capsule rail is placed at the left side above it; HP display now includes a moving ECG-style scanner trace.",
     "Aircraft are placed in an upper altitude band and road traffic in a ground band to reduce intersections with buildings.",
     "The nine Mana capsule upgrade levels and N-BI shot-cost reduction are not yet implemented; current Chaos shot still costs 10 Mana.",
-    "The city layout is an art-direction proposal, not a canonical map. Published sources describe Niroo City as green, engineered, sustainable, and founded by Binam Binshun, but do not establish a definitive skyline layout."
+    "The city layout is an art-direction proposal, not a canonical map. Published sources describe Niroo City as green, engineered, sustainable, and founded by Binam Binshun, but do not establish a definitive skyline layout.",
+    "Generation 1.34 candidate: Exchange replay selectors use number-free seconds/minutes/hours/days/weeks/months labels; player controls chart zoom across the retained 24 local steps, grid, candle shadows, volume, moving-average overlays, day/night mode and packaged palettes. Candle wick tolerance is deterministic and display-only (up to ±5 N.U index points).",
+    "Exchange refinement: optional neutral-grey parametric dispersion bands show rolling mean ± one standard deviation from recorded candle closes; a local wallet-ledger change restarts the replay cursor and pulses the chart. Both are presentation-only."
   ],
   "rendering": {
     "pixelWorld": {
@@ -168,7 +170,7 @@
     }
   ],
   "generation1Exchange": {
-    "status": "modular-offline-single-player-candidate",
+    "status": "modular-offline-single-player-chart-controls-candidate",
     "page": "exchange.html",
     "script": "nu-exchange.js",
     "modules": [
@@ -187,15 +189,46 @@
       "cache": "Dedicated local exchange cache rebuilt from the local wallet on refresh; underlying wallet ledger is not truncated."
     },
     "replayScales": [
-      "24s",
-      "1m24s",
-      "24m",
-      "1h24m",
-      "24d",
-      "2m24d"
+      "seconds",
+      "minutes",
+      "hours",
+      "days",
+      "weeks",
+      "months"
     ],
     "cooldown": "Ten successful operations may complete in one Exchange visit; the 11th attempted operation starts a 120-second cooldown. Leaving before the 11th attempt resets the in-memory visit count.",
     "maintenanceLock": "Cross-game transfer module is locked by default. A two-step local maintenance latch is a UX safeguard only, not authentication or anti-cheat.",
-    "note": "Fictional N.U-only activity visualization. Replay animation changes presentation only and never fabricates wallet events or real-world financial data."
+    "note": "Fictional N.U-only activity visualization. Replay animation changes presentation only and never fabricates wallet events or real-world financial data.",
+    "chartControls": {
+      "zoomVisibleSteps": {
+        "min": 4,
+        "max": 24,
+        "default": 24
+      },
+      "grid": true,
+      "candleShadows": true,
+      "volume": true,
+      "movingAverage": true,
+      "movingAveragePeriods": [
+        3,
+        5,
+        8,
+        12
+      ],
+      "themes": [
+        "night",
+        "day"
+      ],
+      "palettes": [
+        "aurora",
+        "emerald",
+        "rose",
+        "amber",
+        "monochrome"
+      ],
+      "parametricBands": "rolling mean ± one standard deviation; display-only",
+      "ledgerChangeResponse": "restart replay cursor and pulse chart on actual local transaction add/remove; no synthetic transactions"
+    },
+    "visualWickTolerance": "Deterministic display-only range of up to ±5 N.U index points; it never changes candle close, wallet balances or transactions."
   }
 }
