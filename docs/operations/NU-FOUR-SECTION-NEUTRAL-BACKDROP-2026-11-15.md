@@ -37,3 +37,14 @@ To roll back, create a dedicated rollback branch and restore only the archived s
 
 - Automated regression tests cover view lifecycle, the neutral static background, disabled world background layers, and preservation of Exchange chart markup.
 - Browser/device visual acceptance remains a separate human check.
+
+## CI result on the current branch head
+
+- Wallet/Profile workflow: 34 passed, 2 failed. The two failures are the pre-existing profile-preview tests for local photo-input matching and eight photo-placement controls; the new four-section neutral-backdrop tests passed.
+- Studio export workflow: 152 passed, 2 failed, the same two profile-preview tests.
+- Graphics integrity: PASS.
+- Generation 1 HUD layout regression: PASS.
+- Graphics preview smoke checks: PASS.
+- JavaScript syntax checks: PASS.
+- No changes were made to `index.html` or `tests/nu-profile-preview.test.js` in this operation.
+- Human browser/device visual acceptance is still pending.
