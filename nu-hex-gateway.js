@@ -138,6 +138,15 @@
   scrim.addEventListener("click",()=>setOpen(false));
   document.addEventListener("pointermove",event=>{
     if(!open||!["mouse","touch","pen"].includes(event.pointerType))return;
+    // Touch browsers may capture the pointer on pointerdown; hit-test coordinates so a finger drag can still enter an option.
+    if(event.pointerType==="touch"&&typeof document.elementFromPoint==="function"){
+      const hit=document.elementFromPoint(event.clientX,event.clientY);
+      const item=hit?.closest?.(".nu-gateway-item");
+      if(item&&root.contains(item)){
+        suppressClickUntil=Date.now()+900;
+        activate(item);
+      }
+    }
     const tolerance=10,rect=root.getBoundingClientRect();
     const orbit=window.matchMedia("(max-width: 600px)").matches?112:126;
     const inside=event.clientX>=rect.left-orbit-tolerance&&event.clientX<=rect.right+tolerance&&
