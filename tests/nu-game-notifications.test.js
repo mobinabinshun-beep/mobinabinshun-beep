@@ -29,7 +29,7 @@ test("HP capsule consumption uses the original paired floating-change visual wit
 test("HP consumption is anchored below the live viewport HP rail and uses legacy rise/fade motion",()=>{
   assert.match(moduleSource,/anchor\.getBoundingClientRect\(\)/);
   assert.match(moduleSource,/if\(!\(rect\.width>0&&rect\.height>0\)\)return null/);
-  assert.match(moduleSource,/options\.anchorCenterX!=null/);
+  assert.match(moduleSource,/options\.anchorCenterX!=null/);\n  assert.match(moduleSource,/options\.placement==="center"\?rect\.top\+rect\.height\/2/);\n  assert.match(moduleSource,/options\.placement==="center"\?" is-centered":""/);
   assert.match(moduleSource,/rect\.bottom\+/);
   assert.match(css,/@keyframes nu-floating-change/);
   assert.match(css,/0%\{opacity:0;transform:translateY\(18px\) scale\(\.82\)\}/);
@@ -89,7 +89,7 @@ test("bar and consumption presets accept sanitized per-game tone classes",()=>{
 });
 
 
-test("HP consumption falls back instead of placing a toast at viewport origin when the HUD is hidden",()=>{
+test("Store capsule purchase and use share one centred paired notice and suppress duplicate text",()=>{\n  assert.match(gameSource,/showStoreHpPillNotice\\(\"−10 XP\",\"\\+1 CAPSULE\"\\)/);\n  assert.match(gameSource,/showStoreHpPillNotice\\(\"−1 CAPSULE HEAL\",\"\\+10 HP\"\\)/);\n  assert.match(gameSource,/showConsumption\\(\\{anchor,placement:\"center\",itemDelta,resourceDelta,duration:1750/);\n  assert.match(gameSource,/\\$\\(\"shop-status\"\\)\\.textContent=feedback\\|\\|\"\";\\$\\(\"shop-status\"\\)\\.hidden=!feedback/);\n  assert.doesNotMatch(gameSource,/showFloatingChange\\(\"−10 XP\"/);\n  assert.doesNotMatch(gameSource,/PURCHASE COMPLETE · −10 XP · \\+1 CAPSULE/);\n  assert.match(gameSource,/if\\(!isStoreUse\\)\\{announceHpBarTransaction\\(\\);/);\n});\n\ntest("HP consumption falls back instead of placing a toast at viewport origin when the HUD is hidden",()=>{
   assert.match(moduleSource,/if\(!\(rect\.width>0&&rect\.height>0\)\)return null/);
   assert.match(gameSource,/if\(rect\.width>0&&rect\.height>0\)[\s\S]*?if\(notice\)return;\}\}announceTransaction\("−1 CAPSULE HEAL · \+10 HP"/);
 });
