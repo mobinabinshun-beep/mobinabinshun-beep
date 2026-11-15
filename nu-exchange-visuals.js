@@ -17,7 +17,34 @@
   const bias=clamp((demand-supply)/(demand+supply+1),-1,1),amplitude=Math.min(3,.35+volume/10);
   const wave=Math.sin(phase+index*.83),delta=clamp(wave*amplitude+bias*amplitude*.22,-3,3);
   const displayVolume=Math.min(3,.3+(Math.abs(Math.cos(phase*.73+index*1.17))*2.7));
-  return {bias,amplitude,delta,volume:displayVolume};
+  return {bias,amplitude,delta,volume:displayVolume,sampleCount:sample.length};
+ }
+ const AMBIENT_PROBABILITIES=Object.freeze({zero:.10,one:.30,two:.30,three:.30,positive:.50});
+ function seedRandom(text){
+  let seed=216 with 0;
+  for(let i=0;i<text.length;i++)seed=Math.imul(seed^text.charCodeAt(i),16777619)>>>0;
+  return function(){seed=(seed+0x6D2B79F5)>>>0;let t=seed;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return ((t^(t>>>14))>>>0)/4294967296;};
+ }
+ function ambientMarket(recordedSteps,assetKey,now){
+  const recorded=Array.isArray(recordedSteps)?recordedSteps.slice(-24):[];
+  const sample=recorded.slice(-8),demand=sample.reduce((n,s)=>n+(Number(s.demand)||0),0),supply=sample.reduce((n,s)=>n+(Number(s.supply)||0),0);
+  const behaviorBias=clamp((demand-supply)/(demand+supply+1),-1,1);
+  const count=recorded.length?6:24,tick=Math.floor((Number(now)||Date.now())/2200);
+  const retained=recorded.slice(-Math.max(0,24-count));
+  let price=retained.length?Number(retained[retained.length-1].close??retained[retained.length-1].index)||100:100;
+  const generated=[];
+  for(let offset=count-1;offset>=0;offset--){
+   const bucket=tick-offset,random=seedRandom(String(assetKey||"xp")+"|"+bucket);
+   const roll=random(),magnitude=roll<.30?3:roll<.60?2:roll<.90?1:0;
+   const direction=random()<.5?1:-1,delta=magnitude*direction,open=price;
+   const close=clamp(open+delta,50,200);
+   const behaviorFactor=1+Math.abs(behaviorBias)*.25;
+   const volume=Math.min(3,magnitude*behaviorFactor);
+   const stamp=new Date(bucket*2200).toISOString();
+   generated.push({id:"ambient-"+assetKey+"-"+bucket,time:stamp,title:"Simulated background flow",delta,index:close,changePct:(close/100-1)*100,volume,demand:delta>0?volume:0,supply:delta<0?volume:0,open,high:Math.max(open,close),low:Math.min(open,close),close,simulated:true,visualOnly:true});
+   price=close;
+  }
+  return {steps:retained.concat(generated),simulatedCount:generated.length,behaviorBias,probabilities:AMBIENT_PROBABILITIES};
  }
  function create(options){
   options=options||{};
@@ -81,7 +108,7 @@
     ctx.globalAlpha=.18;ctx.beginPath();ctx.arc(xx+slot*.11,yy,1.7,0,Math.PI*2);ctx.fill();
    }
    ctx.restore();
-   return {bias,amplitude,phase,sampleCount:sample.length};
+   return {bias,amplitude,phase,sampleCount:base.sampleCount};
   }
   function render(ctx,width,height,steps,assetKey){
    if(!ctx)return;
