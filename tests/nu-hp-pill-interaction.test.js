@@ -124,15 +124,13 @@ test("Generation 1.28 makes the HP HUD frame visibly more compact on phone scree
 });
 
 
-test("Generation 1.29 places the phone HP capsule below a compact HP rail",()=>{
-  assert.match(css,/@media\(max-width:520px\)\{\s*#game-view\.active \.hp-bar\{\s*width:max-content;\s*max-width:calc\(100vw - 24px\);/);
-  assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use\{\s*left:50%;\s*right:auto;\s*top:auto;\s*bottom:3px;\s*transform:translateX\(-50%\)/);
-  assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use img\{width:27px;height:27px/);
-  assert.ok(css.includes("@media(max-width:520px)"));
-  assert.ok(games.includes("const centerY=barRect.top+barRect.height/2"));
+test("Mobile HP capsule drawer expands rightward without dropping below the HP rail",()=>{
+  assert.ok(css.includes("--hp-core-width:min(276px,calc(100vw - 82px))"));
+  assert.ok(css.includes("width:calc(var(--hp-core-width) + var(--hp-drawer-width))!important"));
+  assert.ok(css.includes("width:48px!important"));
+  assert.ok(games.includes("centerY=barRect.top+barRect.height/2"));
   assert.ok(html.includes("20261115-hp-drawer-r2"));
 });
-
 
 test("Generation 1.30 refreshes the Store count immediately after Store-side capsule use",()=>{
   assert.match(games,/const isStoreUse=!!\(button&&button\.matches\("\[data-use-hp-pill\]"\)\)/);
@@ -146,7 +144,7 @@ test("Generation 1.30 refreshes the Store count immediately after Store-side cap
 
 test("Generation 1.30 HUD-side capsule use keeps the shared wallet count in sync",()=>{
   assert.match(games,/const count=pill\.querySelector\("#hp-pill-count"\);if\(count\)count\.textContent="×"\+state\.save\.hpPills/);
-  assert.match(games,/if\(anchor\)showHpPillInteraction\(anchor,result\.restored\)/);
+  assert.doesNotMatch(games,/showHpPillInteraction|showHpGain|void track\.offsetWidth/);
 });
 
 
