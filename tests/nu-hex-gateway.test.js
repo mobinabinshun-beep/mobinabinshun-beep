@@ -25,7 +25,7 @@ test("Gateway exposes exactly Back, Menu and Profile as one-click actions",()=>{
  assert.doesNotMatch(js,/clickArmed|hoverTimer|two-step|confirm\(item\)/);
 });
 
-test("Opening Gateway freezes the game and all ambient renderers until a decision",()=>{
+test("Opening Gateway freezes gameplay; image-only mode has no ambient renderers to resume",()=>{
  assert.match(js,/nu:gateway-open/);assert.match(js,/nu:gateway-close/);
  assert.match(games,/state\.engine\[frozen\?"pause":"resume"\]/);
  assert.match(games,/NUBackgroundEngine\.setFrozen/);
