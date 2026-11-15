@@ -7,9 +7,9 @@
  "use strict";
  const MODES=[
   {id:"24s",label:"Seconds",durationMs:24000},
-  {id:"1m24s",label:"Minutes",durationMs:84000},
-  {id:"24m",label:"Hours",durationMs:1440000},
-  {id:"1h24m",label:"Days",durationMs:5040000},
+  {id:"1m24s",label:"Minutes",durationMs:60000},
+  {id:"24m",label:"Hours",durationMs:3600000},
+  {id:"1h24m",label:"Days",durationMs:86400000},
   {id:"24d",label:"Weeks",durationMs:604800000},
   {id:"2m24d",label:"Months",durationMs:2592000000}
  ];
