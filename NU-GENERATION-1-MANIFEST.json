@@ -33,7 +33,8 @@
     "nu-exchange-guard.js",
     "nu-exchange-replay.js",
     "nu-exchange-lock.js",
-    "nu-exchange-visuals.js"
+    "nu-exchange-visuals.js",
+    "nu-exchange-engines.js"
   ],
   "randomPool": [
     "bubble",
@@ -52,6 +53,7 @@
     "native": "future adapter required"
   },
   "notes": [
+    "Generation 1 Exchange wallet bridge: reads the canonical nu-world-save-v1 profile, asset rows, unpriced X/N fields and recent transactions. Game manifests are discovered on launcher startup and reconciled after wallet saves / module inventory events. Protocol metadata only; no shadow wallet or settlement.",
     "Generation 1 Exchange visual refinement: adds a restrained ambient background-flow animation derived from recent local economic behavior, bounded to ±3 index points and 3 display-volume units, plus player-drawn trend/horizontal/vertical lines and shaded analysis zones. All ambient pulses and drawings are presentation-only and never write wallet transactions.",
     "Generation 1.35 candidate (2026-11-15): Gateway is the single in-game navigation gate with Back, Menu and Profile one-click actions. Opening it freezes the game round and all ambient renderers until a decision; duplicate in-game navigation buttons are hidden. The centered menu lists concise module titles with keyboard keycaps: player modules first, then Painting, Random Game and the three core games. Store-purchased assets are durably excluded from Exchange selectors and virtual market charts. Latest Exchange chart controls (zoom, grid, wicks, volume, moving average, themes, palettes and parametric bands) are preserved.",
     "Generation 1 unified profile workshop preview (2026-11-14): preserves the historical four-field card and exposes all current profile design alternatives for human comparison: hue, neutral white/dark tint, selected-color lightness and optional saturation; exact age, age band, both or no age; Bio and Interests; optional/local-identity-required/required public-card models; per-field privacy and share-consent preview; private-view YES/NO and fake passphrase flow; appearance-only, appearance-plus-fields and full lock policies; card/HUD/Wallet/hidden stats placement; holographic materials, typography, geometry, glow, transparency, scanlines, texture, motion, reduced effects, high contrast and device quality; local image fit and 2x4 crop-anchor/photo-slot semantics; recovery choices; platform and launcher delivery alternatives; local save, export protection, import validation and future sync models; reduced-effects and high-contrast accessibility previews. All are temporary preview controls that reset on close. No credentials are authenticated, no data is saved/exported/imported/recovered, no image is uploaded and no network sync/share occurs.",
@@ -183,7 +185,8 @@
       "nu-exchange-replay.js",
       "nu-exchange-lock.js",
       "nu-market-sim.js",
-      "nu-exchange-visuals.js"
+      "nu-exchange-visuals.js",
+      "nu-exchange-engines.js"
     ],
     "assets": "Only wallet-backed Generation 1 assets are listed; no placeholder coin is invented.",
     "crossGameChange": "Prepared registry for Launcher game adapters; transfer settlement remains disabled until two compatible approved game adapters exist.",
@@ -251,6 +254,26 @@
         "ledgerWrites": false,
         "syntheticEventsAreNotTransactions": true
       }
+    },
+    "walletBridge": {
+      "engine": "nu-exchange-engines.js",
+      "source": "nu-world-save-v1",
+      "mode": "LOCAL_READ_ONLY",
+      "shadowWallet": false,
+      "settlement": false,
+      "refreshTriggers": [
+        "page-entry",
+        "nu:save-updated",
+        "storage",
+        "pageshow"
+      ]
+    },
+    "protocolLifecycle": {
+      "storage": "nu.exchange.protocols.v1",
+      "retentionDays": 30,
+      "launcherHooks": "NUExchangeModuleLifecycle.discover / reconcile; nu:launcher:modules-changed event",
+      "trustDefault": "DECLARED_UNVERIFIED",
+      "settlementEnabled": false
     }
   },
   "navigation": {
