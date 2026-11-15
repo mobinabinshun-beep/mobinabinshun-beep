@@ -16,6 +16,34 @@ const games=[
  {id:"mana",name:"Mana Collector",desc:"Collect luminous hexagonal Mana particles.",status:"PLAYABLE"},
  {id:"chaos",name:"Chaos Attack",desc:"Spot Chaos masses; the N-BI cannon fires from outside your view.",status:"PLAYABLE"}
 ];
+const exchangeManifests=[
+ {gameId:"bubble",displayName:"Bubble Hunt",manifestVersion:"g1-2026-11-15",assets:[{assetId:"g1.xp",label:"XP",walletKey:"xp",unit:"XP",kind:"asset",valuationClass:"non-convertible",source:"nu.g1.shared-economy"},{assetId:"g1.hp",label:"HP",walletKey:"hp",unit:"HP",kind:"asset",valuationClass:"non-convertible",source:"nu.g1.shared-economy"},{assetId:"g1.hp-capsule",label:"HP Capsules",walletKey:"hpPills",unit:"capsule",kind:"asset",valuationClass:"non-convertible",source:"nu.g1.shared-economy"}]},
+ {gameId:"mana",displayName:"Mana Collector",manifestVersion:"g1-2026-11-15",assets:[{assetId:"g1.mana",label:"Mana",walletKey:"mana",unit:"Mana",kind:"asset",valuationClass:"non-convertible",source:"nu.g1.shared-economy"},{assetId:"g1.mana-capsule",label:"Mana Capsules",walletKey:"manaCapsules",unit:"capsule",kind:"asset",valuationClass:"non-convertible",source:"nu.g1.shared-economy"},{assetId:"g1.hp",label:"HP",walletKey:"hp",unit:"HP",kind:"asset",valuationClass:"non-convertible",source:"nu.g1.shared-economy"}]},
+ {gameId:"chaos",displayName:"Chaos Attack",manifestVersion:"g1-2026-11-15",assets:[{assetId:"g1.hp",label:"HP",walletKey:"hp",unit:"HP",kind:"asset",valuationClass:"non-convertible",source:"nu.g1.shared-economy"},{assetId:"g1.mana",label:"Mana",walletKey:"mana",unit:"Mana",kind:"asset",valuationClass:"non-convertible",source:"nu.g1.shared-economy"},{assetId:"g1.xp",label:"XP",walletKey:"xp",unit:"XP",kind:"asset",valuationClass:"non-convertible",source:"nu.g1.shared-economy"}]}
+];
+function syncExchangeModuleLifecycle(installedGameIds){
+ if(!window.NUExchangeCore||!window.NUExchangeEngines)return {ok:false,reason:"EXCHANGE_ENGINE_UNAVAILABLE"};
+ const protocol=window.NUExchangeEngines.protocolEngine;
+ const installed=Array.isArray(installedGameIds)?installedGameIds:games.map(game=>game.id);
+ const ids=new Set(installed.map(String));
+ exchangeManifests.forEach(manifest=>{
+  const isInstalled=ids.has(manifest.gameId);
+  if(isInstalled)protocol.discover(manifest,{installed:true});
+  window.NUExchangeCore.registerGame({id:manifest.gameId,name:manifest.displayName,assets:manifest.assets.map(a=>({id:a.assetId,label:a.label,unit:a.unit})),coins:[],transferEnabled:false});
+ });
+ return protocol.reconcile({installedGameIds:installed});
+}
+window.NUExchangeModuleLifecycle={
+ discover(manifest,installed){if(!window.NUExchangeEngines)return {ok:false,reason:"EXCHANGE_ENGINE_UNAVAILABLE"};return window.NUExchangeEngines.protocolEngine.discover(manifest,{installed:installed!==false});},
+ reconcile(installedGameIds){return syncExchangeModuleLifecycle(installedGameIds);},
+ manifests:exchangeManifests
+};
+window.addEventListener("nu:launcher:modules-changed",event=>{
+ const detail=event.detail||{};
+ if(window.NUExchangeEngines&&Array.isArray(detail.manifests))detail.manifests.forEach(manifest=>window.NUExchangeModuleLifecycle.discover(manifest,true));
+ syncExchangeModuleLifecycle(Array.isArray(detail.installedGameIds)?detail.installedGameIds:games.map(game=>game.id));
+});
+syncExchangeModuleLifecycle(games.map(game=>game.id));
 const canvas=$("game-canvas"),ctx=canvas.getContext("2d");
 state.save.hp=Number.isFinite(state.save.hp)?state.save.hp:10;state.save.hpPills=Number.isFinite(state.save.hpPills)?Math.max(0,state.save.hpPills):0;state.save.manaCapsules=Number.isFinite(state.save.manaCapsules)?Math.max(1,Math.min(10,state.save.manaCapsules)):1;state.save.mana=Math.max(0,Math.min(state.save.mana,state.save.manaCapsules*10));
 function save(){const ok=NU.save(state.save);if(ok){renderWallet();window.dispatchEvent(new CustomEvent("nu:save-updated"));}return ok;}function persistWalletState(next){const previous=state.save;state.save=next;if(!save()){state.save=previous;renderWallet();announceTransaction("SAVE FAILED · WALLET WAS NOT CHANGED","warning");return false;}return true;}function awardXP(amount,source){const result=NUWallet.grantXP(state.save,amount,{title:source||"Game reward"});if(!result.ok)return false;return persistWalletState(result.state);}
