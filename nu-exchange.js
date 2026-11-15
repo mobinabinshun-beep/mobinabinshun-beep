@@ -112,8 +112,6 @@ window.NUExchangeAttempt=async function(commit){
 };
 NUExchangeCore.connectWallet({load:()=>NU.load(),wallet:NUWallet});
 window.addEventListener("nu:save-updated",refresh);
-NUExchangeCore.connectWallet({load:()=>NU.load(),wallet:NUWallet});
-window.addEventListener("nu:save-updated",refresh);
 window.addEventListener("nu:exchange:registry-change",refresh);
 window.addEventListener("storage",e=>{if(e.key===NU.storageKey)refresh();});
 window.addEventListener("pageshow",()=>{replayStart=Date.now();refresh();});
