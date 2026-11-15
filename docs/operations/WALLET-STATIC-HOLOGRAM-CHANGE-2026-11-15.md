@@ -13,9 +13,9 @@
   4. Opening another view or closing Wallet restores the normal world background.
   5. Wallet balances, ledger, save schema, Player ID, navigation routes, game logic, Gateway and protected LV/XP/Mana HUD remain unchanged.
 - Museum baseline: `archive/museum/2026-11-15-wallet-backdrop-v1/`
-  - `nu-world.css___.museum` (original stylesheet)
-  - `nu-player-ui.js___.museum` (original wallet view lifecycle)
-  - `tests__nu-wallet-tabs.test.js___.museum` (original focused regression tests)
+  - `nu-world.css.museum` (original stylesheet)
+  - `nu-player-ui.js.museum` (original wallet view lifecycle)
+  - `tests__nu-wallet-tabs.test.js.museum` (original focused regression tests)
 - Museum artifact status: immutable pre-change source snapshots; not imported by runtime. Restore by copying the archived file content back to its original path on a dedicated rollback branch.
 - Planned implementation files: `nu-world.css`, `nu-player-ui.js`, `tests/nu-wallet-tabs.test.js`.
 - Verification: GitHub Actions wallet regression workflow on the pull request; browser/device visual acceptance remains pending.
