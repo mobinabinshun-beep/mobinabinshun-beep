@@ -51,7 +51,7 @@ test("image failure never starts a procedural fallback or decorative layer", () 
   assert.doesNotMatch(runtime, /NUPixelWorld\.setEnabled\(true\)/);
   assert.doesNotMatch(runtime, /NUDynamicLayers\.apply/);
   assert.doesNotMatch(html, /<canvas id="(?:pixel-world|world-canvas)"/);
-  assert.match(css, /body\\{overflow-x:hidden;background:var\\(--bg\\)\\}/);
+  assert.match(css, /body\{overflow-x:hidden;background:var\(--bg\)\}/);
 });
 
 test("pixel-faithful image fit preserves the complete artwork without cropping", () => {
