@@ -57,13 +57,13 @@
   const centerX=options.anchorCenterX!=null&&Number.isFinite(Number(options.anchorCenterX))?Number(options.anchorCenterX):rect.left+rect.width/2;
   const duration=options.duration==null?DEFAULTS.consumptionDuration:Math.max(0,Number(options.duration)||0);
   const root=document.createElement("div");
-  root.className="nu-notification-pair";
+  root.className="nu-notification-pair"+(options.placement==="center"?" is-centered":"");
   root.setAttribute("role","status");
   root.setAttribute("aria-live","polite");
   root.setAttribute("aria-atomic","true");
   root.setAttribute("aria-label",String(options.itemDelta||"")+" · "+String(options.resourceDelta||""));
   root.style.left=centerX+"px";
-  root.style.top=(rect.bottom+(Number(options.offset)==null?DEFAULTS.consumptionOffset:Number(options.offset)))+"px";
+  root.style.top=(options.placement==="center"?rect.top+rect.height/2:rect.bottom+(Number(options.offset)==null?DEFAULTS.consumptionOffset:Number(options.offset)))+"px";
   root.style.setProperty("--nu-notification-duration",duration+"ms");
   const item=document.createElement("span");
   item.className="floating-change "+toneClass(options.itemTone,"loss");
