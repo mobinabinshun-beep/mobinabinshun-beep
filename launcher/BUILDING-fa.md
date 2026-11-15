@@ -11,18 +11,31 @@
 نمونهٔ فرمان MinGW (پس از نصب toolchain سازگار):
 
 ```bat
-i686-w64-mingw32-g++ -D_WIN32_WINNT=0x0501 -DWINVER=0x0501 -O2 -mwindows -static-libgcc -static-libstdc++ windows-xp\nu_launcher_win32.cpp -o NU-Launcher.exe -luser32 -lgdi32 -lshell32
+i686-w64-mingw32-g++ -D_WIN32_WINNT=0x0501 -DWINVER=0x0501 -O2 -mwindows -static-libgcc -static-libstdc++ windows-xp\nu_launcher_win32.cpp -o NU-Launcher.exe -luser32 -lgdi32
 ```
 
-این فرمان فقط نقطهٔ شروع است؛ سازگاری runtime و DLLهای واردشده باید با ابزارهایی مانند Dependency Walker روی XP بررسی شود. `-static` به‌تنهایی تضمین سازگاری XP نیست.
+ساخت ماژول نمونه به‌صورت DLL:
+
+```bat
+i686-w64-mingw32-g++ -D_WIN32_WINNT=0x0501 -O2 -shared -Wl,--kill-at modules\sample-module.cpp -o modules\sample-module.dll -luser32
+```
+
+در `modules/modules.ini` این خط را اضافه کنید:
+
+```ini
+sample.g1|Generation 1 Sample Module|modules\sample-module.dll
+```
+
+این فرمان‌ها فقط نقطهٔ شروع هستند؛ سازگاری runtime و DLLهای واردشده باید با ابزارهایی مانند Dependency Walker روی XP بررسی شود. `-static` به‌تنهایی تضمین سازگاری XP نیست.
 
 ## اجرای محلی
 
-1. کنار فایل اجرایی، پوشهٔ `modules` بسازید.
-2. `modules.ini.example` را به `modules.ini` کپی کنید.
+1. کنار فایل اجرایی، پوشه‌های `modules` و در صورت نیاز `assets` بسازید.
+2. `modules.ini.example` را به `modules/modules.ini` کپی کنید.
 3. DLL ماژول‌های مورداعتماد را در پوشهٔ `modules` قرار دهید و مسیر نسبی آن‌ها را در فایل ثبت کنید.
-4. `NU-Launcher.exe` را اجرا کنید.
-5. ماژول را انتخاب و Launch را بزنید؛ Exit Module به میزبان برمی‌گردد.
+4. برای پس‌زمینهٔ ثابت اختیاری، تصویر BMP را با نام `assets/launcher-background.bmp` قرار دهید. این نسخه فقط یک تصویر ثابت می‌خواند؛ لایه و انیمیشن پس‌زمینه ندارد.
+5. `NU-Launcher.exe` را اجرا کنید.
+6. ماژول را انتخاب و Launch را بزنید؛ Exit Module به میزبان برمی‌گردد.
 
 ## آزمون پذیرش لازم
 
