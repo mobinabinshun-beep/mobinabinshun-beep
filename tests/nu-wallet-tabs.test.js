@@ -41,7 +41,7 @@ test("wallet view switches off world renderers and restores them on exit",()=>{
 });
 
 test("wallet backdrop is one fixed CSS glow with no animation, blur or input capture",()=>{
-  const glow=css.slice(css.lastIndexOf("/* Wallet low-cost scene mode"));
+  const glow=css.slice(css.lastIndexOf("body.nu-wallet-open #wallet-view .wallet-panel::before"));
   assert.match(glow,/radial-gradient\(ellipse at 50% 8%/);
   assert.match(glow,/pointer-events:none/);
   assert.doesNotMatch(glow,/animation\s*:|filter\s*:|canvas|requestAnimationFrame|backdrop-filter\s*:/);
