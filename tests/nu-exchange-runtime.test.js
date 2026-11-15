@@ -1,6 +1,6 @@
 "use strict";
 const test=require("node:test"),assert=require("node:assert/strict");
-const core=require("../nu-exchange-core.js"),guard=require("../nu-exchange-guard.js"),replay=require("../nu-exchange-replay.js"),lock=require("../nu-exchange-lock.js");
+const core=require("../nu-exchange-core.js"),guard=require("../nu-exchange-guard.js"),replay=require("../nu-exchange-replay.js"),lock=require("../nu-exchange-lock.js"),wallet=require("../nu-wallet.js"),market=require("../nu-market-sim.js"),fs=require("node:fs");
 function memory(){const m=new Map();return {getItem:k=>m.has(k)?m.get(k):null,setItem:(k,v)=>m.set(k,String(v)),removeItem:k=>m.delete(k)};}
 test("registry starts empty and only exposes explicitly registered game assets",()=>{
  core.clear();assert.deepEqual(core.listGames(),[]);assert.deepEqual(core.listAssets(),[]);
@@ -30,4 +30,17 @@ test("two-step maintenance latch requires phrase and second confirmation",()=>{
  const store=memory(),l=lock.create(store);assert.equal(l.isLocked(),true);
  assert.equal(l.begin("wrong",1000).ok,false);assert.equal(l.begin(lock.PHRASE,1000).ok,true);
  assert.equal(l.confirm(lock.PHRASE,1200).ok,false);assert.equal(l.confirm(lock.PHRASE,1500).ok,true);assert.equal(l.isLocked(),false);l.relock();assert.equal(l.isLocked(),true);
+});
+
+test("Exchange runtime preserves chart controls while using purchase-filtered assets",()=>{
+ const source=fs.readFileSync("nu-exchange.js","utf8");
+ assert.match(source,/NUWallet\.exchangeAssetRows\(save\)/);
+ assert.match(source,/NUVirtualMarket\.assets\(save\)/);
+ assert.match(source,/chartPrefs\.zoom/);
+ assert.match(source,/chartPrefs\.theme/);
+ assert.match(source,/nu_exchange_cache_v3/);
+ let purchased=wallet.buyHpPill({xp:20,hpPills:0}).state;
+ for(let i=0;i<30;i++)purchased=wallet.grantXP(purchased,1,{id:"later-"+i}).state;
+ assert.ok(!wallet.exchangeAssetRows(purchased).some(row=>row.key==="hpPills"));
+ assert.ok(!market.assets(purchased).some(row=>row.key==="hpPills"));
 });

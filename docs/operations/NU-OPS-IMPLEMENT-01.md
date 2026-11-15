@@ -18,15 +18,21 @@ For every instruction such as «اعمال کن»، «پیاده کن»، «فی
 8. Open a PR with a narrow scope and test evidence. Merge/deploy only after the requested scope and required CI checks are satisfied. Label human QA separately from CI.
 9. Preserve candidate branches, CI evidence and rollback information after merge.
 
-## 3. Explicit freeze lock — Gateway icon
+## 3. Explicit freeze lock — Gateway operating gate
 **LOCK ID:** NU-LOCK-GATEWAY-ICON-01  
-**Status:** SCOPED UNFREEZE APPROVED — 2026-11-14; main game page only.
+**Status:** SCOPED UNFREEZE APPROVED — 2026-11-15; Generation 1 main-game pages only.  
+**Owner correction:** This section supersedes the earlier Settings-based three-action description.
 
-- The owner explicitly authorized unfreezing the Gateway only while an actual game is active in index.html. Keep it hidden on the home screen, library, menu, profile, store and all non-game views.
-- Gateway must remain hidden and behaviorally inactive on Casino, Launcher, Creative Studio, and all other internal pages until separate owner approval. Existing legacy navigation remains available.
-- Keep the legacy main MENU and in-game PAUSE/RESUME controls visible and operable; Gateway is additive navigation, not a replacement for those controls.
-- Do not change Gateway destinations, shared game rules, wallet/save data, or unrelated pages as part of this scoped unfreeze.
-- Gateway actions are limited to Back/Home, Menu Options (existing menu), and Settings Options (existing Launcher settings route). Any further page expansion or new destination requires separate explicit owner approval.
+- The Gateway is an operational decluttering gate: it replaces scattered in-game navigation clicks with one entry point.
+- It is visible only while an actual Generation 1 game is active in index.html. Keep it hidden on home/library and all non-game views.
+- The Gateway exposes exactly three one-click actions: **Back, Menu, Profile**. No Settings action is included in the current Gateway.
+- Opening the Gateway freezes the active round and all background rendering/ambient loops until the user decides. This includes the game loop, Background Engine, Dynamic Layers and Pixel World. Closing without a route selection restores only a pause that the Gateway itself initiated.
+- Hide duplicate in-game navigation triggers (the topbar MENU button and the game-view BACK button) while gameplay is active. Keep the actual PAUSE/RESUME and game-specific controls operable; they are not duplicate navigation controls.
+- Menu opens a centered modal directory. Each module entry contains only a concise title and a keyboard keycap. Do not place descriptions, statistics, previews or destination content inside the menu; render content in the destination view/page.
+- Menu order is fixed for this scope: player modules first (Store, Profile, Exchange, Wallet), then games (Painting, Random Game, Bubble Hunt, Mana Collector, Chaos Attack). Random Game selects only from the three core Generation 1 games; Painting is not in the random pool.
+- Store-purchased assets are non-exchangeable. Exclude them from Exchange asset selectors, balance-history charts and virtual market simulation while retaining ownership in the Wallet.
+- The Gateway remains hidden and behaviorally inactive on Casino, Launcher, Creative Studio, Pixel Art Studio, Wallet and Exchange. Future analogous gates for other areas require separate owner approval and their own access rules.
+- Existing game rules, HUD, save schema and wallet balances are preserved except for the explicit Exchange eligibility rule above.
 
 ## 4. Shield visibility
 - Do not display a shield meter, charge bar, shield capsule or shield status when the player has no shield item/state.
@@ -44,3 +50,16 @@ For every instruction such as «اعمال کن»، «پیاده کن»، «فی
 
 ## 6. Rollback and evidence
 Rollback by reverting the scoped PR/commit or restoring the exact pre-change backup branch. Never force-push the public default branch. Record CI-PASSED, DEPLOYED, HUMAN-QA-PENDING and HUMAN-QA-PASSED as distinct states; automated CI is not human browser acceptance.
+
+## 7. Mandatory human-acceptance gate — owner rule (2026-11-15)
+
+**Rule:** No implementation, release candidate, feature, or defect is marked APPROVED or REJECTED solely from automated checks, source inspection, or an agent's assessment. A human test and a traceable human report are required first.
+
+- CI-PASSED means only that the recorded automated workflows passed. It is not human acceptance.
+- Before a human report exists, the acceptance state must remain **PENDING HUMAN TEST / PENDING HUMAN REPORT**. Do not convert that state to APPROVED or REJECTED.
+- A failed CI run may be recorded as an automated failure, but it does not by itself constitute the owner's final human acceptance/rejection decision.
+- The human report must identify the candidate commit/build, date, tester (or anonymous tester ID), device, OS, browser, viewport/orientation, input method (mouse/touch/keyboard), test scenario, expected result, actual result, PASS/FAIL, and evidence or reproduction steps. Do not collect passwords, private credentials, or unnecessary personal data.
+- Each reported defect receives a reproducible issue with severity, affected build, steps, expected/actual behavior, and evidence. Fixes require a new candidate build and a repeat human test of the affected scenario.
+- Final acceptance is recorded only after the required human scenarios have reports. A mixed result remains **PARTIALLY TESTED / PENDING**, not globally approved.
+- Merge/deployment must not be used to bypass this gate. If a separate public preview is explicitly prepared for testing, label it **TEST CANDIDATE — NOT APPROVED** and preserve rollback; public availability itself is not acceptance.
+- Keep the following states distinct: **IMPLEMENTED**, **CI-PASSED / CI-FAILED**, **HUMAN-QA-PENDING**, **HUMAN-QA-PASSED / HUMAN-QA-FAILED**, **APPROVED / REJECTED**, **MERGED**, and **DEPLOYED**. No state implies another.

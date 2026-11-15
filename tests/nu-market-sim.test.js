@@ -68,3 +68,19 @@ test("parametric dispersion bands are rolling, deterministic, and display-only",
  assert.ok(Math.abs(bands[2].mean-mean)<1e-9);assert.ok(bands[2].upper>mean);assert.ok(bands[2].lower<mean);
  assert.deepEqual(market.analysisBands(steps,3),bands);assert.equal(JSON.stringify(steps),before);
 });
+
+test("store-purchased assets are excluded from market choices and chart building",()=>{
+ const legacy={xp:15,hpPills:1,transactions:[{kind:"purchase",title:"Golden HP Capsule",deltas:{xp:-10,hpPills:1}}]};
+ assert.ok(!market.assets(legacy).some(asset=>asset.key==="hpPills"));
+ assert.equal(market.build(legacy,"hpPills").asset,null);
+ assert.deepEqual(market.build(legacy,"hpPills").steps,[]);
+ assert.ok(market.assets(legacy).some(asset=>asset.key==="xp"));
+});
+test("durable purchase exclusion survives the rolling transaction ledger",()=>{
+ const save={xp:15,hpPills:1,nonExchangeableAssets:["hpPills"],transactions:[]};
+ assert.ok(!market.assets(save).some(asset=>asset.key==="hpPills"));
+ assert.equal(market.build(save,"hpPills").asset,null);
+});
+
+// Keep ambient Exchange flow and player chart drawing covered by the market-simulation CI run.
+require("./nu-exchange-visuals.test.js");

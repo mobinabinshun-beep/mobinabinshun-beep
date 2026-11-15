@@ -1,0 +1,39 @@
+name: N.U Exchange feature regression
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'exchange.html'
+      - 'index.html'
+      - 'nu-exchange-*'
+      - 'nu-market-sim.js'
+      - 'nu-games.js'
+      - 'nu-wallet.js'
+      - 'NU-GENERATION-1-MANIFEST.json'
+      - 'tests/nu-exchange-*.test.js'
+      - '.github/workflows/exchange-feature-tests.yml'
+  push:
+    branches:
+      - feature/nu-exchange-complete-2026-11-15
+jobs:
+  exchange-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check changed runtime syntax
+        run: |
+          node --check nu-exchange.js
+          node --check nu-exchange-core.js
+          node --check nu-exchange-engines.js
+          node --check nu-exchange-visuals.js
+          node --check nu-exchange-analytics.js
+          node --check nu-games.js
+      - name: Validate Generation 1 manifest
+        run: node -e "JSON.parse(require('node:fs').readFileSync('NU-GENERATION-1-MANIFEST.json','utf8'))"
+      - name: Test Exchange, ambient flow, drawing and protocol engines
+        run: node --test tests/nu-exchange-*.test.js tests/nu-market-sim.test.js

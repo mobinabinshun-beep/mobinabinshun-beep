@@ -19,7 +19,7 @@
   };
   function normalizeSave(raw){
     const source=raw&&typeof raw==="object"?raw:{};
-    const next=Object.assign({xp:0,level:1,mana:0,xCredits:0,nCredits:0,upgrade:0,hp:10,hpPills:0,manaCapsules:1,casinoCredits:100,transactions:[],rewardIds:[]},source);
+    const next=Object.assign({xp:0,level:1,mana:0,xCredits:0,nCredits:0,upgrade:0,hp:10,hpPills:0,manaCapsules:1,casinoCredits:100,transactions:[],rewardIds:[],nonExchangeableAssets:[]},source);
     next.xp=number(next.xp,0);
     next.level=number(next.level,1,1);
     next.manaCapsules=number(next.manaCapsules,1,1,10);
@@ -32,11 +32,17 @@
     next.upgrade=number(next.upgrade,0,0,9);
     next.transactions=Array.isArray(next.transactions)?next.transactions.slice(-MAX_TRANSACTIONS):[];
     next.rewardIds=Array.isArray(next.rewardIds)?next.rewardIds.filter(v=>typeof v==="string").slice(-500):[];
+    next.nonExchangeableAssets=Array.isArray(next.nonExchangeableAssets)?Array.from(new Set(next.nonExchangeableAssets.filter(v=>typeof v==="string"&&/^[a-zA-Z][a-zA-Z0-9_-]{0,47}$/.test(v)))):[];
     return next;
   }
   function transaction(next,kind,title,deltas,meta){
     const details=meta||{};
-    const entry={id:String(details.id||("nu-tx-"+Date.now()+"-"+Math.random().toString(36).slice(2,8))),at:String(details.at||new Date().toISOString()),kind,title,deltas};
+    if(kind==="purchase"){
+      const purchasedKeys=Object.keys(deltas||{}).filter(key=>Number(deltas[key])>0);
+      const explicit=Array.isArray(details.exchangeExcludedKeys)?details.exchangeExcludedKeys.filter(key=>typeof key==="string"):[];
+      next.nonExchangeableAssets=Array.from(new Set([...(next.nonExchangeableAssets||[]),...purchasedKeys,...explicit]));
+    }
+    const entry={id:String(details.id||("nu-tx-"+Date.now()+"-"+Math.random().toString(36).slice(2,8))),at:String(details.at||new Date().toISOString()),kind,title,deltas};if(Array.isArray(details.exchangeExcludedKeys)&&details.exchangeExcludedKeys.length)entry.exchangeExcludedKeys=details.exchangeExcludedKeys.filter(k=>typeof k==="string");
     next.transactions=next.transactions.concat(entry).slice(-MAX_TRANSACTIONS);
     return entry;
   }
@@ -45,7 +51,7 @@
     if(next.xp<HP_PILL_COST)return {ok:false,reason:"INSUFFICIENT_XP",state:next};
     next.xp-=HP_PILL_COST;
     next.hpPills+=1;
-    const entry=transaction(next,"purchase","Golden HP Capsule",{xp:-HP_PILL_COST,hpPills:1},meta);
+    const entry=transaction(next,"purchase","Golden HP Capsule",{xp:-HP_PILL_COST,hpPills:1},Object.assign({},meta||{},{exchangeExcludedKeys:["hpPills"]}));
     return {ok:true,state:next,transaction:entry};
   }
   function useHpPill(raw,meta){
@@ -108,6 +114,17 @@
     }
     return rows.filter(row=>Number.isFinite(Number(row.value))&&Number(row.value)>0&&(row.key!=="manaCapsules"||Number(row.value)>1||s.mana>0));
   }
+  function isExchangeableAsset(raw,key){
+    if(typeof key!=="string"||!key)return false;
+    const s=normalizeSave(raw);
+    if(s.nonExchangeableAssets.includes(key))return false;
+    return !s.transactions.some(tx=>{
+      if(!tx||!tx.deltas)return false;
+      if(Array.isArray(tx.exchangeExcludedKeys)&&tx.exchangeExcludedKeys.includes(key))return true;
+      return tx.kind==="purchase"&&Number(tx.deltas[key])>0;
+    });
+  }
+  function exchangeAssetRows(raw){return assetRows(raw).filter(row=>isExchangeableAsset(raw,row.key));}
   function assetHistory(raw,key){
     const s=normalizeSave(raw),current=Number(s[key]);
     if(!Number.isFinite(current)||!["xp","mana","hp","hpPills","manaCapsules","casinoCredits"].includes(key))return [];
@@ -123,5 +140,5 @@
     if(!entries.length)points.push({id:"current",at:"",title:"Current balance · no recorded changes",delta:0,balance:current});
     return points;
   }
-  return {MAX_HP,HP_PILL_COST,MAX_TRANSACTIONS,normalizeSave,buyHpPill,useHpPill,grantXP,settleCasinoRound,registerAsset,registerGameAssets,assetRows,gameAssetRows,assetHistory};
+  return {MAX_HP,HP_PILL_COST,MAX_TRANSACTIONS,normalizeSave,buyHpPill,useHpPill,grantXP,settleCasinoRound,registerAsset,registerGameAssets,assetRows,exchangeAssetRows,isExchangeableAsset,gameAssetRows,assetHistory};
 });

@@ -714,3 +714,17 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 .world>.nu-world-background,.world>.sky,.world>#world-canvas,.world>#pixel-world,.world>.horizon,.world>.world-effects,#nu-dynamic-layers{
  pointer-events:none!important;
 }
+
+/* N.U compact navigation directory — labels and keyboard keycaps only */
+.menu-backdrop{z-index:130;background:rgba(2,8,16,.84);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
+.menu-panel{width:min(390px,100%);max-height:min(82vh,720px);overflow:auto;padding:18px 18px 20px}
+.menu-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.menu-heading h2{margin:0;font-size:15px;letter-spacing:.14em}
+.menu-close{width:34px;height:34px;border:1px solid var(--line);border-radius:9px;background:#0b1b2b;color:#d9f8ff;font-size:21px;line-height:1;cursor:pointer}
+.menu-items{display:grid;grid-template-columns:1fr;gap:17px;margin:0}
+.menu-group{display:grid;grid-template-columns:1fr;gap:6px;min-width:0}
+.menu-group h3{margin:0 0 3px;color:#83bfd3;font-size:9px;letter-spacing:.18em;font-weight:800}
+.menu-items .menu-item{min-height:42px;width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 11px;border:1px solid rgba(122,199,225,.22);border-radius:9px;background:rgba(8,24,38,.82);color:#e2f7ff;text-decoration:none;text-align:left;font:inherit;font-size:11px;font-weight:700;line-height:1.2;cursor:pointer}
+.menu-items .menu-item:hover,.menu-items .menu-item:focus-visible{border-color:#85eaff;background:rgba(24,73,93,.72);outline:2px solid rgba(133,234,255,.28);outline-offset:1px}
+.menu-item kbd{display:inline-grid;place-items:center;flex:0 0 25px;height:25px;border:1px solid rgba(137,221,246,.55);border-bottom-width:3px;border-radius:6px;background:#0b2638;color:#bff5ff;font:800 10px/1 ui-monospace,monospace;box-shadow:0 2px 0 rgba(0,0,0,.25)}
+@media(max-width:600px){.menu-panel{width:min(360px,100%);padding:15px}.menu-items{gap:13px}.menu-items .menu-item{min-height:40px}}
