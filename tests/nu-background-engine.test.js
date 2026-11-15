@@ -43,7 +43,7 @@ test("static background is non-interactive and uses only one image",()=>{
 test("CSS disables every legacy decorative world layer and leaves foreground above image",()=>{
  assert.ok(css.includes("N.U XP-FIRST STATIC IMAGE OVERRIDE"));
  assert.ok(css.includes(".world>.sky,"));
- assert.ok(css.includes("#nu-dynamic-layers,"));
+ assert.ok(css.includes("#nu-dynamic-layers{"));
  assert.ok(css.includes("#pixel-world,"));
  assert.ok(css.includes("display:none!important"));
  assert.ok(css.includes("z-index:var(--nu-layer-world-content,3)!important"));
