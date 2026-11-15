@@ -5,7 +5,7 @@
 <title>N.U Virtual Market — Generation 1</title>
 <meta name="description" content="A fictional N.U game-world market simulator driven only by player activity.">
 <meta name="theme-color" content="#071018">
-<link rel="stylesheet" href="./nu-exchange.css?v=20261115-exchange-chart-controls-r1">
+<link rel="stylesheet" href="./nu-exchange.css?v=20261115-ambient-drawing-r1">
 </head>
 <body>
 <main class="exchange-shell">
@@ -14,6 +14,11 @@
 <p class="eyebrow">N.U ECONOMY SYSTEM</p><h1>VIRTUAL <em>MARKET</em></h1>
 <p>A fictional market simulation with trading-style charts. Every movement is derived only from your own locally saved wallet and asset activity.</p>
 <div class="exchange-notice">100% FICTIONAL · N.U ACTIVITY ONLY · NO REAL-WORLD DATA OR VALUE</div>
+</section>
+<section class="exchange-panel wallet-bridge-panel">
+<div class="panel-heading"><div><p class="eyebrow">N.U WALLET BRIDGE</p><h2>PLAYER &amp; OWNED ASSETS</h2></div><span class="sim-tag">LIVE LOCAL CONNECTION</span></div>
+<div id="wallet-connection" aria-live="polite"><p class="panel-note">Connecting to the existing N.U wallet…</p></div>
+<p class="panel-note">Read-only connection to the canonical local save. No shadow wallet, balance mutation, or cross-game settlement. X/N Credits remain unpriced until reviewed.</p>
 </section>
 <section class="market-panel">
 <div class="panel-heading"><div><p class="eyebrow">ACTIVITY-DRIVEN SIMULATION</p><h2>MARKET INDEX</h2></div><span class="sim-tag">SIMULATED · NOT A REAL PRICE</span></div>
@@ -37,6 +42,17 @@
  <label class="chart-toggle"><input id="chart-average-toggle" type="checkbox" checked> Analysis line</label>
  <label class="chart-toggle"><input id="chart-bands-toggle" type="checkbox" checked> Parametric bands</label>
  <label class="chart-toggle"><input id="chart-tolerance-toggle" type="checkbox" checked> Visual tolerance ±5</label>
+</div>
+<div id="chart-drawing-tools" class="chart-drawing-tools" aria-label="Chart drawing and analysis tools">
+ <span class="drawing-tools-label">DRAW ON CHART</span>
+ <button type="button" data-draw-tool="cursor" aria-pressed="true" class="is-active">Cursor</button>
+ <button type="button" data-draw-tool="trend" aria-pressed="false">Trend line</button>
+ <button type="button" data-draw-tool="horizontal" aria-pressed="false">Horizontal</button>
+ <button type="button" data-draw-tool="vertical" aria-pressed="false">Vertical</button>
+ <button type="button" data-draw-tool="zone" aria-pressed="false">Shaded zone</button>
+ <button type="button" data-draw-action="undo">Undo</button>
+ <button type="button" data-draw-action="clear">Clear</button>
+ <small data-ambient-status>BACKGROUND FLOW · LOCAL SIMULATION · MAX 3 UNITS · VISUAL ONLY</small>
 </div>
 <canvas id="market-chart" role="img" aria-label="Fictional N.U market index candlestick chart"></canvas>
 <div id="market-empty" class="chart-empty">No local activity has been recorded for this asset yet. The simulator will create candles only after in-game wallet activity occurs.</div>
@@ -77,5 +93,5 @@
 </section>
 <footer class="exchange-footer">N.U — NIROO UNIVERSE · GENERATION 1 FICTIONAL ECONOMY</footer>
 </main>
-<script src="./nu-engine.js"></script><script src="./nu-wallet.js"></script><script src="./nu-exchange-core.js?v=20261114-modular-r1"></script><script src="./nu-exchange-guard.js?v=20261114-modular-r1"></script><script src="./nu-exchange-replay.js?v=20261115-number-free-periods-r1"></script><script src="./nu-exchange-lock.js?v=20261114-modular-r1"></script><script src="./nu-market-sim.js?v=20261115-visual-wick-tolerance-r1"></script><script src="./nu-exchange.js?v=20261115-chart-controls-r1"></script>
+<script src="./nu-engine.js"></script><script src="./nu-wallet.js?v=20261115-exchange-purchase-exclusion-r2"></script><script src="./nu-exchange-core.js?v=20261114-modular-r1"></script><script src="./nu-exchange-engines.js?v=20261115-dual-engine-r2"></script><script src="./nu-exchange-guard.js?v=20261114-modular-r1"></script><script src="./nu-exchange-replay.js?v=20261115-number-free-periods-r1"></script><script src="./nu-exchange-lock.js?v=20261114-modular-r1"></script><script src="./nu-market-sim.js?v=20261115-purchase-exclusion-r2"></script><script src="./nu-exchange.js?v=20261115-ambient-drawing-r1"></script>
 </body></html>
