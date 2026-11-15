@@ -8,7 +8,7 @@
  function walletReader(){
   if(!root.NU||!root.NUWallet)throw new Error("Canonical N.U wallet is not available");
   const raw=root.NU.load(),save=root.NUWallet.normalizeSave(raw);
-  return {source:"nu-world-save-v1",player:{id:String(save.playerId||"LOCAL-PLAYER"),name:String(save.displayName||"N.U Explorer"),level:Number(save.level)||1},assets:root.NUWallet.assetRows(save),transactions:Array.isArray(save.transactions)?save.transactions.slice(-40):[],readAt:new Date().toISOString()};
+  return {source:"nu-world-save-v1",player:{id:String(save.playerId||"LOCAL-PLAYER"),name:String(save.displayName||"N.U Explorer"),level:Number(save.level)||1},assets:root.NUWallet.assetRows(save),unpricedFields:{xCredits:Number(save.xCredits)||0,nCredits:Number(save.nCredits)||0},transactions:Array.isArray(save.transactions)?save.transactions.slice(-10).reverse():[],transactionCount:Array.isArray(save.transactions)?save.transactions.length:0,mode:"LOCAL_READ_ONLY",readAt:new Date().toISOString()};
  }
  function walletEngine(){return {read:walletReader,refresh(){const snapshot=walletReader();root.dispatchEvent(new root.CustomEvent("nu:exchange:wallet-refresh",{detail:snapshot}));return snapshot;}}}
  function cleanManifest(m){
@@ -31,7 +31,7 @@
   function reconcile({installedGameIds=[]}={}){
    const installed=new Set(installedGameIds.map(safeId)),store=readStore(),wallet=walletReader(),balances=new Map(wallet.assets.map(a=>[a.key,Number(a.value)||0])),removed=[];
    Object.keys(store).forEach(id=>{const p=store[id],owns=p.assets.some(a=>a.walletKey&&((balances.get(a.walletKey)||0)>0));
-    if(installed.has(id)||p.installed||owns){p.installed=installed.has(id)||p.installed;p.status="ACTIVE";p.dormantUntil=null;p.lastSeen=now();}
+    if(installed.has(id)||owns){p.installed=installed.has(id);p.status="ACTIVE";p.dormantUntil=null;p.lastSeen=now();}
     else if(!p.dormantUntil){p.status="DORMANT";p.dormantUntil=now()+RETENTION_DAYS*86400000;}
     else if(now()>=p.dormantUntil){delete store[id];removed.push(id);}
    });writeStore(store);return {protocols:Object.values(store),removed,retentionDays:RETENTION_DAYS};
