@@ -25,8 +25,8 @@
   const node=document.createElement("span");
   node.className="hit-progress"+(options.tone?" "+options.tone:"");
   node.textContent=String(options.text==null?"":options.text);
-  node.style.left=Number(options.x)||0;
-  node.style.top=Number(options.y)||0;
+  node.style.left=(Number(options.x)||0)+"px";
+  node.style.top=(Number(options.y)||0)+"px";
   container.appendChild(node);
   removeAfter(node,options.duration==null?DEFAULTS.interactionDuration:options.duration);
   return node;
