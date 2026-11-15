@@ -118,6 +118,11 @@ test("Movement over a Gateway option activates it without a click or second sele
 
 test("Gateway scrim blocks the rest of the page while the round is paused",()=>{
  assert.match(css,/body\.nu-gateway-open \.nu-gateway-scrim\{opacity:1;visibility:visible;pointer-events:auto\}/);
+ assert.match(css,/touch-action:none;overscroll-behavior:contain/);
  assert.match(js,/scrim\.addEventListener\("click"/);
+ assert.match(js,/document\.addEventListener\("pointerdown",event=>\{if\(open\)event\.stopPropagation\(\);\}\)/);
+ assert.match(js,/document\.addEventListener\("pointerup",event=>\{if\(open\)event\.stopPropagation\(\);\}\)/);
+ assert.match(js,/event\.preventDefault\(\);event\.stopPropagation\(\)/);
+ assert.match(js,/event\.stopImmediatePropagation\(\)/);
  assert.match(js,/pauseGame\(\);[\s\S]*?nu:gateway-open/);
 });
