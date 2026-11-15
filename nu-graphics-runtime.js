@@ -10,9 +10,11 @@ function modeFromPage(){
  return "ambient";
 }
 function syncPageState(){
- const intro=document.getElementById("intro"),menu=document.getElementById("menu"),profile=document.getElementById("profile-view"),shop=document.getElementById("shop-view");
- const frozen=!!((intro&&!intro.classList.contains("hidden"))||(menu&&menu.classList.contains("open"))||activeClass(profile)||activeClass(shop));
+ const intro=document.getElementById("intro"),menu=document.getElementById("menu"),profile=document.getElementById("profile-view"),wallet=document.getElementById("wallet-view"),shop=document.getElementById("shop-view");
+ const gatewayOpen=!!(document.body&&document.body.classList.contains("nu-gateway-open"));
+ const frozen=!!(gatewayOpen||(intro&&!intro.classList.contains("hidden"))||(menu&&menu.classList.contains("open"))||activeClass(profile)||activeClass(wallet)||activeClass(shop));
  g.NUBackgroundEngine&&g.NUBackgroundEngine.setFrozen(frozen);
+ g.NUDynamicLayers&&g.NUDynamicLayers.setFrozen&&g.NUDynamicLayers.setFrozen(frozen);
  g.NUBackgroundEngine&&g.NUBackgroundEngine.setMode(modeFromPage());
 }
 function watchPage(){
