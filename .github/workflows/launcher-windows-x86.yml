@@ -44,7 +44,7 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force dist | Out-Null
-          & "$env:ProgramFiles(x86)\NSIS\makensis.exe" /V3 "/DAPP_VERSION=0.1.0" installer/NULauncher.nsi
+          & "${env:ProgramFiles(x86)}\NSIS\makensis.exe" /V3 "/DAPP_VERSION=0.1.0" installer/NULauncher.nsi
           if ($LASTEXITCODE -ne 0) { throw "NSIS build failed" }
           Get-Item "dist/N.U-Launcher-Setup-0.1.0-x86.exe" | Format-List Name,Length
       - name: Upload installer artifact
