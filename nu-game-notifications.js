@@ -53,6 +53,8 @@
   const anchor=options.anchor;
   if(!anchor||typeof anchor.getBoundingClientRect!=="function"||!document.body)return null;
   const rect=anchor.getBoundingClientRect();
+  if(!(rect.width>0&&rect.height>0))return null;
+  const centerX=options.anchorCenterX!=null&&Number.isFinite(Number(options.anchorCenterX))?Number(options.anchorCenterX):rect.left+rect.width/2;
   const duration=options.duration==null?DEFAULTS.consumptionDuration:Math.max(0,Number(options.duration)||0);
   const root=document.createElement("div");
   root.className="nu-notification-pair";
@@ -60,7 +62,7 @@
   root.setAttribute("aria-live","polite");
   root.setAttribute("aria-atomic","true");
   root.setAttribute("aria-label",String(options.itemDelta||"")+" · "+String(options.resourceDelta||""));
-  root.style.left=(rect.left+rect.width/2)+"px";
+  root.style.left=centerX+"px";
   root.style.top=(rect.bottom+(Number(options.offset)==null?DEFAULTS.consumptionOffset:Number(options.offset)))+"px";
   root.style.setProperty("--nu-notification-duration",duration+"ms");
   const item=document.createElement("span");
