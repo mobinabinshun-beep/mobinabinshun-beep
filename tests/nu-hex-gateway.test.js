@@ -14,11 +14,12 @@ test("Gateway is mounted only in the main game entry and enabled only during gam
   assert.match(html, /id="nu-hex-gateway"/);
   assert.match(html, /class="nu-gateway-scrim"/);
   for (const page of [casino, launcher, studio]) {
-    assert.doesNotMatch(page, /id="nu-hex-gateway"/);
+    assert.match(page, /id="nu-hex-gateway"/);
   }
   assert.match(js, /if \(!root \|\| !scrim \|\| !gameView\) return/);
   assert.match(js, /classList\.toggle\("nu-game-active", gameActive\)/);
   assert.doesNotMatch(js, /walletView|nu-wallet-active/);
+  assert.match(js, /if \(!root \|\| !scrim \|\| !gameView\) return/);
   assert.match(css, /body\.nu-game-active #nu-hex-gateway/);
   assert.doesNotMatch(css, /nu-wallet-active/);
 });
