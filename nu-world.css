@@ -734,3 +734,19 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 .wallet-report-button{margin:0 0 12px;min-height:38px;font-size:10px;letter-spacing:.08em}
 .wallet-transaction{gap:5px}
 .wallet-transaction small{line-height:1.55;overflow-wrap:anywhere}
+
+
+/* N.U Health module and wallet drawer contrast calibration */
+.wallet-panel{background:rgba(2,8,15,.97)!important;box-shadow:0 22px 70px rgba(0,0,0,.62),inset 0 1px rgba(150,225,255,.06)}
+.wallet-card-tabs::before{background:rgba(2,8,15,.99)}
+.wallet-tab-content{background:rgba(3,9,17,.92);border:1px solid rgba(113,224,255,.13);border-radius:12px;padding:16px}
+.wallet-card-tab{flex:1 1 0;width:auto;max-width:none}
+.wallet-hologram-title{margin-top:2px}
+.health-history-group{margin-top:16px;padding:13px;border:1px solid rgba(113,224,255,.12);border-radius:10px;background:rgba(1,6,12,.72)}
+.health-history-group h4{margin:0 0 9px;color:#8edfff;font:800 10px/1.4 ui-monospace,monospace;letter-spacing:.12em}
+.health-history-list{display:grid;gap:7px}
+.health-history-row{display:grid;gap:4px;padding:9px 10px;border:1px solid rgba(113,224,255,.09);border-radius:8px;background:rgba(8,18,29,.86);color:#d8eaf4;font-size:11px}
+.health-history-row small{color:#829bab;font-size:9px;line-height:1.5}
+.health-history-empty{margin:0;color:#829bab;font-size:11px;line-height:1.6}
+.intro-panel{max-width:480px;padding:31px 29px 28px}
+@media(max-width:520px){.wallet-tab-content{padding:12px}.wallet-card-tab{flex:1 1 0;width:auto;max-width:none;padding:10px 3px;font-size:8px}.intro-panel{padding:29px 22px 25px}}
