@@ -6,6 +6,8 @@ on:
       - "index.html"
       - "nu-hex-gateway.js"
       - "nu-hex-gateway.css"
+      - "nu-games.js"
+      - "nu-dynamic-layers.js"
       - "tests/nu-hex-gateway.test.js"
       - ".github/workflows/gateway-main-game.yml"
   workflow_dispatch:
@@ -23,7 +25,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Check Gateway controller syntax
-        run: node --check nu-hex-gateway.js
+      - name: Check Gateway and renderer lifecycle syntax
+        run: |
+          node --check nu-hex-gateway.js
+          node --check nu-games.js
+          node --check nu-dynamic-layers.js
       - name: Run Gateway main-game regression tests
         run: node --test tests/nu-hex-gateway.test.js
