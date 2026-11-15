@@ -70,3 +70,18 @@ Each change must have a record (for example, `CHANGELOG/<change-id>.md`) contain
 **Backup → archive → conversation/change record → isolated implementation → technical checks → public demo → human testing → feedback review → explicit approval → optional promotion.**
 
 Skipping a gate blocks the next stage. When evidence is unavailable, mark the gate as **NOT VERIFIED**; never claim it passed. This protocol supplements normal Git history and does not replace verified, recoverable backups.
+
+
+## Per-stage human acceptance is mandatory
+
+This rule applies to **every independently reviewable change package or implementation stage**, including visual, functional, data, configuration, documentation, build and deployment work. Automated tests and CI are necessary evidence, but they never replace human acceptance.
+
+- A stage must be isolated, backed up, documented and technically checked, then deployed to the designated public Demo before human acceptance is requested.
+- The project owner must be given the exact public Demo URL, deployed commit/build identifier, scope and concise scenarios. A branch, PR, local build, screenshot or CI result is not a substitute.
+- The stage remains **HUMAN-QA-PENDING** until the owner records an explicit Approved, Rejected, or Approved-with-limitations result against that deployed revision.
+- Do not begin the next independent implementation stage, stack additional feature work on the unaccepted candidate, merge, lock, or promote while the current stage is pending or rejected. A rejection requires triage and a new isolated fix cycle under this same protocol.
+- Each subsequent fix or changed stage requires its own fresh backup/change record, technical checks, Demo deployment and human retest. Previous acceptance does not automatically approve later revisions.
+- If public Demo deployment or human review is unavailable, stop at the current stage, record **NOT VERIFIED / HUMAN-QA-PENDING**, and report the blocker. Do not describe the work as complete or accepted.
+- The owner may explicitly authorize a documented exception or a deliberately bundled stage. No contributor or automation may infer such authorization from silence, a passing CI run, or an open PR.
+
+**Stage invariant:** one independently reviewable change stage → one identifiable Demo revision → one recorded human decision. No stage advances on automated evidence alone.
