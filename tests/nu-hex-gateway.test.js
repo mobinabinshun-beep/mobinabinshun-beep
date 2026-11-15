@@ -5,7 +5,7 @@ const fs=require("node:fs");
 const read=name=>fs.readFileSync(name,"utf8");
 const html=read("index.html"),casino=read("casino.html"),launcher=read("launcher.html"),studio=read("pixel-art-studio.html");
 const js=read("nu-hex-gateway.js"),css=read("nu-hex-gateway.css"),worldCss=read("nu-world.css");
-const games=read("nu-games.js"),graphics=read("nu-graphics-runtime.js"),exchange=read("nu-exchange.js");
+const games=read("nu-games.js"),graphics=read("nu-graphics-runtime.js"),exchange=read("nu-exchange.js"),dynamic=read("nu-dynamic-layers.js");
 
 test("Gateway controller is scoped only to active main-game view",()=>{
  assert.match(html,/id="nu-hex-gateway"/);
@@ -86,3 +86,12 @@ test("Legacy in-game navigation duplicates are hidden, not deleted from other vi
 });
 
 test("No unsupported shield meter is introduced",()=>assert.doesNotMatch(html,/id="nbi-shield-bar"/));
+
+test("Gateway orbit exit bounds include the full vertical fan",()=>{
+ assert.match(js,/event\.clientY>=rect\.top-orbit-tolerance&&event\.clientY<=rect\.bottom\+orbit\+tolerance/);
+});
+
+test("A hidden tab cannot restart frozen game or ambient renderers",()=>{
+ assert.match(games,/gatewayOpen=document\.body\.classList\.contains\("nu-gateway-open"\)/);
+ assert.match(dynamic,/function resume\(\)\{if\(!profile\|\|!active\|\|frozen\|\|document\.hidden\)return/);
+});
