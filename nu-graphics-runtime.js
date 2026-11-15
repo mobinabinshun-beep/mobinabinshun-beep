@@ -41,7 +41,7 @@
       g.addEventListener("nu:background-missing", function () {
         emitReady(activeProfile);
       }, { once: true });
-      emitReady(profile);
+      emitReady(activeProfile);
     }).catch(function (error) {
       running = false;
       if (g.console && g.console.warn) g.console.warn("N.U graphics runtime fallback", error);
