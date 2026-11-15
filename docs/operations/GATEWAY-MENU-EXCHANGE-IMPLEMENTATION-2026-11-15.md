@@ -181,3 +181,24 @@
 `backup/pre-gateway-menu-exchange-2026-11-15`
 
 هیچ force-push یا تغییری روی شاخهٔ پیش‌فرض انجام نشده است.
+
+
+## 12. تکمیل قفل Dynamic Layers در نسخهٔ عمومی — 2026-11-15
+
+**شاخهٔ پشتیبان:** `backup/pre-dynamic-layers-freeze-default-2026-11-15`  
+**شاخهٔ اصلاح:** `fix/dynamic-layers-freeze-default-2026-11-15`
+
+### مشکل
+در نسخهٔ عمومی، `resume()` از قبل وضعیت frozen و hidden را بررسی می‌کرد، اما resize listener، `apply()` و `setMode()` هنوز می‌توانستند در زمان توقف، canvas را resize یا render کنند.
+
+### اصلاح
+- renderStatic در حالت frozen/hidden هیچ فریمی رسم نمی‌کند.
+- resize هنگام freeze/hidden به‌صورت pending ثبت می‌شود.
+- apply و setMode در زمان freeze/hidden فقط وضعیت pending را ثبت می‌کنند.
+- پس از visible شدن تب و رفع freeze، resize معوق یک بار اعمال و سپس رندر از سر گرفته می‌شود.
+- هیچ تغییری در قوانین بازی، Wallet، save schema، Exchange یا HUD انجام نشده است.
+
+### آزمون
+- تست رگرسیون برای render/resume/resize/apply/mode افزوده شد.
+- workflow موجود از قبل فایل Dynamic Layers و تست Gateway را پوشش می‌دهد.
+- CI پس از بازشدن PR باید ثبت شود؛ Human QA همچنان جداگانه در انتظار است.

@@ -3,7 +3,7 @@
  */
 (function(g){
 "use strict";
-let canvas=null,ctx=null,profile=null,raf=0,active=false,frozen=false,last=0,mode="ambient",particles=[];
+let canvas=null,ctx=null,profile=null,raf=0,active=false,frozen=false,last=0,mode="ambient",particles=[],needsResize=false;
 const reduced=()=>typeof matchMedia==="function"&&matchMedia("(prefers-reduced-motion: reduce)").matches;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function mount(){
@@ -13,7 +13,7 @@ function mount(){
  canvas.style.cssText="position:fixed;inset:0;width:100%;height:100%;z-index:-2;pointer-events:none";
  world.insertBefore(canvas,world.children[1]||null);ctx=canvas.getContext("2d",{alpha:true,desynchronized:true});
  document.addEventListener("visibilitychange",()=>{if(document.hidden)pause();else resume();});
- window.addEventListener("resize",()=>{if(profile){resize();renderStatic();if(active&&!frozen&&!reduced())schedule();}},{passive:true});
+ window.addEventListener("resize",()=>{if(!profile)return;if(frozen||document.hidden){needsResize=true;return;}resize();renderStatic();if(active&&!reduced())schedule();},{passive:true});
 }
 function resize(){
  if(!canvas||!ctx||!profile)return;
@@ -25,7 +25,7 @@ function resize(){
  particles=Array.from({length:count},()=>({x:Math.random()*w,y:Math.random()*h,r:.45+Math.random()*1.25,a:.10+Math.random()*.22,vx:(Math.random()-.5)*.12,vy:-.04-Math.random()*.12,phase:Math.random()*6.28}));
 }
 function renderStatic(t){
- if(!ctx||!canvas)return;
+ if(!ctx||!canvas||frozen||document.hidden)return;
  const w=innerWidth,h=innerHeight,cx=w*.5,cy=h*.205;
  ctx.clearRect(0,0,w,h);ctx.save();ctx.globalCompositeOperation="screen";
  const glow=ctx.createRadialGradient(cx,cy,0,cx,cy,Math.min(w,h)*.43);
@@ -47,9 +47,9 @@ function frame(t){
 }
 function schedule(){cancelAnimationFrame(raf);last=0;if(active&&!frozen&&!document.hidden&&!reduced()&&particles.length)raf=requestAnimationFrame(frame);}
 function pause(){cancelAnimationFrame(raf);}
-function resume(){if(!profile||!active||frozen||document.hidden)return;renderStatic();schedule();}
-function apply(p){profile=p;active=true;mount();resize();renderStatic();schedule();}
-function setMode(next){mode=["ambient","sleep","focus","game"].includes(next)?next:"ambient";if(profile){resize();renderStatic();schedule();}}
+function resume(){if(!profile||!active||frozen||document.hidden)return;if(needsResize){resize();needsResize=false;}renderStatic();schedule();}
+function apply(p){profile=p;active=true;mount();if(frozen||document.hidden){needsResize=true;return;}resize();renderStatic();schedule();}
+function setMode(next){mode=["ambient","sleep","focus","game"].includes(next)?next:"ambient";if(!profile)return;if(frozen||document.hidden){needsResize=true;return;}resize();renderStatic();schedule();}
 function setFrozen(value){frozen=!!value;if(frozen)pause();else resume();}
 function stop(){active=false;pause();if(ctx&&canvas)ctx.clearRect(0,0,canvas.width,canvas.height);}
 g.NUDynamicLayers={apply,setMode,setFrozen,stop,getState:()=>({active,frozen,mode,particles:particles.length})};
