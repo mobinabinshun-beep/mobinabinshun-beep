@@ -19,7 +19,7 @@
   };
   function normalizeSave(raw){
     const source=raw&&typeof raw==="object"?raw:{};
-    const next=Object.assign({xp:0,level:1,mana:0,xCredits:0,nCredits:0,upgrade:0,hp:10,hpPills:0,manaCapsules:1,casinoCredits:100,transactions:[],rewardIds:[],nonExchangeableAssets:[],activeWave:null,settledWaveIds:[]},source);
+    const next=Object.assign({xp:0,level:1,mana:0,xCredits:0,nCredits:0,upgrade:0,hp:10,hpPills:0,manaCapsules:1,casinoCredits:100,transactions:[],rewardIds:[],nonExchangeableAssets:[],activeWave:null,settledWaveIds:[],casinoRoundIds:[]},source);
     next.xp=number(next.xp,0);
     next.level=number(next.level,1,1);
     next.manaCapsules=number(next.manaCapsules,1,1,10);
@@ -33,6 +33,7 @@
     next.transactions=Array.isArray(next.transactions)?next.transactions.slice(-MAX_TRANSACTIONS):[];
     next.rewardIds=Array.isArray(next.rewardIds)?next.rewardIds.filter(v=>typeof v==="string").slice(-500):[];
     next.settledWaveIds=Array.isArray(next.settledWaveIds)?next.settledWaveIds.filter(v=>typeof v==="string").slice(-500):[];
+    next.casinoRoundIds=Array.isArray(next.casinoRoundIds)?next.casinoRoundIds.filter(v=>typeof v==="string").slice(-500):[];
     next.activeWave=next.activeWave&&typeof next.activeWave==="object"?next.activeWave:null;
     next.nonExchangeableAssets=Array.isArray(next.nonExchangeableAssets)?Array.from(new Set(next.nonExchangeableAssets.filter(v=>typeof v==="string"&&/^[a-zA-Z][a-zA-Z0-9_-]{0,47}$/.test(v)))):[];
     return next;
@@ -137,6 +138,29 @@
     next.activeWave=null;
     return {ok:true,state:next,wave:next.lastSettledWave,transactions:entries};
   }
+
+  function casinoSpendableAssets(raw){
+    return assetRows(raw).filter(row=>["progression","resources","currency","games"].includes(row.group)&&Number(row.value)>=1);
+  }
+  function settleWalletBet(raw,asset,stake,payout,meta){
+    const next=normalizeSave(raw),details=meta||{},bet=Number(stake),requested=Number(payout);
+    if(typeof asset!=="string"||!casinoSpendableAssets(next).some(row=>row.key===asset))return {ok:false,reason:"ASSET_NOT_SPENDABLE",state:next};
+    if(!Number.isSafeInteger(bet)||bet<1||!Number.isSafeInteger(requested)||requested<0)return {ok:false,reason:"INVALID_BET",state:next};
+    const current=Number(next[asset]??(next.assets&&next.assets[asset])??0);
+    if(current<bet)return {ok:false,reason:"INSUFFICIENT_BALANCE",state:next};
+    const roundId=String(details.roundId||("nu-casino-round-"+Date.now()+"-"+Math.random().toString(36).slice(2,8)));
+    if(next.casinoRoundIds.includes(roundId)||next.transactions.some(tx=>tx&&tx.roundId===roundId))return {ok:false,reason:"DUPLICATE_ROUND",state:next};
+    const afterStake=current-bet,capacity=asset==="mana"?next.manaCapsules*10:Number.MAX_SAFE_INTEGER;
+    const credited=Math.min(requested,Math.max(0,capacity-afterStake)),finalBalance=afterStake+credited;
+    if(Object.prototype.hasOwnProperty.call(next,asset))next[asset]=finalBalance;
+    else {next.assets=Object.assign({},next.assets||{},{[asset]:finalBalance});}
+    const at=new Date().toISOString(),gameId=String(details.gameId||"casino"),source="nu.casino",base={at,playerId:String(next.playerId||"guest-local"),source,gameId,roundId,game:String(details.game||gameId),detail:String(details.detail||""),settlementStatus:"SETTLED"};
+    const entries=[{...base,id:roundId+"|stake",kind:"casino-bet",title:"N.U Casino · "+base.game+" · wager spent",asset,direction:"OUTGOING",signedAmount:-bet,category:"CASINO_WAGER",resultingBalance:afterStake,idempotencyKey:roundId+"|stake",deltas:{[asset]:-bet}}];
+    if(credited>0)entries.push({...base,id:roundId+"|payout",kind:"casino-payout",title:"N.U Casino · "+base.game+" · payout received",asset,direction:"INCOMING",signedAmount:credited,requestedPayout:requested,payoutCapped:credited<requested,category:"CASINO_PAYOUT",resultingBalance:finalBalance,idempotencyKey:roundId+"|payout",deltas:{[asset]:credited}});
+    next.transactions=next.transactions.concat(entries).slice(-MAX_TRANSACTIONS);
+    next.casinoRoundIds=next.casinoRoundIds.concat(roundId).slice(-500);
+    return {ok:true,state:next,asset,stake:bet,requestedPayout:requested,payout:credited,payoutCapped:credited<requested,net:credited-bet,roundId,transactions:entries};
+  }
   function gameAssetRows(raw,gameId){
     const id=String(gameId||"").toLowerCase(),rows=assetRows(raw);
     const defaults={bubble:["xp","hp","hpPills"],mana:["mana","manaCapsules","hp"],chaos:["hp","mana","xp","hpPills","manaCapsules"]};
@@ -192,5 +216,5 @@
     if(!entries.length)points.push({id:"current",at:"",title:"Current balance · no recorded changes",delta:0,balance:current});
     return points;
   }
-  return {MAX_HP,HP_PILL_COST,MAX_TRANSACTIONS,normalizeSave,buyHpPill,useHpPill,grantXP,settleCasinoRound,beginWave,recordWaveDelta,settleWave,registerAsset,registerGameAssets,assetRows,exchangeAssetRows,isExchangeableAsset,gameAssetRows,assetHistory};
+  return {MAX_HP,HP_PILL_COST,MAX_TRANSACTIONS,normalizeSave,buyHpPill,useHpPill,grantXP,settleCasinoRound,settleWalletBet,casinoSpendableAssets,beginWave,recordWaveDelta,settleWave,registerAsset,registerGameAssets,assetRows,exchangeAssetRows,isExchangeableAsset,gameAssetRows,assetHistory};
 });
