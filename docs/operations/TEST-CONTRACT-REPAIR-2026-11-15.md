@@ -3,7 +3,7 @@
 **Date:** 2026-11-15  
 **Change ID:** TEST-CONTRACT-REPAIR-01  
 **Repository:** `mobinabinshun-beep/mobinabinshun-beep`  
-**Status:** Draft candidate · CI pending · no runtime change
+**Status:** MERGED · CI-PASSED · no runtime change
 
 ## Request and purpose
 Repair stale automated assertions discovered while reviewing the public-demo candidate PR #145. Keep the change test-only and do not alter product behavior.
@@ -29,10 +29,10 @@ PR #145 at head `7578bcd6ef456814589b3a5fd5a152e3bf73884c` showed:
 - HP HUD and world-entry tests failing because they required cache-bust values that are no longer the current script version.
 - The relevant runtime files were unchanged from the inspected base commit.
 
-The original test files were archived and hash-verified before edits. PR #146 is draft; CI results are pending. No local execution, browser QA, deployment, or human acceptance is claimed.
+The original test files were archived and hash-verified before edits. PR #146 merged into the default branch as commit `08b640c5e2d6b755466ef4bd4677cd3d2bb1e56f`. Wallet/profile regression, Graphics Preview smoke checks, and Studio export regression gates all passed. No local execution, browser QA, or user-facing runtime change is claimed.
 
 ## Rollback
 Close/revert PR #146 and restore the exact test files from the archive folder or backup branch. No runtime rollback is required because runtime files were not changed.
 
 ## Next gate
-Wait for PR #146 CI, inspect all results, then submit the exact diff and line check to the project owner. Do not merge or deploy without explicit owner approval.
+The test-only repair is merged. Preserve the human-acceptance gate for all product-facing candidates; CI success does not constitute human acceptance.
