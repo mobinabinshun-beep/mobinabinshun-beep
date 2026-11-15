@@ -169,9 +169,20 @@
     profile = initial;
     g.NUGraphicsProfile = initial;
     savedProfile = readLauncherProfile();
-    ceilingLevel = savedProfile
-      ? Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, Number(savedProfile.stableLevel) || Number(savedProfile.level) || initial.level))
-      : Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, Number(initial.level) || 3));
+    if (savedProfile) {
+      ceilingLevel = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, Number(savedProfile.stableLevel) || Number(savedProfile.level) || initial.level));
+    } else {
+      var memoryHint = Number(initial.memoryGb) || 0;
+      var coreHint = Number(initial.logicalCores) || 0;
+      ceilingLevel = MAX_LEVEL;
+      if (initial.saveData || (memoryHint && memoryHint <= 2) || (coreHint && coreHint <= 2)) {
+        ceilingLevel = 2;
+      } else if ((memoryHint && memoryHint <= 4) || (coreHint && coreHint <= 4)) {
+        ceilingLevel = 5;
+      } else if (!memoryHint && !coreHint) {
+        ceilingLevel = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, Number(initial.level) || 3));
+      }
+    }
     if (savedProfile) {
       profile = {};
       var key;
