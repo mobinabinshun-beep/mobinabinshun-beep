@@ -51,3 +51,30 @@ jobs:
             dist/SHA256SUMS.txt
           if-no-files-found: error
           retention-days: 30
+
+  windows-smoke:
+    needs: build-x86
+    runs-on: windows-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: N.U-XP-first-native-launcher-x86
+          path: artifact
+      - name: Install, launch and uninstall the native package
+        shell: powershell
+        run: |
+          $setup = Join-Path $env:GITHUB_WORKSPACE "artifact/N.U-Launcher-Setup-x86.exe"
+          $install = Join-Path $env:LOCALAPPDATA "N.U Launcher"
+          if (!(Test-Path $setup)) { throw "Installer artifact is missing." }
+          Start-Process -FilePath $setup -ArgumentList "/S" -Wait
+          $exe = Join-Path $install "NULauncher.exe"
+          if (!(Test-Path $exe)) { throw "Silent install did not create NULauncher.exe." }
+          if (!(Test-Path (Join-Path $install "background.bmp"))) { throw "Canonical background image was not installed." }
+          $process = Start-Process -FilePath $exe -PassThru
+          Start-Sleep -Seconds 3
+          if ($process.HasExited) { throw "Launcher exited during the Windows smoke test." }
+          Stop-Process -Id $process.Id -Force
+          $uninstaller = Join-Path $install "Uninstall.exe"
+          if (!(Test-Path $uninstaller)) { throw "Uninstaller is missing." }
+          Start-Process -FilePath $uninstaller -ArgumentList "/S" -Wait
+          if (Test-Path $install) { throw "Silent uninstall did not remove the application directory." }
