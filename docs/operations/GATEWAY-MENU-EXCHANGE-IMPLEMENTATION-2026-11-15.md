@@ -107,12 +107,16 @@
 ## 5. بکاپ، شاخه‌ها و آرشیو
 
 - SHA دقیق مبنای بررسی: `471dadbd9c795465c27b386137eefab4c9668b10`
-- شاخهٔ بکاپ قبل از تغییر: `backup/pre-gateway-menu-exchange-2026-11-15`
-- شاخهٔ کاندید: `feature/gateway-menu-exchange-2026-11-15`
-- شاخهٔ کاندید از همان SHA بکاپ ساخته شد؛ تغییرات فقط روی شاخهٔ کاندید انجام شده‌اند.
+- شاخهٔ بکاپ کاندید قبلی: `backup/pre-gateway-menu-exchange-2026-11-15` (مبنای اولیهٔ `471dadbd9c795465c27b386137eefab4c9668b10`).
+- شاخهٔ بکاپ آخرین نسخهٔ عمومی پیش از ادغام: `backup/pre-gateway-menu-exchange-mainline-2026-11-15` (SHA: `d52a38074b19260c677379344e52042279239015`).
+- شاخهٔ کاندید نهایی: `feature/gateway-menu-exchange-2026-11-15`.
+- آخرین commit عمومی Exchange با حفظ کنترل‌های نمودار (zoom، grid، wick، volume، moving average، theme، palette و parametric bands) به‌عنوان parent دوم ادغام شد: `ebbd1c031d223ef173cda9ee8ad3c0bf11c0999b`.
+- شاخهٔ پیش‌فرض دست‌کاری نشده است؛ تغییرات روی شاخهٔ کاندید انجام شده‌اند.
 - snapshot فایل‌های اصلی و تست‌های پیش از تغییر در مسیر زیر نگهداری می‌شوند:
   `archive/pre-change/2026-11-15/gateway-menu-exchange/`
-- snapshotها شامل index، Gateway JS/CSS، nu-world.css، nu-games، wallet، exchange، exchange.html، market simulator، graphics runtime، README، پروتکل اجرایی، تست‌های Gateway/Wallet/Exchange/Market و Generation 1 manifest هستند.
+- snapshot فایل‌های نسخهٔ عمومی جدیدتر Exchange پیش از ادغام در مسیر زیر نگهداری می‌شوند:
+  `archive/latest-default-before-merge/2026-11-15/`
+- snapshotها شامل index، Gateway JS/CSS، nu-world.css، nu-games، wallet، exchange، exchange.html، market simulator، graphics runtime، README، پروتکل اجرایی، تست‌های Gateway/Wallet/Exchange/Market و Generation 1 manifest هستند. مجموعهٔ latest-default-before-merge نیز نسخهٔ جدید Exchange و تست‌های آن را ثبت می‌کند.
 - شاخهٔ قبلی `feature/gateway-main-game-focused-2026-11-15` دست‌نخورده باقی مانده است.
 
 ## 6. آزمون و وضعیت پذیرش
