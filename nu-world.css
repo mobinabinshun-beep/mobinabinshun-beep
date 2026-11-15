@@ -764,3 +764,48 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 @media(prefers-reduced-motion:reduce){
  #game-view.active .hp-bar{animation:none!important;transform:translateX(-50%)!important}
 }
+
+
+/* HP capsule drawer: expand only to the right; keep the HP core's centre pinned. */
+#game-view.active .hp-bar{
+ --hp-core-width:min(276px,calc(100vw - 82px));--hp-drawer-width:64px;
+ position:fixed!important;top:max(8px,env(safe-area-inset-top,0px))!important;
+ left:50%!important;right:auto!important;width:var(--hp-core-width)!important;
+ min-width:0!important;max-width:calc(100vw - 18px)!important;box-sizing:border-box!important;
+ padding:8px 12px!important;gap:8px!important;justify-content:flex-start!important;
+ transform:translateX(calc(var(--hp-core-width) / -2))!important;transform-origin:top left!important;
+ overflow:visible!important;contain:layout!important;
+ transition:width .34s cubic-bezier(.2,.72,.24,1),background-color .2s ease!important;
+ animation:nu-hp-hud-enter-v2 .42s cubic-bezier(.2,.8,.2,1) both;
+}
+#game-view.active .hp-bar.hp-pill-drawer-open{width:calc(var(--hp-core-width) + var(--hp-drawer-width))!important}
+#game-view.active .hp-bar .hp-track{flex:1 1 auto!important;width:auto!important;min-width:24px!important;max-width:none!important}
+#game-view.active .hp-bar>span:first-child,#game-view.active .hp-bar #hp-value{flex:0 0 auto;white-space:nowrap}
+#game-view.active .hp-bar #hp-pill-use{
+ position:absolute!important;top:50%!important;right:7px!important;left:auto!important;
+ width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important;
+ padding:5px!important;margin:0!important;border-radius:50%!important;box-sizing:border-box!important;
+ transform:translateY(-50%) scale(1)!important;z-index:14!important;touch-action:manipulation!important;
+ -webkit-tap-highlight-color:transparent;
+}
+#game-view.active .hp-bar #hp-pill-use img{display:block;width:34px;height:34px;object-fit:contain;pointer-events:none}
+#game-view.active .hp-bar #hp-pill-use span{pointer-events:none}
+#game-view.active .hp-bar #hp-pill-use[hidden]{display:none!important}
+#game-view.active .hp-bar #hp-pill-use:focus-visible{outline:2px solid #caff9f;outline-offset:3px}
+.hp-pill-travel-layer{position:fixed!important;inset:0!important;z-index:1602!important;overflow:visible!important;pointer-events:none!important}
+.hp-pill-travel-ghost{position:absolute!important;width:36px;height:36px;object-fit:contain;image-rendering:pixelated;pointer-events:none;filter:drop-shadow(0 0 4px #b7ff75);will-change:transform,opacity}
+@keyframes nu-hp-hud-enter-v2{
+ from{opacity:0;transform:translateX(calc(var(--hp-core-width) / -2)) translateY(-8px) scale(.985)}
+ to{opacity:1;transform:translateX(calc(var(--hp-core-width) / -2)) translateY(0) scale(1)}
+}
+@media(max-width:520px){
+ #game-view.active .hp-bar{--hp-core-width:min(276px,calc(100vw - 82px));--hp-drawer-width:64px;max-width:calc(100vw - 18px)!important;padding:7px 9px!important;gap:clamp(5px,1.8vw,8px)!important}
+ #game-view.active .hp-bar #hp-pill-use{right:6px!important;width:48px!important;height:48px!important}
+ #game-view.active .hp-bar #hp-pill-use img{width:34px;height:34px}
+ #game-view.active .hp-bar .hp-track{min-width:20px!important}
+ .hp-pill-travel-ghost{width:34px;height:34px}
+}
+@media(prefers-reduced-motion:reduce){
+ #game-view.active .hp-bar{animation:none!important;transition:none!important}
+ .hp-pill-travel-ghost{display:none!important}
+}
