@@ -26,10 +26,14 @@
    const magnitude=Math.abs(e.delta),isDemand=e.delta<0,intensity=magnitude/(magnitude+10);
    const move=(isDemand?1:-1)*0.025*intensity,next=clamp(price*(1+move),50,200);
    const date=new Date(e.tx.at||0),time=Number.isNaN(date.getTime())?"Recorded activity":date.toISOString();
-   const candle={time,open:price,high:Math.max(price,next),low:Math.min(price,next),close:next,volume:magnitude,demand:isDemand?magnitude:0,supply:isDemand?0:magnitude,events:1};
+   // Deterministic display-only wick: at most five index points, never a balance change.
+   const seedText=String(e.tx.id||e.tx.at||e.i);
+   let seed=0;for(let j=0;j<seedText.length;j++)seed=(seed*31+seedText.charCodeAt(j))>>>0;
+   const visualTolerance=(seed%501)/100;
+   const candle={time,open:price,high:Math.max(price,next)+visualTolerance,low:Math.min(price,next)-visualTolerance,close:next,visualTolerance,volume:magnitude,demand:isDemand?magnitude:0,supply:isDemand?0:magnitude,events:1};
    if(isDemand)totalDemand+=magnitude;else totalSupply+=magnitude;
    totalVolume+=magnitude;price=next;
-   steps.push({id:String(e.tx.id||("step-"+e.i)),time,title:String(e.tx.title||e.tx.kind||"Player asset activity"),delta:e.delta,index:price,changePct:(price/BASE_INDEX-1)*100,volume:magnitude,demand:candle.demand,supply:candle.supply,open:candle.open,high:candle.high,low:candle.low,close:candle.close});
+   steps.push({id:String(e.tx.id||("step-"+e.i)),time,title:String(e.tx.title||e.tx.kind||"Player asset activity"),delta:e.delta,index:price,changePct:(price/BASE_INDEX-1)*100,volume:magnitude,demand:candle.demand,supply:candle.supply,open:candle.open,high:candle.high,low:candle.low,close:candle.close,visualTolerance});
   }
   const bounded=steps.slice(-MAX_CANDLES),last=bounded[bounded.length-1];
   return {asset:ASSETS.find(a=>a.key===key),steps:bounded,candles:bounded,index:last?last.index:BASE_INDEX,changePct:((last?last.index:BASE_INDEX)/BASE_INDEX-1)*100,volume:bounded.reduce((n,s)=>n+s.volume,0),demand:bounded.reduce((n,s)=>n+s.demand,0),supply:bounded.reduce((n,s)=>n+s.supply,0),events:bounded.length,baseline:BASE_INDEX};
