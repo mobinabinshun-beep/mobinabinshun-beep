@@ -28,6 +28,10 @@ async function start(existing){
  let sample=existing;
  if(!sample&&g.NU&&g.NU.samplePerformance)try{sample=await g.NU.samplePerformance();}catch(_){}
  let level=clamp(Number(sample&&sample.level)||3,1,10);
+ // A native Windows launcher may pass a conservative hardware ceiling. Browser checks may lower it, never raise it.
+ let nativeLevelCap=0;
+ try { const requested=Number(new URLSearchParams(g.location.search).get("nuNativeLevel")); if(Number.isFinite(requested)&&requested>=1&&requested<=10) nativeLevelCap=Math.floor(requested); } catch(_) {}
+ if(nativeLevelCap) level=Math.min(level,nativeLevelCap);
  const mem=Number(navigator.deviceMemory)||0,cores=Number(navigator.hardwareConcurrency)||0;
  const saveData=!!(navigator.connection&&navigator.connection.saveData);
  if(mem&&mem<=2)level=Math.min(level,2);
@@ -36,7 +40,7 @@ async function start(existing){
  if(saveData)level=Math.min(level,2);
  const b=budget(level);
  profile=Object.freeze({platform:detectPlatform(),level,budget:b,locked:true,
-  memoryGb:mem||null,logicalCores:cores||null,saveData,
+  memoryGb:mem||null,logicalCores:cores||null,saveData,nativeLevelCap:nativeLevelCap||null,
   reducedMotion:typeof matchMedia==="function"&&matchMedia("(prefers-reduced-motion: reduce)").matches,
   sampledAt:new Date().toISOString()});
  g.NUGraphicsProfile=profile;
