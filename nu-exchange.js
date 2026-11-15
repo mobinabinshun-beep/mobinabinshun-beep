@@ -100,7 +100,7 @@ window.NUExchangeAttempt=async function(commit){
 window.addEventListener("nu:exchange:registry-change",refresh);
 window.addEventListener("storage",e=>{if(e.key===NU.storageKey)refresh();});
 window.addEventListener("pageshow",()=>{replayStart=Date.now();refresh();});
-window.addEventListener("resize",()=>{const rows=NUWallet.assetRows(NU.load()).filter(r=>r.key!=="hp"),cache=readCache();if(cache)frame(cache,rows);});
-refresh();replayTimer=window.setInterval(()=>{const cache=readCache();if(cache)frame(cache,NUWallet.assetRows(NU.load()).filter(r=>r.key!=="hp"));updateGuard();},250);
+window.addEventListener("resize",()=>{const rows=NUWallet.exchangeAssetRows(NU.load()).filter(r=>r.key!=="hp"),cache=readCache();if(cache)frame(cache,rows);});
+refresh();replayTimer=window.setInterval(()=>{const cache=readCache();if(cache)frame(cache,NUWallet.exchangeAssetRows(NU.load()).filter(r=>r.key!=="hp"));updateGuard();},250);
 window.addEventListener("pagehide",()=>{clearInterval(replayTimer);guard.leaveVisit();});
 })();
