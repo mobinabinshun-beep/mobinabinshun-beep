@@ -3,7 +3,7 @@
 **Status:** LOCKED — temporary, in force from 2026-11-15  
 **Canonical implementation:** `nu-world.css` and the resource HUD markup in `index.html`  
 **Last restoration:** PR #97, merge commit `f09c4f8e31e59f2f746b717438654293cb4e64fa`  
-**Archive snapshot:** [`docs/archive/2026-11-15/classic-resource-hud/nu-world.css.snapshot`](../archive/2026-11-15/classic-resource-hud/nu-world.css.snapshot)
+**Archive snapshot:** [`docs/archive/2026-11-15/xp-full-width-bottom-rail/nu-world.css.snapshot`](../archive/2026-11-15/xp-full-width-bottom-rail/nu-world.css.snapshot)
 
 ## Protected behavior and presentation
 - Keep **LV** above the lower resource rails, aligned to the left.
