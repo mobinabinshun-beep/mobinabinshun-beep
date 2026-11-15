@@ -83,7 +83,7 @@ function updateGuard(){
  $("exchange-lock-status").className=maintenance.isLocked()?"pending-tag":"sim-tag";
 }
 function refresh(){
- const save=NUWallet.normalizeSave(NU.load()),wallet=NUExchangeCore.walletSnapshot(),rows=NUWallet.assetRows(save).filter(r=>r.key!=="hp");
+ const save=NUWallet.normalizeSave(NU.load()),wallet=NUExchangeEngines.walletEngine.read(),rows=NUWallet.assetRows(save).filter(r=>r.key!=="hp");
  if(!rows.some(r=>r.key===selected))selected=rows[0]?.key||"xp";
  $("asset-select").innerHTML=rows.map(r=>'<option value="'+r.key+'">'+esc(r.label)+'</option>').join("");$("asset-select").value=selected;
  $("market-asset").innerHTML=NUVirtualMarket.assets().map(a=>'<option value="'+a.key+'">'+esc(a.label)+'</option>').join("");$("market-asset").value=marketSelected;
