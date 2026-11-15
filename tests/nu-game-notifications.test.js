@@ -78,3 +78,10 @@ test("the existing XP and Mana +1 boundary feedback delegates to the shared bar-
   assert.match(gameSource,/NUGameNotifications\.showBarDelta\(\{anchor:bar,fill,text,tone:type,duration:1100,boundaryOffset:1\.5\}\)/);
   assert.match(moduleCss,/\.nu-game-notification-bar-delta\{[^}]*top:-23px[^}]*z-index:12/);
 });
+
+test("bar and consumption presets accept sanitized per-game tone classes",()=>{
+  assert.match(moduleSource,/function toneClass\(value,fallback\)/);
+  assert.match(moduleSource,/const tone=toneClass\(options\.tone,"xp"\)/);
+  assert.match(moduleSource,/toneClass\(options\.itemTone,"loss"\)/);
+  assert.match(moduleSource,/toneClass\(options\.resourceTone,"hp"\)/);
+});
