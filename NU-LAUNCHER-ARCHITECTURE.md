@@ -72,3 +72,16 @@ Not yet implemented:
 
 ## Human acceptance gates
 Do not describe this as production-ready until real-device tests verify startup gate, no premature game execution, CPU/GPU/memory/network fallbacks, ten-level budget behavior, reduced motion, touch, keyboard accessibility, refresh/reset, saved preferences, extension isolation, package integrity, rollback, and actual public deployment.
+
+
+## Cross-generation launcher law — 2026-11-15
+
+The launcher is one long-lived product for all N.U generations, not a Generation 1 shell. Keep its core lightweight, stable and limited to shared host/platform services. Games, creative tools, expansions and extensions are independently installable packages; they own their gameplay, presentation, assets, module data and module-specific lifecycle. New modules must not be forced to adopt launcher internals or require a launcher redesign merely because their content or technology differs.
+
+Package discovery is metadata-only and must never execute package code. Use a versioned, capability-based host API; explicit permissions; namespaced storage/events/routes; least privilege; integrity/signature checks; staged atomic activation; and last-known-good rollback for the future operational installer. A module may lower its resource request but cannot raise the central launcher ceiling. Package updates must not overwrite player saves. Uninstall must preserve saves by default and ask separately before deleting module data.
+
+Keep installed package content separate from mutable player data, shared identity, per-game saves, canonical wallet state, derived caches and user-created content. Current Generation 1 facts remain: nu-world-save-v1 is the browser-local save; nu_exchange_cache_v2 is derived only; nu.exchange.protocols.v1 is protocol metadata; the Exchange bridge is read-only; offlineLauncher is false. Browser offline cache is not a native launcher, durable backup or guaranteed offline install.
+
+Offline Browser, Personal Downloadable Launcher, LAN, Online Launcher and Server-rendered modes remain distinct. One launcher serves all generations by default; generation labels are catalogue metadata, not separate launcher shells. Core updates should be rare and justified by security, platform/runtime necessity or owner-approved architecture changes.
+
+Normative full contract: [N.U Launcher — Cross-Generation Runtime, Packaging & Data Persistence Contract](./docs/architecture/NU-LAUNCHER-CROSS-GENERATION-RUNTIME-AND-PACKAGING-CONTRACT-2026-11-15.md).
