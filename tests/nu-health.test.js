@@ -14,9 +14,17 @@ test("health events use a separate storage key and never write into wallet save 
 
 test("each health category keeps only its five newest events",()=>{
   const store=health.createHealthStore(memoryStorage());
-  for(let i=1;i<=7;i++)store.recordDamage({gameId:"game-"+i,amount:i,hpAfter:10-i});
+  for(let i=1;i<=7;i++){
+    store.recordDamage({gameId:"game-"+i,amount:i,hpAfter:10-i});
+    store.recordMedicationUse({gameId:"game-"+i,itemName:"Medicine "+i});
+    store.recordHealing({gameId:"game-"+i,amount:i,hpAfter:i,source:"Treatment "+i});
+    store.recordDeath({gameId:"game-"+i,reason:"Death "+i});
+  }
   assert.deepEqual(store.getHistory("damage").map(event=>event.amount),[3,4,5,6,7]);
-  assert.equal(store.getHistory("damage").length,5);
+  assert.deepEqual(store.getHistory("medicationUses").map(event=>event.itemName),["Medicine 3","Medicine 4","Medicine 5","Medicine 6","Medicine 7"]);
+  assert.deepEqual(store.getHistory("healing").map(event=>event.amount),[3,4,5,6,7]);
+  assert.deepEqual(store.getHistory("deaths").map(event=>event.reason),["Death 3","Death 4","Death 5","Death 6","Death 7"]);
+  for(const category of ["damage","medicationUses","healing","deaths"])assert.equal(store.getHistory(category).length,5);
 });
 
 test("medicine, damage, healing and death histories are isolated from one another",()=>{
