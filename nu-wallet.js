@@ -55,8 +55,8 @@
     next.nonExchangeableAssets=Array.from(new Set([...(next.nonExchangeableAssets||[]),"hpPills"]));
     const at=String(details.at||new Date().toISOString()),baseId=String(details.id||("nu-store-"+Date.now()+"-"+Math.random().toString(36).slice(2,8)));
     const entries=[
-      {id:baseId+"|xp",at,kind:"purchase",title:"Golden HP Capsule · XP spent",direction:"OUTGOING",asset:"xp",signedAmount:-HP_PILL_COST,category:"STORE_PURCHASE",resultingBalance:next.xp,settlementStatus:"SETTLED",idempotencyKey:baseId+"|xp",deltas:{xp:-HP_PILL_COST}},
-      {id:baseId+"|capsule",at,kind:"purchase",title:"Golden HP Capsule · inventory received",direction:"INCOMING",asset:"hpPills",signedAmount:1,category:"STORE_PURCHASE",resultingBalance:next.hpPills,settlementStatus:"SETTLED",idempotencyKey:baseId+"|capsule",exchangeExcludedKeys:["hpPills"],deltas:{hpPills:1}}
+      {id:baseId+"|xp",at,kind:"purchase",title:"Golden HP Capsule · XP spent",playerId:String(next.playerId||"guest-local"),source:"nu.store",direction:"OUTGOING",asset:"xp",signedAmount:-HP_PILL_COST,category:"STORE_PURCHASE",resultingBalance:next.xp,settlementStatus:"SETTLED",idempotencyKey:baseId+"|xp",deltas:{xp:-HP_PILL_COST}},
+      {id:baseId+"|capsule",at,kind:"purchase",title:"Golden HP Capsule · inventory received",playerId:String(next.playerId||"guest-local"),source:"nu.store",direction:"INCOMING",asset:"hpPills",signedAmount:1,category:"STORE_PURCHASE",resultingBalance:next.hpPills,settlementStatus:"SETTLED",idempotencyKey:baseId+"|capsule",exchangeExcludedKeys:["hpPills"],deltas:{hpPills:1}}
     ];
     next.transactions=next.transactions.concat(entries).slice(-MAX_TRANSACTIONS);
     return {ok:true,state:next,transaction:entries[0],transactions:entries};
@@ -69,8 +69,8 @@
     next.hpPills-=1;next.hp+=restored;
     const at=String(details.at||new Date().toISOString()),baseId=String(details.id||("nu-capsule-use-"+Date.now()+"-"+Math.random().toString(36).slice(2,8)));
     const entries=[
-      {id:baseId+"|hp",at,kind:"consumption",title:"HP Capsule · HP restored",direction:"INCOMING",asset:"hp",signedAmount:restored,category:"CAPSULE_CONSUMPTION",resultingBalance:next.hp,settlementStatus:"SETTLED",idempotencyKey:baseId+"|hp",deltas:{hp:restored}},
-      {id:baseId+"|capsule",at,kind:"consumption",title:"HP Capsule · inventory spent",direction:"OUTGOING",asset:"hpPills",signedAmount:-1,category:"CAPSULE_CONSUMPTION",resultingBalance:next.hpPills,settlementStatus:"SETTLED",idempotencyKey:baseId+"|capsule",deltas:{hpPills:-1}}
+      {id:baseId+"|hp",at,kind:"consumption",title:"HP Capsule · HP restored",playerId:String(next.playerId||"guest-local"),source:"nu.store",direction:"INCOMING",asset:"hp",signedAmount:restored,category:"CAPSULE_CONSUMPTION",resultingBalance:next.hp,settlementStatus:"SETTLED",idempotencyKey:baseId+"|hp",deltas:{hp:restored}},
+      {id:baseId+"|capsule",at,kind:"consumption",title:"HP Capsule · inventory spent",playerId:String(next.playerId||"guest-local"),source:"nu.store",direction:"OUTGOING",asset:"hpPills",signedAmount:-1,category:"CAPSULE_CONSUMPTION",resultingBalance:next.hpPills,settlementStatus:"SETTLED",idempotencyKey:baseId+"|capsule",deltas:{hpPills:-1}}
     ];
     next.transactions=next.transactions.concat(entries).slice(-MAX_TRANSACTIONS);
     return {ok:true,state:next,restored,transaction:entries[0],transactions:entries};
@@ -101,7 +101,7 @@
     const next=normalizeSave(raw);
     if(next.activeWave){const closed=settleWave(next,"superseded");return beginWave(closed.state,gameId,meta);}
     const id="nu-wave-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,9);
-    next.activeWave={id,gameId:String(gameId||"unknown"),startedAt:new Date().toISOString(),successfulInteractions:0,aggregates:{}};
+    next.activeWave={id,gameId:String(gameId||"unknown"),playerId:String(next.playerId||"guest-local"),startedAt:new Date().toISOString(),successfulInteractions:0,aggregates:{}};
     return {ok:true,state:next,waveId:id};
   }
   function recordWaveDelta(raw,asset,amount,category,meta){
@@ -129,7 +129,7 @@
       const asset=aggregate.asset,amount=aggregate.amount;
       const id=wave.id+"|"+aggregate.direction+"|"+asset+"|"+aggregate.category;
       if(next.transactions.some(tx=>tx&&tx.id===id))continue;
-      const entry={id,at:new Date().toISOString(),kind:aggregate.direction==="INCOMING"?"wave-reward":"wave-cost",title:String(wave.gameId)+" · "+String(aggregate.category),source:String(wave.gameId),waveId:wave.id,asset,direction:aggregate.direction,signedAmount:amount,category:aggregate.category,successfulInteractionCount:aggregate.interactionCount||0,rewardOrCostRate:aggregate.rate,resultingBalance:Number(next[asset]||0),settlementStatus:"SETTLED",idempotencyKey:id,settlementReason:String(reason||"completed"),deltas:{[asset]:amount}};
+      const entry={id,at:new Date().toISOString(),kind:aggregate.direction==="INCOMING"?"wave-reward":"wave-cost",title:String(wave.gameId)+" · "+String(aggregate.category),playerId:String(wave.playerId||next.playerId||"guest-local"),source:String(wave.gameId),gameId:String(wave.gameId),waveId:wave.id,asset,direction:aggregate.direction,signedAmount:amount,category:aggregate.category,successfulInteractionCount:aggregate.interactionCount||0,rewardOrCostRate:aggregate.rate,resultingBalance:Number(next[asset]||0),settlementStatus:"SETTLED",idempotencyKey:id,settlementReason:String(reason||"completed"),deltas:{[asset]:amount}};
       next.transactions=next.transactions.concat(entry).slice(-MAX_TRANSACTIONS);entries.push(entry);
     }
     next.settledWaveIds=next.settledWaveIds.concat(wave.id).slice(-500);
