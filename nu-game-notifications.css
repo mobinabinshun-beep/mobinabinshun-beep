@@ -7,7 +7,7 @@
 .nu-notification-pair>.floating-change.loss{color:#ffca79;border-color:#ffca7980}
 .nu-notification-pair>.floating-change.hp{color:#91ff82;border-color:#91ff8280;font-size:17px}
 .nu-game-notification-interaction{position:absolute;z-index:14;pointer-events:none;color:#eafaff;font:800 11px/1 ui-monospace,monospace;text-shadow:0 0 5px #49cfff,0 1px 3px #000;animation:nu-hit-pop .85s ease-out forwards;transform:translate(-50%,-50%)}
-.nu-game-notification-bar-delta{position:absolute;left:50%;top:-22px;transform:translateX(-50%);z-index:8;font-size:12px;font-weight:900;letter-spacing:.04em;pointer-events:none;animation:capsule-rise 1s ease-out forwards;text-shadow:0 0 10px currentColor;white-space:nowrap}
+.nu-game-notification-bar-delta{position:absolute;left:50%;top:-23px;transform:translateX(-50%);z-index:12;font-size:12px;font-weight:900;letter-spacing:.04em;pointer-events:none;animation:capsule-rise 1s ease-out forwards;text-shadow:0 0 9px currentColor,0 1px 3px #000;white-space:nowrap}
 .nu-game-notification-bar-delta.xp{color:#a7ff62}
 .nu-game-notification-bar-delta.mana{color:#65dcff}
 @keyframes nu-floating-change{0%{opacity:0;transform:translateY(18px) scale(.82)}14%{opacity:1;transform:translateY(0) scale(1.04)}28%{transform:translateY(0) scale(1)}82%{opacity:1}100%{opacity:0;transform:translateY(-22px) scale(.96)}}
