@@ -18,7 +18,7 @@ test("shared game notification module exposes all three default game notificatio
 });
 
 test("HP capsule consumption uses the original paired floating-change visual with exact labels",()=>{
-  assert.match(gameSource,/showConsumption\(\{anchor:bar,itemDelta:"−1 CAPSULE HEAL",resourceDelta:"+10 HP",duration:1750,offset:4\}\)/);
+  assert.match(gameSource,/showConsumption\(\{anchor:bar,anchorCenterX,itemDelta:"−1 CAPSULE HEAL",resourceDelta:"\+10 HP",duration:1750,offset:4\}\)/);
   assert.match(moduleSource,/item\.className="floating-change "\+toneClass\(options\.itemTone,"loss"\)/);
   assert.match(moduleSource,/resource\.className="floating-change "\+toneClass\(options\.resourceTone,"hp"\)/);
   assert.match(moduleCss,/\.nu-notification-pair/);
@@ -28,6 +28,8 @@ test("HP capsule consumption uses the original paired floating-change visual wit
 
 test("HP consumption is anchored below the live viewport HP rail and uses legacy rise/fade motion",()=>{
   assert.match(moduleSource,/anchor\.getBoundingClientRect\(\)/);
+  assert.match(moduleSource,/if\(!\(rect\.width>0&&rect\.height>0\)\)return null/);
+  assert.match(moduleSource,/options\.anchorCenterX!=null/);
   assert.match(moduleSource,/rect\.bottom\+/);
   assert.match(css,/@keyframes nu-floating-change/);
   assert.match(css,/0%\{opacity:0;transform:translateY\(18px\) scale\(\.82\)\}/);
@@ -84,4 +86,15 @@ test("bar and consumption presets accept sanitized per-game tone classes",()=>{
   assert.match(moduleSource,/const tone=toneClass\(options\.tone,"xp"\)/);
   assert.match(moduleSource,/toneClass\(options\.itemTone,"loss"\)/);
   assert.match(moduleSource,/toneClass\(options\.resourceTone,"hp"\)/);
+});
+
+
+test("HP consumption falls back instead of placing a toast at viewport origin when the HUD is hidden",()=>{
+  assert.match(moduleSource,/if\(!\(rect\.width>0&&rect\.height>0\)\)return null/);
+  assert.match(gameSource,/if\(rect\.width>0&&rect\.height>0\)[\s\S]*?if\(notice\)return;\}\}announceTransaction\("−1 CAPSULE HEAL · \+10 HP"/);
+});
+
+test("HP notification stays centred on the core while the right-side capsule drawer is expanded",()=>{
+  assert.match(gameSource,/drawerWidth=bar\.classList\.contains\("hp-pill-drawer-open"\)[\s\S]*?anchorCenterX=rect\.left\+Math\.max\(0,rect\.width-drawerWidth\)\/2/);
+  assert.match(moduleSource,/root\.style\.left=centerX\+"px"/);
 });
