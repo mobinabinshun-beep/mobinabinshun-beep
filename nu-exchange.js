@@ -92,6 +92,7 @@ function updateMarket(steps){
  $("market-events").textContent=steps.length+" RECORDED · "+(flow.simulatedCount||0)+" SIMULATED";
  const bias=playerSupply>playerDemand?"SUPPLY-LEANING":playerDemand>playerSupply?"DEMAND-LEANING":"BALANCED";$("market-bias").textContent=bias;$("market-bias").className="bias-indicator "+(playerSupply>playerDemand?"positive":playerDemand>playerSupply?"negative":"");$("market-bias").dataset.direction=playerSupply>playerDemand?"up":playerDemand>playerSupply?"down":"flat";
  drawMarket(displaySteps);if(drawing){drawing.setAsset(marketSelected);drawing.render($("market-chart").getContext("2d"),$("market-chart").clientWidth||700,330,displaySteps,marketSelected);}
+ if(window.NUExchangeAnalytics){const analytics=window.NUExchangeAnalytics.render(displaySteps,$("market-indicators"),$("market-timeline"));$("timeline-count").textContent=analytics.events.length+" EVENTS · "+analytics.events.filter(e=>e.kind==="SIMULATED").length+" SIMULATED";}
  renderHistory(steps.slice(-MAX_TEXT_HISTORY).map(s=>({title:s.title,time:s.time,delta:s.delta,index:s.index})),"market-history");
 }
 function frame(cache,rows){
