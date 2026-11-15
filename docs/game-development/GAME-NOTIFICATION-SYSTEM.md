@@ -2,6 +2,7 @@
 
 **Status:** Default reusable module for all current and future games  
 **Runtime module:** `nu-game-notifications.js`  
+**Standalone visual presets:** `nu-game-notifications.css`  
 **Public API:** `window.NUGameNotifications`  
 **Visual contract:** Preserve the Generation 1 notification signature by default.
 
@@ -26,7 +27,7 @@ The default visual identity is not a new design. It is recovered from the reposi
 - [Generation 1.19 — viewport-coordinate overlay correction](https://github.com/mobinabinshun-beep/mobinabinshun-beep/commit/460bc773e1e8a55a04ff42f51c52acceca52ac1d)
   - Establishes why fixed HUD notifications must be anchored from viewport rectangles rather than game-stage-relative coordinates: the stage may clip overflow while the HP rail is viewport-fixed.
 
-The module reuses these existing CSS signatures. It must not replace them with generic toast styling or a new visual language.
+The module reuses these existing CSS signatures. Its standalone stylesheet namespaces the interaction and bar-delta selectors so it can be loaded by any game page without changing the protected classic resource HUD. It must not replace the historical appearance with generic toast styling or a new visual language.
 
 ## Default motion signature
 
@@ -92,7 +93,7 @@ Use for a single non-blocking notification when a paired preset is not appropria
 
 - For fixed HUD elements, always call `getBoundingClientRect()` at the moment the event is accepted and position in viewport coordinates. Do not reuse stale positions captured before state persistence or a rerender.
 - Use the HP rail's lower edge as the consumption pair's origin. Default pair offset is 4px; the cards rise and fade using the legacy curve.
-- The overlay is fixed, pointer-transparent, and outside clipping game stages. It must not intercept clicks, alter layout, move the HP rail, or change the capsule drawer width.
+- Load both shared files on each game entry page: `nu-game-notifications.css` for the visual presets and `nu-game-notifications.js` before the game runtime. The main game hub and Casino page are wired as examples. The overlay is fixed, pointer-transparent, and outside clipping game stages. It must not intercept clicks, alter layout, move the HP rail, or change the capsule drawer width.
 - Notifications are transient and removed after their animation. Do not leave hidden nodes accumulating.
 - Reduced-motion users receive the same message and tone without the movement animation.
 - Use polite live-region semantics for transaction pairs. Do not make decorative particle bursts a prerequisite for semantic feedback.
