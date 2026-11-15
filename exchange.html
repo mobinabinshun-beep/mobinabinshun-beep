@@ -65,7 +65,7 @@
 <div id="chart-empty" class="chart-empty" hidden>No recorded changes for this asset yet. The current balance is shown above.</div>
 </section>
 <section class="exchange-panel audit-trail-panel" aria-label="Wallet audit trail">
-<div class="panel-heading"><div><p class="eyebrow">AUDIT TRAIL</p><h2>RECENT ASSET MOVEMENTS</h2></div><span>LOCAL SAVE</span></div>
+<div class="panel-heading"><div><p class="eyebrow">AUDIT TRAIL</p><h2>RECENT ASSET MOVEMENTS</h2></div><span>LOCAL SAVE</span></div><p id="exchange-offline-status" class="panel-note" role="status">OFFLINE CACHE · CHECKING</p>
 <div id="asset-transactions" class="asset-transactions" aria-live="polite"></div>
 <div class="wallet-audit-subsection">
 <div class="panel-heading"><div><p class="eyebrow">CANONICAL PLAYER WALLET · SAME WALLET · NO COPIED BALANCE</p><h2>PLAYER PROFILE &amp; OWNED ASSETS</h2></div><span class="sim-tag">READ ONLY · LOCAL SAVE</span></div>
@@ -94,4 +94,21 @@
 <footer class="exchange-footer">N.U — NIROO UNIVERSE · GENERATION 1 FICTIONAL ECONOMY</footer>
 </main>
 <script src="./nu-engine.js"></script><script src="./nu-wallet.js?v=20261115-exchange-purchase-exclusion-r2"></script><script src="./nu-exchange-core.js?v=20261114-modular-r1"></script><script src="./nu-exchange-engines.js?v=20261115-dual-engine-r2"></script><script src="./nu-exchange-guard.js?v=20261114-modular-r1"></script><script src="./nu-exchange-replay.js?v=20261115-number-free-periods-r1"></script><script src="./nu-exchange-lock.js?v=20261114-modular-r1"></script><script src="./nu-market-sim.js?v=20261115-purchase-exclusion-r2"></script><script src="./nu-exchange-visuals.js?v=20261115-ambient-drawing-r2"></script><script src="./nu-exchange-analytics.js?v=20261115-market-analytics-r1"></script><script src="./nu-exchange.js?v=20261115-market-analytics-r1"></script>
+<script>
+(function(){
+ "use strict";
+ const status=document.getElementById("exchange-offline-status");
+ function setStatus(value){if(status)status.textContent=value;}
+ if(!("serviceWorker" in navigator)){setStatus("OFFLINE CACHE NOT SUPPORTED");return;}
+ window.addEventListener("load",function(){
+  navigator.serviceWorker.register("./nu-exchange-sw.js").then(function(){
+   return navigator.serviceWorker.ready;
+  }).then(function(){
+   setStatus(navigator.onLine?"OFFLINE CACHE READY · LOCAL SAVE ONLY":"OFFLINE · LOCAL SAVE");
+  }).catch(function(){setStatus("OFFLINE CACHE UNAVAILABLE · LOCAL SAVE ONLY");});
+ });
+ window.addEventListener("offline",function(){setStatus("OFFLINE · LOCAL SAVE");});
+ window.addEventListener("online",function(){setStatus("ONLINE · LOCAL SAVE");});
+})();
+</script>
 </body></html>
