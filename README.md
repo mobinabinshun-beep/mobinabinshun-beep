@@ -505,3 +505,5 @@ The classic lower-left LV / XP / Mana resource bars are protected from incidenta
 - Ambient player-behavior-shaped background flow (±3 index points, maximum 3 display-volume units; visual-only).
 - Local chart drawing tools: trend, horizontal and vertical lines, shaded analysis zones, undo and clear.
 - Implementation and QA record: `docs/operations/EXCHANGE-AMBIENT-FLOW-CHART-DRAWING-2026-11-15.md`.
+
+- Read-only wallet bridge and launcher module lifecycle: `docs/operations/EXCHANGE-WALLET-BRIDGE-LIFECYCLE-2026-11-15.md`.
