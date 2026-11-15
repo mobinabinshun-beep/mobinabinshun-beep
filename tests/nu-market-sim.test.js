@@ -81,3 +81,6 @@ test("durable purchase exclusion survives the rolling transaction ledger",()=>{
  assert.ok(!market.assets(save).some(asset=>asset.key==="hpPills"));
  assert.equal(market.build(save,"hpPills").asset,null);
 });
+
+// Keep ambient Exchange flow and player chart drawing covered by the market-simulation CI run.
+require("./nu-exchange-visuals.test.js");
