@@ -91,3 +91,10 @@ When one of these terms appears in a scenario, use the matching concept and do n
 - **Operational replacement flow:** when an authenticated player replaces a profile photo, first create a recoverable copy of the currently active image and initiate its download/export to a player-selected destination; only after the recovery step succeeds may the replacement become active. If recovery fails or is cancelled, do not replace the previous image. Never claim that a browser can silently write to an arbitrary Desktop/Gallery folder or reveal the original absolute source path. Desktop launchers may use explicit OS file permissions and a managed media directory.
 - **Network/server future:** support player-owned private photo albums and interactive profile surfaces that players can selectively share with other players and community members. Sharing must be opt-in, scoped (private/friends/community/public), revocable, auditable and protected by access control. Do not expose private albums or original files to other players by default. This is a future online capability, not a Generation 1 public-demo feature.
 - **Demo extension exception:** a collaborator may create a clearly labelled static/illustrative mock-up of albums or community interaction for design review, but it must not accept real uploads, persist personal images, contact a server or imply a live social feature. Keep it separate from the operational feature implementation.
+
+## 8. Canonical Wave and wallet transaction economy
+The authoritative definitions of the two Wave meanings (HP mission-completion Wave and wallet-income aggregation Wave), incoming/received versus outgoing/spent transactions, game reward rates, settlement lifecycle, idempotency and worked examples are archived in:
+
+- [NU-WAVE-AND-WALLET-TRANSACTION-ECONOMY.md](./NU-WAVE-AND-WALLET-TRANSACTION-ECONOMY.md)
+
+Use that document as the canonical economy reference for future implementation, QA and code review. Do not conflate HP mission completion with wallet transaction aggregation. This link records the architecture relationship; it does not imply that the current prototype already implements the full specification.
