@@ -25,9 +25,10 @@ For every instruction such as «اعمال کن»، «پیاده کن»، «فی
 
 - The Gateway is an operational decluttering gate: it replaces scattered in-game navigation clicks with one entry point.
 - It is visible only while an actual Generation 1 game is active in index.html. Keep it hidden on home/library and all non-game views.
-- The Gateway exposes exactly three one-click actions: **Back, Menu, Profile**. No Settings action is included in the current Gateway.
+- The Gateway exposes exactly three actions: **Back, Menu, Profile**. No Settings action is included in the current Gateway.
+- The primary controller is movement-first: mouse/pen hover over the hex opens it; moving over Back/Menu/Profile executes that action without a click or a separate selection. Touch contact on the hex opens it and freezes the page; touch contact/movement onto an option executes it. Click/Enter remain fallback input paths for accessibility, not required steps for pointer/touch users.
 - Opening the Gateway freezes the active round and all background rendering/ambient loops until the user decides. This includes the game loop, Background Engine, Dynamic Layers and Pixel World. Closing without a route selection restores only a pause that the Gateway itself initiated.
-- Hide duplicate in-game navigation triggers (the topbar MENU button and the game-view BACK button) while gameplay is active. Keep the actual PAUSE/RESUME and game-specific controls operable; they are not duplicate navigation controls.
+- Hide duplicate in-game navigation triggers (the topbar MENU button and the game-view BACK button) while gameplay is active. While Gateway is open, its scrim blocks every page/game control outside the Gateway; those controls return unchanged after close. The Gateway is not a replacement for the player's ordinary Pause/Resume control outside the Gateway.
 - Menu opens a centered modal directory. Each module entry contains only a concise title and a keyboard keycap. Do not place descriptions, statistics, previews or destination content inside the menu; render content in the destination view/page.
 - Menu order is fixed for this scope: player modules first (Store, Profile, Exchange, Wallet), then games (Painting, Random Game, Bubble Hunt, Mana Collector, Chaos Attack). Random Game selects only from the three core Generation 1 games; Painting is not in the random pool.
 - Store-purchased assets are non-exchangeable. Exclude them from Exchange asset selectors, balance-history charts and virtual market simulation while retaining ownership in the Wallet.
