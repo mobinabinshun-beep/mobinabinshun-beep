@@ -428,6 +428,12 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 - **Generation boundary:** N.U Casino is Generation 1.31 only. Do not move or classify it as a Generation 2 feature.
 
 
+## Cross-generation launcher architecture
+
+- [N.U Launcher — Cross-Generation Runtime, Packaging & Data Persistence Contract](docs/architecture/NU-LAUNCHER-CROSS-GENERATION-RUNTIME-AND-PACKAGING-CONTRACT-2026-11-15.md) — normative contract for the single all-generations launcher, independently installable games/modules, package lifecycle, data ownership, persistence, compatibility, offline modes, security and acceptance gates.
+- [Launcher architecture](NU-LAUNCHER-ARCHITECTURE.md) and [Launcher human QA](NU-LAUNCHER-HUMAN-QA.md) are aligned with this contract. The current browser preview is not a native package installer; the Generation 1 manifest still declares offlineLauncher=false.
+
+
 ## Operational protocol
 
 - [N.U Implementation & Calibration Protocol](./docs/operations/NU-OPS-IMPLEMENT-01.md)
