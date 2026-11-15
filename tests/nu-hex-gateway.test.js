@@ -126,3 +126,11 @@ test("Gateway scrim blocks the rest of the page while the round is paused",()=>{
  assert.match(js,/event\.stopImmediatePropagation\(\)/);
  assert.match(js,/pauseGame\(\);[\s\S]*?nu:gateway-open/);
 });
+
+
+test("Gateway option feedback is a steady illuminated state, not a looping animation",()=>{
+ assert.match(css,/\.nu-gateway-item\.is-selected::before[\s\S]*?filter:brightness\(1\.45\)/);
+ assert.match(css,/\.nu-gateway-item\.is-confirming::before\{background:[^}]*filter:brightness\(1\.75\)/);
+ assert.doesNotMatch(css,/nuHexPulse|nuHexConfirm|@keyframes/);
+ assert.match(js,/item\.classList\.add\("is-selected","is-confirming"\)/);
+});
