@@ -51,3 +51,18 @@ Annotations are stored in local browser presentation preferences, keyed by selec
 - Drawings remain presentation-only and never trigger transfers or settlement.
 - Store-purchased assets remain excluded from Exchange selectors and simulation.
 - No real money, external financial data, deposits, withdrawals, cash-out, or shared order book.
+
+
+## Owner-requested idle-market behavior
+- The chart renders a rolling, non-persistent ambient candle tape even when the player has no recorded transactions.
+- Each background candle moves by 0, 1, 2, or 3 index units. The cumulative probabilities are P(|move| >= 1) = 90%, P(|move| >= 2) = 60%, and P(|move| = 3) = 30%; exact outcomes are therefore 0: 10%, 1: 30%, 2: 30%, and 3: 30%.
+- Positive and negative directions are equally likely (50% each, conditional on a non-zero move).
+- The selected asset seeds the local deterministic sequence. Recent player demand/supply behavior adjusts simulated volume intensity only (bounded to 3); it does not bias the 50/50 direction or alter player data.
+- Ambient candles and volume are explicitly labelled simulated. They are never represented as real player trades and never enter wallet history, saved transactions, replay cache, asset balances, or settlement.
+- When player history exists, a short ambient tail follows it. With no history, a full 24-candle ambient tape is shown.
+- The event counter and player history keep recorded activity separate from simulated background flow.
+
+## User-controlled analysis
+- The Analysis line (moving average) and Parametric bands remain independently user-toggleable.
+- Trend line, horizontal level, vertical marker, and shaded analysis zone tools remain presentation-only and persist per selected asset in local browser preferences.
+- No annotation or ambient event can create an order, transaction, quote, or settlement.
