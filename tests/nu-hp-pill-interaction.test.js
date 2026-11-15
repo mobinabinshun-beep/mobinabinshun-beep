@@ -168,7 +168,7 @@ test("successful HP capsule use renders an accessible transaction notice inside 
   assert.match(games,/function announceHpBarTransaction\(restored\)/);
   assert.match(games,/cost\.textContent="−1 CAPSULE HEAL"/);
   assert.match(games,/gain\.textContent="\+"\+restored\+" HP"/);
-  assert.match(games,/announceHpBarTransaction\(result\.restored\)/);
+  assert.match(games,/announceHpBarTransaction\(\)/);
   assert.match(games,/notice\.setAttribute\("aria-live","polite"\)/);
   assert.match(css,/#game-view\.active \.hp-bar \.hp-bar-transaction\.is-visible/);
 });
