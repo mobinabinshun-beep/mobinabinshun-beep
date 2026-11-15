@@ -16,7 +16,7 @@ The prior controller was selection-first: hovering an option only highlighted it
 - Touch contact/movement onto an option activates it; document-level coordinate hit-testing supports finger drags even when the browser implicitly captures the touch pointer; pointer-up remains a compatibility fallback.
 - Keyboard focus plus Enter and ordinary click remain fallback paths; they are not required for mouse/touch.
 - Moving outside the existing Gateway orbit closes it. Escape and scrim close remain available.
-- While open, the scrim intercepts page/game input. The game round, Background Engine, Dynamic Layers and Pixel World retain the existing freeze-event contract.
+- While open, the scrim intercepts page/game input and prevents touch scrolling. Document-level input isolation blocks page/window pointer and keyboard handlers; wheel/context-menu input is suppressed, and resize/orientation handlers are stopped after the Gateway recalculates its own option layout. The game round, Background Engine, Dynamic Layers and Pixel World retain the existing freeze-event contract.
 - Only a Gateway-initiated pause is resumed on ordinary close. A pause that predates Gateway remains paused.
 
 ## Preserved boundaries
@@ -30,7 +30,8 @@ The prior controller was selection-first: hovering an option only highlighted it
 
 ## Changed files
 
-- `nu-hex-gateway.js` — hover-open trigger, touch-down open, hover/touch option activation, duplicate-activation guard.
+- `nu-hex-gateway.js` — hover-open trigger, touch-down open, hover/touch option activation, touch-drag hit-testing, page-input/keyboard isolation and resize-event isolation.
+- `nu-hex-gateway.css` — prevent touch scroll/overscroll through the pause scrim.
 - `index.html` — updated controller cache token and movement-first hint.
 - `tests/nu-hex-gateway.test.js` — assertions for mouse/pen hover, touch contact/drag hit-testing, click-free activation and scrim blocking.
 - `docs/operations/NU-OPS-IMPLEMENT-01.md` — authoritative Gateway input contract.
@@ -46,7 +47,7 @@ The prior controller was selection-first: hovering an option only highlighted it
 
 - Controller JavaScript syntax: PASS.
 - Test-file JavaScript syntax: PASS.
-- Focused source assertions for hover-open, touch-open, movement activation, touch-drag hit-testing, duplicate guard, cache token and scrim blocking: PASS.
+- Focused source assertions for hover-open, touch-open, movement activation, touch-drag hit-testing, duplicate guard, cache token, scrim blocking and input/resize isolation: PASS.
 - Mocked pointer-flow harness: mouse hover-open/action, touch contact-open/drag-action, Menu/Profile pause restoration, and preservation of a pre-existing manual pause: PASS.
 - Full Gateway regression execution: pending.
 - GitHub Actions: no workflow runs or commit status checks were returned for the PR head; CI is therefore NOT VERIFIED.
