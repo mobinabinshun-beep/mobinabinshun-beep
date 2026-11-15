@@ -714,3 +714,51 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 .world>.nu-world-background,.world>.sky,.world>#world-canvas,.world>#pixel-world,.world>.horizon,.world>.world-effects,#nu-dynamic-layers{
  pointer-events:none!important;
 }
+
+
+/* Owner-authorized restoration — XP rail spans the full bottom edge in all three Gen 1 games. */
+#game-view.active .bars{
+ position:fixed;left:0;right:0;bottom:0;width:100vw;
+ display:flex;flex-direction:column;align-items:stretch;justify-content:flex-end;
+ gap:8px;padding:0;margin:0;z-index:8;pointer-events:none;
+}
+#game-view.active #level-chip{
+ order:0;align-self:flex-start;margin-left:12px;white-space:nowrap;
+}
+#game-view.active .bars .bar-wrap{
+ display:block;position:relative;flex:0 0 12px;height:12px;min-width:0;
+ background:#03090fbd;border:1px solid #ffffff25;border-radius:99px;
+}
+#game-view.active .bars .bar-wrap:nth-child(2){
+ order:3;width:100vw;max-width:none;height:12px;flex-basis:12px;
+ margin:0;border-radius:0;
+}
+#game-view.active .bars .bar-wrap:nth-child(3){
+ order:1;width:min(232px,calc(100vw - 24px));margin-left:12px;
+}
+#game-view.active .bars .bar-label{
+ position:absolute;left:0;right:auto;top:auto;bottom:15px;
+ transform:none;font-size:9px;letter-spacing:normal;white-space:nowrap;
+}
+#game-view.active .bars .bar-value{
+ position:absolute;left:50%;right:auto;top:50%;
+ transform:translate(-50%,-50%);font-size:9px;
+}
+#game-view.active .bars .mana-capsules{
+ order:2;position:static;display:flex;align-self:flex-start;
+ gap:3px;margin:-2px 0 0 12px;padding:0;font-size:8px;
+}
+@media(max-width:700px){
+ #game-view.active .bars{gap:7px}
+ #game-view.active .bars .bar-wrap:nth-child(3){
+  width:min(204px,calc(100vw - 16px));margin-left:8px;
+ }
+ #game-view.active #level-chip{margin-left:8px}
+ #game-view.active .bars .mana-capsules{margin-left:8px}
+ #game-view.active .bars .bar-wrap:nth-child(2){
+  width:100vw;max-width:none;margin:0;border-radius:0;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ #game-view.active .bars .bar-fill{transition:none}
+}
