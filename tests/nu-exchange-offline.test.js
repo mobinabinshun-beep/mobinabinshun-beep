@@ -32,10 +32,12 @@ test("Exchange offline cache does not replace or upload the canonical player sav
 test("precache URLs stay aligned with the exact runtime script and stylesheet references",()=>{
  const html=fs.readFileSync(path.join(__dirname,"../exchange.html"),"utf8");
  const sw=fs.readFileSync(path.join(__dirname,"../nu-exchange-sw.js"),"utf8");
- const block=sw.match(/const APP_ASSETS=\\[([\\s\\S]*?)\\];/);
- assert.ok(block,"offline asset manifest must exist");
- const cached=Array.from(block[1].matchAll(/"([^"]+)"/g),match=>match[1]);
+ const start=sw.indexOf("const APP_ASSETS=[");
+ const end=sw.indexOf("];",start);
+ assert.ok(start>=0&&end>start,"offline asset manifest must exist");
+ const block=sw.slice(start,end);
+ const cached=Array.from(block.matchAll(/"([^"]+)"/g),match=>match[1]);
  const scripts=Array.from(html.matchAll(/<script src="([^"]+)"/g),match=>match[1]);
- const stylesheet=(html.match(/<link rel="stylesheet" href="([^"]*nu-exchange\\.css[^"]*)"/)||[])[1];
+ const stylesheet=(html.match(/<link rel="stylesheet" href="([^"]*nu-exchange\.css[^"]*)"/)||[])[1];
  for(const asset of [...scripts,stylesheet].filter(Boolean))assert.ok(cached.includes(asset),asset+" must be in the offline precache");
 });
