@@ -136,15 +136,29 @@
 - حذف دارایی خریداری‌شده از Exchange و market simulation.
 - حفظ دارایی خریداری‌شده در Wallet.
 
-### وضعیت فعلی
-- کد و تست‌ها در شاخهٔ کاندید ثبت شده‌اند.
-- اجرای واقعی تست‌های CI برای آخرین SHA این شاخه هنوز تأیید نشده است.
+### وضعیت فعلی — آخرین CI برای SHA `6b48b6813903c263b6091cfc959124abefaf9354`
+
+| Workflow | نتیجه |
+|---|---|
+| Gateway main-game regression | PASS |
+| Generation 1 HUD layout regression | PASS |
+| Graphics integrity | PASS |
+| Graphics preview smoke checks | PASS |
+| Wallet/Profile regression | FAIL — دو assertion مربوط به preview عکس پروفایل |
+| Studio export regression gates | FAIL — همان دو assertion مربوط به preview عکس پروفایل |
+
+دو شکست باقی‌مانده به قابلیت Gateway یا Exchange مربوط نیستند: تست‌های `nu-profile-preview.test.js` انتظار یک ورودی فایل و هشت گزینهٔ جایگاه عکس را دارند، درحالی‌که این عناصر در `index.html` نسخهٔ عمومیِ مبنا نیز وجود ندارند. بخش Profile در این تغییر بازنویسی نشده است؛ بنابراین این دو مورد خارج از دامنه باقی مانده‌اند و برای رفع آن‌ها مجوز تغییر Profile لازم است.
+
+- JavaScript و فایل‌های تست از نظر syntax: PASS.
+- منطق کیف پول و بازار به‌صورت مستقیم بررسی شد: دارایی خریداری‌شده در Wallet باقی می‌ماند، در Exchange و بازار نمایش داده نمی‌شود و پس از عبور از 24 تراکنش نیز مستثنا می‌ماند: PASS.
+- برچسب‌های replay بدون عدد و کنترل‌های جدید نمودار Exchange حفظ شده‌اند: PASS.
+- PR #114 باز و mergeable است؛ merge انجام نشده است.
 - آزمون مرورگر واقعی، ماوس، لمس، صفحه‌کلید و اندازه‌های واکنش‌گرا هنوز انجام نشده است.
 - Human QA: PENDING.
 - Merge: NOT PERFORMED.
 - Deployment: NOT PERFORMED.
 
-هیچ ادعایی دربارهٔ سبزشدن CI، تأیید انسانی یا انتشار عمومی تا دریافت شواهد معتبر مطرح نمی‌شود.
+دو شکست Profile عمداً در این تغییر اصلاح نشده‌اند تا بدون مجوز، دامنهٔ Profile گسترش پیدا نکند.
 
 ## 7. معیار پذیرش نهایی
 
