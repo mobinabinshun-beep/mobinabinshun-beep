@@ -199,7 +199,7 @@
     "cooldown": "Ten successful operations may complete in one Exchange visit; the 11th attempted operation starts a 120-second cooldown. Leaving before the 11th attempt resets the in-memory visit count.",
     "maintenanceLock": "Cross-game transfer module is locked by default. A two-step local maintenance latch is a UX safeguard only, not authentication or anti-cheat.",
     "note": "Fictional N.U-only activity visualization. Replay animation changes presentation only and never fabricates wallet events or real-world financial data.",
-    "storePurchasePolicy": "Store-purchased assets are non-exchangeable and excluded from wallet asset selectors, local balance history charts and the virtual market simulator. The purchase currency debit remains an ordinary wallet transaction."
+    "storePurchasePolicy": "Store-purchased assets are durably marked in save.nonExchangeableAssets and remain non-exchangeable even after the rolling 24-transaction history expires. They are excluded from wallet asset selectors, local balance history charts and the virtual market simulator. The purchased asset remains owned in the Wallet; the purchase currency debit remains an ordinary wallet transaction."
   },
   "navigation": {
     "gateway": {
