@@ -128,11 +128,11 @@ NUGameNotifications.showBarDelta({
   tone: "mana"
 });
 
-// Successful HP capsule use — use the wallet's actual result
+// Successful HP capsule use — fixed playful display copy; wallet healing remains independent
 NUGameNotifications.showConsumption({
   anchor: hpBar,
   itemDelta: "−1 CAPSULE HEAL",
-  resourceDelta: "+" + result.restored + " HP"
+  resourceDelta: "+10 HP"
 });
 ```
 
@@ -146,7 +146,7 @@ NUGameNotifications.showConsumption({
 
 ## Acceptance checklist
 
-- [ ] Correct event and actual data supplied by the game.
+- [ ] Correct event, anchor and approved display copy supplied by the game.
 - [ ] Correct anchor measured at event time.
 - [ ] Legacy visual preset used by default.
 - [ ] Text remains legible during the hold.
