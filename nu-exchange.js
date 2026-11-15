@@ -10,6 +10,14 @@ function format(n){return new Intl.NumberFormat(undefined,{maximumFractionDigits
 function dateLabel(value){const d=new Date(value);return Number.isNaN(d.getTime())?"Recorded":new Intl.DateTimeFormat(undefined,{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}).format(d);}
 function esc(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function readCache(){try{return JSON.parse(localStorage.getItem(CACHE_KEY)||"null");}catch(_){return null;}}
+function renderWalletConnection(snapshot){
+ const host=$("wallet-connection");if(!host)return;
+ if(!snapshot){host.innerHTML='<p class="panel-note">Wallet connector unavailable.</p>';return;}
+ const p=snapshot.player||{};
+ const assetHtml=(snapshot.assets||[]).map(a=>'<article class="exchange-card"><span>'+esc(a.label)+'</span><strong>'+format(a.value)+esc(a.unit||"")+'</strong></article>').join("");
+ const txHtml=(snapshot.transactions||[]).map(tx=>'<div class="asset-row"><div><strong>'+esc(tx.title||tx.kind||"Wallet activity")+'</strong><small>'+esc(dateLabel(tx.at))+'</small></div><span class="asset-delta">'+esc(Object.entries(tx.deltas||{}).map(([k,v])=>k+": "+(Number(v)>0?"+":"")+format(v)).join(" · "))+'</span></div>').join("")||'<p class="panel-note">No recorded transactions yet.</p>';
+ host.innerHTML='<div class="wallet-connection-head"><div><p class="eyebrow">CONNECTED LOCAL PLAYER PROFILE</p><h2>'+esc(p.displayName||"N.U Explorer")+'</h2><p class="panel-note">'+esc(p.id||"LOCAL-PLAYER")+(p.callsign?" · "+esc(p.callsign):"")+" · Level "+format(p.level||1)+'</p></div><span class="sim-tag">READ ONLY · LOCAL SAVE</span></div><div class="market-summary wallet-asset-grid">'+assetHtml+'</div><div class="wallet-unpriced"><strong>Unpriced / not enabled for exchange</strong><span>X Credits: '+format(snapshot.unpricedFields&&snapshot.unpricedFields.xCredits)+'</span><span>N Credits: '+format(snapshot.unpricedFields&&snapshot.unpricedFields.nCredits)+'</span></div><div class="panel-heading"><div><p class="eyebrow">SAME WALLET · NO COPIED BALANCE</p><h2>RECENT WALLET TRANSACTIONS</h2></div><span>'+format(snapshot.transactionCount||0)+' RECORDED</span></div><div class="asset-transactions">'+txHtml+'</div>';
+}
 function snapshot(save,rows){
  const out={version:2,updatedAt:new Date().toISOString(),assets:{},market:{}};
  rows.forEach(r=>{const all=NUWallet.assetHistory(save,r.key);out.assets[r.key]={chart:all.slice(-(MAX_CHART_STEPS+1)),recent:all.slice(1).slice(-MAX_TEXT_HISTORY)};});
@@ -102,7 +110,7 @@ function signalLedgerChange(){
  window.clearTimeout(ledgerPulseTimer);ledgerPulseTimer=window.setTimeout(()=>panel.classList.remove("ledger-updated"),720);
 }
 function refresh(){
- const save=NUWallet.normalizeSave(NU.load()),rows=NUWallet.exchangeAssetRows(save).filter(r=>r.key!=="hp"),signature=JSON.stringify(save.transactions||[]);
+ const save=NUWallet.normalizeSave(NU.load()),wallet=NUExchangeEngines.walletEngine.read(),rows=NUWallet.exchangeAssetRows(save).filter(r=>r.key!=="hp"),signature=JSON.stringify(save.transactions||[]);renderWalletConnection(wallet);NUExchangeEngines.protocolEngine.list().forEach(p=>{if(!NUExchangeCore.listGames().some(g=>g.id===p.gameId))NUExchangeCore.registerGame({id:p.gameId,name:p.displayName,assets:(p.assets||[]).map(a=>({id:a.assetId,label:a.label,unit:a.unit})),coins:(p.coins||[]).map(a=>({id:a.assetId,label:a.label,unit:a.unit})),transferEnabled:false});});
  if(lastLedgerSignature&&signature!==lastLedgerSignature){replayStart=Date.now();signalLedgerChange();}
  lastLedgerSignature=signature;
  if(!rows.some(r=>r.key===selected))selected=rows[0]?.key||"xp";
@@ -157,6 +165,8 @@ window.NUExchangeAttempt=async function(commit){
  const result=await commit();if(result&&result.ok)guard.recordSuccess();updateGuard();return result;
 };
 window.addEventListener("nu:exchange:registry-change",refresh);
+window.addEventListener("nu:save-updated",refresh);
+window.addEventListener("nu:exchange:wallet-refresh",refresh);
 window.addEventListener("storage",e=>{if(e.key===NU.storageKey)refresh();});
 window.addEventListener("pageshow",()=>{replayStart=Date.now();refresh();});
 window.addEventListener("resize",()=>{const rows=NUWallet.exchangeAssetRows(NU.load()).filter(r=>r.key!=="hp"),cache=readCache();if(cache)frame(cache,rows);});
