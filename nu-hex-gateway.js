@@ -117,7 +117,7 @@
     const tolerance=10,rect=root.getBoundingClientRect();
     const orbit=window.matchMedia("(max-width: 600px)").matches?112:126;
     const inside=event.clientX>=rect.left-orbit-tolerance&&event.clientX<=rect.right+tolerance&&
-      event.clientY>=rect.top-tolerance&&event.clientY<=rect.bottom+tolerance;
+      event.clientY>=rect.top-orbit-tolerance&&event.clientY<=rect.bottom+orbit+tolerance;
     if(inside)outsideSince=0;
     else if(!outsideSince)outsideSince=performance.now();
     else if(performance.now()-outsideSince>110)setOpen(false);
