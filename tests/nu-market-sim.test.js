@@ -63,7 +63,7 @@ test("display-only candle tolerance is deterministic, bounded to five, and never
 
 test("parametric dispersion bands are rolling, deterministic, and display-only",()=>{
  const steps=[10,12,14,16].map((close,index)=>({close,open:close-1,high:close+2,low:close-2}));
- const before=JSON.stringify(steps),bands=market.analysisBands(steps,3),mean=14;
+ const before=JSON.stringify(steps),bands=market.analysisBands(steps,3),mean=12;
  assert.equal(bands.length,4);assert.equal(bands[0].upper,null);assert.equal(bands[1].lower,null);
  assert.ok(Math.abs(bands[2].mean-mean)<1e-9);assert.ok(bands[2].upper>mean);assert.ok(bands[2].lower<mean);
  assert.deepEqual(market.analysisBands(steps,3),bands);assert.equal(JSON.stringify(steps),before);
