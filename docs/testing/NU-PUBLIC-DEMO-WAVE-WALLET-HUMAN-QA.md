@@ -66,7 +66,23 @@ Missed clicks do not advance the ten-success counter. Leaving early settles all 
 - [ ] Open the downloaded TXT file and verify it includes the generation time, local-mode warning, balances, recent transaction details, Wave IDs, idempotency keys and checklist.
 - [ ] Confirm the report does not claim independent verification or automatic submission.
 
-### 8. Device, accessibility and release checks
+#### 7A. N.U Casino wallet and ladder
+- [ ] Open N.U Casino from the public demo.
+- [ ] Confirm the currency selector is populated from spendable positive wallet assets, not a separate casino-only balance.
+- [ ] Select XP, Mana, Casino Credits, X Credits or N Credits when each has a positive balance.
+- [ ] Confirm the base wager can be set from 1 to the selected asset balance; at higher ladder steps, the maximum base wager must be reduced so the effective wager never exceeds the balance.
+- [ ] Confirm the displayed effective wager equals base wager × current step (1×, 2×, 4× or 8×).
+- [ ] Lose a round at 1×; confirm the next round is 2×. Continue losing to verify 4× and 8×.
+- [ ] Lose at 8×; confirm the ladder resets to 1×.
+- [ ] Win or break even at any step; confirm the ladder resets to 1×.
+- [ ] Confirm each round writes one outgoing wager row and, only for a positive payout, one incoming payout row with the same round ID.
+- [ ] Confirm Coin Flip 2×, Lucky Dice 5×, Mini Slots triple 8× and pair 2× gross payout rules remain unchanged.
+- [ ] If betting Mana, test near capacity and confirm any payout cap is explicitly shown and the balance never exceeds storage capacity.
+- [ ] Navigate away from the casino or close/reload the page; return and confirm the ladder has reset to 1×.
+- [ ] Confirm short start/execution/result feedback appears and reduced-motion mode disables pulsing animation.
+- [ ] Confirm no real-money, deposit, withdrawal or cash-out controls are present.
+
+## 8. Device, accessibility and release checks
 - [ ] Test mouse and touch input on desktop and at least one phone/tablet.
 - [ ] Test keyboard focus and screen-reader labels for Wallet tabs and report action.
 - [ ] Test reduced-motion preference and narrow portrait layout.
