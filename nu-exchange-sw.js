@@ -29,14 +29,22 @@ self.addEventListener("fetch",event=>{
  const url=new URL(request.url);
  if(url.origin!==self.location.origin||!APP_PATHS.includes(url.pathname))return;
  if(request.mode==="navigate"&&url.pathname.endsWith("/exchange.html")){
-  event.respondWith(fetch(request).then(response=>{
-   if(response&&response.ok){const copy=response.clone();caches.open(CACHE_NAME).then(cache=>cache.put(request,copy));}
-   return response;
-  }).catch(()=>caches.match(request).then(cached=>cached||caches.match(new URL("./exchange.html",self.registration.scope).href))));
+  event.respondWith((async()=>{
+   try{
+    const response=await fetch(request);
+    if(response&&response.ok){const cache=await caches.open(CACHE_NAME);await cache.put(request,response.clone());}
+    return response;
+   }catch(_){
+    return (await caches.match(request))||(await caches.match(new URL("./exchange.html",self.registration.scope).href));
+   }
+  })());
   return;
  }
- event.respondWith(caches.match(request).then(cached=>cached||fetch(request).then(response=>{
-  if(response&&response.ok){const copy=response.clone();caches.open(CACHE_NAME).then(cache=>cache.put(request,copy));}
+ event.respondWith((async()=>{
+  const cached=await caches.match(request);
+  if(cached)return cached;
+  const response=await fetch(request);
+  if(response&&response.ok){const cache=await caches.open(CACHE_NAME);await cache.put(request,response.clone());}
   return response;
- })));
+ })());
 });
