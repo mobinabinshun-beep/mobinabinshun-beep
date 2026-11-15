@@ -1,6 +1,6 @@
 Unicode true
 Name "N.U Launcher 0.1"
-OutFile "N.U-Launcher-Setup-0.1.exe"
+OutFile "..\\..\\N.U-Launcher-Setup-0.1.exe"
 InstallDir "$APPDATA\N.U Launcher"
 RequestExecutionLevel user
 SetCompressor zlib
