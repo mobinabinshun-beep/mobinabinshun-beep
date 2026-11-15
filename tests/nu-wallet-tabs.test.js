@@ -31,3 +31,19 @@ test("Player ID keeps the original stable local identifier behavior",()=>{
   for(const id of ["demo-name","demo-call","demo-family","demo-age"])assert.ok(html.includes('id="'+id+'"'));
   assert.doesNotMatch(html,/class="glass player-id-card classic-player-card"/);
 });
+
+
+test("wallet view switches off world renderers and restores them on exit",()=>{
+  assert.match(ui,/classList\.toggle\("nu-wallet-open",view===walletView\)/);
+  assert.match(ui,/classList\.remove\("nu-wallet-open"\)/);
+  assert.match(css,/body\.nu-wallet-open \.world>\.nu-world-background,[\s\S]*?body\.nu-wallet-open \.world>#nu-dynamic-layers\{\s*display:none!important/);
+  assert.match(css,/body\.nu-wallet-open #wallet-view \.wallet-panel\{[\s\S]*?backdrop-filter:none!important/);
+});
+
+test("wallet backdrop is one fixed CSS glow with no animation, blur or input capture",()=>{
+  const glow=css.slice(css.lastIndexOf("/* Wallet low-cost scene mode"));
+  assert.match(glow,/radial-gradient\(ellipse at 50% 8%/);
+  assert.match(glow,/pointer-events:none/);
+  assert.doesNotMatch(glow,/animation\s*:|filter\s*:|canvas|requestAnimationFrame|backdrop-filter\s*:/);
+  assert.match(glow,/z-index:-1/);
+});
