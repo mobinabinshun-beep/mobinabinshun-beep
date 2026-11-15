@@ -27,10 +27,14 @@ test("XP and Mana retain classic labels above their bars and values in the rails
   assert.ok(css.includes("left:50%;right:auto;top:50%"));
 });
 
-test("classic lower HUD stacks LV, XP and Mana and adapts to mobile", () => {
-  assert.ok(css.includes("width:min(232px,calc(100vw - 24px))"));
-  assert.ok(css.includes("@media(max-width:700px)"));
+test("XP rail spans the full bottom edge while LV and Mana stay stacked above it", () => {
+  assert.ok(css.includes("Owner-authorized restoration — XP rail spans the full bottom edge"));
+  assert.match(css, /#game-view\.active \.bars\{[\s\S]*?left:0;right:0;bottom:0;width:100vw/);
+  assert.match(css, /\.bar-wrap:nth-child\(2\)\{[\s\S]*?order:3;width:100vw/);
+  assert.match(css, /\.bar-wrap:nth-child\(3\)\{[\s\S]*?order:1;width:min\(232px,calc\(100vw - 24px\)\)/);
   assert.ok(css.includes("width:min(204px,calc(100vw - 16px))"));
+  assert.ok(css.includes("@media(max-width:700px)"));
+  assert.ok(css.includes("border-radius:0"));
 });
 
 test("HP capsule dock remains state-driven and reversibly animated", () => {
