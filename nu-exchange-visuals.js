@@ -81,7 +81,7 @@
     ctx.globalAlpha=.18;ctx.beginPath();ctx.arc(xx+slot*.11,yy,1.7,0,Math.PI*2);ctx.fill();
    }
    ctx.restore();
-   return {bias,amplitude,phase,sampleCount:sample.length};
+   return {bias,amplitude,phase,sampleCount:(steps||[]).slice(-8).length};
   }
   function render(ctx,width,height,steps,assetKey){
    if(!ctx)return;
@@ -93,7 +93,8 @@
    const tape=toolbar.querySelector("[data-ambient-status]");
    if(tape){
     const direction=ambient.bias>.12?"BUY-LEANING":ambient.bias<-.12?"SELL-LEANING":"BALANCED";
-    tape.textContent="BACKGROUND FLOW · "+direction+" · ±"+ambient.amplitude.toFixed(2)+" INDEX · MAX 3 UNITS · VISUAL ONLY";
+    const ticks=[0,1,2].map(i=>{const pulse=ambientPulse(steps||[],ambient.phase,i+10);return "TICK "+(i+1)+" "+(pulse.delta>=0?"+":"")+pulse.delta.toFixed(2)+" · VOL "+pulse.volume.toFixed(1);});
+    tape.textContent="BACKGROUND FLOW · "+direction+" · "+ticks.join(" · ")+" · ±3 INDEX / 3 VOL MAX · VISUAL ONLY";
    }
   }
   function commit(p){
