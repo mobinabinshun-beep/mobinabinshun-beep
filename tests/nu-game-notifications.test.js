@@ -18,7 +18,7 @@ test("shared game notification module exposes all three default game notificatio
 });
 
 test("HP capsule consumption uses the original paired floating-change visual with exact labels",()=>{
-  assert.match(gameSource,/showConsumption\(\{anchor:bar,itemDelta:"−1 CAPSULE HEAL",resourceDelta:"\+"\+restored\+" HP",duration:1750,offset:4\}\)/);
+  assert.match(gameSource,/showConsumption\(\{anchor:bar,itemDelta:"−1 CAPSULE HEAL",resourceDelta:"+10 HP",duration:1750,offset:4\}\)/);
   assert.match(moduleSource,/item\.className="floating-change "\+toneClass\(options\.itemTone,"loss"\)/);
   assert.match(moduleSource,/resource\.className="floating-change "\+toneClass\(options\.resourceTone,"hp"\)/);
   assert.match(moduleCss,/\.nu-notification-pair/);
