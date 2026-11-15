@@ -27,12 +27,11 @@ test("Gateway exposes exactly Back, Menu and Profile as one-click actions",()=>{
 
 test("Opening Gateway freezes gameplay; image-only mode has no ambient renderers to resume",()=>{
  assert.match(js,/nu:gateway-open/);assert.match(js,/nu:gateway-close/);
- assert.match(games,/state\.engine\[frozen\?"pause":"resume"\]/);
- assert.match(games,/NUBackgroundEngine\.setFrozen/);
- assert.match(games,/NUDynamicLayers\.setFrozen/);
- assert.match(games,/NUPixelWorld\.setEnabled/);
- assert.match(graphics,/nu-gateway-open/);
- assert.match(graphics,/NUDynamicLayers&&g\.NUDynamicLayers\.setFrozen/);
+ assert.match(games,/if\(state\.engine&&typeof state\.engine\[frozen\?"pause":"resume"\]/);
+ assert.match(games,/NUBackgroundEngine&&typeof window\.NUBackgroundEngine\.setFrozen/);
+ assert.match(games,/NUDynamicLayers&&typeof window\.NUDynamicLayers\.setFrozen/);
+ assert.doesNotMatch(html,/nu-dynamic-layers\.js|nu-pixel-world\.js/);
+ assert.doesNotMatch(graphics,/NUDynamicLayers\.setFrozen|NUPixelWorld\.setEnabled/);
  assert.match(js,/setOpen\(false,false\)/);
  assert.match(js,/nu:menu-dismissed/);
  assert.match(js,/nu:player-overlay-close/);
@@ -61,9 +60,8 @@ test("Painting leads the game list and Random Game selects only the three core p
  assert.doesNotMatch(html,/id="start-random"/);
 });
 
-test("Gateway blur and animation pause stay limited to decorative background layers",()=>{
- assert.match(css,/body\.nu-gateway-open \.world>\.sky/);
- assert.match(css,/filter:blur\(2\.5px\)/);
+test("image-only mode leaves no ambient layer for Gateway blur",()=>{
+ assert.doesNotMatch(html,/class="sky"|id="world-canvas"|id="pixel-world"|class="horizon"/);
  assert.match(css,/backdrop-filter:none/);
  assert.doesNotMatch(css,/body\.nu-gateway-open \.world,body\.nu-gateway-open/);
  assert.doesNotMatch(css,/body\.nu-gateway-open \.world \*/);
@@ -91,7 +89,9 @@ test("Gateway orbit exit bounds include the full vertical fan",()=>{
  assert.match(js,/event\.clientY>=rect\.top-orbit-tolerance&&event\.clientY<=rect\.bottom\+orbit\+tolerance/);
 });
 
-test("A hidden tab cannot restart frozen game or ambient renderers",()=>{
+test("A hidden tab cannot restart frozen gameplay or load removed ambient renderers",()=>{
  assert.match(games,/gatewayOpen=document\.body\.classList\.contains\("nu-gateway-open"\)/);
- assert.match(dynamic,/function resume\(\)\{if\(!profile\|\|!active\|\|frozen\|\|document\.hidden\)return/);
+ assert.match(games,/if\(state\.engine&&!gatewayOpen\)state\.engine\.resume\(\)/);
+ assert.doesNotMatch(html,/nu-dynamic-layers\.js|nu-pixel-world\.js/);
 });
+
