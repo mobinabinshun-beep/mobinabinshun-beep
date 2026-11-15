@@ -147,3 +147,6 @@ test("store-purchased asset exclusion survives the rolling 24-transaction ledger
 
 // Keep the Exchange wallet-reader and protocol lifecycle covered by the canonical wallet CI run.
 require("./nu-exchange-engines.test.js");
+
+// The Health module has an independent store and never shares the wallet ledger.
+require("./nu-health.test.js");
