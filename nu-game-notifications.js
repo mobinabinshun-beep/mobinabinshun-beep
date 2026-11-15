@@ -23,7 +23,7 @@
   const container=options.container;
   if(!container||!document.createElement)return null;
   const node=document.createElement("span");
-  node.className="hit-progress"+(options.tone?" "+options.tone:"");
+  node.className="nu-game-notification-interaction hit-progress"+(options.tone?" "+options.tone:"");
   node.textContent=String(options.text==null?"":options.text);
   node.style.left=(Number(options.x)||0)+"px";
   node.style.top=(Number(options.y)||0)+"px";
@@ -37,7 +37,7 @@
   if(!anchor||!document.createElement)return null;
   const node=document.createElement("span");
   const tone=options.tone==="mana"?"mana":"xp";
-  node.className="capsule-gain "+tone;
+  node.className="nu-game-notification-bar-delta capsule-gain "+tone;
   node.textContent=String(options.text==null?"":options.text);
   const fill=options.fill;
   const current=fill?parseFloat(fill.style.width)||0:0;
