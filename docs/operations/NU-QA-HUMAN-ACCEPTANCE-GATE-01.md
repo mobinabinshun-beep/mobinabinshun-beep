@@ -22,6 +22,20 @@ Automated CI, code review, source inspection, a successful build, a deployment, 
 7. **Record the decision:** only after the required human scenarios have traceable reports may the responsible human owner record APPROVED or REJECTED. Partial coverage remains PARTIALLY TESTED / PENDING.
 8. **Promote after acceptance:** merge/promote the accepted candidate to the stable release path only after the human acceptance decision and required engineering gates. Preserve the reports, CI evidence and rollback reference.
 
+## 2.1 Explicit change scope — no unrelated edits
+
+A change may be **small and local, incremental and item-by-item, or broad and cross-cutting**. Its size does not expand its authorization. Every implementation must modify only the components, files, modules, behaviors or areas that are explicitly identified in the approved request/specification.
+
+- Before editing, write a scope statement that names the permitted target area(s), intended effects and acceptance scenarios. Where practical, identify protected or out-of-scope neighboring areas as well.
+- Do not make opportunistic cleanup, refactoring, redesign, renaming, formatting, dependency changes or behavior changes outside the declared scope—even if they appear beneficial or technically convenient.
+- Do not let a broad task become permission to alter every related subsystem. “Related”, “nearby”, shared styling, common utilities or architectural proximity do not by themselves authorize edits.
+- If the requested outcome appears to require an out-of-scope change, stop before making that change. Explain the dependency and request explicit authorization, or propose an in-scope alternative.
+- Keep diffs minimal and attributable. Review the final diff file-by-file for unintended changes; remove unrelated edits before submitting the candidate.
+- If an explicitly requested change is broad, enumerate its affected areas and boundaries before implementation. If it is incremental, implement and document each increment separately where that improves traceability and reduces regression risk.
+- Human reports and acceptance must cover the declared scope and relevant regression boundaries. A successful test in the target area does not excuse damage in unrelated areas.
+
+This boundary exists to reduce human error, accidental regressions and collateral damage to modules outside the subject's scope. Explicit scope is the limit of permission, not a suggestion.
+
 ## 3. Status vocabulary — never collapse these states
 
 - **DOCUMENTED:** requirement and intended behavior are recorded.
