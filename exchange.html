@@ -98,17 +98,19 @@
 (function(){
  "use strict";
  const status=document.getElementById("exchange-offline-status");
+ let cacheReady=false;
  function setStatus(value){if(status)status.textContent=value;}
  if(!("serviceWorker" in navigator)){setStatus("OFFLINE CACHE NOT SUPPORTED");return;}
  window.addEventListener("load",function(){
   navigator.serviceWorker.register("./nu-exchange-sw.js").then(function(){
    return navigator.serviceWorker.ready;
   }).then(function(){
+   cacheReady=true;
    setStatus(navigator.onLine?"OFFLINE CACHE READY · LOCAL SAVE ONLY":"OFFLINE · LOCAL SAVE");
   }).catch(function(){setStatus("OFFLINE CACHE UNAVAILABLE · LOCAL SAVE ONLY");});
  });
- window.addEventListener("offline",function(){setStatus("OFFLINE · LOCAL SAVE");});
- window.addEventListener("online",function(){setStatus("ONLINE · LOCAL SAVE");});
+ window.addEventListener("offline",function(){setStatus(cacheReady?"OFFLINE · LOCAL SAVE":"OFFLINE · CACHE NOT READY");});
+ window.addEventListener("online",function(){setStatus(cacheReady?"ONLINE · OFFLINE CACHE READY":"ONLINE · CACHE INSTALLING");});
 })();
 </script>
 </body></html>
