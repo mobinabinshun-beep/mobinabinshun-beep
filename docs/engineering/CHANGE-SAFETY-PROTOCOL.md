@@ -43,7 +43,7 @@ Any operation that consumes, spends, grants, restores, deletes, or transfers a r
 - success versus failure;
 - no false success message when persistence fails.
 
-For HP capsule use specifically, successful feedback is displayed on/anchored to the HP HUD and reports the actual restored amount. Drawer open/close animation must not remove, cover, or suppress this notice. The notice is separate from the capsule icon animation and from generic global toasts.
+For HP capsule use specifically, successful feedback is displayed on/anchored to the HP HUD and reports the actual restored amount. Drawer open/close animation must not remove, cover, or suppress this notice. The notice is separate from the capsule icon animation and from generic global toasts. Game notifications use the shared presets in `nu-game-notifications.js` and `nu-game-notifications.css`; preserve their established visual signature and motion by default. See `docs/game-development/GAME-NOTIFICATION-SYSTEM.md`.
 
 ## 5. Implementation rules
 
