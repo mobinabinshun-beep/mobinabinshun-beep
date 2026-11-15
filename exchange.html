@@ -5,7 +5,7 @@
 <title>N.U Virtual Market — Generation 1</title>
 <meta name="description" content="A fictional N.U game-world market simulator driven only by player activity.">
 <meta name="theme-color" content="#071018">
-<link rel="stylesheet" href="./nu-exchange.css?v=20261114-exchange-modular-r1">
+<link rel="stylesheet" href="./nu-exchange.css?v=20261115-exchange-chart-controls-r1">
 </head>
 <body>
 <main class="exchange-shell">
@@ -17,7 +17,7 @@
 </section>
 <section class="market-panel">
 <div class="panel-heading"><div><p class="eyebrow">ACTIVITY-DRIVEN SIMULATION</p><h2>MARKET INDEX</h2></div><span class="sim-tag">SIMULATED · NOT A REAL PRICE</span></div>
-<div class="market-controls"><label for="market-asset">SELECT VIRTUAL ASSET</label><select id="market-asset"></select><span id="market-events">0 / 24 PLAYER STEPS</span><label for="chart-time-scale">REPLAY SCALE</label><select id="chart-time-scale"></select></div>
+<div class="market-controls"><label for="market-asset">SELECT VIRTUAL ASSET</label><select id="market-asset"></select><span id="market-events">0 RECORDED STEPS</span><label for="chart-time-scale">REPLAY PERIOD</label><select id="chart-time-scale"></select></div>
 <div class="market-summary">
 <article class="exchange-card"><span>NU INDEX</span><strong id="market-index">100.00</strong></article>
 <article class="exchange-card"><span>CHANGE FROM BASELINE</span><strong id="market-change">0.00%</strong></article>
@@ -25,7 +25,18 @@
 <article class="exchange-card"><span>SIMULATED DEMAND</span><strong id="market-demand">0</strong></article>
 <article class="exchange-card"><span>SIMULATED SUPPLY</span><strong id="market-supply">0</strong></article><article class="exchange-card behavior-card"><span>PLAYER ACTIVITY TENDENCY</span><strong id="market-bias" class="bias-indicator">BALANCED</strong></article>
 </div>
-<div class="chart-legend"><span><i class="legend-up"></i> Index rising</span><span><i class="legend-down"></i> Index falling</span><span>24 recorded player steps · animated replay</span><span id="replay-mode-label">24 SECONDS · REPLAYING YOUR SAVED ACTIVITY</span><span id="replay-progress">0 / 24</span></div>
+<div class="chart-legend"><span><i class="legend-up"></i> Index rising</span><span><i class="legend-down"></i> Index falling</span><span>RECORDED PLAYER STEPS · ANIMATED REPLAY</span><span id="replay-mode-label">SECONDS · REPLAYING YOUR SAVED ACTIVITY</span><span id="replay-progress">0 VISIBLE</span></div>
+<div class="chart-tools" aria-label="Chart display controls">
+ <label class="chart-range-control" for="chart-zoom">ZOOM / HISTORY <input id="chart-zoom" type="range" min="4" max="24" step="1" value="24"><output id="chart-zoom-value" for="chart-zoom">24</output></label>
+ <label for="chart-theme">MODE <select id="chart-theme"><option value="night">Night</option><option value="day">Day</option></select></label>
+ <label for="chart-palette">COLOR PACK <select id="chart-palette"><option value="aurora">Aurora</option><option value="emerald">Emerald</option><option value="rose">Rose</option><option value="amber">Amber</option><option value="mono">Monochrome</option></select></label>
+ <label for="chart-average-period">AVERAGE PERIOD <select id="chart-average-period"><option value="3">Short</option><option value="5" selected>Medium</option><option value="8">Long</option><option value="12">Extended</option></select></label>
+ <label class="chart-toggle"><input id="chart-grid-toggle" type="checkbox" checked> Grid</label>
+ <label class="chart-toggle"><input id="chart-wicks-toggle" type="checkbox" checked> Candle shadows</label>
+ <label class="chart-toggle"><input id="chart-volume-toggle" type="checkbox" checked> Volume</label>
+ <label class="chart-toggle"><input id="chart-average-toggle" type="checkbox" checked> Analysis line</label>
+ <label class="chart-toggle"><input id="chart-tolerance-toggle" type="checkbox" checked> Visual tolerance ±5</label>
+</div>
 <canvas id="market-chart" role="img" aria-label="Fictional N.U market index candlestick chart"></canvas>
 <div id="market-empty" class="chart-empty">No local activity has been recorded for this asset yet. The simulator will create candles only after in-game wallet activity occurs.</div>
 <div class="panel-heading"><div><p class="eyebrow">LAST FIVE RECORDED STEPS</p><h2>PLAYER MARKET HISTORY</h2></div><span>LOCAL ACTIVITY ONLY</span></div><div id="market-history" class="asset-transactions"></div><p class="panel-note">Only your own recorded asset changes are replayed. Positive and negative deltas are visual tendencies, not a shared order book, real demand, or real prices. Replay speed changes presentation only; it never creates transactions.</p>
