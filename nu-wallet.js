@@ -19,7 +19,7 @@
   };
   function normalizeSave(raw){
     const source=raw&&typeof raw==="object"?raw:{};
-    const next=Object.assign({xp:0,level:1,mana:0,xCredits:0,nCredits:0,upgrade:0,hp:10,hpPills:0,manaCapsules:1,casinoCredits:100,transactions:[],rewardIds:[],nonExchangeableAssets:[]},source);
+    const next=Object.assign({xp:0,level:1,mana:0,xCredits:0,nCredits:0,upgrade:0,hp:10,hpPills:0,manaCapsules:1,casinoCredits:100,transactions:[],rewardIds:[],nonExchangeableAssets:[],activeWave:null,settledWaveIds:[]},source);
     next.xp=number(next.xp,0);
     next.level=number(next.level,1,1);
     next.manaCapsules=number(next.manaCapsules,1,1,10);
@@ -32,6 +32,8 @@
     next.upgrade=number(next.upgrade,0,0,9);
     next.transactions=Array.isArray(next.transactions)?next.transactions.slice(-MAX_TRANSACTIONS):[];
     next.rewardIds=Array.isArray(next.rewardIds)?next.rewardIds.filter(v=>typeof v==="string").slice(-500):[];
+    next.settledWaveIds=Array.isArray(next.settledWaveIds)?next.settledWaveIds.filter(v=>typeof v==="string").slice(-500):[];
+    next.activeWave=next.activeWave&&typeof next.activeWave==="object"?next.activeWave:null;
     next.nonExchangeableAssets=Array.isArray(next.nonExchangeableAssets)?Array.from(new Set(next.nonExchangeableAssets.filter(v=>typeof v==="string"&&/^[a-zA-Z][a-zA-Z0-9_-]{0,47}$/.test(v)))):[];
     return next;
   }
@@ -47,22 +49,31 @@
     return entry;
   }
   function buyHpPill(raw,meta){
-    const next=normalizeSave(raw);
+    const next=normalizeSave(raw),details=meta||{};
     if(next.xp<HP_PILL_COST)return {ok:false,reason:"INSUFFICIENT_XP",state:next};
-    next.xp-=HP_PILL_COST;
-    next.hpPills+=1;
-    const entry=transaction(next,"purchase","Golden HP Capsule",{xp:-HP_PILL_COST,hpPills:1},Object.assign({},meta||{},{exchangeExcludedKeys:["hpPills"]}));
-    return {ok:true,state:next,transaction:entry};
+    next.xp-=HP_PILL_COST;next.hpPills+=1;
+    next.nonExchangeableAssets=Array.from(new Set([...(next.nonExchangeableAssets||[]),"hpPills"]));
+    const at=String(details.at||new Date().toISOString()),baseId=String(details.id||("nu-store-"+Date.now()+"-"+Math.random().toString(36).slice(2,8)));
+    const entries=[
+      {id:baseId+"|xp",at,kind:"purchase",title:"Golden HP Capsule · XP spent",playerId:String(next.playerId||"guest-local"),source:"nu.store",direction:"OUTGOING",asset:"xp",signedAmount:-HP_PILL_COST,category:"STORE_PURCHASE",resultingBalance:next.xp,settlementStatus:"SETTLED",idempotencyKey:baseId+"|xp",deltas:{xp:-HP_PILL_COST}},
+      {id:baseId+"|capsule",at,kind:"purchase",title:"Golden HP Capsule · inventory received",playerId:String(next.playerId||"guest-local"),source:"nu.store",direction:"INCOMING",asset:"hpPills",signedAmount:1,category:"STORE_PURCHASE",resultingBalance:next.hpPills,settlementStatus:"SETTLED",idempotencyKey:baseId+"|capsule",exchangeExcludedKeys:["hpPills"],deltas:{hpPills:1}}
+    ];
+    next.transactions=next.transactions.concat(entries).slice(-MAX_TRANSACTIONS);
+    return {ok:true,state:next,transaction:entries[0],transactions:entries};
   }
   function useHpPill(raw,meta){
-    const next=normalizeSave(raw);
+    const next=normalizeSave(raw),details=meta||{};
     if(next.hp>=MAX_HP)return {ok:false,reason:"HP_FULL",state:next};
     if(next.hpPills<1)return {ok:false,reason:"NO_HP_CAPSULE",state:next};
     const restored=Math.min(HP_PILL_COST,MAX_HP-next.hp);
-    next.hpPills-=1;
-    next.hp+=restored;
-    const entry=transaction(next,"consumption","HP Capsule used",{hp:restored,hpPills:-1},meta);
-    return {ok:true,state:next,restored,transaction:entry};
+    next.hpPills-=1;next.hp+=restored;
+    const at=String(details.at||new Date().toISOString()),baseId=String(details.id||("nu-capsule-use-"+Date.now()+"-"+Math.random().toString(36).slice(2,8)));
+    const entries=[
+      {id:baseId+"|hp",at,kind:"consumption",title:"HP Capsule · HP restored",playerId:String(next.playerId||"guest-local"),source:"nu.store",direction:"INCOMING",asset:"hp",signedAmount:restored,category:"CAPSULE_CONSUMPTION",resultingBalance:next.hp,settlementStatus:"SETTLED",idempotencyKey:baseId+"|hp",deltas:{hp:restored}},
+      {id:baseId+"|capsule",at,kind:"consumption",title:"HP Capsule · inventory spent",playerId:String(next.playerId||"guest-local"),source:"nu.store",direction:"OUTGOING",asset:"hpPills",signedAmount:-1,category:"CAPSULE_CONSUMPTION",resultingBalance:next.hpPills,settlementStatus:"SETTLED",idempotencyKey:baseId+"|capsule",deltas:{hpPills:-1}}
+    ];
+    next.transactions=next.transactions.concat(entries).slice(-MAX_TRANSACTIONS);
+    return {ok:true,state:next,restored,transaction:entries[0],transactions:entries};
   }
   function grantXP(raw,amount,meta){
     const next=normalizeSave(raw),details=meta||{},rewardId=String(details.id||"");
@@ -84,6 +95,47 @@
     next.casinoCredits=next.casinoCredits-stake+returned;
     const entry=transaction(next,"casino","N.U Casino round",{casinoCredits:returned-stake,wager:-stake,payout:returned},meta);
     return {ok:true,state:next,wager:stake,payout:returned,net:returned-stake,transaction:entry};
+  }
+
+  function beginWave(raw,gameId,meta){
+    const next=normalizeSave(raw);
+    if(next.activeWave){const closed=settleWave(next,"superseded");return beginWave(closed.state,gameId,meta);}
+    const id="nu-wave-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,9);
+    next.activeWave={id,gameId:String(gameId||"unknown"),playerId:String(next.playerId||"guest-local"),startedAt:new Date().toISOString(),successfulInteractions:0,aggregates:{}};
+    return {ok:true,state:next,waveId:id};
+  }
+  function recordWaveDelta(raw,asset,amount,category,meta){
+    const next=normalizeSave(raw),wave=next.activeWave,qty=Number(amount),details=meta||{};
+    if(!wave||!Number.isSafeInteger(qty)||qty===0||typeof asset!=="string")return {ok:false,reason:"NO_ACTIVE_WAVE_OR_INVALID_DELTA",state:next};
+    const allowed=["xp","mana","hp","hpPills","manaCapsules","xCredits","nCredits","casinoCredits"];
+    if(!allowed.includes(asset))return {ok:false,reason:"UNKNOWN_ASSET",state:next};
+    const key=(qty>0?"INCOMING":"OUTGOING")+"|"+asset+"|"+String(category||"GAME_REWARD");
+    const aggregate=wave.aggregates[key]||(wave.aggregates[key]={asset,category:String(category||"GAME_REWARD"),direction:qty>0?"INCOMING":"OUTGOING",amount:0,interactionCount:0,rate:details.rate??null});
+    aggregate.amount+=qty;
+    if(details.successfulInteraction) { aggregate.interactionCount+=1; wave.successfulInteractions+=1; }
+    next[asset]=number(Number(next[asset]||0)+qty,0,0,Number.MAX_SAFE_INTEGER);
+    if(asset==="mana")next.mana=Math.min(next.mana,next.manaCapsules*10);
+    if(asset==="hp")next.hp=Math.min(next.hp,MAX_HP);
+    if(asset==="xp"){const before=Math.floor((next.xp-qty)/100);next.level=Math.max(1,next.level+Math.floor(next.xp/100)-before);}
+    return {ok:true,state:next};
+  }
+  function settleWave(raw,reason){
+    const next=normalizeSave(raw),wave=next.activeWave;
+    if(!wave||!wave.id)return {ok:false,reason:"NO_ACTIVE_WAVE",state:next};
+    if(next.settledWaveIds.includes(wave.id)){next.activeWave=null;return {ok:false,reason:"ALREADY_SETTLED",state:next};}
+    const entries=[];
+    for(const aggregate of Object.values(wave.aggregates||{})){
+      if(!aggregate||!Number.isSafeInteger(aggregate.amount)||aggregate.amount===0)continue;
+      const asset=aggregate.asset,amount=aggregate.amount;
+      const id=wave.id+"|"+aggregate.direction+"|"+asset+"|"+aggregate.category;
+      if(next.transactions.some(tx=>tx&&tx.id===id))continue;
+      const entry={id,at:new Date().toISOString(),kind:aggregate.direction==="INCOMING"?"wave-reward":"wave-cost",title:String(wave.gameId)+" · "+String(aggregate.category),playerId:String(wave.playerId||next.playerId||"guest-local"),source:String(wave.gameId),gameId:String(wave.gameId),waveId:wave.id,asset,direction:aggregate.direction,signedAmount:amount,category:aggregate.category,successfulInteractionCount:aggregate.interactionCount||0,rewardOrCostRate:aggregate.rate,resultingBalance:Number(next[asset]||0),settlementStatus:"SETTLED",idempotencyKey:id,settlementReason:String(reason||"completed"),deltas:{[asset]:amount}};
+      next.transactions=next.transactions.concat(entry).slice(-MAX_TRANSACTIONS);entries.push(entry);
+    }
+    next.settledWaveIds=next.settledWaveIds.concat(wave.id).slice(-500);
+    next.lastSettledWave={id:wave.id,gameId:wave.gameId,reason:String(reason||"completed"),successfulInteractions:wave.successfulInteractions||0,settledAt:new Date().toISOString(),transactionCount:entries.length};
+    next.activeWave=null;
+    return {ok:true,state:next,wave:next.lastSettledWave,transactions:entries};
   }
   function gameAssetRows(raw,gameId){
     const id=String(gameId||"").toLowerCase(),rows=assetRows(raw);
@@ -140,5 +192,5 @@
     if(!entries.length)points.push({id:"current",at:"",title:"Current balance · no recorded changes",delta:0,balance:current});
     return points;
   }
-  return {MAX_HP,HP_PILL_COST,MAX_TRANSACTIONS,normalizeSave,buyHpPill,useHpPill,grantXP,settleCasinoRound,registerAsset,registerGameAssets,assetRows,exchangeAssetRows,isExchangeableAsset,gameAssetRows,assetHistory};
+  return {MAX_HP,HP_PILL_COST,MAX_TRANSACTIONS,normalizeSave,buyHpPill,useHpPill,grantXP,settleCasinoRound,beginWave,recordWaveDelta,settleWave,registerAsset,registerGameAssets,assetRows,exchangeAssetRows,isExchangeableAsset,gameAssetRows,assetHistory};
 });

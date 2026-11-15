@@ -128,9 +128,9 @@ The HP reward shown above follows the current prototype's round-completion behav
 
 ## 7. Implementation boundaries and current-state warning
 
-This document is a **frozen specification for future project work**, not a claim of completed implementation.
+This document is the **canonical specification**. The public demo candidate on branch `feat/public-demo-wave-wallet-human-test-2026-11-15` now implements a browser-local Wave settlement path for the three Generation 1 core games: each launch creates a Wave ID; successful rewards and N-BI Mana costs are aggregated by asset/category; exit, new round, ten-success completion, page unload and interrupted-session recovery close the Wave; and settlement rows carry direction, signed amount, interaction count, resulting balance and an idempotency key. The Wallet transaction view presents Incoming / Received and Outgoing / Spent records. Store purchase and capsule-use movements are represented as separate asset-direction rows.
 
-The current prototype has per-interaction reward functions and local browser storage. Its current transaction behavior may still emit per-reward entries rather than the required Wave-level aggregate rows. The Wave settlement lifecycle, separate incoming/outgoing transaction views, durable idempotency, and complete cross-game wallet integration must be verified and implemented before claiming operational compliance.
+This is a **local demo implementation only**, not production wallet infrastructure. It uses localStorage, a bounded local transaction history and client-side idempotency. It does not provide server authority, cross-device consistency, authenticated ownership, tamper resistance, cloud recovery or production-grade durable idempotency. Manual browser/device acceptance is pending. Do not claim operational financial or online-wallet compliance.
 
 Do not:
 - create one history row for every low-level click;
