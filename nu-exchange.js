@@ -1,18 +1,27 @@
 (function(){
 "use strict";
-const $=id=>document.getElementById(id),CACHE_KEY="nu_exchange_cache_v2",MAX_CHART_STEPS=24,MAX_TEXT_HISTORY=5;
-let selected="xp",marketSelected="xp",replayMode="24s",replayStart=Date.now(),replayTimer=0,lastLedgerSignature="",ledgerPulseTimer=0;
+const $=id=>document.getElementById(id),CACHE_KEY="nu_exchange_cache_v3",MAX_CHART_STEPS=24,MAX_TEXT_HISTORY=5;
+let selected="xp",marketSelected="xp",replayMode="24s",replayStart=Date.now(),replayTimer=0,lastLedgerSignature="",ledgerPulseTimer=0,syncingProtocols=false;
 const PREF_KEY="nu_exchange_chart_preferences_v1";
 let chartPrefs={zoom:24,grid:true,wicks:true,volume:true,average:true,tolerance:true,bands:true,averagePeriod:5,theme:"night",palette:"aurora"};
 const guard=NUExchangeGuard.create(window.localStorage),maintenance=NUExchangeLock.create(window.localStorage);
+const drawing=window.NUExchangeVisuals?window.NUExchangeVisuals.create({canvas:$("market-chart"),toolbar:$("chart-drawing-tools"),storage:window.localStorage}):null;
 function format(n){return new Intl.NumberFormat(undefined,{maximumFractionDigits:2}).format(Number(n)||0);}
 function dateLabel(value){const d=new Date(value);return Number.isNaN(d.getTime())?"Recorded":new Intl.DateTimeFormat(undefined,{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}).format(d);}
 function esc(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function readCache(){try{return JSON.parse(localStorage.getItem(CACHE_KEY)||"null");}catch(_){return null;}}
+function renderWalletConnection(snapshot){
+ const host=$("wallet-connection");if(!host)return;
+ if(!snapshot){host.innerHTML='<p class="panel-note">Wallet connector unavailable.</p>';return;}
+ const p=snapshot.player||{};
+ const assetHtml=(snapshot.assets||[]).map(a=>'<article class="exchange-card"><span>'+esc(a.label)+'</span><strong>'+format(a.value)+esc(a.unit||"")+'</strong></article>').join("");
+ const txHtml=(snapshot.transactions||[]).map(tx=>'<div class="asset-row"><div><strong>'+esc(tx.title||tx.kind||"Wallet activity")+'</strong><small>'+esc(dateLabel(tx.at))+'</small></div><span class="asset-delta">'+esc(Object.entries(tx.deltas||{}).map(([k,v])=>k+": "+(Number(v)>0?"+":"")+format(v)).join(" · "))+'</span></div>').join("")||'<p class="panel-note">No recorded transactions yet.</p>';
+ host.innerHTML='<div class="wallet-connection-head"><div><p class="eyebrow">CONNECTED LOCAL PLAYER PROFILE</p><h2>'+esc(p.displayName||"N.U Explorer")+'</h2><p class="panel-note">'+esc(p.id||"LOCAL-PLAYER")+(p.callsign?" · "+esc(p.callsign):"")+" · Level "+format(p.level||1)+'</p></div><span class="sim-tag">READ ONLY · LOCAL SAVE</span></div><div class="market-summary wallet-asset-grid">'+assetHtml+'</div><div class="wallet-unpriced"><strong>Unpriced / not enabled for exchange</strong><span>X Credits: '+format(snapshot.unpricedFields&&snapshot.unpricedFields.xCredits)+'</span><span>N Credits: '+format(snapshot.unpricedFields&&snapshot.unpricedFields.nCredits)+'</span></div><div class="panel-heading"><div><p class="eyebrow">SAME WALLET · NO COPIED BALANCE</p><h2>RECENT WALLET TRANSACTIONS</h2></div><span>'+format(snapshot.transactionCount||0)+' RECORDED</span></div><div class="asset-transactions">'+txHtml+'</div>';
+}
 function snapshot(save,rows){
- const out={version:2,updatedAt:new Date().toISOString(),assets:{},market:{}};
+ const out={version:3,updatedAt:new Date().toISOString(),assets:{},market:{}};
  rows.forEach(r=>{const all=NUWallet.assetHistory(save,r.key);out.assets[r.key]={chart:all.slice(-(MAX_CHART_STEPS+1)),recent:all.slice(1).slice(-MAX_TEXT_HISTORY)};});
- NUVirtualMarket.assets().forEach(a=>{const steps=NUVirtualMarket.build(save,a.key).steps.slice(-MAX_CHART_STEPS);out.market[a.key]={steps,recent:steps.slice(-MAX_TEXT_HISTORY)};});
+ NUVirtualMarket.assets(save).forEach(a=>{const steps=NUVirtualMarket.build(save,a.key).steps.slice(-MAX_CHART_STEPS);out.market[a.key]={steps,recent:steps.slice(-MAX_TEXT_HISTORY)};});
  return out;
 }
 function chartColors(){
@@ -76,7 +85,7 @@ function updateMarket(steps){
  $("market-index").textContent=index.toFixed(2);$("market-change").textContent=(index>100?"+":"")+((index/100-1)*100).toFixed(2)+"%";$("market-change").className=index>100?"positive":index<100?"negative":"";
  $("market-volume").textContent=format(steps.reduce((n,s)=>n+s.volume,0));$("market-demand").textContent=format(demand);$("market-supply").textContent=format(supply);$("market-events").textContent=steps.length+" RECORDED STEPS";
  const bias=supply>demand?"SUPPLY-LEANING":demand>supply?"DEMAND-LEANING":"BALANCED";$("market-bias").textContent=bias;$("market-bias").className="bias-indicator "+(supply>demand?"positive":demand>supply?"negative":"");$("market-bias").dataset.direction=supply>demand?"up":demand>supply?"down":"flat";
- drawMarket(steps);renderHistory(steps.slice(-MAX_TEXT_HISTORY).map(s=>({title:s.title,time:s.time,delta:s.delta,index:s.index})),"market-history");
+ drawMarket(steps);if(drawing){drawing.setAsset(marketSelected);drawing.render($("market-chart").getContext("2d"),$("market-chart").clientWidth||700,330,steps,marketSelected);}renderHistory(steps.slice(-MAX_TEXT_HISTORY).map(s=>({title:s.title,time:s.time,delta:s.delta,index:s.index})),"market-history");
 }
 function frame(cache,rows){
  const mode=NUExchangeReplay.getMode(replayMode),elapsed=Date.now()-replayStart,asset=cache.assets[selected]||{chart:[],recent:[]},points=asset.chart||[];
@@ -101,12 +110,12 @@ function signalLedgerChange(){
  window.clearTimeout(ledgerPulseTimer);ledgerPulseTimer=window.setTimeout(()=>panel.classList.remove("ledger-updated"),720);
 }
 function refresh(){
- const save=NUWallet.normalizeSave(NU.load()),rows=NUWallet.assetRows(save).filter(r=>r.key!=="hp"),signature=JSON.stringify(save.transactions||[]);
+ const save=NUWallet.normalizeSave(NU.load()),wallet=NUExchangeEngines.walletEngine.read(),rows=NUWallet.exchangeAssetRows(save).filter(r=>r.key!=="hp"),signature=JSON.stringify(save.transactions||[]);renderWalletConnection(wallet);syncingProtocols=true;try{NUExchangeEngines.protocolEngine.list().forEach(p=>{if(!NUExchangeCore.listGames().some(g=>g.id===p.gameId))NUExchangeCore.registerGame({id:p.gameId,name:p.displayName,assets:(p.assets||[]).map(a=>({id:a.assetId,label:a.label,unit:a.unit})),coins:(p.coins||[]).map(a=>({id:a.assetId,label:a.label,unit:a.unit})),transferEnabled:false});});}finally{syncingProtocols=false;}
  if(lastLedgerSignature&&signature!==lastLedgerSignature){replayStart=Date.now();signalLedgerChange();}
  lastLedgerSignature=signature;
  if(!rows.some(r=>r.key===selected))selected=rows[0]?.key||"xp";
  $("asset-select").innerHTML=rows.map(r=>'<option value="'+r.key+'">'+esc(r.label)+'</option>').join("");$("asset-select").value=selected;
- $("market-asset").innerHTML=NUVirtualMarket.assets().map(a=>'<option value="'+a.key+'">'+esc(a.label)+'</option>').join("");$("market-asset").value=marketSelected;
+ const marketAssets=NUVirtualMarket.assets(save);if(!marketAssets.some(a=>a.key===marketSelected))marketSelected=marketAssets[0]?.key||"xp";$("market-asset").innerHTML=marketAssets.map(a=>'<option value="'+a.key+'">'+esc(a.label)+'</option>').join("");$("market-asset").value=marketSelected;
  const next=snapshot(save,rows);try{localStorage.setItem(CACHE_KEY,JSON.stringify(next));}catch(_){}
  const cache=readCache()||next;frame(cache,rows);
  const games=NUExchangeCore.listGames();$("change-from").innerHTML=games.map(g=>'<option value="'+g.id+'">'+esc(g.name)+'</option>').join("");
@@ -155,10 +164,12 @@ window.NUExchangeAttempt=async function(commit){
  if(typeof commit!=="function")return {ok:false,reason:"NO_APPROVED_TRANSFER_ADAPTER"};
  const result=await commit();if(result&&result.ok)guard.recordSuccess();updateGuard();return result;
 };
-window.addEventListener("nu:exchange:registry-change",refresh);
+window.addEventListener("nu:exchange:registry-change",()=>{if(!syncingProtocols)refresh();});
+window.addEventListener("nu:save-updated",refresh);
+window.addEventListener("nu:exchange:wallet-refresh",refresh);
 window.addEventListener("storage",e=>{if(e.key===NU.storageKey)refresh();});
 window.addEventListener("pageshow",()=>{replayStart=Date.now();refresh();});
-window.addEventListener("resize",()=>{const rows=NUWallet.assetRows(NU.load()).filter(r=>r.key!=="hp"),cache=readCache();if(cache)frame(cache,rows);});
-bindChartPreferences();refresh();replayTimer=window.setInterval(()=>{const save=NUWallet.normalizeSave(NU.load()),signature=JSON.stringify(save.transactions||[]);if(signature!==lastLedgerSignature)refresh();else{const cache=readCache();if(cache)frame(cache,NUWallet.assetRows(save).filter(r=>r.key!=="hp"));}updateGuard();},250);
+window.addEventListener("resize",()=>{const rows=NUWallet.exchangeAssetRows(NU.load()).filter(r=>r.key!=="hp"),cache=readCache();if(cache)frame(cache,rows);});
+bindChartPreferences();refresh();replayTimer=window.setInterval(()=>{const save=NUWallet.normalizeSave(NU.load()),signature=JSON.stringify(save.transactions||[]);if(signature!==lastLedgerSignature)refresh();else{const cache=readCache();if(cache)frame(cache,NUWallet.exchangeAssetRows(save).filter(r=>r.key!=="hp"));}updateGuard();},250);
 window.addEventListener("pagehide",()=>{clearInterval(replayTimer);guard.leaveVisit();});
 })();
