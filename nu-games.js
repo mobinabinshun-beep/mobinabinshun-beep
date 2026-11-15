@@ -46,6 +46,7 @@ window.addEventListener("nu:launcher:modules-changed",event=>{
 });
 syncExchangeModuleLifecycle(games.map(game=>game.id));
 window.addEventListener("nu:save-updated",()=>syncExchangeModuleLifecycle(exchangeInstalledIds));
+window.addEventListener("storage",event=>{if(event.key===NU.storageKey)syncExchangeModuleLifecycle(exchangeInstalledIds);});
 const canvas=$("game-canvas"),ctx=canvas.getContext("2d");
 state.save.hp=Number.isFinite(state.save.hp)?state.save.hp:10;state.save.hpPills=Number.isFinite(state.save.hpPills)?Math.max(0,state.save.hpPills):0;state.save.manaCapsules=Number.isFinite(state.save.manaCapsules)?Math.max(1,Math.min(10,state.save.manaCapsules)):1;state.save.mana=Math.max(0,Math.min(state.save.mana,state.save.manaCapsules*10));
 function save(){const ok=NU.save(state.save);if(ok){renderWallet();window.dispatchEvent(new CustomEvent("nu:save-updated"));}return ok;}function persistWalletState(next){const previous=state.save;state.save=next;if(!save()){state.save=previous;renderWallet();announceTransaction("SAVE FAILED · WALLET WAS NOT CHANGED","warning");return false;}return true;}function awardXP(amount,source){const result=NUWallet.grantXP(state.save,amount,{title:source||"Game reward"});if(!result.ok)return false;return persistWalletState(result.state);}
