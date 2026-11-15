@@ -1,82 +1,88 @@
-const test = require("node:test");
-const assert = require("node:assert/strict");
-const fs = require("node:fs");
+"use strict";
+const test=require("node:test");
+const assert=require("node:assert/strict");
+const fs=require("node:fs");
+const read=name=>fs.readFileSync(name,"utf8");
+const html=read("index.html"),casino=read("casino.html"),launcher=read("launcher.html"),studio=read("pixel-art-studio.html");
+const js=read("nu-hex-gateway.js"),css=read("nu-hex-gateway.css"),worldCss=read("nu-world.css");
+const games=read("nu-games.js"),graphics=read("nu-graphics-runtime.js"),exchange=read("nu-exchange.js");
 
-const read = name => fs.readFileSync(name, "utf8");
-const html = read("index.html");
-const casino = read("casino.html");
-const launcher = read("launcher.html");
-const studio = read("pixel-art-studio.html");
-const js = read("nu-hex-gateway.js");
-const css = read("nu-hex-gateway.css");
-
-test("Gateway markup remains present while controller activation is limited to gameplay and wallet", () => {
-  for (const page of [html, casino, launcher, studio]) {
-    assert.match(page, /id="nu-hex-gateway"/);
-    assert.match(page, /class="nu-gateway-scrim"/);
-  }
-  assert.match(html, /nu-hex-gateway\.css\?v=20261114-wallet-gateway-r1/);
-  assert.match(html, /nu-hex-gateway\.js\?v=20261114-wallet-gateway-r1/);
-  assert.match(js, /if \(!root \|\| !scrim \|\| !gameView \|\| !walletView\) return/);
-  assert.match(js, /classList\.toggle\("nu-game-active", gameActive\)/);
-  assert.match(js, /classList\.toggle\("nu-main-game-page", gameActive\)/);
-  assert.match(css, /body\.nu-game-active #nu-hex-gateway/);
-  assert.match(css, /body\.nu-game-active \.nu-gateway-scrim/);
-  assert.match(js, /gameView\?\.classList\.contains\("active"\)/);
-  assert.match(js, /walletView\?\.classList\.contains\("active"\)/);
-  assert.match(css, /body\.nu-wallet-active #nu-hex-gateway/);
+test("Gateway controller is scoped only to active main-game view",()=>{
+ assert.match(html,/id="nu-hex-gateway"/);
+ assert.match(js,/if\(!root\|\|!scrim\|\|!gameView\)return/);
+ assert.match(js,/classList\.toggle\("nu-game-active",active\)/);
+ assert.match(css,/body\.nu-game-active #nu-hex-gateway/);
+ assert.match(css,/body\.nu-game-active #menu-open/);
+ assert.match(css,/body\.nu-game-active #back-home/);
+ for(const page of [casino,launcher,studio])assert.match(page,/id="nu-hex-gateway"/);
 });
 
-test("Gateway is available in gameplay and wallet; classic menu is hidden only in wallet", () => {
-  assert.match(js, /gameView\?\.classList\.contains\("active"\)/);
-  assert.match(js, /MutationObserver/);
-  assert.match(css, /body\.nu-wallet-active #menu-open\{display:none!important\}/);
-  assert.doesNotMatch(css, /#finish-round[^{}]*display:none/);
-  assert.match(html, /id="menu-open"/);
-  assert.match(html, /id="finish-round"/);
+test("Gateway exposes exactly Back, Menu and Profile as one-click actions",()=>{
+ for(const action of ["back","menu","profile"]){assert.match(html,new RegExp('data-action="'+action+'"'));assert.match(js,new RegExp(action+":"));}
+ assert.doesNotMatch(html,/data-action="(settings|store|wallet|exchange|casino|studio|library)"/);
+ assert.doesNotMatch(js,/settings:/);
+ assert.match(js,/activate\(item\)/);
+ assert.doesNotMatch(js,/clickArmed|hoverTimer|two-step|confirm\(item\)/);
 });
 
-test("touch activates an item on release while mouse hover and click retain separate paths", () => {
-  assert.match(js, /pointerType !== "touch"/);
-  assert.match(js, /suppressClickUntil/);
-  assert.match(js, /pointerType === "mouse"/);
-  assert.match(js, /hoverTimer = window\.setTimeout/);
-  assert.match(js, /clickArmed === item/);
-  assert.match(js, /clearTimeout\(activationTimer\)/);
-  assert.match(js, /event\.key === "Escape"/);
+test("Opening Gateway freezes the game and all ambient renderers until a decision",()=>{
+ assert.match(js,/nu:gateway-open/);assert.match(js,/nu:gateway-close/);
+ assert.match(games,/state\.engine\[frozen\?"pause":"resume"\]/);
+ assert.match(games,/NUBackgroundEngine\.setFrozen/);
+ assert.match(games,/NUDynamicLayers\.setFrozen/);
+ assert.match(games,/NUPixelWorld\.setEnabled/);
+ assert.match(graphics,/nu-gateway-open/);
+ assert.match(graphics,/NUDynamicLayers&&g\.NUDynamicLayers\.setFrozen/);
+ assert.match(js,/setOpen\(false,false\)/);
+ assert.match(js,/nu:menu-dismissed/);
+ assert.match(js,/nu:player-overlay-close/);
 });
 
-test("outside exit uses the 10px tolerance and returns gameplay to its prior state", () => {
-  assert.match(js, /const tolerance = 10/);
-  assert.match(js, /performance\.now\(\) - outsideSince > 110/);
-  assert.match(js, /pauseGame\(\)/);
-  assert.match(js, /resumeGame\(\)/);
-  assert.match(css, /backdrop-filter:blur\(6px\)/);
+test("Menu is a centered, concise module directory with player modules before games",()=>{
+ const items=html.slice(html.indexOf('<div class="menu-backdrop"'),html.indexOf('<div class="intro"'));
+ const order=["menu-store","menu-profile","./exchange.html","menu-wallet","./pixel-art-studio.html","menu-random","menu-bubble","menu-mana","menu-chaos"].map(x=>items.indexOf(x));
+ assert.ok(order.every(x=>x>=0));
+ assert.deepEqual(order.slice().sort((a,b)=>a-b),order);
+ assert.match(items,/N\.U MENU/);
+ assert.match(items,/<kbd>S<\/kbd>/);
+ assert.match(items,/<kbd>P<\/kbd>/);
+ assert.match(items,/<kbd>E<\/kbd>/);
+ assert.match(items,/<kbd>W<\/kbd>/);
+ assert.doesNotMatch(items,/<small>|Choose a destination|System profile|Original source/);
+ assert.match(worldCss,/\.menu-panel\{width:min\(390px,100%\)/);
 });
 
-test("Gateway is compact, fixed, responsive and does not create boxed menu cards", () => {
-  assert.match(css, /position:fixed/);
-  assert.match(css, /top:clamp\(118px,17vh,154px\)/);
-  assert.match(css, /right:clamp\(12px,2\.4vw,28px\)/);
-  assert.match(css, /scale\(1\.2\)/);
-  assert.match(css, /prefers-reduced-motion/);
-  assert.match(js, /function layoutItems\(\)/);
-  assert.match(js, /window\.addEventListener\("resize",layoutItems/);
-  assert.match(js, /window\.addEventListener\("orientationchange",layoutItems/);
+test("Painting leads the game list and Random Game selects only the three core prototypes",()=>{
+ assert.ok(html.indexOf("./pixel-art-studio.html")<html.indexOf('id="menu-random"'));
+ assert.ok(html.indexOf('id="menu-random"')<html.indexOf('id="menu-bubble"'));
+ assert.match(games,/function chooseGame\(id\)/);
+ assert.match(games,/id\|\|games\[Math\.floor\(Math\.random\(\)\*games\.length\)\]\.id/);
+ assert.match(games,/data-random-game/);
+ assert.doesNotMatch(html,/id="start-random"/);
 });
 
-test("Gateway destinations remain isolated from game rules and Casino stays linked", () => {
-  for (const action of ["back","profile","settings"]) {
-    assert.match(html, new RegExp('data-action="' + action + '"'));
-    assert.match(js, new RegExp(action + ":"));
-  }
-  assert.match(html, /href="\.\/casino\.html"/);
-  assert.match(js, /menu-profile.*click/);
-  assert.match(js, /menu-store.*click/);
-  assert.doesNotMatch(html, /data-action="(library|store|wallet|launcher|studio|casino|resume)"/);
-  assert.doesNotMatch(js, /nu-engine\.js|nu-games\.js|nu-wallet\.js/);
+test("Gateway blur and animation pause stay limited to decorative background layers",()=>{
+ assert.match(css,/body\.nu-gateway-open \.world>\.sky/);
+ assert.match(css,/filter:blur\(2\.5px\)/);
+ assert.match(css,/backdrop-filter:none/);
+ assert.doesNotMatch(css,/body\.nu-gateway-open \.world,body\.nu-gateway-open/);
+ assert.doesNotMatch(css,/body\.nu-gateway-open \.world \*/);
 });
 
-test("unsupported N-BI shield meter is not rendered", () => {
-  assert.doesNotMatch(html, /id="nbi-shield-bar"/);
+test("Gateway keeps responsive geometry, touch, keyboard and reduced-motion support",()=>{
+ assert.match(css,/position:fixed/);assert.match(css,/prefers-reduced-motion/);
+ assert.match(js,/function layoutItems\(\)/);
+ assert.match(js,/window\.addEventListener\("resize",layoutItems/);
+ assert.match(js,/window\.addEventListener\("orientationchange",layoutItems/);
+ assert.match(js,/pointerType!=="touch"/);
+ assert.match(js,/event\.key==="Escape"/);
+ assert.match(js,/const tolerance=10/);
 });
+
+test("Legacy in-game navigation duplicates are hidden, not deleted from other views",()=>{
+ assert.match(html,/id="menu-open"/);assert.match(html,/id="back-home"/);assert.match(html,/id="finish-round"/);
+ assert.match(css,/body\.nu-game-active #menu-open/);
+ assert.match(css,/body\.nu-game-active #back-home/);
+});
+
+test("No unsupported shield meter is introduced",()=>assert.doesNotMatch(html,/id="nbi-shield-bar"/));
