@@ -3,7 +3,7 @@ const test=require("node:test");
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const read=name=>fs.readFileSync(name,"utf8");
-const html=read("index.html"),js=read("nu-hex-gateway.js"),css=read("nu-hex-gateway.css"),games=read("nu-games.js");
+const html=read("index.html"),js=read("nu-hex-gateway.js"),css=read("nu-hex-gateway.css"),games=read("nu-games.js"),dynamic=read("nu-dynamic-layers.js");
 
 test("Gateway is enabled only while the main game view is active",()=>{
  assert.match(js,/if\(!root\|\|!scrim\|\|!gameView\)return/);
