@@ -1,6 +1,6 @@
 (function(){
 "use strict";
-const $=id=>document.getElementById(id),CACHE_KEY="nu_exchange_cache_v2",MAX_CHART_STEPS=24,MAX_TEXT_HISTORY=5;
+const $=id=>document.getElementById(id),CACHE_KEY="nu_exchange_cache_v3",MAX_CHART_STEPS=24,MAX_TEXT_HISTORY=5;
 let selected="xp",marketSelected="xp",replayMode="24s",replayStart=Date.now(),replayTimer=0;
 const guard=NUExchangeGuard.create(window.localStorage),maintenance=NUExchangeLock.create(window.localStorage);
 function format(n){return new Intl.NumberFormat(undefined,{maximumFractionDigits:2}).format(Number(n)||0);}
@@ -10,7 +10,7 @@ function readCache(){try{return JSON.parse(localStorage.getItem(CACHE_KEY)||"nul
 function snapshot(save,rows){
  const out={version:2,updatedAt:new Date().toISOString(),assets:{},market:{}};
  rows.forEach(r=>{const all=NUWallet.assetHistory(save,r.key);out.assets[r.key]={chart:all.slice(-(MAX_CHART_STEPS+1)),recent:all.slice(1).slice(-MAX_TEXT_HISTORY)};});
- NUVirtualMarket.assets().forEach(a=>{const steps=NUVirtualMarket.build(save,a.key).steps.slice(-MAX_CHART_STEPS);out.market[a.key]={steps,recent:steps.slice(-MAX_TEXT_HISTORY)};});
+ NUVirtualMarket.assets(save).forEach(a=>{const steps=NUVirtualMarket.build(save,a.key).steps.slice(-MAX_CHART_STEPS);out.market[a.key]={steps,recent:steps.slice(-MAX_TEXT_HISTORY)};});
  return out;
 }
 function drawBalance(points){
@@ -72,10 +72,10 @@ function updateGuard(){
  $("exchange-lock-status").className=maintenance.isLocked()?"pending-tag":"sim-tag";
 }
 function refresh(){
- const save=NUWallet.normalizeSave(NU.load()),rows=NUWallet.assetRows(save).filter(r=>r.key!=="hp");
+ const save=NUWallet.normalizeSave(NU.load()),rows=NUWallet.exchangeAssetRows(save).filter(r=>r.key!=="hp");
  if(!rows.some(r=>r.key===selected))selected=rows[0]?.key||"xp";
  $("asset-select").innerHTML=rows.map(r=>'<option value="'+r.key+'">'+esc(r.label)+'</option>').join("");$("asset-select").value=selected;
- $("market-asset").innerHTML=NUVirtualMarket.assets().map(a=>'<option value="'+a.key+'">'+esc(a.label)+'</option>').join("");$("market-asset").value=marketSelected;
+ const marketAssets=NUVirtualMarket.assets(save);if(!marketAssets.some(a=>a.key===marketSelected))marketSelected=marketAssets[0]?.key||"xp";$("market-asset").innerHTML=marketAssets.map(a=>'<option value="'+a.key+'">'+esc(a.label)+'</option>').join("");$("market-asset").value=marketSelected;
  const next=snapshot(save,rows);try{localStorage.setItem(CACHE_KEY,JSON.stringify(next));}catch(_){}
  const cache=readCache()||next;frame(cache,rows);
  const games=NUExchangeCore.listGames();$("change-from").innerHTML=games.map(g=>'<option value="'+g.id+'">'+esc(g.name)+'</option>').join("");
