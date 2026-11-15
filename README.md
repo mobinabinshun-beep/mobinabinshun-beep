@@ -507,3 +507,21 @@ The classic lower-left LV / XP / Mana resource bars are protected from incidenta
 - Implementation and QA record: `docs/operations/EXCHANGE-AMBIENT-FLOW-CHART-DRAWING-2026-11-15.md`.
 
 - Read-only wallet bridge and launcher module lifecycle: `docs/operations/EXCHANGE-WALLET-BRIDGE-LIFECYCLE-2026-11-15.md`.
+
+
+## Public demo — Wave wallet & human-test candidate (2026-11-15)
+
+This candidate wires the three Generation 1 games to the canonical Wave settlement rules documented in `docs/architecture/NU-WAVE-AND-WALLET-TRANSACTION-ECONOMY.md`.
+
+- Each game launch creates a unique local Wave ID. Successful game rewards and gameplay costs are accumulated by asset and category during the run.
+- Leaving a game, starting a new round, completing the ten-success mission, or recovering an interrupted browser session closes the Wave and writes aggregate ledger rows. Repeated settlement is guarded by Wave IDs and transaction idempotency keys.
+- Bubble Hunt: successful hunts aggregate as incoming XP. Mana Collector: successful collections aggregate as incoming Mana. Chaos Attack: successful shots aggregate +3 XP and -10 Mana each.
+- Completing ten successful interactions grants up to +1 HP under the current prototype rule. Leaving early preserves earned rewards but does not grant the completion HP reward.
+- The wallet ledger labels Incoming / Received and Outgoing / Spent movements separately. Store purchase and capsule use are represented by separate asset-direction rows.
+- The Wallet → Transactions view includes a **Download Human Test Report** action. It exports a local text snapshot with recent transactions and a manual acceptance checklist.
+
+### Public demo boundaries
+
+This is still a browser-local test candidate. Balances and transaction history are stored in localStorage; they are not server-backed, cross-device, transferable, real-money or production financial records. The report is generated locally and is not submitted to the N.U team. Do not enter personal secrets or real payment information. Public Pages deployment, real-device acceptance and human review must be confirmed before calling this release accepted.
+
+See `docs/testing/NU-PUBLIC-DEMO-WAVE-WALLET-HUMAN-QA.md` for the manual test procedure and expected outcomes.
