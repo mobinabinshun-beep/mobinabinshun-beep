@@ -135,3 +135,12 @@ test("legacy purchase ledger entries also exclude their acquired asset from Exch
   assert.ok(wallet.assetRows(save).some(row=>row.key==="hpPills"));
   assert.ok(!wallet.exchangeAssetRows(save).some(row=>row.key==="hpPills"));
 });
+
+test("store-purchased asset exclusion survives the rolling 24-transaction ledger",()=>{
+  let save=wallet.buyHpPill({xp:25,hpPills:0},{id:"durable-shop-purchase"}).state;
+  for(let i=0;i<30;i++)save=wallet.grantXP(save,1,{id:"later-reward-"+i}).state;
+  assert.equal(save.transactions.length,wallet.MAX_TRANSACTIONS);
+  assert.ok(!save.transactions.some(tx=>tx.id==="durable-shop-purchase"));
+  assert.ok(save.nonExchangeableAssets.includes("hpPills"));
+  assert.ok(!wallet.exchangeAssetRows(save).some(row=>row.key==="hpPills"));
+});
