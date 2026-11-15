@@ -74,6 +74,20 @@ Load only the local image and essential launcher UI. Do not create WebGL context
 
 This decision does not authorize changes to the classic LV/XP/Mana HUD or its lock, game mechanics, XP/Mana/HP, wallet, saves or progression, protected capability sampler/network probe, Gateway/menu architecture, Generation 2, archived experiments, canonical artwork, package sandboxing, signed catalog, dependency resolver, auto-update or cloud services.
 
-## 9. Acceptance statement
 
-The new direction is **one static canonical image and no background effects or renderer layers**, with Windows XP as the oldest compatibility target and low-spec Windows hardware as the performance reference. This is a documented design decision only. Image-only launcher CSS, XP-compatible runtime/installer, RAM measurements, compatibility testing and release acceptance remain unimplemented and unverified.
+
+## 10. Self-adaptive runtime policy
+
+A new isolated module, nu-adaptive-governor.js, is integrated after the shared graphics runtime in index.html. It listens for the existing shared graphics profile and measures short windows of actual frame pacing. Under sustained frame pressure it lowers the shared graphics level by one step; it raises the level by one step only after three consecutive headroom windows. It pauses its sampling while the document is hidden, does not run a synthetic stress test, and does not read or write XP, Mana, HP, wallet, save or progression state. It publishes nu:graphics-adjusted and reapplies the shared game-render adapter and pixel-world quality setting.
+
+This is an initial runtime governor, not proof of full automatic hardware adaptation. It reacts to frame pacing, but browser-exposed RAM/GPU details remain incomplete, it cannot directly measure total system memory pressure in many browsers, and it does not itself guarantee that every game loop obeys the target FPS. The current implementation still has existing procedural background scripts in index.html; the earlier image-only/no-background-layers decision has **not** yet been implemented in runtime markup. The launcher calibration preview also remains a separate preview and is not a native Windows installer.
+
+The governor has focused Node tests for downshifting under poor frame pacing, delayed upshifting after sustained headroom, and pausing while hidden. Tests must be run in CI before merge; no result is claimed here until CI reports it.
+
+## 11. XP compatibility remains a release blocker
+
+The governor uses an ES5-style isolated module to reduce its own parser requirements, but the surrounding application still contains modern JavaScript and browser APIs (including async functions, optional chaining, fetch, CustomEvent and modern CSS). Therefore this addition does **not** make the complete application Windows XP-compatible. A legacy runtime/transpilation strategy and clean XP SP3 execution test remain mandatory before any XP compatibility claim.
+
+## 12. Acceptance statement
+
+The target remains **automatic self-adjustment, one static canonical image and no background effects or renderer layers**, with Windows XP as the oldest compatibility target and low-spec Windows hardware as the performance reference. The first isolated frame-pacing governor has been added to source, but image-only launcher presentation, complete legacy runtime compatibility, RAM measurements, XP installer, device testing and release acceptance remain unimplemented or unverified.
