@@ -56,7 +56,7 @@ test("display-only candle tolerance is deterministic, bounded to five, and never
  assert.equal(candle.visualTolerance,second.candles[0].visualTolerance);
  assert.ok(candle.visualTolerance>=0&&candle.visualTolerance<=5);
  assert.equal(candle.close,first.index);
- assert.equal(candle.close,candle.open===candle.close?candle.close:candle.close);
+ assert.ok(Math.abs(candle.close-(100*(1+0.025*(9/19))))<1e-9);
  assert.ok(candle.high>=Math.max(candle.open,candle.close));
  assert.ok(candle.low<=Math.min(candle.open,candle.close));
 });
