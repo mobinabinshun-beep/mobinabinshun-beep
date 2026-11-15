@@ -11,6 +11,14 @@
  const STORAGE_KEY="nu_exchange_chart_annotations_v1";
  const TOOLS=new Set(["cursor","trend","horizontal","vertical","zone"]);
  const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
+ function ambientPulse(steps,phase,index){
+  const sample=(steps||[]).slice(-8),volume=sample.length?sample.reduce((n,s)=>n+(Number(s.volume)||0),0)/sample.length:0;
+  const demand=sample.reduce((n,s)=>n+(Number(s.demand)||0),0),supply=sample.reduce((n,s)=>n+(Number(s.supply)||0),0);
+  const bias=clamp((demand-supply)/(demand+supply+1),-1,1),amplitude=Math.min(3,.35+volume/10);
+  const wave=Math.sin(phase+index*.83),delta=clamp(wave*amplitude+bias*amplitude*.22,-3,3);
+  const displayVolume=Math.min(3,.3+(Math.abs(Math.cos(phase*.73+index*1.17))*2.7));
+  return {bias,amplitude,delta,volume:displayVolume};
+ }
  function create(options){
   options=options||{};
   const canvas=options.canvas,toolbar=options.toolbar,storage=options.storage||null;
@@ -60,16 +68,13 @@
    ctx.restore();
   }
   function renderAmbient(ctx,w,h,steps){
-   const sample=(steps||[]).slice(-8),vol=sample.length?sample.reduce((n,s)=>n+(Number(s.volume)||0),0)/sample.length:0;
-   const demand=sample.reduce((n,s)=>n+(Number(s.demand)||0),0),supply=sample.reduce((n,s)=>n+(Number(s.supply)||0),0);
-   const bias=clamp((demand-supply)/(demand+supply+1),-1,1),amplitude=Math.min(3,.35+vol/10),phase=Date.now()/1750;
+   const phase=Date.now()/1750,base=ambientPulse(steps,phase,0),bias=base.bias,amplitude=base.amplitude;
    const positive=getComputedStyle(document.body).getPropertyValue("--positive").trim()||"#70dfaa";
    const negative=getComputedStyle(document.body).getPropertyValue("--negative").trim()||"#ff8b91";
    const baseY=h-14,slot=w/12;
    ctx.save();
    for(let i=0;i<10;i++){
-    const wave=Math.sin(phase+i*.83),drift=clamp(wave*amplitude+bias*amplitude*.22,-3,3);
-    const volume=Math.min(3,.3+(Math.abs(Math.cos(phase*.73+i*1.17))*2.7));
+    const pulse=ambientPulse(steps,phase,i),drift=pulse.delta,volume=pulse.volume;
     const barH=3+volume*3.4,xx=slot*(i+1),yy=baseY-barH;
     ctx.globalAlpha=.11+volume/22;ctx.fillStyle=drift>=0?positive:negative;
     ctx.fillRect(xx,yy,Math.max(2,slot*.22),barH);
@@ -126,5 +131,5 @@
    destroy(){canvas.removeEventListener("pointerdown",()=>{});}
   };
  }
- return {create,TOOLS,STORAGE_KEY};
+ return {create,TOOLS,STORAGE_KEY,ambientPulse};
 });
