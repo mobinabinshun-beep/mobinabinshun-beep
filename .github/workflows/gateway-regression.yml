@@ -5,7 +5,7 @@ on:
       - "index.html"
       - "nu-hex-gateway.js"
       - "nu-hex-gateway.css"
-      - "nu-games.js"
+      - "nu-games.js"\n      - "nu-dynamic-layers.js"
       - "tests/nu-gateway-scope-regression.test.js"
       - ".github/workflows/gateway-regression.yml"
   push:
@@ -27,6 +27,6 @@ jobs:
       - name: Check JavaScript syntax
         run: |
           node --check nu-hex-gateway.js
-          node --check nu-games.js
+          node --check nu-games.js\n          node --check nu-dynamic-layers.js
       - name: Run Gateway regression tests
         run: node --test tests/nu-gateway-scope-regression.test.js
