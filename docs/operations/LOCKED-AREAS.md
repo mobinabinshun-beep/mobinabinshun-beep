@@ -3,11 +3,12 @@
 **Status:** LOCKED — temporary, in force from 2026-11-15  
 **Canonical implementation:** `nu-world.css` and the resource HUD markup in `index.html`  
 **Last restoration:** PR #97, merge commit `f09c4f8e31e59f2f746b717438654293cb4e64fa`  
-**Archive snapshot:** [`docs/archive/2026-11-15/classic-resource-hud/nu-world.css.snapshot`](../archive/2026-11-15/classic-resource-hud/nu-world.css.snapshot)
+**Archive snapshot:** [`docs/archive/2026-11-15/xp-full-width-bottom-rail/nu-world.css.snapshot`](../archive/2026-11-15/xp-full-width-bottom-rail/nu-world.css.snapshot)
 
 ## Protected behavior and presentation
-- Keep **LV** at the lower-left.
-- Keep the **XP** rail directly beneath LV and the **Mana** rail beneath XP.
+- Keep **LV** above the lower resource rails, aligned to the left.
+- Keep the **Mana** rail and its capsule count above the XP rail at the lower-left.
+- Keep the **XP** rail flush with and spanning the full bottom edge of the game viewport in all three Generation 1 games.
 - Keep the classic labels above their rails and current values centered inside the rails.
 - Preserve state-driven fill/value behavior and the Mana capsule count display.
 - Preserve responsive sizing and reduced-motion behavior.
@@ -28,6 +29,13 @@ Only a new, explicit instruction from the user that specifically requests a chan
 4. Run the focused HUD regression test and relevant build/CI checks.
 5. Record the change in this document and archive the resulting snapshot.
 6. Reinstate this temporary lock immediately after the authorized change.
+
+## Latest owner-authorized exception — 2026-11-15
+- The owner explicitly requested restoration of the XP rail across the entire bottom edge in all three core games.
+- The authorized patch changes CSS presentation only: XP is full-viewport width and flush with the bottom edge; LV and Mana remain above it; Mana capsule count remains visible.
+- XP/Mana calculations, level progression, game logic, DOM markup, wallet, save data and HP behavior remain unchanged.
+- Regression coverage was updated and the lock is reinstated immediately after this one scoped change.
+- Candidate branch: `fix/gen1-xp-full-width-bottom-rail-2026-11-15`.
 
 ## Instructions for future chats and agents
 The repository root `AGENTS.md` points every coding agent to this lock. Any contributor or assistant starting work must read this document before editing. Treat this record as the source of truth even when a prior conversation is unavailable.
