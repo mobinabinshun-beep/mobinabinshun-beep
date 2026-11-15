@@ -22,15 +22,15 @@
 </section>
 <section class="market-panel">
 <div class="panel-heading"><div><p class="eyebrow">ACTIVITY-DRIVEN SIMULATION</p><h2>MARKET INDEX</h2></div><span class="sim-tag">SIMULATED · NOT A REAL PRICE</span></div>
-<div class="market-controls"><label for="market-asset">SELECT VIRTUAL ASSET</label><select id="market-asset"></select><span id="market-events">0 RECORDED STEPS</span><label for="chart-time-scale">REPLAY PERIOD</label><select id="chart-time-scale"></select></div>
+<div class="market-controls"><label for="market-asset">SELECT VIRTUAL ASSET</label><select id="market-asset"></select><span id="market-events">0 RECORDED · SIMULATION ACTIVE</span><label for="chart-time-scale">REPLAY PERIOD</label><select id="chart-time-scale"></select></div>
 <div class="market-summary">
 <article class="exchange-card"><span>NU INDEX</span><strong id="market-index">100.00</strong></article>
 <article class="exchange-card"><span>CHANGE FROM BASELINE</span><strong id="market-change">0.00%</strong></article>
-<article class="exchange-card"><span>ACTIVITY VOLUME</span><strong id="market-volume">0</strong></article>
+<article class="exchange-card"><span>DISPLAY VOLUME · SIMULATED</span><strong id="market-volume">0</strong></article>
 <article class="exchange-card"><span>SIMULATED DEMAND</span><strong id="market-demand">0</strong></article>
 <article class="exchange-card"><span>SIMULATED SUPPLY</span><strong id="market-supply">0</strong></article><article class="exchange-card behavior-card"><span>PLAYER ACTIVITY TENDENCY</span><strong id="market-bias" class="bias-indicator">BALANCED</strong></article>
 </div>
-<div class="chart-legend"><span><i class="legend-up"></i> Index rising</span><span><i class="legend-down"></i> Index falling</span><span>RECORDED PLAYER STEPS · ANIMATED REPLAY</span><span id="replay-mode-label">SECONDS · REPLAYING YOUR SAVED ACTIVITY</span><span id="replay-progress">0 VISIBLE</span></div>
+<div class="chart-legend"><span><i class="legend-up"></i> Index rising</span><span><i class="legend-down"></i> Index falling</span><span>PLAYER HISTORY + SIMULATED BACKGROUND FLOW</span><span id="replay-mode-label">SAVED ACTIVITY + BACKGROUND SIMULATION</span><span id="replay-progress">0 VISIBLE</span></div>
 <div class="chart-tools" aria-label="Chart display controls">
  <label class="chart-range-control" for="chart-zoom">ZOOM / HISTORY <input id="chart-zoom" type="range" min="4" max="24" step="1" value="24"><output id="chart-zoom-value" for="chart-zoom">24</output></label>
  <label for="chart-theme">MODE <select id="chart-theme"><option value="night">Night</option><option value="day">Day</option></select></label>
@@ -55,8 +55,8 @@
  <small data-ambient-status>BACKGROUND FLOW · LOCAL SIMULATION · MAX 3 UNITS · VISUAL ONLY</small>
 </div>
 <canvas id="market-chart" role="img" aria-label="Fictional N.U market index candlestick chart"></canvas>
-<div id="market-empty" class="chart-empty">No local activity has been recorded for this asset yet. The simulator will create candles only after in-game wallet activity occurs.</div>
-<div class="panel-heading"><div><p class="eyebrow">LAST FIVE RECORDED STEPS</p><h2>PLAYER MARKET HISTORY</h2></div><span>LOCAL ACTIVITY ONLY</span></div><div id="market-history" class="asset-transactions"></div><p class="panel-note">Only your own recorded asset changes are replayed. Positive and negative deltas are visual tendencies, not a shared order book, real demand, or real prices. Replay speed changes presentation only; it never creates transactions.</p>
+<div id="market-empty" class="chart-empty">Background candles are active as a display-only simulation. Recorded player activity will appear separately when it occurs.</div>
+<div class="panel-heading"><div><p class="eyebrow">LAST FIVE RECORDED STEPS</p><h2>PLAYER MARKET HISTORY</h2></div><span>LOCAL ACTIVITY ONLY</span></div><div id="market-history" class="asset-transactions"></div><p class="panel-note">Recorded player activity remains separate from simulated background candles and volume. Background movement is fictional, locally generated, and never represents real players, real trades, a shared order book, or wallet transactions. It never changes balances or saved transaction history.</p>
 </section>
 <section class="exchange-panel">
 <div class="panel-heading"><div><p class="eyebrow">YOUR WALLET · SINGLE-PLAYER LOCAL BALANCE</p><h2>ASSET BALANCE HISTORY</h2></div><span id="history-count">0 RECORDS</span></div>
