@@ -30,7 +30,8 @@ The game adapter records Golden HP Capsule use, HP restoration, Chaos Attack dam
 - `docs/operations/2026-11-15-wallet-health-module.md`: this record.
 
 ## Verification
-- Automated tests are added but have not yet been executed in a repository runner.
+- Automated tests are added but have not yet been executed in a repository runner. Suggested command: `node --test tests/nu-wallet.test.js` (this entry point includes the Health tests).
+- No GitHub Actions workflow runs or commit status checks were returned for the candidate PR; CI is therefore **NOT VERIFIED**, not passed.
 - Browser/device acceptance remains pending; do not mark approved from source review or CI alone.
 - Confirm four category lists, independent retention, event recording across games, and no health fields in wallet transactions.
 
