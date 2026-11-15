@@ -72,6 +72,7 @@ function positionGameAssetProfile(trigger){
 }
 function showGameAssetProfile(trigger){
  const root=$("game-asset-profile");if(!root||!trigger)return;
+ if(activeAssetTrigger===trigger&&!root.hidden)return;
  renderGameAssetProfile();if(!root.childElementCount)return;
  activeAssetTrigger=trigger;root.hidden=false;setAssetProfileExpanded(true);positionGameAssetProfile(trigger);
 }
