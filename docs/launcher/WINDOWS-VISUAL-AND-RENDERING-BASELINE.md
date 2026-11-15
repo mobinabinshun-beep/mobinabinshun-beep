@@ -91,3 +91,44 @@ The governor uses an ES5-style isolated module to reduce its own parser requirem
 ## 12. Acceptance statement
 
 The active Generation 1 page now mounts only the canonical image background and no procedural background layers; the launcher applies its calibration automatically by default, the game runtime consumes that saved profile, and the adaptive governor tunes game render quality/FPS pacing from live frame timing. The canonical PNG is still missing from the public source tree, so the image itself cannot yet be displayed and the page uses its neutral CSS base. Complete legacy runtime compatibility, measured RAM, an XP installer, device testing and release acceptance remain unimplemented or unverified.
+
+
+## 10. Mandatory automatic adaptation contract
+
+The launcher must select and maintain its own resource profile. Manual graphics-level selection is not the intended end-user workflow and must not be required for successful startup.
+
+### Startup
+- Start with a conservative bootstrap profile before collecting optional device information.
+- Detect the actual runtime/OS capabilities first. Never infer Windows XP support merely from a Windows user-agent string.
+- Read memory/CPU/GPU hints only when exposed by the host. Treat missing, contradictory or permission-restricted values as unknown.
+- Do not run stress tests, large allocations, WebGL probes or long synchronous loops just to score a device.
+- Choose the safest supported profile automatically and proceed to the usable launcher UI without a profile-selection screen.
+
+### Runtime adaptation
+- Monitor lightweight, passive signals: task duration/frame delay where available, long tasks where supported, memory pressure only when an actual API exists, visibility changes and repeated resource/load failures.
+- Use hysteresis and cooldowns so the profile does not oscillate. A degradation response must be faster than a quality increase.
+- On sustained pressure, step down in this order: stop nonessential work; reduce image decode/target dimensions where a verified smaller approved variant exists; reduce polling/update frequency; defer noncritical work; keep the foreground UI responsive.
+- On sustained headroom, only restore optional work if such work is explicitly enabled in the product design. The image-only baseline has no decorative renderer to scale up.
+- Never use invented RAM values or pretend browser memory hints are exact process measurements.
+- Persist only a small profile/version record if persistence is useful. Re-evaluate after runtime/OS changes and allow safe recovery from corrupt or stale settings.
+
+### User experience
+- No mandatory performance-level chooser or repeated calibration prompt.
+- No blocking hardware scan. Start the shell immediately using the conservative profile; refine silently.
+- If detection fails, continue in safe mode and report the limitation in diagnostics, not as a user-facing failure.
+- Keep accessibility, text clarity, foreground controls, navigation and game rules invariant across profiles.
+- Diagnostics may explain the selected profile and why it changed, but users are not required to configure it.
+
+### Architecture and protected code
+- There must be one authoritative capability/performance profile shared by launcher and game adapters; do not create competing benchmark systems.
+- The existing protected capability sampler/network probe and locked gameplay/HUD systems are not authorized for modification by this decision. First map their current APIs and tests. If the existing sampler cannot support automatic adaptation, propose a narrow adapter that consumes its output rather than rewriting the protected sampler.
+- Do not change network reachability checks as a proxy for hardware performance. Network state may affect network features, not CPU/RAM/GPU classification.
+- Any runtime adaptation implementation must include deterministic unit tests for missing APIs, low-memory hints, slow task signals, cooldown/hysteresis, tab hide/resume, stale/corrupt saved profiles and foreground invariants.
+
+### Acceptance gates
+- Automatic profile selection occurs without user input.
+- The launcher remains usable when all optional hardware APIs are absent.
+- No heavy benchmark or unbounded observer/timer is introduced.
+- Runtime pressure causes a bounded, explainable step-down without changing foreground geometry or game state.
+- XP SP3 and newer Windows targets are tested independently on the actual selected host/runtime.
+- RAM targets in Section 5 are verified using process working-set measurements on the stated configurations; browser-provided memory class is not accepted as proof.
