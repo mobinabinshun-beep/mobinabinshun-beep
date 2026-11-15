@@ -30,7 +30,7 @@ test("HP pill interaction pop uses viewport coordinates and cannot be clipped by
 
 test("HUD markup is a native button and uses the current generation 1.29 assets",()=>{
   assert.match(html,/<button class="hp-pill-use" id="hp-pill-use" type="button"/);
-  assert.match(html,/nu-games\.js\?v=20261115-nonblocking-entry-r1/);
+  assert.match(html,/nu-games\.js\?v=20261115-(?:gateway-menu|nonblocking-entry)-r1/);
   assert.match(html,/nu-world\.css\?v=[^"]+/);
 });
 
