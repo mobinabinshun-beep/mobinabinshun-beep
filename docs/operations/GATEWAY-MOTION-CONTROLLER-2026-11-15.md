@@ -50,7 +50,7 @@ The prior controller was selection-first: hovering an option only highlighted it
 - Focused source assertions for hover-open, touch-open, movement activation, touch-drag hit-testing, duplicate guard, cache token, scrim blocking and input/resize isolation: PASS.
 - Mocked interaction harness: mouse hover-open/action, touch contact-open/drag-action, pointer/keyboard/wheel isolation, resize suppression, Menu/Profile pause restoration, and preservation of a pre-existing manual pause: PASS.
 - Full Gateway regression execution: pending.
-- GitHub Actions: no workflow runs or commit status checks were returned for the PR head; CI is therefore NOT VERIFIED.
+- GitHub Actions: no workflow runs or commit status checks were returned for this PR head; CI is therefore NOT VERIFIED. The separate Dynamic Layers guard PR #125 reports CI PASS but remains unmerged.
 - Human mouse/touch/keyboard and responsive browser QA: pending.
 - Reference rationale in `mobinabinshun-beep/Repository` was updated to match movement-first activation (commit `c3f70441d7f84483acf6bf257f1e45eb05715f84`).
 - Merge/deployment: not performed.
