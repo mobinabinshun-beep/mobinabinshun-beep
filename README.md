@@ -525,3 +525,12 @@ This candidate wires the three Generation 1 games to the canonical Wave settleme
 This is still a browser-local test candidate. Balances and transaction history are stored in localStorage; they are not server-backed, cross-device, transferable, real-money or production financial records. The report is generated locally and is not submitted to the N.U team. Do not enter personal secrets or real payment information. Public Pages deployment, real-device acceptance and human review must be confirmed before calling this release accepted.
 
 See `docs/testing/NU-PUBLIC-DEMO-WAVE-WALLET-HUMAN-QA.md` for the manual test procedure and expected outcomes.
+
+
+### N.U Casino — wallet-backed betting candidate (2026-11-15)
+
+The three existing casino games now use spendable positive assets from the shared N.U Wallet instead of a casino-only wager balance. Players select the asset and base wager (1 unit up to the available balance). The effective wager follows the visible 1× / 2× / 4× / 8× double-up ladder: a loss advances, a win or break-even resets, and leaving the casino resets the sequence. Each casino round is a separate operation (not a core-game Wave) with outgoing wager and non-zero incoming payout rows sharing a round ID.
+
+The existing Coin Flip 2×, Lucky Dice 5×, Mini Slots triple 8× and pair 2× gross payout rules remain unchanged. Mana payouts respect the current storage capacity. Short round feedback respects reduced-motion preferences.
+
+See `docs/architecture/NU-CASINO-WALLET-BETTING-ECONOMY.md`. This is still local virtual demo activity only; no real-money deposits, withdrawals, cash-out or server-backed ledger exist. Add casino checks from `docs/testing/NU-PUBLIC-DEMO-WAVE-WALLET-HUMAN-QA.md` to the manual acceptance run.

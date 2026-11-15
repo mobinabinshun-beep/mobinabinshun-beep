@@ -141,6 +141,10 @@ Do not:
 - settle a Wave more than once;
 - duplicate a game reward in both the game profile and the global wallet.
 
+## 7.1 Casino betting is a separate wallet operation
+
+N.U Casino bets are not core-game Waves. Each casino round is an independent operation with a round ID: the wager is recorded as an outgoing/spent wallet row, and any non-zero payout is a separate incoming/received row. The casino uses spendable assets from the shared wallet and does not mint a separate casino-only balance. The betting ladder and existing mini-game payout rules are defined in [NU-CASINO-WALLET-BETTING-ECONOMY.md](NU-CASINO-WALLET-BETTING-ECONOMY.md). All casino values remain local virtual demo assets with no monetary value.
+
 ## 8. Canonical terminology
 
 - **HP-economy Wave:** one completed 10-successful-interaction mission in a core Generation 1 game round.
