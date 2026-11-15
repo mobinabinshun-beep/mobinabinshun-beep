@@ -95,3 +95,11 @@ test("launcher calibration auto-applies by default instead of requiring a level 
   const launcher = fs.readFileSync(path.join(__dirname, "..", "nu-launcher.js"), "utf8");
   assert.match(launcher, /calibrate\(!!p\.ask\)\.catch\(fail\)/);
 });
+
+test("adaptive quality updates the game renderer without touching game progression", function () {
+  const games = fs.readFileSync(path.join(__dirname, "..", "nu-games.js"), "utf8");
+  const match = games.match(/window\.addEventListener\("nu:graphics-adjusted",function\(event\)\{([\s\S]*?)\}\);/);
+  assert.ok(match, "game renderer must consume adaptive quality events");
+  assert.match(match[1], /state\.quality=/);
+  assert.doesNotMatch(match[1], /state\.save|recordGameDelta|xp|mana|hp/i);
+});
