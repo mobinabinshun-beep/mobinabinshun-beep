@@ -8,7 +8,7 @@
  function walletReader(){
   if(!root.NU||!root.NUWallet)throw new Error("Canonical N.U wallet is not available");
   const raw=root.NU.load(),save=root.NUWallet.normalizeSave(raw);
-  return {source:"nu-world-save-v1",player:{id:String(save.playerId||"LOCAL-PLAYER"),name:String(save.displayName||"N.U Explorer"),level:Number(save.level)||1},assets:root.NUWallet.assetRows(save),unpricedFields:{xCredits:Number(save.xCredits)||0,nCredits:Number(save.nCredits)||0},transactions:Array.isArray(save.transactions)?save.transactions.slice(-10).reverse():[],transactionCount:Array.isArray(save.transactions)?save.transactions.length:0,mode:"LOCAL_READ_ONLY",readAt:new Date().toISOString()};
+  return {source:"nu-world-save-v1",player:{id:String(save.playerId||"LOCAL-PLAYER"),displayName:String(save.displayName||"N.U Explorer"),callsign:String(save.callsign||""),level:Number(save.level)||1},assets:root.NUWallet.assetRows(save),unpricedFields:{xCredits:Number(save.xCredits)||0,nCredits:Number(save.nCredits)||0},transactions:Array.isArray(save.transactions)?save.transactions.slice(-10).reverse():[],transactionCount:Array.isArray(save.transactions)?save.transactions.length:0,mode:"LOCAL_READ_ONLY",readAt:new Date().toISOString()};
  }
  function walletEngine(){return {read:walletReader,refresh(){const snapshot=walletReader();root.dispatchEvent(new root.CustomEvent("nu:exchange:wallet-refresh",{detail:snapshot}));return snapshot;}}}
  function cleanManifest(m){
