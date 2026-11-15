@@ -162,3 +162,19 @@ test("HP pill action has a generous 48px hit target and no extra particle burst 
   assert.ok(css.includes("width:48px!important"));assert.ok(css.includes("height:48px!important"));
   assert.ok(games.includes("duration:opening?440:380"));
 });
+
+
+test("successful HP capsule use renders an accessible transaction notice inside the HP bar",()=>{
+  assert.match(games,/function announceHpBarTransaction\(restored\)/);
+  assert.match(games,/cost\.textContent="−1 CAPSULE HEAL"/);
+  assert.match(games,/gain\.textContent="\+"\+restored\+" HP"/);
+  assert.match(games,/announceHpBarTransaction\(result\.restored\)/);
+  assert.match(games,/notice\.setAttribute\("aria-live","polite"\)/);
+  assert.match(css,/#game-view\.active \.hp-bar \.hp-bar-transaction\.is-visible/);
+});
+
+test("HP transaction feedback remains separate from capsule drawer motion",()=>{
+  assert.match(games,/function animateHpPillTravel\(direction\)/);
+  assert.match(games,/function announceHpBarTransaction\(restored\)/);
+  assert.match(games,/announceHpBarTransaction\(result\.restored\)/);
+});
