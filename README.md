@@ -493,3 +493,8 @@ The experimental profile keeps the restored historical four-field card as its ba
 
 ## Temporarily locked UI area
 The classic lower-left LV / XP / Mana resource bars are protected from incidental edits. All coding agents and contributors must read [AGENTS.md](./AGENTS.md) and [the lock record](./docs/operations/LOCKED-AREAS.md) before making changes. This area may only be changed after a new, explicit user instruction naming the classic resource bars.
+
+## Gateway and Exchange operational contract — 2026-11-15
+
+- [Gateway menu and Exchange implementation record](./docs/operations/GATEWAY-MENU-EXCHANGE-IMPLEMENTATION-2026-11-15.md) — Back/Menu/Profile one-click Gateway, complete background freeze, centered keyboard-keycap module list and non-exchangeable Store purchases.
+- [Gateway purpose and rationale archive](https://github.com/mobinabinshun-beep/Repository/blob/main/Operations/2026-11-15/GATEWAY-PURPOSE-AND-RATIONALE-fa.md) — owner-corrected product purpose, menu hierarchy and future-scope boundaries.
