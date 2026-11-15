@@ -5,10 +5,16 @@ on:
       - "index.html"
       - "nu-background-engine.js"
       - "nu-graphics-runtime.js"
+      - "nu-adaptive-governor.js"
+      - "nu-games.js"
+      - "nu-launcher.js"
+      - "nu-game-render-adapter.js"
       - "nu-world.css"
       - "nu-hex-gateway.css"
       - "tests/nu-layer-contract.test.js"
       - "tests/nu-background-engine.test.js"
+      - "tests/nu-adaptive-governor.test.js"
+      - "tests/nu-hex-gateway.test.js"
       - "docs/architecture/NU-UI-LAYER-AND-EXTENSION-ISOLATION-PROTOCOL.md"
       - "assets/backgrounds/**"
       - "assets/nu-celestial-city.png"
@@ -42,23 +48,31 @@ jobs:
         run: |
           set -euo pipefail
           grep -Fq 'const ASSET="./assets/nu-celestial-city.png"' nu-background-engine.js
-          if [ -f assets/nu-celestial-city.png ]; then test -s assets/nu-celestial-city.png; else echo "Canonical PNG not yet transferred; procedural fallback must remain available."; fi
+          if [ -f assets/nu-celestial-city.png ]; then test -s assets/nu-celestial-city.png; else echo "Canonical PNG missing; active page must use neutral solid fallback and must not start procedural renderers."; fi
           grep -Fq 'id="nu-background-image"' nu-background-engine.js
           grep -Fq 'z-index:var(--nu-layer-world-background,0);overflow:hidden' nu-background-engine.js
           grep -Fq 'world.insertBefore(node,world.firstChild)' nu-background-engine.js
-          grep -Fq 'world>.sky{position:absolute;z-index:var(--nu-layer-world-atmosphere,1)!important' nu-world.css
-          grep -Fq 'nu-pixel-world.js' index.html
           grep -Fq 'nu-background-engine.js' index.html
-          grep -Fq 'visualOverlays:status.loaded?"image-first":"procedural-fallback"' nu-graphics-runtime.js
-          grep -Fq 'NUPixelWorld&&g.NUPixelWorld.setEnabled&&g.NUPixelWorld.setEnabled(true)' nu-graphics-runtime.js
+          grep -Fq 'nu-adaptive-governor.js' index.html
+          ! grep -Fq 'nu-dynamic-layers.js' index.html
+          ! grep -Fq 'nu-pixel-world.js' index.html
+          ! grep -Fq 'id="pixel-world"' index.html
+          ! grep -Fq 'id="world-canvas"' index.html
+          ! grep -Fq 'class="sky"' index.html
+          ! grep -Fq 'class="horizon"' index.html
+          grep -Fq 'imageOnly: true' nu-graphics-runtime.js
+          grep -Fq 'visualOverlays: "none"' nu-graphics-runtime.js
+          grep -Fq 'fallback: status.loaded ? null : "solid-color"' nu-graphics-runtime.js
+          grep -Fq 'nu:graphics-adjusted' nu-games.js
+          grep -Fq 'state.quality=' nu-games.js
           test -s archive/visual-layers/nu-pixel-world.js
           test -s archive/visual-layers/nu-dynamic-layers.js
       - name: Check runtime JavaScript syntax
         shell: bash
         run: |
           set -euo pipefail
-          for file in nu-background-engine.js nu-graphics-runtime.js nu-graphics-core.js nu-dynamic-layers.js nu-game-render-adapter.js; do
+          for file in nu-background-engine.js nu-graphics-runtime.js nu-graphics-core.js nu-adaptive-governor.js nu-game-render-adapter.js nu-games.js nu-launcher.js; do
             node --check "$file"
           done
       - name: Enforce UI layer and foreground safety contract
-        run: node --test tests/nu-background-engine.test.js tests/nu-layer-contract.test.js
+        run: node --test tests/nu-background-engine.test.js tests/nu-layer-contract.test.js tests/nu-adaptive-governor.test.js tests/nu-hex-gateway.test.js
