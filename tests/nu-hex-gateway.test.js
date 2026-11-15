@@ -62,6 +62,7 @@ test("Outside exit preserves the 10px boundary tolerance and resumes the game", 
   assert.match(css, /filter:blur\(2\.5px\)/);
   assert.match(css, /backdrop-filter:none/);
   assert.doesNotMatch(css, /body\.nu-gateway-open \.world,body\.nu-gateway-open/);
+  assert.doesNotMatch(css, /body\.nu-gateway-open \.world \*/);
 });
 
 test("Opening Gateway pauses both the game round and ambient world renderers", () => {
