@@ -1,0 +1,90 @@
+name: N.U Windows legacy launcher 0.1
+
+on:
+  pull_request:
+    paths:
+      - "launcher/windows/**"
+      - "assets/backgrounds/niroo-universe-background.svg"
+      - "nu-graphics-core.js"
+      - ".github/workflows/windows-launcher.yml"
+  push:
+    paths:
+      - "launcher/windows/**"
+      - "assets/backgrounds/niroo-universe-background.svg"
+      - "nu-graphics-core.js"
+      - ".github/workflows/windows-launcher.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-x86-installer:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Install 32-bit MinGW toolchain
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW32
+          update: false
+          cache: true
+          install: mingw-w64-i686-gcc
+
+      - name: Install image conversion dependency
+        shell: pwsh
+        run: python -m pip install --disable-pip-version-check pillow
+
+      - name: Prepare the single still background image
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force build | Out-Null
+          python launcher/windows/make-background.py
+
+      - name: Compile static 32-bit Win32 launcher
+        shell: msys2 {0}
+        run: |
+          set -euo pipefail
+          i686-w64-mingw32-g++ -std=c++11 -Os -s -static -static-libgcc -static-libstdc++ -mwindows \
+            -Wl,--subsystem,windows -Wl,--major-subsystem-version,5 -Wl,--minor-subsystem-version,1 \
+            -o build/NULauncher.exe launcher/windows/nu-launcher-win32.cpp \
+            -luser32 -lgdi32 -lshell32
+
+      - name: Install NSIS
+        shell: pwsh
+        run: choco install nsis -y --no-progress
+
+      - name: Build installer
+        shell: pwsh
+        run: |
+          $makensis = (Get-Command makensis.exe -ErrorAction SilentlyContinue).Source
+          if (-not $makensis) {
+            $candidate = "C:\\Program Files (x86)\\NSIS\\makensis.exe"
+            if (Test-Path $candidate) { $makensis = $candidate }
+          }
+          if (-not $makensis) { throw "makensis.exe was not found after NSIS installation." }
+          & $makensis /V3 launcher/windows/installer.nsi
+          if (-not (Test-Path "N.U-Launcher-Setup-0.1.exe")) { throw "Installer output missing." }
+
+      - name: Check browser graphics adapter syntax
+        shell: pwsh
+        run: node --check nu-graphics-core.js
+
+      - name: Create SHA-256 checksums
+        shell: pwsh
+        run: |
+          Get-FileHash "N.U-Launcher-Setup-0.1.exe" -Algorithm SHA256 |
+            ForEach-Object { "$($_.Hash)  N.U-Launcher-Setup-0.1.exe" } |
+            Set-Content -Encoding ascii "N.U-Launcher-Setup-0.1.exe.sha256"
+
+      - name: Upload installer candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: N.U-Windows-Launcher-0.1-x86-installer
+          path: |
+            N.U-Launcher-Setup-0.1.exe
+            N.U-Launcher-Setup-0.1.exe.sha256
+          if-no-files-found: error
+          retention-days: 14

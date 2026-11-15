@@ -72,3 +72,8 @@ Not yet implemented:
 
 ## Human acceptance gates
 Do not describe this as production-ready until real-device tests verify startup gate, no premature game execution, CPU/GPU/memory/network fallbacks, ten-level budget behavior, reduced motion, touch, keyboard accessibility, refresh/reset, saved preferences, extension isolation, package integrity, rollback, and actual public deployment.
+
+
+## Native Windows delivery candidate (2026-11-15)
+
+A separate 32-bit Win32 shell and NSIS setup candidate is being introduced under `launcher/windows/`. It uses a single still background image, local RAM/CPU heuristics and a `nuNativeLevel` URL ceiling consumed by `nu-graphics-core.js`. This is an initial installer experiment, not a production native package manager or proof of Windows XP support. See `docs/operations/NU-WINDOWS-LAUNCHER-0.1.md` for exact scope and acceptance gates.
