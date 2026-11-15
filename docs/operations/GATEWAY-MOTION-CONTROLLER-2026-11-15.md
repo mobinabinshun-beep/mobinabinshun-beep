@@ -52,7 +52,7 @@ The prior controller was selection-first: hovering an option only highlighted it
 - Full Gateway regression execution: pending.
 - GitHub Actions: no workflow runs or commit status checks were returned for the PR head; CI is therefore NOT VERIFIED.
 - Human mouse/touch/keyboard and responsive browser QA: pending.
-- Reference rationale in `mobinabinshun-beep/Repository` was updated to match movement-first activation (commit `39bd31f604ddb78b5a78405b0332698c4e5c3049`).
+- Reference rationale in `mobinabinshun-beep/Repository` was updated to match movement-first activation (commit `c3f70441d7f84483acf6bf257f1e45eb05715f84`).
 - Merge/deployment: not performed.
 
 ## Rollback
