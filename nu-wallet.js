@@ -154,6 +154,7 @@
     const credited=Math.min(requested,Math.max(0,capacity-afterStake)),finalBalance=afterStake+credited;
     if(Object.prototype.hasOwnProperty.call(next,asset))next[asset]=finalBalance;
     else {next.assets=Object.assign({},next.assets||{},{[asset]:finalBalance});}
+    if(asset==="xp"&&credited>0)next.level=Math.max(1,next.level+Math.max(0,Math.floor(finalBalance/100)-Math.floor(current/100)));
     const at=new Date().toISOString(),gameId=String(details.gameId||"casino"),source="nu.casino",base={at,playerId:String(next.playerId||"guest-local"),source,gameId,roundId,game:String(details.game||gameId),detail:String(details.detail||""),settlementStatus:"SETTLED"};
     const entries=[{...base,id:roundId+"|stake",kind:"casino-bet",title:"N.U Casino · "+base.game+" · wager spent",asset,direction:"OUTGOING",signedAmount:-bet,category:"CASINO_WAGER",resultingBalance:afterStake,idempotencyKey:roundId+"|stake",deltas:{[asset]:-bet}}];
     if(credited>0)entries.push({...base,id:roundId+"|payout",kind:"casino-payout",title:"N.U Casino · "+base.game+" · payout received",asset,direction:"INCOMING",signedAmount:credited,requestedPayout:requested,payoutCapped:credited<requested,category:"CASINO_PAYOUT",resultingBalance:finalBalance,idempotencyKey:roundId+"|payout",deltas:{[asset]:credited}});
