@@ -28,17 +28,18 @@
     if (running) return;
     running = true;
     g.NUGraphicsCore.start(sample).then(function (profile) {
+      var activeProfile = g.NUGraphicsProfile || profile;
       g.NUBackgroundEngine.mount();
-      g.NUBackgroundEngine.setQuality(profile.budget);
-      g.NUGameRenderAdapter.apply(profile);
+      g.NUBackgroundEngine.setQuality(activeProfile.budget);
+      g.NUGameRenderAdapter.apply(activeProfile);
 
       // Image failure is fail-closed: keep the neutral CSS base and never
       // activate a procedural renderer, canvas, particle system or overlay.
       g.addEventListener("nu:background-ready", function () {
-        emitReady(profile);
+        emitReady(activeProfile);
       }, { once: true });
       g.addEventListener("nu:background-missing", function () {
-        emitReady(profile);
+        emitReady(activeProfile);
       }, { once: true });
       emitReady(profile);
     }).catch(function (error) {
