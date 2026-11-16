@@ -152,16 +152,17 @@
     $("player-name-input").value=s.displayName||"";
     $("player-callsign-input").value=s.callsign||"";
   }
-  let previousView=null;
+  const viewStack=[];
   function setWalletTab(name){
-    document.querySelectorAll("[data-wallet-tab]").forEach(button=>{const active=button.dataset.walletTab===name;button.classList.toggle("is-active",active);button.setAttribute("aria-selected",String(active));});
+    document.querySelectorAll("[data-wallet-tab]").forEach(button=>{const active=button.dataset.walletTab===name;button.classList.toggle("is-active",active);button.setAttribute("aria-selected",String(active));button.tabIndex=active||button.dataset.walletTab==="profile"?0:-1;});
     document.querySelectorAll("[data-wallet-panel]").forEach(panel=>{panel.hidden=panel.dataset.walletPanel!==name;});
     if(name==="transactions")renderWallet();
     if(name==="health")renderHealth();
     if(name==="mana")renderManaHistory();
   }
   function open(view){
-    previousView=document.querySelector(".view.active");
+    const activeView=document.querySelector(".view.active");
+    if(activeView&&activeView!==view)viewStack.push({view:activeView,focus:document.activeElement});
     window.dispatchEvent(new Event("nu:player-overlay-open"));
     document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));
     view.classList.add("active");
@@ -170,8 +171,19 @@
     else if(view===inventoryView)renderInventory();
     else if(view===profileView)renderProfile();
     const menu=$("menu");if(menu)menu.classList.remove("open");
+    const heading=view.querySelector(".view-head h2");if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}
   }
-  function close(){if(profileView.classList.contains("active")){["demo-name","demo-call","demo-family","demo-age","demo-age-band","demo-bio","demo-interests","demo-passphrase-test"].forEach(id=>{const field=$(id);if(field)field.value="";});const warning=$("demo-profile-warning");if(warning)warning.hidden=true;applyAppearance(true);resetWorkshop();}document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));(previousView&&previousView!==profileView?previousView:$("home-view")).classList.add("active");previousView=null;window.dispatchEvent(new Event("nu:player-overlay-close"));}
+  function close(){
+    if(profileView.classList.contains("active")){["demo-name","demo-call","demo-family","demo-age","demo-age-band","demo-bio","demo-interests","demo-passphrase-test"].forEach(id=>{const field=$(id);if(field)field.value="";});const warning=$("demo-profile-warning");if(warning)warning.hidden=true;applyAppearance(true);resetWorkshop();}
+    document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));
+    const previous=viewStack.pop(),returnView=previous&&previous.view?previous.view:$("home-view");returnView.classList.add("active");
+    const returnTarget=previous&&previous.focus;
+    const hidden=returnTarget&&(!returnTarget.isConnected||returnTarget.closest(".view:not(.active)")||returnTarget.closest("#menu:not(.open)")||returnTarget.closest("#nu-hex-gateway:not(.is-open)")||returnTarget.closest("[hidden]"));
+    if(returnTarget&&!hidden)returnTarget.focus({preventScroll:true});
+    else if(returnTarget&&returnTarget.closest&&returnTarget.closest("#nu-hex-gateway")){const trigger=document.querySelector(".nu-gateway-trigger");if(trigger)trigger.focus({preventScroll:true});}
+    else{const heading=returnView.querySelector(".view-head h2");if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}else{$("menu-open")?.focus({preventScroll:true});}}
+    window.dispatchEvent(new Event("nu:player-overlay-close"));
+  }
   $("bag-back").addEventListener("click",close);
   $("inventory-back").addEventListener("click",close);
   $("wallet-back").addEventListener("click",close);
@@ -353,15 +365,22 @@
   if(demoClose)demoClose.addEventListener("click",close);
   if(demoClear)demoClear.addEventListener("click",close);
   profileView.addEventListener("click",event=>{if(event.target===profileView)close();});
-  document.addEventListener("keydown",event=>{if(event.key==="Enter"&&profileView.classList.contains("active")){event.preventDefault();close();}});
+  document.addEventListener("keydown",event=>{if(event.key==="Escape"&&profileView.classList.contains("active")){event.preventDefault();close();}});
   $("menu-bag").addEventListener("click",()=>open(bagView));
   document.querySelectorAll("[data-bag-destination]").forEach(button=>button.addEventListener("click",()=>{const destination=button.dataset.bagDestination;if(destination==="bag")open(bagView);else if(destination==="inventory")open(inventoryView);else if(destination==="wallet")open(walletView);else if(destination==="profile")open(profileView);}));
   $("menu-profile").addEventListener("click",()=>open(profileView));
-  document.querySelectorAll("[data-wallet-tab]").forEach(button=>button.addEventListener("click",()=>{
-    const tab=button.dataset.walletTab;
-    if(tab==="profile"){open(profileView);return;}
-    setWalletTab(tab);
-  }));
+  const walletTabButtons=[...document.querySelectorAll("[data-wallet-tab]")];
+  walletTabButtons.forEach((button,index)=>{
+    button.addEventListener("click",()=>{const tab=button.dataset.walletTab;if(tab==="profile"){open(profileView);return;}setWalletTab(tab);});
+    button.addEventListener("keydown",event=>{
+      if(!["ArrowLeft","ArrowRight","Home","End"].includes(event.key))return;
+      event.preventDefault();
+      const nextIndex=event.key==="Home"?0:event.key==="End"?walletTabButtons.length-1:(index+(event.key==="ArrowRight"?1:-1)+walletTabButtons.length)%walletTabButtons.length;
+      const target=walletTabButtons[nextIndex],tab=target.dataset.walletTab;
+      if(tab==="profile"){open(profileView);return;}
+      setWalletTab(tab);target.focus({preventScroll:true});
+    });
+  });
   const identitySave=$("player-identity-save");
   if(identitySave)identitySave.addEventListener("click",()=>{
     const s=ensureIdentity();
