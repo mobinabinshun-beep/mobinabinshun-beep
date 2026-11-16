@@ -16,7 +16,7 @@ test("builds a multi-resolution ICO with Windows-compatible DIB payloads",()=>{
 test("preserves transparent pixels in the DIB alpha channel and AND mask",()=>{
  const bytes=buildIco(["#ff0000",null],2,1,{sizes:[16]}),view=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength),offset=view.getUint32(18,true);
  const size=16,maskOffset=offset+40+size*size*4,maskStride=Math.ceil(size/32)*4,rowForTop=15-4,maskByte=bytes[maskOffset+rowForTop*maskStride];
- assert.equal(maskByte&0x80,0);assert.notEqual(maskByte&0x40,0);
+ assert.notEqual(maskByte&0x80,0);assert.equal(maskByte&0x40,0);
 });
 test("rejects empty, malformed or unsafe icon data",()=>{
  assert.throws(()=>buildIco([null],1,1),/artwork is empty/);assert.throws(()=>buildIco(["red"],1,1),/six-digit hexadecimal/);

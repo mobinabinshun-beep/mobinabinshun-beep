@@ -229,7 +229,7 @@ function svgSource(){
  if(!pixels.some(Boolean))throw new Error("The artwork is empty. Draw or import an image before exporting SVG.");
  try{
   const result=window.NUSVGVectorizer.vectorize(pixels,width,height,{mode:$("vector-mode").value});
-  if(result.pathCount>0&&/<path\\b/.test(result.source))return result;
+  if(result.pathCount>0&&/<path\b/.test(result.source))return result;
   return {source:rasterSvgSource(),pathCount:0,colorCount:palette.length,mode:"embedded-raster-fallback",fallback:true};
  }catch(error){
   if(!(error instanceof RangeError))throw error;
