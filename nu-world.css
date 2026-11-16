@@ -776,3 +776,8 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
  .bag-shortcut{flex:1 1 auto;padding:7px 8px;font-size:8px}
  .wallet-card-tab{flex:1 1 28%;font-size:8px;padding:9px 3px}
 }
+
+/* A zero-count HP Capsule is actionable only when the player can afford it. */
+.hp-pill-use.is-purchasable{border-color:#f3cb79;background:rgba(75,53,20,.9);color:#ffe2a0;box-shadow:0 0 13px rgba(243,203,121,.28)}
+.hp-pill-use.is-purchasable img{filter:drop-shadow(0 0 5px rgba(255,210,112,.65))}
+.hp-pill-use.is-purchasable:focus-visible{outline-color:#ffe2a0}
