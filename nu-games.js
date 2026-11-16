@@ -107,7 +107,7 @@ function animateHpPillTravel(direction){
  const bar=$("hp-bar"),button=$("hp-pill-use"),source=button&&button.querySelector("img");
  if(!bar||!button)return;
  button.hidden=true;
- const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+ const reduced=(window.NUMotion&&window.NUMotion.isReduced())||(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);
  if(reduced||!source||typeof source.animate!=="function"){
   if(hpPillTravelAnimation){hpPillTravelAnimation.cancel();hpPillTravelAnimation=null;}
   if(hpPillTravelLayer){hpPillTravelLayer.remove();hpPillTravelLayer=null;hpPillTravelGhost=null;}
