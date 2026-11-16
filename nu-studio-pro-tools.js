@@ -57,7 +57,7 @@
   const out=pixels.slice(),mask=new Uint8Array(w*h),src=pixels.slice();
   for(let y=t;y<=b;y++)for(let x=l;x<=r;x++)if(selection[idx(x,y,w)])out[idx(x,y,w)]=null;
   const left=Math.round(cx-nw/2),top=Math.round(cy-nh/2);
-  for(let y=0;y<nh;y++)for(let x=0;x<nw;x++){const dx=left+x,dy=top+y;if(dx<0||dy<0||dx>=w||dy>=h)continue;const sx=l+Math.min(r-l,Math.floor(x/scaleX)),sy=t+Math.min(b-t,Math.floor(y/scaleY));const si=idx(sx,sy,w),di=idx(dx,dy,w);out[di]=src[si];mask[di]=1;}
+  for(let y=0;y<nh;y++)for(let x=0;x<nw;x++){const dx=left+x,dy=top+y;if(dx<0||dy<0||dx>=w||dy>=h)continue;const sx=l+Math.min(r-l,Math.floor(x/scaleX)),sy=t+Math.min(b-t,Math.floor(y/scaleY));const si=idx(sx,sy,w),di=idx(dx,dy,w);if(!selection[si])continue;out[di]=src[si];mask[di]=1;}
   return {pixels:out,selection:mask};
  }
  function bezier(pixels,w,h,start,end,curvature,color,size=1){

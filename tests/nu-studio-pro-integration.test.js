@@ -35,3 +35,11 @@ test("pro geometry module is pure and has no network dependency",()=>{
  assert.match(moduleSource,/function bezier/);
  assert.doesNotMatch(moduleSource,/\bfetch\s*\(/);
 });
+
+test("group controls are wired to visibility, opacity and layer assignment",()=>{
+ assert.match(js,/adv\.groups\[l\.group/);
+ for(const id of ["pro-group-target","pro-group-opacity","pro-group-toggle","pro-group-assign"])assert.ok(js.includes(id),id);
+});
+test("selection scaling preserves holes in freehand lasso masks",()=>{
+ assert.match(moduleSource,/if\(!selection\[si\]\)continue/);
+});

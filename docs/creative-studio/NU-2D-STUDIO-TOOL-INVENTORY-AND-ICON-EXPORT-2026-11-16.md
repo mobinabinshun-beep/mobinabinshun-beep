@@ -56,7 +56,7 @@ For an application icon, the Windows icon container is .ico. .iso is a disk-imag
 - Linear and radial gradients, clipped to the active selection when present.
 - Square, circular and diamond brush footprints with deterministic dot, diagonal and grain textures.
 - Quadratic Bezier curve drawing with adjustable curvature.
-- Per-layer non-destructive binary masks with add, invert, apply, remove and mask-paint modes.
-- Per-layer blend mode and group assignment controls.
+- Per-layer non-destructive binary masks with add, invert, apply, remove and mask-paint modes. Masks are currently binary (visible/hidden), not continuous grayscale alpha masks.
+- Per-layer blend modes, group assignment, and group-level visibility/opacity controls. Groups are named collections, not nested folder trees.
 - Selection and mask state are included in undo/redo snapshots; resizing and transforms preserve layer data.
 - This phase remains separate from animation, spritesheets, tilemaps, vector authoring and package management, which remain archived.
