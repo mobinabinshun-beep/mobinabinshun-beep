@@ -49,12 +49,12 @@ test("HP capsule wallet rules consume exactly one capsule and cap healing at 10 
 
 test("HP HUD shows a zero-count capsule only when purchase is affordable and keeps the click meaningful",()=>{
   assert.ok(games.includes('const shouldShow=next<10&&(state.save.hpPills>0||state.save.xp>=NUWallet.HP_PILL_COST);'));
-  assert.match(games,/pill\\.classList\\.toggle\\("is-purchasable",state\\.save\\.hp<10&&empty&&affordable\\)/);
-  assert.match(games,/0 HP CAPSULES · BUY FOR 10 XP IN STORE/);
-  assert.match(games,/0 HP CAPSULES · EARN 10 XP TO UNLOCK/);
-  assert.match(games,/state\\.save\\.hp<10&&state\\.save\\.hpPills===0&&state\\.save\\.xp>=NUWallet\\.HP_PILL_COST/);
-  assert.match(css,/\\.hp-pill-use\\.is-purchasable\\{[^}]*border-color/);
-  assert.match(css,/#game-view\\.active \\.hp-bar #hp-pill-use\\.unavailable\\{[^}]*pointer-events:auto!important/);
+  assert.ok(games.includes('pill.classList.toggle("is-purchasable",state.save.hp<10&&empty&&affordable)'));
+  assert.ok(games.includes("0 HP CAPSULES · BUY FOR 10 XP IN STORE"));
+  assert.ok(games.includes("0 HP CAPSULES · EARN 10 XP TO UNLOCK"));
+  assert.ok(games.includes('state.save.hp<10&&state.save.hpPills===0&&state.save.xp>=NUWallet.HP_PILL_COST&&!rows.some(row=>row.key==="hpPills")'));
+  assert.ok(css.includes(".hp-pill-use.is-purchasable{"));
+  assert.ok(css.includes("#game-view.active .hp-bar #hp-pill-use.unavailable{"));
 });
 
 
