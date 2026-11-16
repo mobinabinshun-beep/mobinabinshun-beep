@@ -167,7 +167,7 @@
     else if(view===profileView)renderProfile();
     const menu=$("menu");if(menu)menu.classList.remove("open");
   }
-  function close(){if(profileView.classList.contains("active")){["demo-name","demo-call","demo-family","demo-age","demo-bio","demo-interests","demo-passphrase-test"].forEach(id=>{const field=$(id);if(field)field.value="";});const warning=$("demo-profile-warning");if(warning)warning.hidden=true;applyAppearance(true);resetWorkshop();}document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));(previousView&&previousView!==profileView?previousView:$("home-view")).classList.add("active");previousView=null;window.dispatchEvent(new Event("nu:player-overlay-close"));}
+  function close(){if(profileView.classList.contains("active")){["demo-name","demo-call","demo-family","demo-age","demo-age-band","demo-bio","demo-interests","demo-passphrase-test"].forEach(id=>{const field=$(id);if(field)field.value="";});const warning=$("demo-profile-warning");if(warning)warning.hidden=true;applyAppearance(true);resetWorkshop();}document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));(previousView&&previousView!==profileView?previousView:$("home-view")).classList.add("active");previousView=null;window.dispatchEvent(new Event("nu:player-overlay-close"));}
   $("bag-back").addEventListener("click",close);
   $("inventory-back").addEventListener("click",close);
   $("wallet-back").addEventListener("click",close);
