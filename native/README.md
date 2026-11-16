@@ -1,17 +1,20 @@
-# N.U XP-first native launcher — first build candidate
+# N.U Native Launcher — internal runtime proof-of-concept
 
-This is the first native x86 shell candidate, not a certified XP release.
+This branch replaces the previous “open in system browser” action with an N.U-owned native shell. The window provides internal Home / Library / Modules / Settings navigation and runs a tiny declarative Generation 1 module through the bundled N.U VM.
 
-## Build contents
-- Win32 x86 launcher executable.
-- One canonical background image extracted from the existing SVG's embedded PNG.
-- No dynamic layers, Canvas, WebGL, shaders, animation, or modern embedded browser.
-- Automatic conservative local profile based on CPU count and physical/available RAM.
-- Offline installer and uninstaller, installed per-user.
-- "Open N.U Web Demo" opens the public project page in the user's default browser.
+## Current deliverable
+- 32-bit Win32 shell targeting the XP 5.1 subsystem.
+- One canonical static background image only; no animated layers, WebGL, Canvas, shader, or browser dependency.
+- Native foreground controls and internal `nu://` navigation.
+- A bounded declarative module interpreter (`NUVM/1`) for a small Generation 1 instruction set.
+- Automatic conservative local capability profile and system diagnostics.
+- Ten persisted manual preferences. They cannot raise the automatic safety ceiling.
+- Offline per-user NSIS installer with bundled sample module.
 
-## Important compatibility boundary
-The native shell is compiled for the Windows XP 5.1 subsystem and uses Win32 APIs intended for XP. However, the output is not certified until it has been installed and run on a real Windows XP SP3 x86 test machine. The browser-based game itself is a separate compatibility problem: opening the web demo does not guarantee that an XP-era browser can run the current JavaScript game.
-
-## Reproducible build
-The GitHub Actions workflow `.github/workflows/xp-launcher-build.yml` builds the x86 executable and NSIS installer, then uploads the setup executable and SHA-256 manifest as an Actions artifact. The artifact is a test candidate, not a signed production release.
+## Important limits
+- This is a proof-of-concept host and VM, not a general game engine or cross-generation translator.
+- Only the sample NUVM/1 display instructions are supported.
+- The current process-level VM is instruction-restricted but is not an OS process sandbox.
+- Current game HTML/JavaScript modules are not executed by this native host.
+- Windows XP SP3 x86 remains unverified until a real XP VM/device install, launch, resize, module-run, close and uninstall test is recorded.
+- The artifact is unsigned and intended for controlled testing only.
