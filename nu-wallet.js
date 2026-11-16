@@ -6,6 +6,7 @@
 })(typeof window!=="undefined"?window:globalThis,function(){
   "use strict";
   const MAX_HP=10,HP_PILL_COST=10,MAX_TRANSACTIONS=24;
+  function isHealthAssetKey(key){return typeof key==="string"&&/^(?:hp|health)/i.test(key);}
   const assetRegistry=new Map();
   const gameAssetRegistry=new Map();
   function registerAsset(definition){
@@ -140,7 +141,7 @@
   }
 
   function casinoSpendableAssets(raw){
-    return assetRows(raw).filter(row=>["progression","resources","currency","games"].includes(row.group)&&Number(row.value)>=1);
+    return assetRows(raw).filter(row=>!isHealthAssetKey(row.key)&&["progression","resources","currency","games"].includes(row.group)&&Number(row.value)>=1);
   }
   function settleWalletBet(raw,asset,stake,payout,meta){
     const next=normalizeSave(raw),details=meta||{},bet=Number(stake),requested=Number(payout);
@@ -196,7 +197,7 @@
     return assetRows(raw).filter(row=>allowedGroups.has(String(row.group||"").toLowerCase())&&Number(row.value)>0);
   }
   function isExchangeableAsset(raw,key){
-    if(typeof key!=="string"||!key)return false;
+    if(typeof key!=="string"||!key||isHealthAssetKey(key))return false;
     const s=normalizeSave(raw);
     if(s.nonExchangeableAssets.includes(key))return false;
     return !s.transactions.some(tx=>{
