@@ -35,3 +35,6 @@ body.nu-gateway-open #nu-hex-gateway{pointer-events:auto}
 /* Gateway is the sole in-game navigation entry point. */
 body.nu-game-active #menu-open,
 body.nu-game-active #back-home{display:none!important}
+
+/* Keep Gateway keyboard focus visible above its decorative states. */
+#nu-hex-gateway button:focus-visible{outline:2px solid var(--cyan,#65dcff);outline-offset:4px;}
