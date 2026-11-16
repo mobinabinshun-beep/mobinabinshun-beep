@@ -24,6 +24,8 @@ body.nu-game-active #nu-hex-gateway,body.nu-game-active .nu-gateway-scrim,body.n
 body.nu-gateway-open .nu-gateway-scrim{opacity:1;visibility:visible;pointer-events:auto}
 body.nu-gateway-open .world>.nu-world-background,body.nu-gateway-open .world>.sky,body.nu-gateway-open .world>#world-canvas,body.nu-gateway-open .world>#pixel-world,body.nu-gateway-open .world>.horizon,body.nu-gateway-open .world>.world-effects{filter:blur(2.5px) saturate(.62);transition:filter .2s ease}
 body.nu-gateway-open .world>.nu-world-background,body.nu-gateway-open .world>.sky,body.nu-gateway-open .world>#world-canvas,body.nu-gateway-open .world>#pixel-world,body.nu-gateway-open .world>.horizon,body.nu-gateway-open .world>.world-effects{animation-play-state:paused!important}
+body.nu-gateway-open .world{position:relative;z-index:115}
+body.nu-gateway-open .shell{position:relative;z-index:115}
 body.nu-gateway-open #nu-hex-gateway{pointer-events:auto}
 
 @keyframes nuHexPulse{0%,100%{filter:brightness(1);opacity:.82}50%{filter:brightness(1.75);opacity:1}}
@@ -43,4 +45,5 @@ body.nu-game-active #back-home{display:none!important}
 body.nu-game-active #finish-round,
 body.nu-gateway-utility-active #bag-back,
 body.nu-gateway-utility-active #inventory-back,
-body.nu-gateway-utility-active #wallet-back{display:none!important}
+body.nu-gateway-utility-active #wallet-back,
+body.nu-gateway-utility-active #profile-back{display:none!important}

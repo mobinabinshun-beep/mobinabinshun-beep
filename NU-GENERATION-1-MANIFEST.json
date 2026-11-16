@@ -16,6 +16,7 @@
     "nu-game-render-adapter.js",
     "nu-graphics-runtime.js",
     "nu-materials.js",
+    "nu-gateway-pause.js",
     "nu-games.js",
     "pixel-art-studio.html",
     "nu-svg-vectorizer.js",

@@ -27,7 +27,9 @@ test("Gateway exposes exactly Back, Menu and Profile as one-click actions",()=>{
 
 test("Opening Gateway freezes the game and all ambient renderers until a decision",()=>{
  assert.match(js,/nu:gateway-open/);assert.match(js,/nu:gateway-close/);
- assert.match(games,/state\.engine\[frozen\?"pause":"resume"\]/);
+ assert.match(games,/state\.engine\[shouldFreeze\?"pause":"resume"\]/);
+ assert.match(games,/setFrozen\(shouldFreeze\)/);
+ assert.match(games,/setEnabled\(!shouldFreeze/);
  assert.match(games,/NUBackgroundEngine\.setFrozen/);
  assert.match(games,/NUDynamicLayers\.setFrozen/);
  assert.match(games,/NUPixelWorld\.setEnabled/);
