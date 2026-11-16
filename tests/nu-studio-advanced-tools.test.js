@@ -96,7 +96,8 @@ test("SVG vectorization consumes the active visible composite snapshot and rejec
  assert.match(js,/vectorize\(pixels,width,height/);
  assert.match(js,/The artwork is empty/);
  assert.match(js,/data:image\/png;base64,/);
- assert.doesNotMatch(js,/?>\\n<svg/);
+ assert.ok(js.includes("?>\\n<svg"),"SVG fallback must use a JavaScript newline escape");
+ assert.ok(!js.includes("?>\\\\n<svg"),"SVG fallback must not emit a literal backslash-n outside the root element");
 });
 test("ICO export is wired to both the main and advanced export panels",()=>{
  assert.match(html,/id="export-ico"/);
