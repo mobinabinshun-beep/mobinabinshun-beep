@@ -47,11 +47,14 @@ test("HP capsule wallet rules consume exactly one capsule and cap healing at 10 
 });
 
 
-test("HP HUD capsule remains visible at zero inventory and reports unavailable state without losing clickability",()=>{
-  assert.doesNotMatch(games,/pill\.hidden=false/);
-  assert.ok(games.includes('button.hidden=hpPillTravelAnimation&&hpPillTravelAnimation.playState==="running"?true:next>=10'));
-  assert.match(games,/pill\.classList\.toggle\("unavailable",state\.save\.hp>=10\|\|state\.save\.hpPills<1\)/);
-  assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use\.unavailable\{[^}]*pointer-events:auto!important/);
+test("HP HUD shows a zero-count capsule only when purchase is affordable and keeps the click meaningful",()=>{
+  assert.ok(games.includes('const shouldShow=next<10&&(state.save.hpPills>0||state.save.xp>=NUWallet.HP_PILL_COST);'));
+  assert.match(games,/pill\\.classList\\.toggle\\("is-purchasable",state\\.save\\.hp<10&&empty&&affordable\\)/);
+  assert.match(games,/0 HP CAPSULES · BUY FOR 10 XP IN STORE/);
+  assert.match(games,/0 HP CAPSULES · EARN 10 XP TO UNLOCK/);
+  assert.match(games,/state\\.save\\.hp<10&&state\\.save\\.hpPills===0&&state\\.save\\.xp>=NUWallet\\.HP_PILL_COST/);
+  assert.match(css,/\\.hp-pill-use\\.is-purchasable\\{[^}]*border-color/);
+  assert.match(css,/#game-view\\.active \\.hp-bar #hp-pill-use\\.unavailable\\{[^}]*pointer-events:auto!important/);
 });
 
 
@@ -70,7 +73,7 @@ test("successful HP capsule use emits a radial interaction burst anchored to the
 
 test("HP capsule travel enters from the inside-right corner and returns along the same reversible path",()=>{
   assert.ok(games.includes("function animateHpPillTravel(direction)"));
-  assert.ok(games.includes("function syncHpPillDock(hp)"));
+  assert.ok(games.includes("function syncHpPillDock()"));
   assert.ok(games.includes("const corner={x:barRect.width-4"));
   assert.ok(games.includes("const dock=mobileDock?"));
   assert.ok(games.includes("hpPillTravelAnimation.reverse()"));
@@ -81,10 +84,10 @@ test("HP capsule travel enters from the inside-right corner and returns along th
 
 test("HP capsule is absent at full HP and remains hidden until its arrival animation finishes",()=>{
   assert.match(html,/<button class="hp-pill-use" id="hp-pill-use" type="button"[^>]*hidden/);
-  assert.ok(games.includes("lastRenderedHp=10;"));
+  assert.ok(games.includes("lastPillDockVisible=false;"));
   assert.ok(games.includes("const finishedDirection=hpPillTravelDirection;"));
   assert.ok(games.includes('button.hidden=finishedDirection==="out"'));
-  assert.ok(games.includes('if(lastRenderedHp>=10&&next<10){if(button)button.hidden=true;animateHpPillTravel("in");}'));
+  assert.ok(games.includes("if(lastPillDockVisible!==shouldShow)"));
   assert.ok(css.includes("#game-view.active .hp-bar #hp-pill-use[hidden]{display:none!important}"));
 });
 
