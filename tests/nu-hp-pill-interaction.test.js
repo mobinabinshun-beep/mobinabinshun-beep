@@ -8,7 +8,8 @@ const css=fs.readFileSync(require.resolve("../nu-world.css"),"utf8");
 const wallet=require("../nu-wallet.js");
 
 test("HP capsule uses a direct native click listener for pointer, touch and keyboard activation",()=>{
-  assert.match(games,/function bindHpPillButton\(\)\{const button=\$\("hp-pill-use"\);if\(!button\)return;button\.addEventListener\("click",e=>\{e\.preventDefault\(\);e\.stopPropagation\(\);if\(button\.hidden\)return;useHpPill\(e\);\}\);\}/);
+  assert.ok(games.includes('function bindHpPillButton(){const button=$("hp-pill-use");if(!button)return;button.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();if(button.hidden)return;if(state.save.hpPills<1){announceTransaction('));
+  assert.ok(games.includes("useHpPill(e);});}"));
   assert.match(games,/renderWallet\(\);bindHpPillButton\(\);bindGameAssetProfiles\(\)/);
   assert.doesNotMatch(games,/document\.addEventListener\("pointerup",handleHpPillPointerUp/);
   assert.doesNotMatch(games,/document\.addEventListener\("click",handleHpPillKeyboardClick/);
@@ -104,7 +105,7 @@ test("Generation 1.26 widens the HP frame and keeps the pill dock inside its rig
 test("HP pill stays hidden during repeated damage and reverses the same in-flight animation when HP recovers",()=>{
   assert.ok(games.includes("hpPillTravelDirection=null"));
   assert.ok(games.includes("hpPillTravelAnimation.reverse()"));
-  assert.ok(games.includes('hpPillTravelAnimation.playState==="running"?true:next>=10'));
+  assert.ok(games.includes('hpPillTravelAnimation.playState==="running"?true:!shouldShow'));
   assert.ok(games.includes('button.hidden=finishedDirection==="out"'));
   assert.ok(games.includes("if(direction!==hpPillTravelDirection){hpPillTravelDirection=direction;hpPillTravelAnimation.reverse();}"));
 });
