@@ -91,10 +91,13 @@ test("Gateway keeps responsive geometry, touch, keyboard and reduced-motion supp
  assert.match(js,/const tolerance=10/);
 });
 
-test("Legacy in-game navigation duplicates are hidden, not deleted from other views",()=>{
- assert.match(html,/id="menu-open"/);assert.match(html,/id="back-home"/);assert.match(html,/id="finish-round"/);
+test("Gateway replaces the duplicate gameplay pause control and hides legacy navigation in-game",()=>{
+ assert.match(html,/id="menu-open"/);assert.match(html,/id="back-home"/);
+ assert.doesNotMatch(html,/id="finish-round"/);
  assert.match(css,/body\.nu-game-active #menu-open/);
  assert.match(css,/body\.nu-game-active #back-home/);
+ assert.match(games,/window\.addEventListener\("nu:gateway-open"/);
+ assert.match(games,/window\.addEventListener\("nu:gateway-close"/);
 });
 
 test("No unsupported shield meter is introduced",()=>assert.doesNotMatch(html,/id="nbi-shield-bar"/));
