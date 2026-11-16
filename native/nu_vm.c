@@ -1,7 +1,7 @@
 #include "nu_vm.h"
 #include <stdio.h>
 #include <string.h>
-#include <ctype.h>
+#include <stdlib.h>
 
 #define NU_VM_MAX_FILE 16384
 #define NU_VM_MAX_LINE 192
