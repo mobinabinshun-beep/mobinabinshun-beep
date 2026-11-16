@@ -1,65 +1,113 @@
 # N.U Implementation & Calibration Protocol
 
 **Protocol ID:** NU-OPS-IMPLEMENT-01  
-**Status:** Active — mandatory for implementation requests  
-**Effective:** 2026-11-13
+**Status:** Active — mandatory for all project implementation and maintenance  
+**Effective:** 2026-11-16  
+**Owner:** Project owner (human product direction and final human QA)  
+**Execution:** Assistant (implementation, machine verification, backup, deployment, reporting)
 
-## 1. Trigger
-For every instruction such as «اعمال کن»، «پیاده کن»، «فیکس کن»، «دیباگ کن»، «کالیبره کن»، «بهینه کن»، «بکاپ بگیر» or «مستند کن», apply this procedure.
+## 1. Roles and authority
 
-## 2. Mandatory sequence
-1. Inspect the exact target, current default-branch commit, related files, shared dependencies and tests.
-2. Create a timestamped backup branch from the exact inspected commit before editing.
-3. Work on a separate candidate branch; do not experiment directly on the public default branch.
-4. Keep the change minimal and localized. Change only the files and behavior required by the request. Preserve the existing layout, visual identity, game rules, save schema, wallet, routes, accessibility and responsive behavior unless the owner explicitly asks otherwise.
-5. Before editing, list the intended files and observable effects. If the request could change unrelated screens or behavior, ask one clarification before proceeding.
-6. Run syntax checks and relevant regression tests. Review the complete diff for unrelated changes, accidental formatting/reflow, cache/version mistakes and documentation drift.
-7. Record the request, exact files, decisions, backup ref, candidate ref, tests, limitations and rollback method in a dated conversation archive and implementation record.
-8. Open a PR with a narrow scope and test evidence. Merge/deploy only after the requested scope and required CI checks are satisfied. Label human QA separately from CI.
-9. Preserve candidate branches, CI evidence and rollback information after merge.
+- **Project owner:** directs ideas and priorities, clarifies product intent, performs or coordinates human QA on the public demo, and decides acceptance/locks.
+- **Assistant:** executes scoped work, reads project documentation, inspects dependencies, implements one change at a time, runs machine checks, creates recoverable backups, deploys eligible candidates to the public demo, tests the deployed build with available automated/runtime checks, and reports evidence and limitations.
+- Machine checks establish technical readiness only. They never impersonate the owner's human acceptance.
+- The assistant must not claim human approval, human visual verification, or successful device testing unless a human report explicitly supplies that result.
 
-## 3. Explicit freeze lock — Gateway operating gate
-**LOCK ID:** NU-LOCK-GATEWAY-ICON-01  
-**Status:** SCOPED UNFREEZE APPROVED — 2026-11-15; Generation 1 main-game pages only.  
-**Owner correction:** This section supersedes the earlier Settings-based three-action description.
+## 2. Standard implementation-to-demo cycle
 
-- The Gateway is an operational decluttering gate: it replaces scattered in-game navigation clicks with one entry point.
-- It is visible only while an actual Generation 1 game is active in index.html. Keep it hidden on home/library and all non-game views.
-- The Gateway exposes exactly three one-click actions: **Back, Menu, Profile**. No Settings action is included in the current Gateway.
-- Opening the Gateway freezes the active round and all background rendering/ambient loops until the user decides. This includes the game loop, Background Engine, Dynamic Layers and Pixel World. Closing without a route selection restores only a pause that the Gateway itself initiated.
-- Hide duplicate in-game navigation triggers (the topbar MENU button and the game-view BACK button) while gameplay is active. Keep the actual PAUSE/RESUME and game-specific controls operable; they are not duplicate navigation controls.
-- Menu opens a centered modal directory. Each module entry contains only a concise title and a keyboard keycap. Do not place descriptions, statistics, previews or destination content inside the menu; render content in the destination view/page.
-- Menu order is fixed for this scope: player modules first (Store, Profile, Exchange, Wallet), then games (Painting, Random Game, Bubble Hunt, Mana Collector, Chaos Attack). Random Game selects only from the three core Generation 1 games; Painting is not in the random pool.
-- Store-purchased assets are non-exchangeable. Exclude them from Exchange asset selectors, balance-history charts and virtual market simulation while retaining ownership in the Wallet.
-- The Gateway remains hidden and behaviorally inactive on Casino, Launcher, Creative Studio, Pixel Art Studio, Wallet and Exchange. Future analogous gates for other areas require separate owner approval and their own access rules.
-- Existing game rules, HUD, save schema and wallet balances are preserved except for the explicit Exchange eligibility rule above.
+For every direct implementation request (implement, fix, debug, calibrate, optimize, document, etc.):
 
-## 4. Shield visibility
-- Do not display a shield meter, charge bar, shield capsule or shield status when the player has no shield item/state.
-- Do not fabricate a default/full shield charge. A shield indicator may appear only after a real, persisted or authoritative shield-ownership/active-state source exists.
-- If no such source exists in the current game model, keep the shield UI absent until the owner requests a real shield system.
+1. **Inspect:** read AGENTS.md, this protocol, relevant architecture/feature/QA/lock records, current source, tests, current deployed/default commit, and dependencies. Identify the exact requested scope and any cross-system effects.
+2. **Plan:** state the intended change and affected files/systems. Keep work one scoped change at a time. Do not expand into unrelated cleanup.
+3. **Implement:** work on an isolated candidate branch. Preserve approved/locked areas and existing game rules, visual identity, save formats, wallet semantics, navigation and responsive behavior unless the owner explicitly requests a change.
+4. **Machine verify:** run syntax/static checks and all relevant automated regression/build/CI workflows. Review the full diff and check for regressions, unrelated changes, dependency effects, security/privacy issues and documentation drift.
+5. **Machine backup:** after the candidate is technically ready and before public deployment, create a named immutable/recoverable backup reference of the exact candidate and preserve the pre-change checkpoint. Record commit SHA, branch/ref, archive paths and rollback steps. A backup must be verified to point to the intended commit.
+6. **Deploy to public demo:** once relevant machine checks pass and the backup is verified, apply the candidate to the public demo. **No prior human approval is required for this demo deployment.** Use the configured public-demo deployment path; verify the public URL and deployed commit/build. If deployment is technically blocked, do not pretend it happened: report the exact blocker and continue only with non-destructive setup/engineering that is within the owner's authorization.
+7. **Test the deployed demo:** run available post-deploy smoke/regression checks against the public URL/build. Check that the intended commit is actually served. Report machine results separately from unperformed human/device checks.
+8. **Human QA:** provide the owner and testers the public demo URL, deployed build/commit, concise test scope, known limitations and a report template. The owner and their testers perform real human visual, interaction, accessibility and device testing.
+9. **Record outcome:** record each human finding against its exact build. If accepted, lock the approved scope. If rejected, record defects, reopen only the affected scope under the rules in Section 4, fix, machine-test, back up, redeploy and repeat public-demo QA.
+10. **Promotion:** a successful demo deployment is not human acceptance and is not a production promotion. Do not promote beyond the public demo, or perform a separate release/promotion action, without the owner's explicit approval when such promotion is required.
 
-## 5. Verification checklist
-- [ ] Only requested files and behaviors changed.
-- [ ] Frozen features remain inaccessible and visually absent.
-- [ ] No placeholder resource meter is shown without a real owned resource.
-- [ ] Existing HP, Mana, XP, wallet, save and game flows remain unchanged.
-- [ ] Relevant syntax and regression tests pass.
-- [ ] Desktop/mobile layout and input behavior are checked where relevant.
-- [ ] Archive, implementation record and rollback reference are updated.
+## 3. Machine status and human status are separate
 
-## 6. Rollback and evidence
-Rollback by reverting the scoped PR/commit or restoring the exact pre-change backup branch. Never force-push the public default branch. Record CI-PASSED, DEPLOYED, HUMAN-QA-PENDING and HUMAN-QA-PASSED as distinct states; automated CI is not human browser acceptance.
+Use these statuses accurately and independently:
 
-## 7. Mandatory human-acceptance gate — owner rule (2026-11-15)
+- **IMPLEMENTED** — code change exists.
+- **MACHINE-TEST-PASSED / MACHINE-TEST-FAILED** — named automated checks and exact commit.
+- **BACKUP-VERIFIED** — backup ref and target SHA are recorded and verified.
+- **DEMO-DEPLOYED / DEMO-DEPLOYMENT-BLOCKED** — public demo URL, deployed SHA/build and timestamp, or exact blocker.
+- **POST-DEPLOY-SMOKE-PASSED / FAILED / NOT-RUN** — checks against the deployed demo.
+- **HUMAN-QA-PENDING / PARTIAL / PASSED / FAILED** — only from human testing and report.
+- **OWNER-APPROVED / OWNER-REJECTED** — explicit owner decision.
+- **SCOPE-LOCKED** — exact approved item/section/pack and acceptance record.
+- **PROMOTED** — separate release action, never implied by demo deployment.
 
-**Rule:** No implementation, release candidate, feature, or defect is marked APPROVED or REJECTED solely from automated checks, source inspection, or an agent's assessment. A human test and a traceable human report are required first.
+Never write “verified” without identifying whether it means machine, post-deploy smoke, or human verification.
 
-- CI-PASSED means only that the recorded automated workflows passed. It is not human acceptance.
-- Before a human report exists, the acceptance state must remain **PENDING HUMAN TEST / PENDING HUMAN REPORT**. Do not convert that state to APPROVED or REJECTED.
-- A failed CI run may be recorded as an automated failure, but it does not by itself constitute the owner's final human acceptance/rejection decision.
-- The human report must identify the candidate commit/build, date, tester (or anonymous tester ID), device, OS, browser, viewport/orientation, input method (mouse/touch/keyboard), test scenario, expected result, actual result, PASS/FAIL, and evidence or reproduction steps. Do not collect passwords, private credentials, or unnecessary personal data.
-- Each reported defect receives a reproducible issue with severity, affected build, steps, expected/actual behavior, and evidence. Fixes require a new candidate build and a repeat human test of the affected scenario.
-- Final acceptance is recorded only after the required human scenarios have reports. A mixed result remains **PARTIALLY TESTED / PENDING**, not globally approved.
-- Merge/deployment must not be used to bypass this gate. If a separate public preview is explicitly prepared for testing, label it **TEST CANDIDATE — NOT APPROVED** and preserve rollback; public availability itself is not acceptance.
-- Keep the following states distinct: **IMPLEMENTED**, **CI-PASSED / CI-FAILED**, **HUMAN-QA-PENDING**, **HUMAN-QA-PASSED / HUMAN-QA-FAILED**, **APPROVED / REJECTED**, **MERGED**, and **DEPLOYED**. No state implies another.
+## 4. Approval, scope locks and explicit reopening
+
+- The owner may approve and lock a single item, a section, or an entire pack. Record the exact scope and build/commit accepted.
+- An approval locks only the stated scope. It does not silently lock neighboring or dependent systems.
+- A locked scope stays unchanged unless the owner directly and explicitly requests a change to that specific scope.
+- A direct request such as “reopen HP Capsule … and change …” opens only the named HP Capsule scope; all other locks remain in force.
+- Treat a scoped reopen as temporary authorization for that requested correction, not as a permanent unlock. After correction, repeat the standard machine-test → backup → public-demo deployment → post-deploy test → human QA cycle. On owner acceptance, relock the corrected scope.
+- If the requested correction may affect another locked or approved area, stop before changing the connected area. Explain the dependency and ask how to proceed.
+- When cross-system impact exists, provide **three practical implementation options**, grounded in project documentation, goals and scenarios. Identify the best candidate and explain why. Wait for the owner's explanation or selection before implementing the cross-system part.
+- After the owner clarifies/selects, implement only the authorized solution, then repeat the full cycle and report both the corrected scope and any dependent effects.
+
+## 5. Change isolation, backups and rollback
+
+- Never edit the public default branch directly as a development workspace.
+- Keep changes narrow and isolated; do not bundle unrelated requests unless the owner explicitly requests a pack.
+- Before deployment, preserve the exact pre-change state and a verified backup of the deployment candidate/current production state as appropriate.
+- Record backup branch/tag, SHA, archive manifest, changed paths and rollback procedure.
+- Rollback must restore a known verified commit or revert the scoped change. Never force-push a public branch as a routine rollback.
+- If a backup cannot be verified or relevant machine checks fail, do not deploy.
+
+## 6. Protected areas and existing locks
+
+- Read `docs/operations/LOCKED-AREAS.md` before touching the classic LV / XP / Mana HUD.
+- Existing feature locks remain effective. This protocol changes the deployment/acceptance sequence; it does not implicitly unlock any feature.
+- Only an explicit owner request naming the locked scope opens that scope.
+- Respect the UI layer safety contract, archived features, Exchange eligibility rules, virtual-only economy boundaries and all documented data/privacy constraints.
+
+## 7. Public demo human acceptance gate (revised 2026-11-16)
+
+This section supersedes any earlier rule that required human approval **before** a public demo deployment.
+
+- Human testing must happen on the public demo, not a branch preview, screenshot or PR diff.
+- The assistant is authorized to deploy a candidate to the public demo after relevant machine checks pass and a verified backup exists. No additional pre-deployment human confirmation is required for that demo deployment.
+- The public demo is the human QA surface. Provide its URL and exact deployed commit/build.
+- Human acceptance is still mandatory before a scope is recorded as owner-approved and locked.
+- A candidate may be publicly deployed and remain **HUMAN-QA-PENDING**. Deployment does not imply acceptance.
+- A rejection triggers a scoped correction and a new deployment/test cycle. It does not authorize unrelated redesign.
+- No PR preview may substitute for the public demo.
+
+## 8. Cross-system clarification template
+
+When a requested edit may affect a connected system, pause and present:
+
+1. **Option A — minimal isolated correction:** preserve the neighboring system and use a narrow adapter/compatibility change.
+2. **Option B — coordinated correction:** update the requested feature and the directly dependent component together, with paired regression coverage.
+3. **Option C — structural correction:** revise the shared contract/architecture, update all affected modules and migration/rollback documentation.
+
+These are option categories, not automatic prescriptions. Adapt the three options to the actual repository dependencies and documented product scenarios, recommend one candidate, and wait for owner direction.
+
+## 9. Verification and reporting checklist
+
+- [ ] Owner request and scope recorded.
+- [ ] Relevant project instructions, docs, locks and dependencies inspected.
+- [ ] Exact files/systems and observable behavior listed.
+- [ ] Minimal implementation completed on candidate branch.
+- [ ] Relevant machine tests and CI checks passed.
+- [ ] Full diff reviewed; unrelated changes excluded.
+- [ ] Pre-change checkpoint and candidate/deployment backup verified.
+- [ ] Public demo deployment confirmed by URL and deployed SHA/build.
+- [ ] Post-deploy smoke checks run and results recorded.
+- [ ] Human QA status clearly marked pending/partial/pass/fail.
+- [ ] Owner approval and exact lock scope recorded when supplied.
+- [ ] Rollback path and implementation record updated.
+
+## 10. Canonical record
+
+Every substantive change must have a dated implementation record with request, scope, design decisions, affected files, tests, backup refs, deployment evidence, human report/acceptance state, lock state, dependencies and rollback. This document is the canonical execution protocol; older documents that conflict with it are superseded for deployment sequencing and must be corrected when next touched.
