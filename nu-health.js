@@ -43,6 +43,31 @@
       notify(category);
       return entry;
     }
+    function accumulateWave(event,damageDelta,hpDelta){
+      const waveId=text(event&&event.waveId,120);
+      if(!waveId)return false;
+      const state=read(),index=state.waveSummaries.findIndex(item=>item&&item.waveId===waveId);
+      const existing=index>=0?state.waveSummaries[index]:null;
+      if(existing&&existing.settled)return existing;
+      const entry=Object.assign({
+        id:"nu-health-wave-"+waveId,
+        at:new Date().toISOString(),
+        gameId:text(event&&event.gameId,64)||"unknown",
+        waveId,
+        damageTaken:0,
+        hpDelta:0,
+        successfulInteractions:0,
+        reason:"active",
+        settled:false
+      },existing||{});
+      entry.damageTaken=Math.max(0,Math.min(1000000,Number(entry.damageTaken||0)+Number(damageDelta||0)));
+      entry.hpDelta=Math.max(-1000000,Math.min(1000000,Number(entry.hpDelta||0)+Number(hpDelta||0)));
+      if(index>=0)state.waveSummaries[index]=entry;
+      else state.waveSummaries=state.waveSummaries.concat(entry).slice(-MAX_WAVES);
+      if(!write(state))return false;
+      notify("waveSummaries");
+      return entry;
+    }
     function recordMedicationUse(event){
       const itemName=text(event&&event.itemName,80);
       if(!itemName)return false;
@@ -58,24 +83,28 @@
     function recordDamage(event){
       const amount=positive(event&&event.amount);
       if(!amount)return false;
-      return append("damage",{
+      const entry=append("damage",{
         gameId:text(event.gameId,64)||"unknown",
         waveId:text(event.waveId,120)||"",
         amount,
         hpAfter:Number.isFinite(Number(event.hpAfter))?Math.max(0,Number(event.hpAfter)):null,
         reason:text(event.reason,100)||"damage"
       });
+      if(entry)accumulateWave(event,amount,-amount);
+      return entry;
     }
     function recordHealing(event){
       const amount=positive(event&&event.amount);
       if(!amount)return false;
-      return append("healing",{
+      const entry=append("healing",{
         gameId:text(event.gameId,64)||"unknown",
         waveId:text(event.waveId,120)||"",
         amount,
         hpAfter:Number.isFinite(Number(event.hpAfter))?Math.max(0,Number(event.hpAfter)):null,
         source:text(event.source,80)||"healing"
       });
+      if(entry)accumulateWave(event,0,amount);
+      return entry;
     }
     function recordDeath(event){
       return append("deaths",{
@@ -90,27 +119,38 @@
       const waveId=text(event.waveId,120);
       if(!waveId)return false;
       const state=read();
-      const existing=state.waveSummaries.find(item=>item&&item.waveId===waveId);
-      if(existing)return existing;
-      const hpDelta=Number(event.hpDelta);
-      const interactions=Number(event.successfulInteractions);
-      const entry={
+      const index=state.waveSummaries.findIndex(item=>item&&item.waveId===waveId);
+      const existing=index>=0?state.waveSummaries[index]:null;
+      if(existing&&existing.settled)return existing;
+      const hpDelta=Number(event.hpDelta),interactions=Number(event.successfulInteractions);
+      const entry=Object.assign({
         id:"nu-health-wave-"+waveId,
         at:new Date().toISOString(),
         gameId:text(event.gameId,64)||"unknown",
         waveId,
         damageTaken:positive(event.damageTaken),
         hpDelta:Number.isFinite(hpDelta)?Math.max(-1000000,Math.min(1000000,hpDelta)):0,
-        successfulInteractions:Number.isSafeInteger(interactions)?Math.max(0,Math.min(1000000,interactions)):0,
-        reason:text(event.reason,80)||"settled"
-      };
-      state.waveSummaries=state.waveSummaries.concat(entry).slice(-MAX_WAVES);
+        successfulInteractions:0,
+        reason:"settled",
+        settled:false
+      },existing||{});
+      if(!existing){
+        entry.damageTaken=positive(event.damageTaken);
+        entry.hpDelta=Number.isFinite(hpDelta)?Math.max(-1000000,Math.min(1000000,hpDelta)):0;
+      }
+      entry.gameId=text(event.gameId,64)||entry.gameId||"unknown";
+      entry.successfulInteractions=Number.isSafeInteger(interactions)?Math.max(0,Math.min(1000000,interactions)):0;
+      entry.reason=text(event.reason,80)||"settled";
+      entry.settled=true;
+      entry.settledAt=new Date().toISOString();
+      if(index>=0)state.waveSummaries[index]=entry;
+      else state.waveSummaries=state.waveSummaries.concat(entry).slice(-MAX_WAVES);
       if(!write(state))return false;
       notify("waveSummaries");
       return entry;
     }
     function getHistory(category){
-      if(category==="waveSummaries")return read().waveSummaries.slice(-MAX_WAVES);
+      if(category==="waveSummaries")return read().waveSummaries.filter(item=>item&&item.settled).slice(-MAX_WAVES);
       if(!CATEGORIES.includes(category))return [];
       return read()[category].slice(-MAX_EVENTS);
     }
