@@ -20,7 +20,7 @@
  style.textContent=`
  :root{scroll-behavior:auto}
  :root[data-nu-motion-level] *, :root[data-nu-motion-level] *::before, :root[data-nu-motion-level] *::after{transition-duration:var(--nu-motion-transition)!important;scroll-behavior:auto!important}
- :root.nu-motion-minimal *, :root.nu-motion-minimal *::before, :root.nu-motion-minimal *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+ :root[data-nu-motion-level="2"] *, :root[data-nu-motion-level="2"] *::before, :root[data-nu-motion-level="2"] *::after{animation-iteration-count:1!important}\n :root[data-nu-motion-level="3"] *, :root[data-nu-motion-level="3"] *::before, :root[data-nu-motion-level="3"] *::after{animation-iteration-count:2!important}\n :root.nu-motion-minimal *, :root.nu-motion-minimal *::before, :root.nu-motion-minimal *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
  `;
  (document.head||document.documentElement).appendChild(style);
 })();
