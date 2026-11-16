@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101522">
+  <title>N.U Launcher</title>
+  <link rel="stylesheet" href="./launcher.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#" aria-label="N.U Launcher home"><span class="brand-mark">N.U</span><span><b>N.U Launcher</b><small>نسخه نسل اول</small></span></a>
+      <nav class="nav" aria-label="ناوبری اصلی">
+        <button class="nav-item active" data-page="home"><span>⌂</span> خانه</button>
+        <button class="nav-item" data-page="library"><span>▦</span> کتابخانه</button>
+        <button class="nav-item" data-page="settings"><span>⚙</span> تنظیمات</button>
+      </nav>
+      <div class="sidebar-bottom"><span class="status-dot"></span><span id="runtime-status">محیط آماده است</span><small>NU Host · Gen 1</small></div>
+    </aside>
+    <main class="main">
+      <header class="topbar"><div><span class="eyebrow">فضای اجرای یکپارچه</span><h1 id="page-title">خانه</h1></div><div class="top-actions"><span class="pill" id="device-pill">در حال بررسی دستگاه</span><button class="icon-button" id="calibrate-btn" title="کالیبراسیون خودکار">⟳</button></div></header>
+      <section class="page active" id="page-home">
+        <div class="hero"><div class="hero-copy"><span class="eyebrow">به فضای خودت خوش آمدی</span><h2>بازی‌ها و ماژول‌ها،<br>همه در یک جا.</h2><p>یک محیط سبک برای اجرای تجربه‌های نسل اول؛ بدون شلوغی و جلوه‌های سنگین.</p><button class="primary-button" data-go="library">رفتن به کتابخانه <span>←</span></button></div><div class="hero-orbit"><div class="orbit-ring"></div><div class="orbit-core">N.U</div><span class="orbit-chip chip-a">HOST</span><span class="orbit-chip chip-b">GEN 1</span></div></div>
+        <div class="section-heading"><div><span class="eyebrow">شروع سریع</span><h2>ماژول‌های پیشنهادی</h2></div><button class="text-button" data-go="library">همه ماژول‌ها ←</button></div>
+        <div class="module-grid" id="featured-modules"></div>
+        <div class="system-grid"><article class="system-card"><span class="system-icon">◈</span><div><small>حالت اجرا</small><b>سبک و تطبیقی</b><p>تنظیم بر اساس توان دستگاه</p></div></article><article class="system-card"><span class="system-icon">⌁</span><div><small>معماری</small><b>ماژولار</b><p>قرارداد مستقل برای هر نسل</p></div></article><article class="system-card"><span class="system-icon">▣</span><div><small>میزبان</small><b>فضای داخلی N.U</b><p>اجرا در پنجره مرکزی لانچر</p></div></article></div>
+      </section>
+      <section class="page" id="page-library"><div class="section-heading"><div><span class="eyebrow">محتوای نصب‌شده</span><h2>کتابخانه ماژول‌ها</h2></div><span class="pill">نسل اول</span></div><div class="module-grid" id="all-modules"></div></section>
+      <section class="page" id="page-settings"><div class="section-heading"><div><span class="eyebrow">شخصی‌سازی</span><h2>تنظیمات لانچر</h2></div></div><div class="settings-list">
+        <label class="setting-row"><span><b>کاهش جلوه‌های بصری</b><small>برای سیستم‌های کم‌توان، پیشنهاد می‌شود.</small></span><input id="low-effects" type="checkbox" checked></label>
+        <label class="setting-row"><span><b>کالیبراسیون خودکار</b><small>انتخاب سطح کیفیت متناسب با دستگاه.</small></span><input id="auto-calibrate" type="checkbox" checked></label>
+        <label class="setting-row"><span><b>اجرای ماژول در فضای داخلی</b><small>ماژول‌ها در قاب مرکزی لانچر باز شوند.</small></span><input id="internal-run" type="checkbox" checked></label>
+        <div class="setting-row"><span><b>سطح عملکرد</b><small id="profile-label">متعادل · تنظیم‌شده با کالیبراسیون</small></span><select id="performance"><option value="auto">خودکار</option><option value="low">حداقلی</option><option value="balanced">متعادل</option><option value="high">کیفیت بالاتر</option></select></div>
+      </div><p class="notice">این صفحه نمونه رابط کاربری است. ذخیره تنظیمات در همین مرورگر انجام می‌شود؛ نسخه بومی ویندوز هنوز به سرویس تنظیمات سیستم متصل نشده است.</p></section>
+      <section class="page" id="page-player"><div class="player-top"><button class="text-button" id="back-library">← بازگشت به کتابخانه</button><span class="pill" id="player-generation">GEN 1</span></div><div class="player-frame" id="player-frame"></div></section>
+      <footer class="footer"><span>N.U Launcher</span><span>پیش‌نمایش رابط · هنوز نسخه انتشار نیست</span></footer>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="./launcher.js"></script>
+</body>
+</html>
