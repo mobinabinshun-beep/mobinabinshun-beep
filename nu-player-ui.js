@@ -152,7 +152,7 @@
     $("player-name-input").value=s.displayName||"";
     $("player-callsign-input").value=s.callsign||"";
   }
-  let previousView=null,previousFocus=null;
+  const viewStack=[];
   function setWalletTab(name){
     document.querySelectorAll("[data-wallet-tab]").forEach(button=>{const active=button.dataset.walletTab===name;button.classList.toggle("is-active",active);button.setAttribute("aria-selected",String(active));button.tabIndex=active||button.dataset.walletTab==="profile"?0:-1;});
     document.querySelectorAll("[data-wallet-panel]").forEach(panel=>{panel.hidden=panel.dataset.walletPanel!==name;});
@@ -161,8 +161,8 @@
     if(name==="mana")renderManaHistory();
   }
   function open(view){
-    previousView=document.querySelector(".view.active");
-    previousFocus=document.activeElement;
+    const activeView=document.querySelector(".view.active");
+    if(activeView&&activeView!==view)viewStack.push({view:activeView,focus:document.activeElement});
     window.dispatchEvent(new Event("nu:player-overlay-open"));
     document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));
     view.classList.add("active");
@@ -176,10 +176,9 @@
   function close(){
     if(profileView.classList.contains("active")){["demo-name","demo-call","demo-family","demo-age","demo-age-band","demo-bio","demo-interests","demo-passphrase-test"].forEach(id=>{const field=$(id);if(field)field.value="";});const warning=$("demo-profile-warning");if(warning)warning.hidden=true;applyAppearance(true);resetWorkshop();}
     document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));
-    const returnView=previousView&&previousView!==profileView?previousView:$("home-view");returnView.classList.add("active");
-    const returnTarget=previousFocus;
+    const previous=viewStack.pop(),returnView=previous&&previous.view?previous.view:$("home-view");returnView.classList.add("active");
+    const returnTarget=previous&&previous.focus;
     const hidden=returnTarget&&(!returnTarget.isConnected||returnTarget.closest(".view:not(.active)")||returnTarget.closest("#menu:not(.open)")||returnTarget.closest("#nu-hex-gateway:not(.is-open)")||returnTarget.closest("[hidden]"));
-    previousView=null;previousFocus=null;
     if(returnTarget&&!hidden)returnTarget.focus({preventScroll:true});
     else if(returnTarget&&returnTarget.closest&&returnTarget.closest("#nu-hex-gateway")){const trigger=document.querySelector(".nu-gateway-trigger");if(trigger)trigger.focus({preventScroll:true});}
     else{const heading=returnView.querySelector(".view-head h2");if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}else{$("menu-open")?.focus({preventScroll:true});}}
