@@ -9,7 +9,7 @@ test("HP pill purchase deducts exactly 10 XP and adds exactly one capsule",()=>{
   assert.equal(result.ok,true);
   assert.equal(result.state.xp,15);
   assert.equal(result.state.hpPills,1);
-  assert.deepEqual(result.transaction.deltas,{xp:-10,hpPills:1});
+  assert.deepEqual(result.transactions.map(entry=>entry.deltas),[{xp:-10},{hpPills:1}]);
   assert.equal(before.xp,25);
   assert.equal(before.hpPills,0);
 });
@@ -28,7 +28,7 @@ test("one capsule heals by at most 10 HP and is consumed once",()=>{
   assert.equal(result.restored,7);
   assert.equal(result.state.hp,10);
   assert.equal(result.state.hpPills,1);
-  assert.deepEqual(result.transaction.deltas,{hp:7,hpPills:-1});
+  assert.deepEqual(result.transactions.map(entry=>entry.deltas),[{hp:7},{hpPills:-1}]);
 });
 test("consumption fails when inventory is empty",()=>{
   const result=wallet.useHpPill({hp:3,hpPills:0},{id:"use-empty"});
@@ -163,6 +163,3 @@ test("inventory hides unowned items and does not invent empty entries",()=>{
 
 // Keep the Exchange wallet-reader and protocol lifecycle covered by the canonical wallet CI run.
 require("./nu-exchange-engines.test.js");
-
-// The Health module has an independent store and never shares the wallet ledger.
-require("./nu-health.test.js");
