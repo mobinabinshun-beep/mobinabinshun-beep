@@ -202,13 +202,13 @@ static void paint_background(HWND hwnd, HDC dc) {
         HDC memory_dc = CreateCompatibleDC(dc);
         if (memory_dc) {
             HGDIOBJ old = SelectObject(memory_dc, g_bitmap);
-            int cw = rc.right, ch = rc.bottom - 76;
+            int cw = rc.right, ch = rc.bottom;
             double sx = (double)cw / (double)g_bitmap_info.bmWidth;
             double sy = (double)ch / (double)g_bitmap_info.bmHeight;
             double scale = sx < sy ? sx : sy;
             int dw = (int)(g_bitmap_info.bmWidth * scale);
             int dh = (int)(g_bitmap_info.bmHeight * scale);
-            int dx = (cw - dw) / 2, dy = 60 + (ch - dh) / 2;
+            int dx = (cw - dw) / 2, dy = (ch - dh) / 2;
             SetStretchBltMode(dc, HALFTONE);
             StretchBlt(dc, dx, dy, dw, dh, memory_dc, 0, 0,
                 g_bitmap_info.bmWidth, g_bitmap_info.bmHeight, SRCCOPY);
@@ -320,6 +320,12 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT message, WPARAM wparam, LPAR
         InvalidateRect(hwnd,NULL,TRUE);
         return 0;
     case WM_ERASEBKGND: return 1;
+    case WM_CTLCOLORSTATIC: {
+        HDC control_dc = (HDC)wparam;
+        SetBkMode(control_dc, TRANSPARENT);
+        SetTextColor(control_dc, RGB(245, 248, 250));
+        return (LRESULT)GetStockObject(NULL_BRUSH);
+    }
     case WM_PAINT: {
         PAINTSTRUCT ps; HDC dc=BeginPaint(hwnd,&ps);
         paint_background(hwnd,dc); EndPaint(hwnd,&ps); return 0;
