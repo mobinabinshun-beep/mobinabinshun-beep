@@ -1,11 +1,13 @@
 # Gateway, navigation and controller integration — 2026-11-17
 
-**Status:** MACHINE VERIFIED — public demo release pending; human/device QA pending  
+**Status:** MACHINE VERIFIED AND MERGED TO DEFAULT/PAGES SOURCE BRANCH — live demo link-check UNVERIFIED; human/device QA pending  
 **Branch:** `feature/gateway-controller-navigation-2026-11-17`  
 **Baseline:** `2f81cf268fe6b89338d6c8001a86538ea917d730`  
 **Preservation branch:** `preservation/pre-gateway-controller-navigation-2026-11-17`  
 **Verified source candidate:** `026a65da2a8d7b5a0feace4e7e6d97ebcaca3470`  
-**Verified recovery branch:** `backup/pre-public-demo-gateway-controller-2026-11-17`
+**Verified recovery branch:** `backup/pre-public-demo-gateway-controller-2026-11-17`  
+**Merged PR:** [#166](https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/166)  
+**Merge commit:** `b2a0b5ed6bc4489a43641272300361e438d6653b`
 
 ## Scope
 
@@ -50,9 +52,10 @@ The recovery branch `backup/pre-public-demo-gateway-controller-2026-11-17` was v
 
 ## Release state
 
-- Candidate implementation is machine-verified and backed up.
-- Public demo publication is the next authorized step under the project protocol; no production promotion is included.
-- Human QA remains pending. This record does not claim HUMAN-QA-PASSED, OWNER-APPROVED or SCOPE-LOCKED.
+- Candidate implementation is machine-verified, backed up and merged to the repository's default branch (the configured source branch used for the public site).
+- Public demo URL: `https://mobinabinshun-beep.github.io/mobinabinshun-beep/`.
+- Live demo link-check could not be completed by the available page-fetch path; deployment visibility is therefore **UNVERIFIED**, not PASS.
+- No production promotion is included. Human QA remains pending. This record does not claim HUMAN-QA-PASSED, OWNER-APPROVED or SCOPE-LOCKED.
 
 ## Human demo checklist
 
