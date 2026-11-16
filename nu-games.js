@@ -56,6 +56,7 @@ function renderGameAssetProfile(){
  const root=$("game-asset-profile");if(!root||!state.game)return;
  const names={bubble:"BUBBLE HUNT · ASSET PROFILE",mana:"MANA COLLECTOR · ASSET PROFILE",chaos:"CHAOS ATTACK · ASSET PROFILE"};
  const rows=NUWallet.gameAssetRows(state.save,state.game);
+ if(state.save.hp<10&&state.save.hpPills===0&&state.save.xp>=NUWallet.HP_PILL_COST&&!rows.some(row=>row.key==="hpPills"))rows.push({key:"hpPills",label:"HP Capsules",value:0,unit:""});
  if(!rows.length){root.replaceChildren();root.hidden=true;return;}
  root.hidden=false;
  root.innerHTML='<strong>'+names[state.game]+'</strong><small>SHARED WALLET · GAME-SCOPED VIEW</small><div class="game-asset-rows">'+rows.map(row=>'<span>'+row.label+'</span><b>'+row.value+row.unit+'</b>').join("")+'</div>';
@@ -101,7 +102,7 @@ function bindGameAssetProfiles(){
  });
  window.addEventListener("resize",()=>{if(!root.hidden){const active=document.activeElement;if(active&&active.matches(".bar-wrap,#hp-bar"))positionGameAssetProfile(active);}});
 }
-let lastRenderedHp=null,hpPillTravelAnimation=null,hpPillTravelGhost=null,hpPillTravelLayer=null,hpPillTravelDirection=null,hpPillTravelRun=0;
+let lastRenderedHp=null,lastPillDockVisible=null,hpPillTravelAnimation=null,hpPillTravelGhost=null,hpPillTravelLayer=null,hpPillTravelDirection=null,hpPillTravelRun=0;
 function animateHpPillTravel(direction){
  const bar=$("hp-bar"),button=$("hp-pill-use"),source=button&&button.querySelector("img");
  if(!bar||!button)return;
@@ -148,24 +149,26 @@ function animateHpPillTravel(direction){
  };
  animation.oncancel=()=>{layer.remove();if(run===hpPillTravelRun){hpPillTravelLayer=null;hpPillTravelGhost=null;hpPillTravelAnimation=null;hpPillTravelDirection=null;}};
 }
-function syncHpPillDock(hp){
- const next=Number.isFinite(hp)?hp:10,button=$("hp-pill-use");
+function syncHpPillDock(){
+ const next=Number.isFinite(state.save.hp)?state.save.hp:10,button=$("hp-pill-use");
+ const shouldShow=next<10&&(state.save.hpPills>0||state.save.xp>=NUWallet.HP_PILL_COST);
  if(lastRenderedHp===null){
-  lastRenderedHp=10;
-  if(next<10){if(button)button.hidden=true;animateHpPillTravel("in");}
+  lastRenderedHp=next;lastPillDockVisible=false;
+  if(shouldShow){if(button)button.hidden=true;animateHpPillTravel("in");}
   else if(button)button.hidden=true;
-  lastRenderedHp=next;
+  lastPillDockVisible=shouldShow;
   return;
  }
- if(lastRenderedHp>=10&&next<10){if(button)button.hidden=true;animateHpPillTravel("in");}
- else if(lastRenderedHp<10&&next>=10){if(button)button.hidden=true;animateHpPillTravel("out");}
- else if(button){
+ if(lastPillDockVisible!==shouldShow){
+  if(button)button.hidden=true;
+  animateHpPillTravel(shouldShow?"in":"out");
+ }else if(button){
   // Keep the real control hidden until the travelling image has fully docked.
-  button.hidden=hpPillTravelAnimation&&hpPillTravelAnimation.playState==="running"?true:next>=10;
+  button.hidden=hpPillTravelAnimation&&hpPillTravelAnimation.playState==="running"?true:!shouldShow;
  }
- lastRenderedHp=next;
+ lastRenderedHp=next;lastPillDockVisible=shouldShow;
 }
-function renderWallet(){syncHpPillDock(state.save.hp);renderGameAssetProfile();const pill=$("hp-pill-use");if(pill){const count=pill.querySelector("#hp-pill-count");if(count)count.textContent="×"+state.save.hpPills;const reason=state.save.hp>=10?"HP is already full.":state.save.hpPills<1?"No HP capsule in inventory.":"Use one HP capsule to restore up to 10 HP.";pill.setAttribute("aria-label",reason);pill.title=reason;pill.classList.toggle("unavailable",state.save.hp>=10||state.save.hpPills<1);}const xp=state.save.xp%100,mana=state.save.mana%10;$("xp-fill").style.width=xp+"%";$("mana-fill").style.width=(mana*10)+"%";$("xp-fill").parentElement.hidden=state.save.xp<1;$("mana-fill").parentElement.hidden=state.save.mana<1;$("xp-fill").parentElement.style.setProperty("--capsule-boundary",xp+"%");$("mana-fill").parentElement.style.setProperty("--capsule-boundary",(mana*10)+"%");$("xp-fill").setAttribute("aria-valuenow",String(xp));$("mana-fill").setAttribute("aria-valuenow",String(mana));$("xp-value").textContent=state.save.xp?state.save.xp+" / 100":"";$("mana-value").textContent=state.save.mana?state.save.mana+" / 10":"";$("level-chip").textContent="LV "+state.save.level;$("hp-value").textContent=state.save.hp+"/10";$("hp-fill").style.width=(state.save.hp*10)+"%";$("mana-capsules").hidden=state.save.mana<1&&state.save.manaCapsules<=1;$("mana-capsules").innerHTML=Array.from({length:state.save.manaCapsules},(_,i)=>{const amount=Math.max(0,Math.min(10,state.save.mana-i*10));return '<span class="mana-slot" title="Mana capsule '+(i+1)+' · '+amount+'/10"><i style="width:'+(amount*10)+'%"></i></span>';}).join("");}
+function renderWallet(){syncHpPillDock();renderGameAssetProfile();const pill=$("hp-pill-use");if(pill){const count=pill.querySelector("#hp-pill-count");if(count)count.textContent="×"+state.save.hpPills;const empty=state.save.hpPills<1,affordable=state.save.xp>=NUWallet.HP_PILL_COST;const reason=state.save.hp>=10?"HP is already full.":empty?(affordable?"0 HP Capsules · 10 XP available · open Store to buy.":"0 HP Capsules · earn 10 XP to unlock."):"Use one HP capsule to restore up to 10 HP.";pill.setAttribute("aria-label",reason);pill.title=reason;pill.classList.toggle("unavailable",state.save.hp>=10||(empty&&!affordable));pill.classList.toggle("is-purchasable",state.save.hp<10&&empty&&affordable);}const xp=state.save.xp%100,mana=state.save.mana%10;$("xp-fill").style.width=xp+"%";$("mana-fill").style.width=(mana*10)+"%";$("xp-fill").parentElement.hidden=state.save.xp<1;$("mana-fill").parentElement.hidden=state.save.mana<1;$("xp-fill").parentElement.style.setProperty("--capsule-boundary",xp+"%");$("mana-fill").parentElement.style.setProperty("--capsule-boundary",(mana*10)+"%");$("xp-fill").setAttribute("aria-valuenow",String(xp));$("mana-fill").setAttribute("aria-valuenow",String(mana));$("xp-value").textContent=state.save.xp?state.save.xp+" / 100":"";$("mana-value").textContent=state.save.mana?state.save.mana+" / 10":"";$("level-chip").textContent="LV "+state.save.level;$("hp-value").textContent=state.save.hp+"/10";$("hp-fill").style.width=(state.save.hp*10)+"%";$("mana-capsules").hidden=state.save.mana<1&&state.save.manaCapsules<=1;$("mana-capsules").innerHTML=Array.from({length:state.save.manaCapsules},(_,i)=>{const amount=Math.max(0,Math.min(10,state.save.mana-i*10));return '<span class="mana-slot" title="Mana capsule '+(i+1)+' · '+amount+'/10"><i style="width:'+(amount*10)+'%"></i></span>';}).join("");}
 function showFloat(){} // N.U policy: no floating XP/Mana/reward text on interactive objects.
 function announceTransaction(message,tone="success"){const el=$("transaction-toast");if(!el)return;el.textContent=message;el.className="transaction-toast "+tone+" visible";clearTimeout(el._hideTimer);el._hideTimer=setTimeout(()=>el.classList.remove("visible"),2200);}function showFloatingChange(message,tone="gain"){const root=$("floating-notifications");if(!root)return;const item=document.createElement("div");item.className="floating-change "+tone;item.textContent=message;root.appendChild(item);setTimeout(()=>item.remove(),1800);}
 function showHpGain(amount){const track=$("hp-fill").parentElement;track.classList.remove("hp-restored");void track.offsetWidth;track.classList.add("hp-restored");const el=document.createElement("span");el.className="hp-gain";el.textContent="+"+amount+" HP";track.appendChild(el);setTimeout(()=>{el.remove();track.classList.remove("hp-restored");},1100);}
@@ -266,7 +269,7 @@ $("menu-random").addEventListener("click",()=>{closeMenu(false);chooseGame();});
 $("menu-bubble").addEventListener("click",()=>{closeMenu(false);chooseGame("bubble");});
 $("menu-mana").addEventListener("click",()=>{closeMenu(false);chooseGame("mana");});
 $("menu-chaos").addEventListener("click",()=>{closeMenu(false);chooseGame("chaos");});$("shop-back").addEventListener("click",closeShop);$("quest-open-store").addEventListener("click",()=>{localStorage.setItem("nu-shop-guide-seen","1");$("shop-quest").classList.add("hidden");$("shop-empty").classList.remove("hidden");renderShop();});
-function bindHpPillButton(){const button=$("hp-pill-use");if(!button)return;button.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();if(button.hidden)return;useHpPill(e);});}$("quest-continue").addEventListener("click",()=>{localStorage.setItem("nu-shop-guide-seen","1");closeShop();});document.querySelectorAll("[data-article]").forEach(b=>b.addEventListener("click",()=>openArticle(b.dataset.title,b.dataset.article)));$("article-back").addEventListener("click",showHome);
+function bindHpPillButton(){const button=$("hp-pill-use");if(!button)return;button.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();if(button.hidden)return;if(state.save.hpPills<1){announceTransaction(state.save.xp>=NUWallet.HP_PILL_COST?"0 HP CAPSULES · BUY FOR 10 XP IN STORE":"0 HP CAPSULES · EARN 10 XP TO UNLOCK","warning");return;}useHpPill(e);});}$("quest-continue").addEventListener("click",()=>{localStorage.setItem("nu-shop-guide-seen","1");closeShop();});document.querySelectorAll("[data-article]").forEach(b=>b.addEventListener("click",()=>openArticle(b.dataset.title,b.dataset.article)));$("article-back").addEventListener("click",showHome);
 if(state.save.activeWave){const recovered=NUWallet.settleWave(state.save,"reload_recovery");if(recovered.ok){state.save=recovered.state;NU.save(state.save);}}
 renderLibrary();renderWallet();bindHpPillButton();bindGameAssetProfiles();renderRoundProgress();resize();
 function unlockWorld(info,label){state.quality=info&&info.level||3;try{state.engine=NU.create($("world-canvas"));state.engine.setQuality(state.quality);}catch(error){console.warn("N.U world canvas fallback",error);}if(window.NUPixelWorld)window.NUPixelWorld.setQuality(state.quality);$("quality-status").textContent=label||("CALIBRATED · Q"+state.quality);$("calibration-status").textContent="READY · RENDER Q"+state.quality+" · NETWORK CHECK RUNS IN BACKGROUND";$("intro-start").disabled=false;$("intro-start").textContent="ENTER WORLD";document.querySelector(".world").classList.add("calibrated");window.dispatchEvent(new CustomEvent("nu:calibrated",{detail:{performance:info||{level:state.quality}}}));}
