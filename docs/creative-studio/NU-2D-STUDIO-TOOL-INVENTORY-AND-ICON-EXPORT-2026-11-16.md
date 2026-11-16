@@ -48,3 +48,15 @@ For an application icon, the Windows icon container is .ico. .iso is a disk-imag
 - Run: https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/43877071226
 - Result: PASS — syntax checks and 245 Node tests, 245 passed / 0 failed
 - Human browser and Windows shell checks remain pending.
+
+
+## Professional 2D tool expansion — implementation candidate
+- Rectangular selection and freehand lasso selection.
+- Move and nearest-neighbour scale of selected pixels, constrained to canvas bounds.
+- Linear and radial gradients, clipped to the active selection when present.
+- Square, circular and diamond brush footprints with deterministic dot, diagonal and grain textures.
+- Quadratic Bezier curve drawing with adjustable curvature.
+- Per-layer non-destructive binary masks with add, invert, apply, remove and mask-paint modes.
+- Per-layer blend mode and group assignment controls.
+- Selection and mask state are included in undo/redo snapshots; resizing and transforms preserve layer data.
+- This phase remains separate from animation, spritesheets, tilemaps, vector authoring and package management, which remain archived.

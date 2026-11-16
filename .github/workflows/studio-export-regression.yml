@@ -9,6 +9,7 @@ on:
       - "nu-svg-vectorizer.js"
       - "nu-studio-export.js"
       - "nu-ico-export.js"
+      - "nu-studio-pro-tools.js"
       - "nu-raster-import.js"
       - "tests/**"
       - ".github/workflows/studio-export-regression.yml"
@@ -47,6 +48,7 @@ jobs:
           node --check nu-svg-vectorizer.js
           node --check nu-studio-export.js
           node --check nu-ico-export.js
+          node --check nu-studio-pro-tools.js
           node --check nu-raster-import.js
       - name: Run all regression tests
         run: node --test tests/*.test.js
