@@ -1,4 +1,4 @@
-name: N.U XP-first native launcher build
+name: N.U Native Runtime Launcher build
 on:
   push:
     paths:
@@ -12,7 +12,17 @@ on:
       - ".github/workflows/xp-launcher-build.yml"
   workflow_dispatch:
 jobs:
+  vm-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile and test the NUVM/1 interpreter
+        run: |
+          gcc -std=c99 -Wall -Wextra -Werror native/nu_vm.c native/test_nu_vm.c -o /tmp/nu-vm-test
+          /tmp/nu-vm-test
+
   build-x86:
+    needs: vm-tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,16 +30,16 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc-mingw-w64-i686 nsis python3-pil
-      - name: Extract the exact canonical image
+      - name: Extract canonical image and module
         run: python3 native/build.py
-      - name: Compile XP-subsystem x86 launcher
+      - name: Compile XP-subsystem x86 native shell and VM
         run: |
           i686-w64-mingw32-gcc -Os -s -mwindows \
             -DWINVER=0x0501 -D_WIN32_WINNT=0x0501 \
             -Wl,--subsystem,windows:5.01 \
             -Wl,--major-os-version,5,--minor-os-version,1 \
-            -static-libgcc native/launcher.c -o dist/NULauncher.exe \
-            -lshell32 -luser32 -lgdi32
+            -static-libgcc native/launcher.c native/nu_vm.c \
+            -o dist/NULauncher.exe -lshell32 -luser32 -lgdi32
       - name: Verify executable format
         run: |
           file dist/NULauncher.exe
@@ -39,14 +49,15 @@ jobs:
       - name: Create SHA-256 manifest
         run: |
           cd dist
-          sha256sum N.U-Launcher-Setup-x86.exe NULauncher.exe background.bmp README.txt > SHA256SUMS.txt
+          sha256sum N.U-Launcher-Setup-x86.exe NULauncher.exe background.bmp modules/hello.nup README.txt > SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: N.U-XP-first-native-launcher-x86
+          name: N.U-Native-Runtime-Launcher-x86
           path: |
             dist/N.U-Launcher-Setup-x86.exe
             dist/NULauncher.exe
             dist/background.bmp
+            dist/modules/hello.nup
             dist/README.txt
             dist/SHA256SUMS.txt
           if-no-files-found: error
@@ -58,9 +69,9 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: N.U-XP-first-native-launcher-x86
+          name: N.U-Native-Runtime-Launcher-x86
           path: artifact
-      - name: Install, launch and uninstall the native package
+      - name: Install, launch, run bundled module and uninstall
         shell: powershell
         run: |
           $setup = Join-Path $env:GITHUB_WORKSPACE "artifact/N.U-Launcher-Setup-x86.exe"
@@ -69,7 +80,7 @@ jobs:
           Start-Process -FilePath $setup -ArgumentList "/S" -Wait
           $exe = Join-Path $install "NULauncher.exe"
           if (!(Test-Path $exe)) { throw "Silent install did not create NULauncher.exe." }
-          if (!(Test-Path (Join-Path $install "background.bmp"))) { throw "Canonical background image was not installed." }
+          if (!(Test-Path (Join-Path $install "modules/hello.nup"))) { throw "Sample module is missing." }
           $process = Start-Process -FilePath $exe -PassThru
           Start-Sleep -Seconds 3
           if ($process.HasExited) { throw "Launcher exited during the Windows smoke test." }
