@@ -1,9 +1,11 @@
 # Gateway, navigation and controller integration — 2026-11-17
 
-**Status:** IMPLEMENTED ON CANDIDATE BRANCH — machine verification pending  
+**Status:** MACHINE VERIFIED — public demo release pending; human/device QA pending  
 **Branch:** `feature/gateway-controller-navigation-2026-11-17`  
 **Baseline:** `2f81cf268fe6b89338d6c8001a86538ea917d730`  
-**Preservation branch:** `preservation/pre-gateway-controller-navigation-2026-11-17`
+**Preservation branch:** `preservation/pre-gateway-controller-navigation-2026-11-17`  
+**Verified source candidate:** `026a65da2a8d7b5a0feace4e7e6d97ebcaca3470`  
+**Verified recovery branch:** `backup/pre-public-demo-gateway-controller-2026-11-17`
 
 ## Scope
 
@@ -28,12 +30,29 @@
 - `tests/nu-gateway-controller-input.test.js`
 - `tests/nu-gateway-pause.test.js`
 
-## Machine checks
+## Machine checks — PASS
 
-- Focused pause-state unit tests cover running, pre-paused, inactive, completed and repeated-close states.
-- Gateway regression tests cover Back/Pause exclusivity, Profile mounting, nested Wallet/Profile history, mouse highlight/click, keyboard navigation, gamepad navigation/confirmation, hidden-tab behavior and background freeze hooks.
-- Existing Gateway, wallet, health, profile, game, graphics and Studio regression suites must also run on the exact candidate.
-- A test that is not executed is NOT VERIFIED. CI results will be recorded after the candidate PR runs.
+All seven GitHub Actions workflows completed successfully for source candidate `026a65da2a8d7b5a0feace4e7e6d97ebcaca3470`:
+
+| Workflow | Run | Result |
+|---|---:|---|
+| Gateway main-game regression | 43963602868 | PASS — 15/15 |
+| Studio export regression gates (full `tests/*.test.js`) | 43963603092 | PASS — 277/277 |
+| Wallet and Profile regression | 43963603310 | PASS — 54/54 |
+| Exchange feature regression | 43963603141 | PASS — 54/54 |
+| Graphics integrity | 43963603148 | PASS |
+| Graphics preview smoke checks | 43963603247 | PASS |
+| Generation 1 HUD layout regression | 43963603197 | PASS |
+
+The focused pause helper tests cover running, pre-paused, inactive, completed and repeated-close states. Gateway tests cover Back/Pause exclusivity, Profile mounting, nested Wallet/Profile history, mouse highlight/click, keyboard navigation, Gamepad navigation/confirmation, hidden-tab behavior and background freeze hooks.
+
+The recovery branch `backup/pre-public-demo-gateway-controller-2026-11-17` was verified identical to the tested source candidate SHA above. Browser/device interaction and human visual acceptance remain **NOT VERIFIED** and are not implied by CI.
+
+## Release state
+
+- Candidate implementation is machine-verified and backed up.
+- Public demo publication is the next authorized step under the project protocol; no production promotion is included.
+- Human QA remains pending. This record does not claim HUMAN-QA-PASSED, OWNER-APPROVED or SCOPE-LOCKED.
 
 ## Human demo checklist
 
