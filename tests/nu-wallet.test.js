@@ -163,3 +163,15 @@ test("inventory hides unowned items and does not invent empty entries",()=>{
 
 // Keep the Exchange wallet-reader and protocol lifecycle covered by the canonical wallet CI run.
 require("./nu-exchange-engines.test.js");
+
+test("all HP and Health assets are excluded from Exchange even in legacy or dynamic saves",()=>{
+  const save=wallet.normalizeSave({
+    xp:20,mana:4,hp:8,hpPills:1,
+    assets:{hpShield:3,hpCapsules:2,healthReserve:5}
+  });
+  const forbidden=/^(?:hp|health)/i;
+  assert.ok(!wallet.exchangeAssetRows(save).some(row=>forbidden.test(row.key)));
+  for(const key of ["hp","hpPills","hpShield","hpCapsules","healthReserve"])
+    assert.equal(wallet.isExchangeableAsset(save,key),false,key+" must never be exchangeable");
+  assert.ok(!wallet.casinoSpendableAssets(save).some(row=>forbidden.test(row.key)));
+});
