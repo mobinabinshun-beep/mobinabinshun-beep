@@ -2,7 +2,7 @@
 
 **Change ID:** NU-BAG-WALLET-01  
 **Date:** 2026-11-16  
-**Status:** IMPLEMENTED IN CANDIDATE · AUTOMATED CI RUNNING AFTER FINAL HUD CHANGE · PUBLIC DEMO DEPLOYMENT BLOCKED · HUMAN QA PENDING  
+**Status:** IMPLEMENTED IN CANDIDATE · AUTOMATED CI PASS · PUBLIC DEMO DEPLOYMENT BLOCKED · HUMAN QA PENDING  
 **Repository:** `mobinabinshun-beep/mobinabinshun-beep`  
 **Candidate branch:** `feat/wallet-health-module-2026-11-15`  
 **Existing review:** https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/136
@@ -86,7 +86,7 @@ Bag and Inventory shortcuts remain available from Wallet. Inventory and Wallet n
 
 - Added wallet tests for owned item-group projection and exclusion of currencies/progression/vitals; Health tests cover per-Wave totals and idempotent settlement.
 - The Bag/Wallet implementation passed all 8 relevant checks on code commit `8207ca89c8d74a97ceeb0b4fab2db396e7a45bdb`.
-- The later per-Wave summary and HP Capsule affordability changes are under a fresh CI run; final result will be recorded only after all checks finish.
+- Automated CI: **PASS** on code commit `746a1ced1142b0309b124ec373f0f0982eac3202` (all 8 relevant checks green). The later commit `176348b1f549f701c13039749e41810b8ddea7d4` adds only an explanatory code comment.
 - Browser execution, touch/keyboard checks, visual layout and live Pages deployment: **PENDING**.
 - No test result is inferred from a source diff or successful Git write.
 
@@ -110,7 +110,7 @@ Bag and Inventory shortcuts remain available from Wallet. Inventory and Wallet n
 - The repository has no branch-specific public-demo deployment workflow in `.github/workflows/`. The current public Pages site is the default-branch site.
 - The mandatory `docs/PUBLIC-DEMO-HUMAN-ACCEPTANCE-GATE.md` forbids treating a branch preview/PR as the public demo and forbids merging/promoting before explicit human acceptance. No separate staging target or deployment action is configured in this repository.
 - Therefore this candidate cannot yet be deployed to the required public demo without changing the deployment arrangement. Do not merge the PR or ask the owner to test the branch as a substitute.
-- Confirm the fresh CI run for the final code commit and record its exact SHA/status.
+- CI is green on the final functional code commit `746a1ced1142b0309b124ec373f0f0982eac3202`; the subsequent `176348b1f549f701c13039749e41810b8ddea7d4` commit is comment-only.
 - Deploy only to the designated public demo target after technical checks.
 - Collect dated human reports from the owner and testers, including browser/device and reproduction steps.
 - Do not promote beyond the demo without explicit owner approval.
