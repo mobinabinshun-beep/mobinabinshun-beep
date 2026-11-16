@@ -135,10 +135,13 @@
   },{passive:true});
 
   document.addEventListener("keydown",event=>{
-    if(event.key==="Escape"&&open)setOpen(false);
-    if(event.key==="Tab"&&open){
-      const focusable=items.filter(item=>item.tabIndex===0);
-      if(event.shiftKey&&document.activeElement===focusable[0]){event.preventDefault();trigger.focus();}
+    if(!open)return;
+    if(event.key==="Escape"){event.preventDefault();setOpen(false);trigger.focus({preventScroll:true});return;}
+    if(event.key==="Tab"){
+      const focusable=[trigger,...items].filter(item=>item.tabIndex>=0);
+      const first=focusable[0],last=focusable[focusable.length-1];
+      if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+      else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
     }
   });
   window.addEventListener("blur",()=>{if(open)setOpen(false);});
