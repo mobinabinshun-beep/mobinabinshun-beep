@@ -38,3 +38,9 @@ body.nu-game-active #back-home{display:none!important}
 
 /* Keep Gateway keyboard focus visible above its decorative states. */
 #nu-hex-gateway button:focus-visible{outline:2px solid var(--cyan,#65dcff);outline-offset:4px;}
+
+/* Gateway exclusively owns gameplay pause/resume and active utility-page back navigation. */
+body.nu-game-active #finish-round,
+body.nu-gateway-utility-active #bag-back,
+body.nu-gateway-utility-active #inventory-back,
+body.nu-gateway-utility-active #wallet-back{display:none!important}
