@@ -2,8 +2,8 @@
 (function(){
   "use strict";
   const $=id=>document.getElementById(id);
-  const walletView=$("wallet-view"),profileView=$("profile-view");
-  if(!window.NU||!window.NUWallet||!walletView||!profileView)return;
+  const walletView=$("wallet-view"),bagView=$("bag-view"),inventoryView=$("inventory-view"),profileView=$("profile-view");
+  if(!window.NU||!window.NUWallet||!walletView||!bagView||!inventoryView||!profileView)return;
   function load(){return NUWallet.normalizeSave(NU.load());}
   function persist(save){return NU.save(save);}
   function safeText(value,fallback){return typeof value==="string"&&value.trim()?value.trim().slice(0,32):fallback;}
@@ -46,14 +46,15 @@
     if(!tx.length){const empty=document.createElement("p");empty.className="wallet-muted";empty.textContent="No recorded wallet transactions yet.";history.appendChild(empty);return;}
     tx.forEach(item=>{
       const row=document.createElement("div"),title=document.createElement("span"),detail=document.createElement("small");
-      row.className="wallet-transaction";title.textContent=String(item.title||"Wallet transaction");
+      row.className="wallet-transaction";const source=String(item.gameId||item.source||"wallet");const sourceNames={bubble:"Bubble Hunt",mana:"Mana Collector",chaos:"Chaos Attack","nu.store":"Store","nu.casino":"Casino","nu.studio":"Studio"};title.textContent=sourceNames[source]||source.toUpperCase();
       const movement=Object.entries(item.deltas||{}).filter(([,value])=>Number(value)!==0).map(([key,value])=>{
         const label=key==="hpPills"?"HP Capsule":key==="hp"?"HP":key==="xp"?"XP":key;
         return (Number(value)>0?"+":"")+Number(value)+" "+label;
       }).join(" · ");
-      const direction=item.direction==="INCOMING"?"RECEIVED":item.direction==="OUTGOING"?"SPENT":"LOCAL OPERATION";
-      const meta=[direction,movement,item.gameId||item.source||"",item.waveId?"WAVE "+item.waveId:"",item.roundId?"ROUND "+item.roundId:"",item.payoutCapped?"PAYOUT CAPPED":"",item.category||"",Number.isFinite(Number(item.successfulInteractionCount))&&item.waveId?(item.successfulInteractionCount+" successful interactions"):"",item.resultingBalance!==undefined?("balance "+item.resultingBalance):""].filter(Boolean);
-      detail.textContent=meta.join(" · ");
+      detail.textContent=Object.entries(item.deltas||{}).filter(([key,value])=>key!=="hp"&&Number(value)!==0).map(([key,value])=>{
+        const label=key==="hpPills"?"HP Capsule":key==="xp"?"XP":key==="mana"?"Mana":key==="manaCapsules"?"Mana Capsule":key;
+        return (Number(value)>0?"+":"")+Number(value)+" "+label;
+      }).join(" · ")||"—";
       row.append(title,detail);history.appendChild(row);
     });
   }
@@ -82,6 +83,42 @@
         detail.textContent=[when,"GAME "+String(item.gameId||"unknown"),item.hpAfter!==undefined&&item.hpAfter!==null?"HP "+item.hpAfter:"",item.effectAmount?"HEAL "+item.effectAmount+" HP":"",item.hpBefore!==undefined&&item.hpBefore!==null?"HP BEFORE "+item.hpBefore:""].filter(Boolean).join(" · ");
         row.append(title,detail);root.appendChild(row);
       });
+    });
+  }
+  function renderInventory(){
+    const root=$("inventory-items");if(!root)return;
+    const rows=NUWallet.inventoryRows(load());
+    root.replaceChildren();
+    if(!rows.length){
+      const empty=document.createElement("p");empty.className="wallet-muted";
+      empty.textContent="Your inventory is empty. Items collected or acquired in supported games will appear here.";
+      root.appendChild(empty);return;
+    }
+    rows.forEach(item=>{
+      const card=document.createElement("div"),name=document.createElement("strong"),count=document.createElement("span"),group=document.createElement("small");
+      card.className="inventory-item";name.textContent=String(item.label||item.key);
+      count.textContent="×"+Number(item.value).toLocaleString(undefined,{maximumFractionDigits:8});
+      group.textContent=String(item.group||"item").toUpperCase();
+      card.append(name,count,group);root.appendChild(card);
+    });
+  }
+  function renderManaHistory(){
+    const root=$("wallet-mana-history");if(!root)return;
+    const entries=load().transactions.filter(item=>item&&item.deltas&&Object.entries(item.deltas).some(([key,value])=>/mana|nbi|arcane|shield|magic/i.test(key)&&Number(value)!==0)).slice(-24).reverse();
+    root.replaceChildren();
+    if(!entries.length){
+      const empty=document.createElement("p");empty.className="wallet-muted";
+      empty.textContent="No Mana-linked game or Store changes have been recorded yet.";
+      root.appendChild(empty);return;
+    }
+    const labels={mana:"Mana",manaCapsules:"Mana Capsule",nbiCharge:"N-BI Arcane Charge",arcaneShieldCharge:"Arcane Shield Charge",shieldCharge:"Shield Charge"};
+    entries.forEach(item=>{
+      const row=document.createElement("div"),title=document.createElement("span"),detail=document.createElement("small");
+      row.className="wallet-transaction";
+      const source=String(item.gameId||item.source||"wallet"),names={bubble:"Bubble Hunt",mana:"Mana Collector",chaos:"Chaos Attack","nu.store":"Store","nu.casino":"Casino"};
+      title.textContent="MHL · "+(names[source]||source.toUpperCase());
+      detail.textContent=Object.entries(item.deltas).filter(([key,value])=>/mana|nbi|arcane|shield|magic/i.test(key)&&Number(value)!==0).map(([key,value])=>(Number(value)>0?"+":"")+Number(value)+" "+(labels[key]||key)).join(" · ");
+      row.append(title,detail);root.appendChild(row);
     });
   }
   function buildHumanReport(){
@@ -117,6 +154,7 @@
     document.querySelectorAll("[data-wallet-panel]").forEach(panel=>{panel.hidden=panel.dataset.walletPanel!==name;});
     if(name==="transactions")renderWallet();
     if(name==="health")renderHealth();
+    if(name==="mana")renderManaHistory();
   }
   function open(view){
     previousView=document.querySelector(".view.active");
@@ -124,10 +162,14 @@
     document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));
     view.classList.add("active");
     document.body.classList.remove("article-mode");
-    if(view===walletView){setWalletTab("balances");renderWallet();}else renderProfile();
+    if(view===walletView){setWalletTab("balances");renderWallet();}
+    else if(view===inventoryView)renderInventory();
+    else if(view===profileView)renderProfile();
     const menu=$("menu");if(menu)menu.classList.remove("open");
   }
-  function close(){if(profileView.classList.contains("active")){["demo-name","demo-call","demo-family","demo-age","demo-age-band","demo-bio","demo-interests","demo-passphrase-test"].forEach(id=>{const field=$(id);if(field)field.value="";});const warning=$("demo-profile-warning");if(warning)warning.hidden=true;applyAppearance(true);resetWorkshop();}document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));(previousView&&previousView!==walletView&&previousView!==profileView?previousView:$("home-view")).classList.add("active");previousView=null;window.dispatchEvent(new Event("nu:player-overlay-close"));}
+  function close(){if(profileView.classList.contains("active")){["demo-name","demo-call","demo-family","demo-age","demo-bio","demo-interests","demo-passphrase-test"].forEach(id=>{const field=$(id);if(field)field.value="";});const warning=$("demo-profile-warning");if(warning)warning.hidden=true;applyAppearance(true);resetWorkshop();}document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));(previousView&&previousView!==profileView?previousView:$("home-view")).classList.add("active");previousView=null;window.dispatchEvent(new Event("nu:player-overlay-close"));}
+  $("bag-back").addEventListener("click",close);
+  $("inventory-back").addEventListener("click",close);
   $("wallet-back").addEventListener("click",close);
   $("profile-back").addEventListener("click",close);
   const demoFields=["demo-name","demo-call","demo-family","demo-age","demo-age-band","demo-bio","demo-interests"];
@@ -308,7 +350,8 @@
   if(demoClear)demoClear.addEventListener("click",close);
   profileView.addEventListener("click",event=>{if(event.target===profileView)close();});
   document.addEventListener("keydown",event=>{if(event.key==="Enter"&&profileView.classList.contains("active")){event.preventDefault();close();}});
-  $("menu-wallet").addEventListener("click",()=>open(walletView));
+  $("menu-bag").addEventListener("click",()=>open(bagView));
+  document.querySelectorAll("[data-bag-destination]").forEach(button=>button.addEventListener("click",()=>{const destination=button.dataset.bagDestination;if(destination==="bag")open(bagView);else if(destination==="inventory")open(inventoryView);else if(destination==="wallet")open(walletView);else if(destination==="profile")open(profileView);}));
   $("menu-profile").addEventListener("click",()=>open(profileView));
   document.querySelectorAll("[data-wallet-tab]").forEach(button=>button.addEventListener("click",()=>{
     const tab=button.dataset.walletTab;
@@ -335,9 +378,9 @@
     window.dispatchEvent(new CustomEvent("nu:save-updated"));
     renderProfile();
   });
-  window.addEventListener("nu:save-updated",()=>{if(walletView.classList.contains("active"))renderWallet();if(profileView.classList.contains("active"))renderProfile();});
+  window.addEventListener("nu:save-updated",()=>{if(walletView.classList.contains("active")){renderWallet();if(document.querySelector('[data-wallet-panel="mana"]')?.hidden===false)renderManaHistory();}if(inventoryView.classList.contains("active"))renderInventory();if(profileView.classList.contains("active"))renderProfile();});
   window.addEventListener("nu:health-updated",()=>{if(walletView.classList.contains("active")&&document.querySelector('[data-wallet-panel="health"]')?.hidden===false)renderHealth();});
   window.addEventListener("storage",e=>{if(e.key==="nu-health-records-v1"&&walletView.classList.contains("active")&&document.querySelector('[data-wallet-panel="health"]')?.hidden===false)renderHealth();});
   window.addEventListener("storage",e=>{if(e.key==="nu-world-save-v1"){if(walletView.classList.contains("active"))renderWallet();if(profileView.classList.contains("active"))renderProfile();}});
-  renderWallet();renderProfile();
+  renderWallet();renderInventory();renderProfile();
 })();
