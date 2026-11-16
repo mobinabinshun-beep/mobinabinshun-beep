@@ -105,15 +105,16 @@ Bag and Inventory shortcuts remain available from Wallet. Inventory and Wallet n
 11. Open Profile from Gateway, close it, and confirm return to the previous Bag/Wallet page. Confirm temporary profile values are cleared on close.
 12. Repeat on narrow portrait and landscape layouts, with keyboard focus and touch input.
 
-## Deployment blocker and outstanding gates
+## Deployment and acceptance status — protocol corrected 2026-11-16
 
-- The repository has no branch-specific public-demo deployment workflow in `.github/workflows/`. The current public Pages site is the default-branch site.
-- The mandatory `docs/PUBLIC-DEMO-HUMAN-ACCEPTANCE-GATE.md` forbids treating a branch preview/PR as the public demo and forbids merging/promoting before explicit human acceptance. No separate staging target or deployment action is configured in this repository.
-- Therefore this candidate cannot yet be deployed to the required public demo without changing the deployment arrangement. Do not merge the PR or ask the owner to test the branch as a substitute.
-- CI is green on the final functional code commit `746a1ced1142b0309b124ec373f0f0982eac3202`; the subsequent `176348b1f549f701c13039749e41810b8ddea7d4` commit is comment-only.
-- Deploy only to the designated public demo target after technical checks.
-- Collect dated human reports from the owner and testers, including browser/device and reproduction steps.
-- Do not promote beyond the demo without explicit owner approval.
+- The owner has explicitly corrected the operating protocol: relevant machine checks PASS + verified machine backup authorize deployment to the public demo; human acceptance is collected after deployment, not before it.
+- The normative protocol is `docs/operations/NU-OPS-IMPLEMENT-01.md`; the dated owner decision is recorded in `docs/operations/OWNER-WORKFLOW-CORRECTION-2026-11-16.md`; the public gate is `docs/PUBLIC-DEMO-HUMAN-ACCEPTANCE-GATE.md`.
+- The current public Pages site is tied to the default branch. This candidate must reach that public demo through the repository's configured Pages publication path; a PR/branch preview is not a substitute.
+- Relevant workflows observed on the updated candidate documentation head `6e42bd499e4d4b88258f6df54677adc96b24200a`: wallet/profile regression, graphics preview smoke, Gateway regression, graphics integrity, Studio export, Generation 1 HUD layout and Exchange regression all completed successfully. The functional Bag/Wallet code commit `746a1ced1142b0309b124ec373f0f0982eac3202` previously passed all 8 relevant checks; Wallet 50/50, Gateway 12/12, Studio/export 219/219.
+- A new verified backup of the exact deployable candidate must be created before merge/publication. Record its exact ref and SHA in the deployment report.
+- After publication, verify the public URL serves the intended merge/build, run available public smoke checks, then provide the owner and testers the URL and scope.
+- Human QA remains pending until the owner/testers report. Keyboard/focus and real-device portrait/landscape behavior remain explicit human QA concerns.
+- Public demo deployment is not human acceptance, scope lock or promotion beyond the demo. Do not claim any of those states without the corresponding evidence.
 
 ## Rollback
 
