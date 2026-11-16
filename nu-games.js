@@ -263,13 +263,35 @@ function renderLibrary(){
  $("game-library").querySelectorAll("[data-random-game]").forEach(b=>b.addEventListener("click",()=>chooseGame()));
 }
 $("back-home").addEventListener("click",showHome);$("finish-round").addEventListener("click",()=>{if(state.active){state.active=false;state.paused=true;cancelAnimationFrame(state.raf);$("finish-round").textContent="RESUME ROUND";$("game-info").textContent="Round paused. Your targets and progress are frozen.";}else if(state.paused&&state.turn<10){state.paused=false;state.active=true;$("finish-round").textContent="PAUSE ROUND";$("game-info").textContent="Round resumed.";state.raf=requestAnimationFrame(animateGame);}});$("restart-round").addEventListener("click",()=>chooseGame(state.game));
-function closeMenu(resume=true){$("menu").classList.remove("open");if(resume)window.dispatchEvent(new Event("nu:menu-dismissed"));}
-$("menu-open").addEventListener("click",()=>$("menu").classList.add("open"));$("menu-close").addEventListener("click",()=>closeMenu(true));$("menu").addEventListener("click",event=>{if(event.target===$("menu"))closeMenu(true);});
-$("menu-store").addEventListener("click",()=>{closeMenu(false);showShop();});
-$("menu-random").addEventListener("click",()=>{closeMenu(false);chooseGame();});
-$("menu-bubble").addEventListener("click",()=>{closeMenu(false);chooseGame("bubble");});
-$("menu-mana").addEventListener("click",()=>{closeMenu(false);chooseGame("mana");});
-$("menu-chaos").addEventListener("click",()=>{closeMenu(false);chooseGame("chaos");});$("shop-back").addEventListener("click",closeShop);$("quest-open-store").addEventListener("click",()=>{localStorage.setItem("nu-shop-guide-seen","1");$("shop-quest").classList.add("hidden");$("shop-empty").classList.remove("hidden");renderShop();});
+const menuRoot=$("menu"),menuPanel=menuRoot.querySelector(".menu-panel");
+let menuReturnFocus=null;
+if(menuPanel)menuPanel.tabIndex=-1;
+function menuFocusable(){return menuPanel?[...menuPanel.querySelectorAll('a[href],button:not([disabled]),[tabindex]:not([tabindex="-1"])')].filter(el=>!el.hidden):[];}
+function openMenu(){if(menuRoot.classList.contains("open"))return;menuReturnFocus=document.activeElement;menuRoot.classList.add("open");const focusable=menuFocusable();(focusable[0]||menuPanel)?.focus({preventScroll:true});}
+function restoreMenuFocus(){
+ const target=menuReturnFocus;
+ const hidden=target&&(!target.isConnected||target.closest(".view:not(.active)")||target.closest("#menu:not(.open)")||target.closest("#nu-hex-gateway:not(.is-open)")||target.closest("[hidden]"));
+ if(target&&!hidden)target.focus({preventScroll:true});
+ else{const fallback=$("game-view").classList.contains("active")?document.querySelector(".nu-gateway-trigger"):$("menu-open");if(fallback)fallback.focus({preventScroll:true});}
+ menuReturnFocus=null;
+}
+function closeMenu(resume=true,restoreFocus=true){menuRoot.classList.remove("open");if(resume)window.dispatchEvent(new Event("nu:menu-dismissed"));if(restoreFocus)restoreMenuFocus();else menuReturnFocus=null;}
+menuRoot.addEventListener("keydown",event=>{
+ if(event.key==="Escape"){event.preventDefault();closeMenu(true);return;}
+ if(event.key!=="Tab")return;
+ const focusable=menuFocusable();
+ if(!focusable.length){event.preventDefault();menuPanel?.focus({preventScroll:true});return;}
+ const first=focusable[0],last=focusable[focusable.length-1];
+ if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+ else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+});
+$("menu-open").addEventListener("click",openMenu);$("menu-close").addEventListener("click",()=>closeMenu(true));$("menu").addEventListener("click",event=>{if(event.target===$("menu"))closeMenu(true);});
+function focusActiveViewHeading(){const heading=document.querySelector(".view.active .view-head h2");if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}}
+$("menu-store").addEventListener("click",()=>{closeMenu(false,false);showShop();focusActiveViewHeading();});
+$("menu-random").addEventListener("click",()=>{closeMenu(false,false);chooseGame();focusActiveViewHeading();});
+$("menu-bubble").addEventListener("click",()=>{closeMenu(false,false);chooseGame("bubble");focusActiveViewHeading();});
+$("menu-mana").addEventListener("click",()=>{closeMenu(false,false);chooseGame("mana");focusActiveViewHeading();});
+$("menu-chaos").addEventListener("click",()=>{closeMenu(false,false);chooseGame("chaos");focusActiveViewHeading();});$("shop-back").addEventListener("click",closeShop);$("quest-open-store").addEventListener("click",()=>{localStorage.setItem("nu-shop-guide-seen","1");$("shop-quest").classList.add("hidden");$("shop-empty").classList.remove("hidden");renderShop();});
 function bindHpPillButton(){const button=$("hp-pill-use");if(!button)return;button.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();if(button.hidden)return;if(state.save.hpPills<1){announceTransaction(state.save.xp>=NUWallet.HP_PILL_COST?"0 HP CAPSULES · BUY FOR 10 XP IN STORE":"0 HP CAPSULES · EARN 10 XP TO UNLOCK","warning");return;}useHpPill(e);});}$("quest-continue").addEventListener("click",()=>{localStorage.setItem("nu-shop-guide-seen","1");closeShop();});document.querySelectorAll("[data-article]").forEach(b=>b.addEventListener("click",()=>openArticle(b.dataset.title,b.dataset.article)));$("article-back").addEventListener("click",showHome);
 if(state.save.activeWave){const recovered=NUWallet.settleWave(state.save,"reload_recovery");if(recovered.ok){state.save=recovered.state;NU.save(state.save);}}
 renderLibrary();renderWallet();bindHpPillButton();bindGameAssetProfiles();renderRoundProgress();resize();
@@ -277,5 +299,5 @@ function unlockWorld(info,label){state.quality=info&&info.level||3;try{state.eng
 NU.samplePerformance().then(info=>{unlockWorld(info);NU.sampleNetwork().then(net=>{const speed=net.estimatedDownlinkMbps===null?"LINK ?":("LINK ~"+net.estimatedDownlinkMbps+" Mbps");const rtt=net.siteRttMs===null?"SITE RTT N/A":("SITE RTT "+net.siteRttMs+" ms");$("quality-status").textContent="N.U Q"+state.quality+" · "+rtt+" · "+speed;$("calibration-status").textContent="READY · RENDER Q"+state.quality+" · "+rtt+" · "+net.probeLossPercent+"% FAILED SITE PROBES";}).catch(()=>{$("quality-status").textContent="N.U Q"+state.quality+" · NETWORK CHECK UNAVAILABLE";});}).catch(error=>{console.warn("N.U performance calibration fallback",error);unlockWorld({level:3},"RUNTIME SAFE MODE");});
 $("intro-start").addEventListener("click",()=>{$("intro").classList.add("hidden");});
 $("intro-close").addEventListener("click",()=>{$("intro").classList.add("hidden");});
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){$("intro").classList.add("hidden");if($("menu").classList.contains("open"))closeMenu(true);}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")$("intro").classList.add("hidden");});
 })();
