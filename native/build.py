@@ -2,12 +2,13 @@
 import base64
 import pathlib
 import re
-import sys
 from PIL import Image
 from io import BytesIO
+import shutil
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "assets" / "backgrounds" / "niroo-universe-background.svg"
+MODULES = ROOT / "native" / "modules"
 DIST = ROOT / "dist"
 
 def main():
@@ -23,15 +24,21 @@ def main():
         raise SystemExit("Unexpected canonical image dimensions: %r" % (image.size,))
     DIST.mkdir(parents=True, exist_ok=True)
     image.save(DIST / "background.bmp", format="BMP")
+    module_out = DIST / "modules"
+    module_out.mkdir(parents=True, exist_ok=True)
+    module = MODULES / "hello.nup"
+    if not module.is_file():
+        raise SystemExit("The Generation 1 sample module is missing.")
+    shutil.copy2(module, module_out / module.name)
     (DIST / "README.txt").write_text(
-        "N.U Launcher — XP-first native preview\n"
+        "N.U Launcher — browser-independent native runtime preview\n"
         "Architecture: 32-bit Win32, single static background image.\n"
-        "The launcher samples processor count and physical memory and selects a conservative local profile.\n"
-        "The web demo opens in the system browser; compatibility of that browser/game with Windows XP is not guaranteed.\n"
-        "This preview does not install a browser, modify Windows settings, or require network access to open the native launcher.\n",
+        "The shell uses internal nu:// navigation and does not launch a system browser.\n"
+        "The bundled NUVM/1 module is declarative and instruction-limited.\n"
+        "Windows XP SP3 x86 compatibility is NOT VERIFIED until tested on XP.\n",
         encoding="utf-8",
     )
-    print("Extracted canonical image %dx%d to dist/background.bmp" % image.size)
+    print("Extracted canonical image %dx%d and bundled NUVM/1 sample module" % image.size)
 
 if __name__ == "__main__":
     main()
