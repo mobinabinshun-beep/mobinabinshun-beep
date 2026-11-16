@@ -31,7 +31,7 @@ Each selected round has 10 successful target interactions. Missed clicks do not 
 - No online accounts, cloud saves, comments, paid economy, multiplayer economy or downloadable launcher is included. The experimental local Store currently supports the HP Capsule transaction only; other upgrades remain unimplemented.
 
 ## Team test
-Open the GitHub Pages site and choose **START A RANDOM GAME**. Click targets in the field. Test missed clicks (they should not consume one of the ten successful interactions), then use **NEW ROUND**. Reload to verify local save persistence and confirm that a new round selects a random game.
+Open the GitHub Pages site and choose **START A RANDOM GAME**. Click targets in the field. Test missed clicks (they should not consume one of the ten successful interactions), then return to the game library and select the same game again to start a fresh round. Reload to verify local save persistence and confirm that a new round selects a random game.
 
 N.U — Niroo Universe
 
@@ -536,3 +536,12 @@ The three existing casino games now use spendable positive assets from the share
 The existing Coin Flip 2×, Lucky Dice 5×, Mini Slots triple 8× and pair 2× gross payout rules remain unchanged. Mana payouts respect the current storage capacity. Short round feedback respects reduced-motion preferences.
 
 See `docs/architecture/NU-CASINO-WALLET-BETTING-ECONOMY.md`. This is still local virtual demo activity only; no real-money deposits, withdrawals, cash-out or server-backed ledger exist. Add casino checks from `docs/testing/NU-PUBLIC-DEMO-WAVE-WALLET-HUMAN-QA.md` to the manual acceptance run.
+
+
+## Team governance and demo workflow
+The archive repository is the canonical source for project-wide roles, owner decisions, scope locks and acceptance criteria:
+- [Team governance](https://github.com/mobinabinshun-beep/Repository/blob/main/Governance/NU-TEAM-GOVERNANCE-AND-WORKING-AGREEMENT-fa.md)
+- [Documentation protocol](https://github.com/mobinabinshun-beep/Repository/blob/main/Governance/NU-DOCUMENTATION-AND-KNOWLEDGE-CAPTURE-PROTOCOL-fa.md)
+- [Owner directive and demo acceptance backlog](https://github.com/mobinabinshun-beep/Repository/blob/main/Operations/2026-11-16/OWNER-DIRECTIVE-AND-DEMO-ACCEPTANCE-BACKLOG-fa.md)
+
+Authorized unlocked demo changes follow: code → machine tests/debugging → verified backup → public demo → link/build check and report → human QA/owner acceptance. Read AGENTS.md and docs/operations/LOCKED-AREAS.md before editing.
