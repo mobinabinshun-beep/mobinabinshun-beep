@@ -23,3 +23,4 @@
 | `nu-health.js` | `archive/pre-change/2026-11-16-NU-BAG-WALLET-01/original/nu-health.js` | `b1c085fb4d0ea1dc1f696f92d7ecb940da02d972` |
 | `nu-games.js` | `archive/pre-change/2026-11-16-NU-BAG-WALLET-01/original/nu-games.js` | `2e40579140349ee4f7fbd4dd251e14d1c24e890f` |
 | `tests/nu-health.test.js` | `archive/pre-change/2026-11-16-NU-BAG-WALLET-01/original/tests/nu-health.test.js` | `9f5b5f9cc108d98af6009490a7d6598eeffaa3dc` |
+| `tests/nu-hud-layout.test.js` | `archive/pre-change/2026-11-16-NU-BAG-WALLET-01/original/tests/nu-hud-layout.test.js` | `3fed4402352d16a0063fa54bc3b5b86b3e9a1d0f` |
