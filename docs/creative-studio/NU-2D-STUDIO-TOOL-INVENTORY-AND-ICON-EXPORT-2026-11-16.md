@@ -1,6 +1,6 @@
 # N.U Pixel Art Studio — 2D Tool Inventory & Icon Export
 **Record:** NU-STUDIO-2D-ICON-EXPORT-2026-11-16  
-**Status:** candidate implementation record; owner visual acceptance tracked separately  
+**Status:** implemented candidate; Studio regression CI passed; owner visual acceptance pending  
 **Scope:** current Generation 1 browser-based 2D Studio only
 
 ## Owner-directed scope
@@ -40,3 +40,11 @@ For an application icon, the Windows icon container is .ico. .iso is a disk-imag
 - No Generation 1 gameplay, wallet/economy, adaptive runtime or protected HUD changes.
 - Preserve local-only import and original source bytes.
 - Automated CI is evidence only; deployment and human visual acceptance are separate.
+
+
+## Machine verification record
+- Candidate commit tested: 743b977c818d288ebd40c6fe3ad9031d6c00f902
+- Workflow: N.U Studio export regression gates
+- Run: https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/43877071226
+- Result: PASS — syntax checks and 245 Node tests, 245 passed / 0 failed
+- Human browser and Windows shell checks remain pending.
