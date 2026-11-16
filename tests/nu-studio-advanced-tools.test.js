@@ -89,17 +89,17 @@ test("PNG export supports toBlob and a data URL fallback",()=>{
 
 test("2D Studio adds filled shapes and symmetry painting controls",()=>{
  for(const tool of ["rect-fill","ellipse-fill"])assert.match(js,new RegExp('data-tool="'+tool+'"'));
- assert.match(js,/adv\\.symmetry==="both"/);
+ assert.match(js,/adv\.symmetry==="both"/);
  assert.match(js,/id="adv-symmetry"/);
 });
 test("SVG vectorization consumes the active visible composite snapshot and rejects blank artwork",()=>{
- assert.match(js,/vectorize\\(pixels,width,height/);
+ assert.match(js,/vectorize\(pixels,width,height/);
  assert.match(js,/The artwork is empty/);
- assert.match(js,/data:image\\/png;base64,/);
- assert.doesNotMatch(js,/?>\\\\\\\\n<svg/);
+ assert.match(js,/data:image\/png;base64,/);
+ assert.doesNotMatch(js,/?>\\n<svg/);
 });
 test("ICO export is wired to both the main and advanced export panels",()=>{
  assert.match(html,/id="export-ico"/);
  assert.match(js,/id="adv-ico"/);
- assert.match(html,/nu-ico-export\\.js/);
+ assert.match(html,/nu-ico-export\.js/);
 });
