@@ -56,3 +56,30 @@ test("health history remains readable after a new store instance is created",()=
   const second=health.createHealthStore(storage);
   assert.equal(second.getHistory("deaths")[0].gameId,"chaos");
 });
+
+test("settled Wave summaries record game, total damage and net HP separately",()=>{
+  const store=health.createHealthStore(memoryStorage());
+  const saved=store.recordWaveSummary({gameId:"chaos",waveId:"wave-001",damageTaken:3,hpDelta:-2,successfulInteractions:10,reason:"completed"});
+  assert.equal(saved.gameId,"chaos");
+  assert.equal(saved.damageTaken,3);
+  assert.equal(saved.hpDelta,-2);
+  assert.equal(store.getWaveHistory().length,1);
+  assert.equal(store.getHistory("waveSummaries")[0].waveId,"wave-001");
+  assert.equal(store.getHistory("damage").length,0);
+});
+test("Wave summary recording is idempotent and retains the latest twenty Waves",()=>{
+  const store=health.createHealthStore(memoryStorage());
+  const first=store.recordWaveSummary({gameId:"chaos",waveId:"wave-001",damageTaken:1,hpDelta:-1});
+  const duplicate=store.recordWaveSummary({gameId:"chaos",waveId:"wave-001",damageTaken:99,hpDelta:-9});
+  assert.equal(duplicate.id,first.id);
+  for(let i=2;i<=22;i++)store.recordWaveSummary({gameId:"mana",waveId:"wave-"+String(i).padStart(3,"0"),damageTaken:0,hpDelta:0});
+  const rows=store.getWaveHistory();
+  assert.equal(rows.length,20);
+  assert.equal(rows[0].waveId,"wave-003");
+  assert.equal(rows.at(-1).waveId,"wave-022");
+});
+test("Wave summary payloads reject missing Wave identifiers",()=>{
+  const store=health.createHealthStore(memoryStorage());
+  assert.equal(store.recordWaveSummary({gameId:"chaos",damageTaken:1}),false);
+  assert.equal(store.getWaveHistory().length,0);
+});
