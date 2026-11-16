@@ -781,3 +781,6 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 .hp-pill-use.is-purchasable{border-color:#f3cb79;background:rgba(75,53,20,.9);color:#ffe2a0;box-shadow:0 0 13px rgba(243,203,121,.28)}
 .hp-pill-use.is-purchasable img{filter:drop-shadow(0 0 5px rgba(255,210,112,.65))}
 .hp-pill-use.is-purchasable:focus-visible{outline-color:#ffe2a0}
+
+/* Keyboard focus visibility: final override for layered tab styles. */
+.wallet-card-tab:focus-visible,.menu-close:focus-visible,.btn:focus-visible,.bag-destination:focus-visible,.bag-shortcut:focus-visible{outline:2px solid #a9f3ff!important;outline-offset:3px;}
