@@ -37,13 +37,14 @@ The repository connector used for this repair does not expose GitHub branch-prot
 
 
 ## 2026-11-16 — 2D icon-design candidate freeze
-- **Candidate source branch:** \`fix/studio-2d-svg-ico-tools-2026-11-16\`
-- **Candidate source commit before this documentation-only update:** \`743b977c818d288ebd40c6fe3ad9031d6c00f902\`
-- **Regression evidence:** [Studio export regression run 922](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/43877071226) — JavaScript syntax and full Node regression suite passed (245 tests; 245 passed, 0 failed).
+- **Candidate source branch:** `fix/studio-2d-svg-ico-tools-2026-11-16`
+- **Frozen source commit:** `f23f8ca38ef011b81279ca01186caa27ea37961a`
+- **Read-only recovery branch:** `freeze/studio-2d-icon-tools-2026-11-16`
+- **Regression evidence:** [Studio export regression run](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/43877235179) — JavaScript syntax and full Node regression suite passed (245 tests; 245 passed, 0 failed).
 - **Scope covered:** visible-composite SVG export, self-contained raster fallback, blank-artwork guard, filled rectangle/ellipse, paint symmetry, and multi-resolution ICO export.
 - **ICO payload:** 16/24/32/48/64/128/256 px, 32-bit DIB/BGRA plus AND transparency mask; the real Windows shell and Windows XP compatibility still require human testing.
 - **Owner design lock:** this exact 2D tool/export scope is frozen against unrelated feature expansion while the owner designs the icon. Reopening these files or export contracts requires the owner's direct instruction.
 - **Human QA:** browser rendering, download behavior and actual Windows icon display remain pending. CI success is not human acceptance.
-- **Future Creative Suite phases:** preserved in \`docs/creative-studio/NU-CREATIVE-SUITE-FUTURE-ARCHIVE-2026-11-16.md\`; archived only, not scheduled or implemented.
+- **Future Creative Suite phases:** preserved in `docs/creative-studio/NU-CREATIVE-SUITE-FUTURE-ARCHIVE-2026-11-16.md`; archived only, not scheduled or implemented.
 
 This freeze is a repository workflow checkpoint. It does not by itself enable GitHub server-side branch protection; configure repository rules in GitHub Settings if technical enforcement is required.
