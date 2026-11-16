@@ -453,7 +453,7 @@ resizeArtwork=function(nextW,nextH,method="nearest"){
  $("image-width").value=width;$("image-height").value=height;updateCanvasDisplay();render();announce("All layers resized to "+width+" × "+height+" px using nearest-neighbor sampling.");return true;
 };
 const resetGridBase=resetGrid;
-resetGrid=function(next){width=next;height=next;layerWidth=width;layerHeight=height;adv.layers.forEach(l=>l.pixels=Array(width*height).fill(null));adv.active=0;pixels=adv.layers[0].pixels.slice();undoStack=[];redoStack=[];imageImported=false;historyButtons();$("image-width").value=width;$("image-height").value=height;updateCanvasDisplay();render();announce("New "+width+" × "+height+" transparent canvas.");};
+resetGrid=function(next){width=next;height=next;layerWidth=width;layerHeight=height;adv.layers.forEach(l=>{l.pixels=Array(width*height).fill(null);l.mask=null;});adv.selection=null;adv.maskEdit=false;$("pro-mask-edit").checked=false;adv.active=0;pixels=adv.layers[0].pixels.slice();undoStack=[];redoStack=[];imageImported=false;historyButtons();$("image-width").value=width;$("image-height").value=height;updateCanvasDisplay();render();announce("New "+width+" × "+height+" transparent canvas.");};
 
 const proTools=window.NUStudioProTools;if(!proTools)throw new Error("N.U professional 2D tools failed to load.");
 function allSelection(){return new Uint8Array(width*height).fill(1);}

@@ -82,7 +82,7 @@
   return out;
  }
  function blendPixel(base,top,mode="normal",opacity=100){
-  const a=rgb(base),b=rgb(top);if(!b)return base;if(!a)return hex(b.map(v=>v*clamp(opacity,0,100)/100+255*(1-clamp(opacity,0,100)/100)));
+  const a=rgb(base),b=rgb(top);if(!b)return base;if(!a)return hex(b);
   const blend=b.map((v,i)=>mode==="multiply"?a[i]*v/255:mode==="screen"?255-(255-a[i])*(255-v)/255:mode==="add"?Math.min(255,a[i]+v):mode==="darken"?Math.min(a[i],v):mode==="lighten"?Math.max(a[i],v):v);
   const alpha=clamp(opacity,0,100)/100;return hex(a.map((v,i)=>v*(1-alpha)+blend[i]*alpha));
  }
