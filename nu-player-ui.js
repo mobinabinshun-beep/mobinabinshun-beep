@@ -45,16 +45,14 @@
     const tx=s.transactions.slice(-24).reverse();
     if(!tx.length){const empty=document.createElement("p");empty.className="wallet-muted";empty.textContent="No recorded wallet transactions yet.";history.appendChild(empty);return;}
     tx.forEach(item=>{
+      const visibleDeltas=Object.entries(item.deltas||{}).filter(([key,value])=>key!=="hp"&&Number(value)!==0);
+      if(!visibleDeltas.length)return;
       const row=document.createElement("div"),title=document.createElement("span"),detail=document.createElement("small");
       row.className="wallet-transaction";const source=String(item.gameId||item.source||"wallet");const sourceNames={bubble:"Bubble Hunt",mana:"Mana Collector",chaos:"Chaos Attack","nu.store":"Store","nu.casino":"Casino","nu.studio":"Studio"};title.textContent=sourceNames[source]||source.toUpperCase();
-      const movement=Object.entries(item.deltas||{}).filter(([,value])=>Number(value)!==0).map(([key,value])=>{
-        const label=key==="hpPills"?"HP Capsule":key==="hp"?"HP":key==="xp"?"XP":key;
-        return (Number(value)>0?"+":"")+Number(value)+" "+label;
-      }).join(" · ");
-      detail.textContent=Object.entries(item.deltas||{}).filter(([key,value])=>key!=="hp"&&Number(value)!==0).map(([key,value])=>{
+      detail.textContent=visibleDeltas.map(([key,value])=>{
         const label=key==="hpPills"?"HP Capsule":key==="xp"?"XP":key==="mana"?"Mana":key==="manaCapsules"?"Mana Capsule":key;
         return (Number(value)>0?"+":"")+Number(value)+" "+label;
-      }).join(" · ")||"—";
+      }).join(" · ");
       row.append(title,detail);history.appendChild(row);
     });
   }
