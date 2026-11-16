@@ -54,3 +54,11 @@ If the demo has a critical regression, stop further rollout, restore the verifie
 
 ## Documentation rule
 A change is not closed until the canonical archive record and relevant repository index are updated. Do not store credentials, private keys, tokens or unnecessary personal information in project records.
+
+
+## Narrow exception — Gateway pause-control clarification (2026-11-16)
+The owner has explicitly confirmed that Gateway exists to serve as the game's pause/resume control. Opening Gateway pauses the active round; closing it releases only the pause owned by Gateway; any manual pause that predated Gateway must remain in force. A separate duplicate Pause/Resume control is not a required parallel path.
+
+For this specific Gateway contract clarification and a narrowly scoped correction directly required to satisfy it, **automated validation is the acceptance gate; human approval is not required to close this item**. The contributor must inspect dependencies, implement only the scoped correction if code is demonstrably needed, debug, run focused and relevant regression tests, and record exact machine evidence. If code changes, the normal verified-backup and public-demo release requirements still apply.
+
+This exception does not grant approval for unrelated work, does not unlock protected areas, and does not create HUMAN-QA-PASSED, OWNER-APPROVED or SCOPE-LOCKED status. Human QA remains distinct and may still be performed, but it is not a prerequisite for closing this narrow protocol item. See the [canonical owner decision](https://github.com/mobinabinshun-beep/Repository/blob/main/Operations/2026-11-16/GATEWAY-IS-THE-PAUSE-CONTROL-fa.md).
