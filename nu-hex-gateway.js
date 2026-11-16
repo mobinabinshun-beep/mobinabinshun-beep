@@ -9,8 +9,7 @@
 
   const trigger=root.querySelector(".nu-gateway-trigger");
   const items=[...root.querySelectorAll(".nu-gateway-item")];
-  const pauseButton=document.getElementById("finish-round");
-  let open=false,pausedByGateway=false,selected=null,activationTimer=0,outsideSince=0,suppressClickUntil=0;
+  let open=false,selected=null,activationTimer=0,outsideSince=0,suppressClickUntil=0;
 
   function syncGatewayScope(){
     const active=gameView.classList.contains("active");
@@ -54,20 +53,9 @@
     profile:()=>document.getElementById("menu-profile")?.click()
   };
 
-  function pauseGame(){
-    if(gameView.classList.contains("active")&&pauseButton&&pauseButton.textContent.trim()==="PAUSE ROUND"){
-      pauseButton.click();pausedByGateway=true;
-    }
-  }
-  function resumeGame(){
-    if(pausedByGateway&&pauseButton&&pauseButton.textContent.trim()==="RESUME ROUND")pauseButton.click();
-    pausedByGateway=false;
-  }
   function releaseHeldState(){
     if(open)return;
     window.dispatchEvent(new Event("nu:gateway-close"));
-    if(gameView.classList.contains("active"))resumeGame();
-    else pausedByGateway=false;
   }
   function setOpen(next,shouldResume=true){
     if(open===next)return;
@@ -78,7 +66,6 @@
     trigger.setAttribute("aria-label",open?"Close N.U navigation gateway":"Open N.U navigation gateway");
     items.forEach(item=>{item.tabIndex=open?0:-1;});
     if(open){
-      pauseGame();
       window.dispatchEvent(new Event("nu:gateway-open"));
       trigger.focus({preventScroll:true});
     }else{
@@ -148,7 +135,7 @@
   window.addEventListener("pagehide",()=>{if(open)setOpen(false);});
   window.addEventListener("nu:menu-dismissed",releaseHeldState);
   window.addEventListener("nu:player-overlay-close",releaseHeldState);
-  window.addEventListener("nu:game-view-exit",()=>{pausedByGateway=false;});
+
 
   const initialView=new URLSearchParams(window.location.search).get("view");
   if(["store","profile"].includes(initialView))document.getElementById("menu-"+initialView)?.click();
