@@ -43,4 +43,5 @@ body.nu-game-active #back-home{display:none!important}
 body.nu-game-active #finish-round,
 body.nu-gateway-utility-active #bag-back,
 body.nu-gateway-utility-active #inventory-back,
-body.nu-gateway-utility-active #wallet-back{display:none!important}
+body.nu-gateway-utility-active #wallet-back,
+body.nu-gateway-utility-active #profile-back{display:none!important}
