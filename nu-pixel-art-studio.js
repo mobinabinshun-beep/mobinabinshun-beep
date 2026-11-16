@@ -451,6 +451,8 @@ resizeArtwork=function(nextW,nextH,method="nearest"){
 const resetGridBase=resetGrid;
 resetGrid=function(next){width=next;height=next;layerWidth=width;layerHeight=height;adv.layers.forEach(l=>{l.pixels=Array(width*height).fill(null);l.mask=null;});adv.selection=null;adv.maskEdit=false;$("pro-mask-edit").checked=false;adv.active=0;pixels=adv.layers[0].pixels.slice();undoStack=[];redoStack=[];imageImported=false;historyButtons();$("image-width").value=width;$("image-height").value=height;updateCanvasDisplay();render();announce("New "+width+" × "+height+" transparent canvas.");};
 
+
+advPanel();render();layerUI();
 const proTools=window.NUStudioProTools;if(!proTools)throw new Error("N.U professional 2D tools failed to load.");
 function allSelection(){return new Uint8Array(width*height).fill(1);}
 function updateProSelection(mask){adv.selection=mask;render();announce(mask&&mask.some(Boolean)?"Selection updated.":"Selection cleared.");}
@@ -476,6 +478,5 @@ $("pro-mask-invert").onclick=()=>{const l=adv.layers[adv.active];if(!l.mask)retu
 $("pro-mask-apply").onclick=()=>{const l=adv.layers[adv.active];if(!l.mask)return announce("Add a mask first.");const before=histAdv();l.pixels=proTools.applyMask(l.pixels,l.mask);l.mask=null;pixels=l.pixels.slice();commitHistory(before);layerUI();render();};
 $("pro-mask-remove").onclick=()=>{adv.layers[adv.active].mask=null;$("pro-mask-edit").checked=false;adv.maskEdit=false;layerUI();render();};
 
-advPanel();render();layerUI();
 
 })();
