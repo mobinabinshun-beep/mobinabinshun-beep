@@ -149,6 +149,7 @@ function animateHpPillTravel(direction){
  };
  animation.oncancel=()=>{layer.remove();if(run===hpPillTravelRun){hpPillTravelLayer=null;hpPillTravelGhost=null;hpPillTravelAnimation=null;hpPillTravelDirection=null;}};
 }
+// Show the HUD capsule only for missing HP when a capsule is owned or 10 XP can buy one.
 function syncHpPillDock(){
  const next=Number.isFinite(state.save.hp)?state.save.hp:10,button=$("hp-pill-use");
  const shouldShow=next<10&&(state.save.hpPills>0||state.save.xp>=NUWallet.HP_PILL_COST);
