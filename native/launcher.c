@@ -297,7 +297,7 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT message, WPARAM wparam, LPAR
             0,0,150,28,hwnd,(HMENU)ID_INFO,GetModuleHandleW(NULL),NULL);
         g_exit = CreateWindowW(L"BUTTON",L"EXIT",WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON,
             0,0,90,28,hwnd,(HMENU)ID_EXIT,GetModuleHandleW(NULL),NULL);
-        g_run = CreateWindowW(L"BUTTON",L"RUN N.U MODULE",WS_CHILD|BS_VISIBLE|BS_PUSHBUTTON,
+        g_run = CreateWindowW(L"BUTTON",L"RUN N.U MODULE",WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON,
             0,0,190,32,hwnd,(HMENU)ID_RUN_MODULE,GetModuleHandleW(NULL),NULL);
         for (i = 0; i < NU_SETTING_COUNT; i++) {
             int j;
