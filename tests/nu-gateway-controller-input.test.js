@@ -94,6 +94,6 @@ test("Hidden tabs do not restart a Gateway-paused round or gamepad polling",()=>
  assert.match(games,/if\(document\.hidden\).*stopGamepad\(\)/);
  assert.match(games,/!gatewayOpen\)\{syncGatewayBackgrounds\(false\)/);
  assert.match(games,/const shouldFreeze=!!frozen\|\|document\.hidden/);
- assert.match(games,/!gatewayOpen&&state\.active&&!state\.paused/);
+ assert.match(games,/if\(state\.active&&!state\.paused\)/);
  assert.match(gateway,/if\(!open\)return/);
 });
