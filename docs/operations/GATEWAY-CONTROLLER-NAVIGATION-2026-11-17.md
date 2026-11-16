@@ -52,9 +52,9 @@ The recovery branch `backup/pre-public-demo-gateway-controller-2026-11-17` was v
 
 ## Release state
 
-- Candidate implementation is machine-verified, backed up and merged to the repository's default branch (the configured source branch used for the public site).
+- Candidate implementation is machine-verified, backed up and merged to the repository's default branch.
 - Public demo URL: `https://mobinabinshun-beep.github.io/mobinabinshun-beep/`.
-- Live demo link-check could not be completed by the available page-fetch path; deployment visibility is therefore **UNVERIFIED**, not PASS.
+- The GitHub Pages deployment source/settings and live demo response could not be independently inspected with the available tools; deployment visibility is therefore **UNVERIFIED**, not PASS.
 - No production promotion is included. Human QA remains pending. This record does not claim HUMAN-QA-PASSED, OWNER-APPROVED or SCOPE-LOCKED.
 
 ## Human demo checklist
