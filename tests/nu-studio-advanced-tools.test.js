@@ -88,7 +88,7 @@ test("PNG export supports toBlob and a data URL fallback",()=>{
 
 
 test("2D Studio adds filled shapes and symmetry painting controls",()=>{
- for(const tool of ["rect-fill","ellipse-fill"])assert.match(js,new RegExp('data-tool="'+tool+'"'));
+ for(const tool of ["rect-fill","ellipse-fill"])assert.match(html,new RegExp('data-tool="'+tool+'"'));
  assert.match(js,/adv\.symmetry==="both"/);
  assert.match(js,/id="adv-symmetry"/);
 });
