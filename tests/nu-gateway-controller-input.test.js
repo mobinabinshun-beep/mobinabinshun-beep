@@ -46,6 +46,8 @@ test("Gateway freezes gameplay and ambient renderers while keeping foreground co
  assert.match(graphics,/nu-gateway-open/);
  assert.match(gatewayCss,/body\.nu-gateway-open \.world>#world-canvas/);
  assert.match(gatewayCss,/backdrop-filter:none/);
+ assert.match(gatewayCss,/body\.nu-gateway-open \.shell\{position:relative;z-index:115\}/);
+ assert.match(games,/document\.body\.classList\.contains\("nu-gateway-open"\)/);
 });
 
 test("Gateway keyboard controls move through options and confirm the selected destination",()=>{
