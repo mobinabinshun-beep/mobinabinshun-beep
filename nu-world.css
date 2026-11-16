@@ -784,3 +784,7 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 
 /* Keyboard focus visibility: final override for layered tab styles. */
 .wallet-card-tab:focus-visible,.menu-close:focus-visible,.btn:focus-visible,.bag-destination:focus-visible,.bag-shortcut:focus-visible{outline:2px solid #a9f3ff!important;outline-offset:3px;}
+
+
+/* Keyboard-accessible game field focus */
+#game-view.active #game-canvas:focus-visible{outline:3px solid #b7f6ff;outline-offset:4px;border-radius:8px}
