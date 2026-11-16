@@ -74,7 +74,8 @@ test("Gateway keeps responsive geometry, touch, keyboard and reduced-motion supp
  assert.match(js,/function layoutItems\(\)/);
  assert.match(js,/window\.addEventListener\("resize",layoutItems/);
  assert.match(js,/window\.addEventListener\("orientationchange",layoutItems/);
- assert.match(js,/pointerType!=="touch"/);
+ assert.match(js,/trigger\.addEventListener\("pointerenter"/);
+ assert.match(js,/trigger\.addEventListener\("pointerdown"/);
  assert.match(js,/event\.key==="Escape"/);
  assert.match(js,/const tolerance=10/);
 });
@@ -94,4 +95,42 @@ test("Gateway orbit exit bounds include the full vertical fan",()=>{
 test("A hidden tab cannot restart frozen game or ambient renderers",()=>{
  assert.match(games,/gatewayOpen=document\.body\.classList\.contains\("nu-gateway-open"\)/);
  assert.match(dynamic,/function resume\(\)\{if\(!profile\|\|!active\|\|frozen\|\|document\.hidden\)return/);
+});
+
+
+
+
+test("Movement mode opens Gateway by mouse/pen hover and touch contact",()=>{
+ assert.match(js,/trigger\.addEventListener\("pointerenter",event=>\{[\s\S]*?setOpen\(true\)/);
+ assert.match(js,/trigger\.addEventListener\("pointerdown",event=>\{[\s\S]*?event\.pointerType!=="touch"[\s\S]*?setOpen\(!open\)/);
+ assert.match(js,/suppressTriggerClickUntil/);
+});
+
+test("Movement over a Gateway option activates it without a click or second selection",()=>{
+ assert.match(js,/item\.addEventListener\("pointerenter",event=>\{[\s\S]*?activate\(item\)/);
+ assert.match(js,/\["mouse","pen","touch"\]\.includes\(event\.pointerType\)/);
+ assert.match(js,/item\.addEventListener\("pointerup"/);
+ assert.match(js,/document\.elementFromPoint\(event\.clientX,event\.clientY\)/);
+ assert.match(js,/hit\?\.closest\?\.\("\.nu-gateway-item"\)/);
+ assert.match(js,/item\.classList\.contains\("is-confirming"\)/);
+ assert.match(js,/event\.key==="Escape"/);
+});
+
+test("Gateway scrim blocks the rest of the page while the round is paused",()=>{
+ assert.match(css,/body\.nu-gateway-open \.nu-gateway-scrim\{opacity:1;visibility:visible;pointer-events:auto\}/);
+ assert.match(css,/touch-action:none;overscroll-behavior:contain/);
+ assert.match(js,/scrim\.addEventListener\("click"/);
+ assert.match(js,/document\.addEventListener\("pointerdown",event=>\{if\(open\)event\.stopPropagation\(\);\}\)/);
+ assert.match(js,/document\.addEventListener\("pointerup",event=>\{if\(open\)event\.stopPropagation\(\);\}\)/);
+ assert.match(js,/event\.preventDefault\(\);event\.stopPropagation\(\)/);
+ assert.match(js,/event\.stopImmediatePropagation\(\)/);
+ assert.match(js,/pauseGame\(\);[\s\S]*?nu:gateway-open/);
+});
+
+
+test("Gateway option feedback is a steady illuminated state, not a looping animation",()=>{
+ assert.match(css,/\.nu-gateway-item\.is-selected::before[\s\S]*?filter:brightness\(1\.45\)/);
+ assert.match(css,/\.nu-gateway-item\.is-confirming::before\{background:[^}]*filter:brightness\(1\.75\)/);
+ assert.doesNotMatch(css,/nuHexPulse|nuHexConfirm|@keyframes/);
+ assert.match(js,/item\.classList\.add\("is-selected","is-confirming"\)/);
 });
