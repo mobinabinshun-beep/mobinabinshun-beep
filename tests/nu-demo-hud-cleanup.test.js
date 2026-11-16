@@ -6,7 +6,7 @@ const html=fs.readFileSync("index.html","utf8");
 const games=fs.readFileSync("nu-games.js","utf8");
 
 test("player-facing game HUD omits prototype and interaction-count clutter",()=>{
-  assert.doesNotMatch(html,/10 ACTIONS|N\.U · GEN 01/);
+  assert.doesNotMatch(html,/10 ACTIONS|N\.U · GEN 01|GENERATION 01 PROTOTYPE/);
   assert.doesNotMatch(games,/Complete 10 interactions to finish this round/);
 });
 
