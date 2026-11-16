@@ -431,6 +431,8 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 ## Operational protocol
 
 - [N.U Implementation & Calibration Protocol](./docs/operations/NU-OPS-IMPLEMENT-01.md)
+- [Owner workflow correction — public demo, QA and scoped locks](./docs/operations/OWNER-WORKFLOW-CORRECTION-2026-11-16.md)
+- [Bag / Inventory / Wallet public demo deployment record](./docs/operations/DEMO-DEPLOYMENT-REPORT-2026-11-16.md)
 - [Human-test report template](./docs/operations/HUMAN-TEST-REPORT-TEMPLATE.md)
 
 
