@@ -2,7 +2,7 @@
 
 **Change ID:** NU-BAG-WALLET-01  
 **Date:** 2026-11-16  
-**Status:** IMPLEMENTED IN CANDIDATE · AUTOMATED CI RUNNING · HUMAN QA PENDING · NOT DEPLOYED  
+**Status:** IMPLEMENTED IN CANDIDATE · AUTOMATED CI PASS · PUBLIC DEMO DEPLOYMENT BLOCKED · HUMAN QA PENDING  
 **Repository:** `mobinabinshun-beep/mobinabinshun-beep`  
 **Candidate branch:** `feat/wallet-health-module-2026-11-15`  
 **Existing review:** https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/136
@@ -83,7 +83,8 @@ Bag and Inventory shortcuts remain available from Wallet. Inventory and Wallet n
 ## Automated verification
 
 - Added wallet tests for owned item-group projection and exclusion of currencies/progression/vitals.
-- Automated CI for the updated PR: **PENDING / NOT VERIFIED** at record creation.
+- Automated CI: **PASS** on code commit `8207ca89c8d74a97ceeb0b4fab2db396e7a45bdb` (all 8 relevant GitHub Actions checks green).
+- Wallet regression: 50/50 tests passed; Gateway regression: 12/12 tests passed; Studio/export suite: 219/219 tests passed; static validation and syntax checks passed.
 - Browser execution, touch/keyboard checks, visual layout and live Pages deployment: **PENDING**.
 - No test result is inferred from a source diff or successful Git write.
 
@@ -108,7 +109,7 @@ Bag and Inventory shortcuts remain available from Wallet. Inventory and Wallet n
 - The mandatory `docs/PUBLIC-DEMO-HUMAN-ACCEPTANCE-GATE.md` forbids treating a branch preview/PR as the public demo and forbids merging/promoting before explicit human acceptance. No separate staging target or deployment action is configured in this repository.
 - Therefore this candidate cannot yet be deployed to the required public demo without changing the deployment arrangement. Do not merge the PR or ask the owner to test the branch as a substitute.
 - Confirm CI and exact commit status.
-- Resolve any regression or workflow failure before demo deployment.
+- No known failing automated checks remain on code commit `8207ca89c8d74a97ceeb0b4fab2db396e7a45bdb`.
 - Deploy only to the designated public demo target after technical checks.
 - Collect dated human reports from the owner and testers, including browser/device and reproduction steps.
 - Do not promote beyond the demo without explicit owner approval.
