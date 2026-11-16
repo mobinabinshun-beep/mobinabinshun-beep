@@ -118,7 +118,9 @@ test("Main menu traps keyboard focus and restores its opener",()=>{
 });
 
 test("Player views manage focus, wallet tabs support arrow navigation, and Enter does not dismiss profile",()=>{
- assert.match(playerUI,/previousFocus=document\.activeElement/);
+ assert.match(playerUI,/const viewStack=\[\]/);
+ assert.match(playerUI,/viewStack\.push\(\{view:activeView,focus:document\.activeElement\}\)/);
+ assert.match(playerUI,/const previous=viewStack\.pop\(\)/);
  assert.match(playerUI,/heading\.focus\(\{preventScroll:true\}\)/);
  assert.match(playerUI,/event\.key==="Escape"&&profileView\.classList\.contains\("active"\)/);
  assert.doesNotMatch(playerUI,/event\.key==="Enter"&&profileView\.classList\.contains\("active"\)/);
