@@ -83,3 +83,15 @@ test("Wave summary payloads reject missing Wave identifiers",()=>{
   assert.equal(store.recordWaveSummary({gameId:"chaos",damageTaken:1}),false);
   assert.equal(store.getWaveHistory().length,0);
 });
+
+test("per-Wave totals accumulate all damage and healing before the Wave is settled",()=>{
+  const store=health.createHealthStore(memoryStorage());
+  store.recordDamage({gameId:"chaos",waveId:"wave-net",amount:2,hpAfter:8});
+  store.recordDamage({gameId:"chaos",waveId:"wave-net",amount:1,hpAfter:7});
+  store.recordHealing({gameId:"chaos",waveId:"wave-net",amount:4,hpAfter:10,source:"Golden HP Capsule"});
+  assert.equal(store.getWaveHistory().length,0);
+  const summary=store.recordWaveSummary({gameId:"chaos",waveId:"wave-net",damageTaken:3,hpDelta:-3,successfulInteractions:10,reason:"completed"});
+  assert.equal(summary.damageTaken,3);
+  assert.equal(summary.hpDelta,1);
+  assert.equal(store.getWaveHistory().length,1);
+});
