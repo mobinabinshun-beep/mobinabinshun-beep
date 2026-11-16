@@ -36,7 +36,7 @@ test("classic lower HUD stacks LV, XP and Mana and adapts to mobile", () => {
 test("HP capsule dock remains state-driven and reversibly animated", () => {
   assert.ok(html.includes('id="hp-bar"'));
   assert.ok(html.includes('id="hp-pill-use"'));
-  assert.ok(games.includes("function syncHpPillDock(hp)"));
+  assert.ok(games.includes("function syncHpPillDock()"));
   assert.ok(games.includes('animateHpPillTravel("in")'));
   assert.ok(games.includes('animateHpPillTravel("out")'));
   assert.ok(games.includes("function useHpPill("));
