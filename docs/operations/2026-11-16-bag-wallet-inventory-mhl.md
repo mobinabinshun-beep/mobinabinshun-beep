@@ -2,7 +2,7 @@
 
 **Change ID:** NU-BAG-WALLET-01  
 **Date:** 2026-11-16  
-**Status:** IMPLEMENTED IN CANDIDATE · AUTOMATED CI PASS · PUBLIC DEMO DEPLOYMENT BLOCKED · HUMAN QA PENDING  
+**Status:** IMPLEMENTED IN CANDIDATE · AUTOMATED CI RUNNING AFTER FINAL HUD CHANGE · PUBLIC DEMO DEPLOYMENT BLOCKED · HUMAN QA PENDING  
 **Repository:** `mobinabinshun-beep/mobinabinshun-beep`  
 **Candidate branch:** `feat/wallet-health-module-2026-11-15`  
 **Existing review:** https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/136
@@ -73,18 +73,20 @@ Bag and Inventory shortcuts remain available from Wallet. Inventory and Wallet n
 
 - `index.html` — Bag and Inventory views, Wallet MHL tab, menu entry and navigation shortcuts.
 - `nu-player-ui.js` — Bag/Inventory routing, item rendering, concise transaction rendering and MHL rendering.
-- `nu-world.css` — responsive Bag, Inventory and Wallet navigation styles.
+- `nu-world.css` — responsive Bag, Inventory and Wallet navigation styles; affordable zero-count HP Capsule state.
 - `nu-hex-gateway.js` / `nu-hex-gateway.css` — Gateway availability and Back routing for Bag/Inventory/Wallet.
 - `nu-wallet.js` — read-only inventory projection.
+- `nu-games.js` — Wave damage/healing aggregation and affordable zero-count HP Capsule HUD state.
+- `tests/nu-hp-pill-interaction.test.js` / `tests/nu-hud-layout.test.js` — HP Capsule visibility, click feedback and dock behavior.
 - `tests/nu-wallet.test.js` — inventory projection tests.
 - `nu-health.js` / `tests/nu-health.test.js` — independent per-Wave damage/healing accumulation, idempotent settlement and 20-Wave retention.
 - Existing Health module code from the preceding Wallet Health candidate remains in the same PR; its independent store and game event integration are not replaced.
 
 ## Automated verification
 
-- Added wallet tests for owned item-group projection and exclusion of currencies/progression/vitals.
-- Automated CI: **PASS** on code commit `8207ca89c8d74a97ceeb0b4fab2db396e7a45bdb` (all 8 relevant GitHub Actions checks green).
-- Wallet regression: 50/50 tests passed; Gateway regression: 12/12 tests passed; Studio/export suite: 219/219 tests passed; static validation and syntax checks passed.
+- Added wallet tests for owned item-group projection and exclusion of currencies/progression/vitals; Health tests cover per-Wave totals and idempotent settlement.
+- The Bag/Wallet implementation passed all 8 relevant checks on code commit `8207ca89c8d74a97ceeb0b4fab2db396e7a45bdb`.
+- The later per-Wave summary and HP Capsule affordability changes are under a fresh CI run; final result will be recorded only after all checks finish.
 - Browser execution, touch/keyboard checks, visual layout and live Pages deployment: **PENDING**.
 - No test result is inferred from a source diff or successful Git write.
 
@@ -92,7 +94,7 @@ Bag and Inventory shortcuts remain available from Wallet. Inventory and Wallet n
 
 1. Open Home → MENU → BAG. Confirm the page opens without starting a game.
 2. Open Inventory with no owned items. Confirm an honest empty state appears.
-3. Earn or buy a supported item (for example, an HP Capsule) and confirm its owned count appears in Inventory.
+3. When HP is below 10 and the player owns no HP Capsules, confirm the icon appears only if XP is at least 10, shows `×0`, and the game asset profile lists `0 HP Capsules`. Clicking it must show a clear Store-purchase notification, not a silent/no-op action. When XP is below 10, the zero-count icon must stay hidden. When a capsule is owned, confirm its positive count appears in Inventory.
 4. Confirm XP, Mana, HP and currency balances do not appear as Inventory items.
 5. Open Wallet → Balances and confirm balances remain consistent with the game.
 6. Open Transactions. Confirm purchase and consumption are separate rows and show only concise signed deltas; HP-only entries must not appear.
@@ -108,8 +110,7 @@ Bag and Inventory shortcuts remain available from Wallet. Inventory and Wallet n
 - The repository has no branch-specific public-demo deployment workflow in `.github/workflows/`. The current public Pages site is the default-branch site.
 - The mandatory `docs/PUBLIC-DEMO-HUMAN-ACCEPTANCE-GATE.md` forbids treating a branch preview/PR as the public demo and forbids merging/promoting before explicit human acceptance. No separate staging target or deployment action is configured in this repository.
 - Therefore this candidate cannot yet be deployed to the required public demo without changing the deployment arrangement. Do not merge the PR or ask the owner to test the branch as a substitute.
-- Confirm CI and exact commit status.
-- No known failing automated checks remain on code commit `8207ca89c8d74a97ceeb0b4fab2db396e7a45bdb`.
+- Confirm the fresh CI run for the final code commit and record its exact SHA/status.
 - Deploy only to the designated public demo target after technical checks.
 - Collect dated human reports from the owner and testers, including browser/device and reproduction steps.
 - Do not promote beyond the demo without explicit owner approval.
