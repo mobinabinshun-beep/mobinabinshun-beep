@@ -148,5 +148,5 @@
   window.addEventListener("nu:game-view-exit",()=>{pausedByGateway=false;});
 
   const initialView=new URLSearchParams(window.location.search).get("view");
-  if(["store","profile"].includes(initialView))document.getElementById("menu-"+initialView)?.click();\n  if(initialView==="bag")document.getElementById("menu-bag")?.click();\n  if(initialView==="wallet")document.getElementById("menu-bag")?.click();
+  if(["store","profile"].includes(initialView))document.getElementById("menu-"+initialView)?.click();\n  if(initialView==="bag")document.getElementById("menu-bag")?.click();\n  if(initialView==="wallet"){document.getElementById("menu-bag")?.click();document.querySelector('[data-bag-destination="wallet"]')?.click();}
 })();
