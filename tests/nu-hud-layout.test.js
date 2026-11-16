@@ -38,7 +38,7 @@ test("HP capsule dock remains state-driven and reversibly animated", () => {
   assert.ok(html.includes('id="hp-pill-use"'));
   assert.ok(games.includes("function syncHpPillDock()"));
   assert.ok(games.includes('animateHpPillTravel("in")'));
-  assert.ok(games.includes('animateHpPillTravel("out")'));
+  assert.ok(games.includes('animateHpPillTravel(shouldShow?"in":"out")'));
   assert.ok(games.includes("function useHpPill("));
 });
 
