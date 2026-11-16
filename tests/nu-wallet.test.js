@@ -145,6 +145,22 @@ test("store-purchased asset exclusion survives the rolling 24-transaction ledger
   assert.ok(!wallet.exchangeAssetRows(save).some(row=>row.key==="hpPills"));
 });
 
+test("inventory projection includes owned item groups and excludes currencies, progression, vitals and HP",()=>{
+  wallet.registerAsset({key:"nbiCharge",label:"N-BI Arcane Charge",group:"equipment"});
+  wallet.registerAsset({key:"moonRelic",label:"Moon Relic",group:"collectibles"});
+  wallet.registerAsset({key:"manaShard",label:"Mana Shard",group:"resources"});
+  const rows=wallet.inventoryRows({
+    xp:40,mana:5,hp:7,hpPills:2,manaCapsules:2,casinoCredits:20,
+    xCredits:3,nCredits:4,
+    assets:{nbiCharge:1,moonRelic:2,manaShard:8}
+  });
+  assert.deepEqual(rows.map(row=>[row.key,row.value]),[["hpPills",2],["manaCapsules",2],["nbiCharge",1],["moonRelic",2]]);
+  assert.ok(!rows.some(row=>["xp","mana","hp","casinoCredits","xCredits","nCredits","manaShard"].includes(row.key)));
+});
+test("inventory hides unowned items and does not invent empty entries",()=>{
+  assert.deepEqual(wallet.inventoryRows({hpPills:0,manaCapsules:1,mana:0,assets:{nbiCharge:0}}),[]);
+});
+
 // Keep the Exchange wallet-reader and protocol lifecycle covered by the canonical wallet CI run.
 require("./nu-exchange-engines.test.js");
 
