@@ -409,8 +409,8 @@ function advPanel(){
  $("adv-svg-code").onclick=()=>{try{const r=svgSource(),name=filename("svg-source.txt");download(new Blob([r.source],{type:"text/plain;charset=utf-8"}),name);announce("کد کامل SVG آمادهٔ دریافت است.");}catch(e){announce("SVG code export failed: "+e.message);}};
  layerUI();
 }
-function mapAdv(fn){if(adv.layers[adv.active].locked)return announce("Layer locked");const before=histAdv();pixels=pixels.map(c=>c?hexRGB(fn(rgb(c))):null);adv.layers[adv.active].pixels=pixels.slice();commitHistory(before);render();}
-function sharpenAdv(){if(adv.layers[adv.active].locked)return announce("Layer locked");const before=histAdv(),src=pixels.slice(),out=src.slice();for(let y=1;y<height-1;y++)for(let x=1;x<width-1;x++){const i=y*width+x;if(!src[i])continue;const center=rgb(src[i]),neighbors=[src[i-1],src[i+1],src[i-width],src[i+width]].map(rgb);out[i]=hexRGB(center.map((v,z)=>5*v-neighbors.reduce((n,q)=>n+(q?q[z]:0),0)));}pixels=out;adv.layers[adv.active].pixels=pixels.slice();commitHistory(before);render();announce("Sharpen filter applied.");}
+function mapAdv(fn){if(adv.layers[adv.active].locked)return announce("Layer locked");const before=histAdv();pixels=pixels.map((c,i)=>c&&(!adv.selection||adv.selection[i])?hexRGB(fn(rgb(c))):c);adv.layers[adv.active].pixels=pixels.slice();commitHistory(before);render();}
+function sharpenAdv(){if(adv.layers[adv.active].locked)return announce("Layer locked");const before=histAdv(),src=pixels.slice(),out=src.slice();for(let y=1;y<height-1;y++)for(let x=1;x<width-1;x++){const i=y*width+x;if(!src[i]||(adv.selection&&!adv.selection[i]))continue;const center=rgb(src[i]),neighbors=[src[i-1],src[i+1],src[i-width],src[i+width]].map(rgb);out[i]=hexRGB(center.map((v,z)=>5*v-neighbors.reduce((n,q)=>n+(q?q[z]:0),0)));}pixels=out;adv.layers[adv.active].pixels=pixels.slice();commitHistory(before);render();announce("Sharpen filter applied.");}
 function transformAdv(k){
  if(adv.layers[adv.active].locked)return announce("Layer locked");
  const before=histAdv(),oldW=width,oldH=height;
@@ -441,7 +441,15 @@ const paintAdv=paintBrush;paintBrush=function(x,y,v){
   let value=v;if(v&&alpha<100)value=mix(pixels[key],v,alpha/100);paintAdv(cx,cy,value);
  }
 };
-const floodAdv=flood;flood=function(x,y,next){if(adv.layers[adv.active].locked)return;const start=pixels[y*width+x];if(adv.bucket==="global"){pixels=pixels.map(c=>c===start?next:c);return;}if(adv.bucket==="similar"){const q=[y*width+x],seen=new Uint8Array(width*height);while(q.length){const i=q.pop();if(i<0||i>=pixels.length||seen[i]||dist(pixels[i],start)>adv.tol)continue;seen[i]=1;pixels[i]=next;const xx=i%width,yy=Math.floor(i/width);if(xx)q.push(i-1);if(xx<width-1)q.push(i+1);if(yy)q.push(i-width);if(yy<height-1)q.push(i+width);}return;}floodAdv(x,y,next);};
+const floodAdv=flood;flood=function(x,y,next){
+ if(adv.layers[adv.active].locked)return;
+ if(adv.selection){
+  const start=pixels[y*width+x],match=c=>adv.bucket==="global"?c===start:adv.bucket==="similar"?dist(c,start)<=adv.tol:c===start;
+  if(adv.bucket==="global"){pixels=pixels.map((c,i)=>adv.selection[i]&&match(c)?next:c);return;}
+  const q=[y*width+x],seen=new Uint8Array(width*height);while(q.length){const i=q.pop();if(i<0||i>=pixels.length||seen[i]||!adv.selection[i]||!match(pixels[i]))continue;seen[i]=1;pixels[i]=next;const xx=i%width,yy=Math.floor(i/width);if(xx)q.push(i-1);if(xx<width-1)q.push(i+1);if(yy)q.push(i-width);if(yy<height-1)q.push(i+width);}return;
+ }
+ const start=pixels[y*width+x];if(adv.bucket==="global"){pixels=pixels.map(c=>c===start?next:c);return;}if(adv.bucket==="similar"){const q=[y*width+x],seen=new Uint8Array(width*height);while(q.length){const i=q.pop();if(i<0||i>=pixels.length||seen[i]||dist(pixels[i],start)>adv.tol)continue;seen[i]=1;pixels[i]=next;const xx=i%width,yy=Math.floor(i/width);if(xx)q.push(i-1);if(xx<width-1)q.push(i+1);if(yy)q.push(i-width);if(yy<height-1)q.push(i+width);}return;}floodAdv(x,y,next);
+};
 
 const resizeArtworkBase=resizeArtwork;
 resizeArtwork=function(nextW,nextH,method="nearest"){
