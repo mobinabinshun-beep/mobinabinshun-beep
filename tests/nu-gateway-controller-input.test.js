@@ -8,6 +8,8 @@ const gatewayCss=fs.readFileSync("nu-hex-gateway.css","utf8");
 const games=fs.readFileSync("nu-games.js","utf8");
 const graphics=fs.readFileSync("nu-graphics-runtime.js","utf8");
 const player=fs.readFileSync("nu-player-ui.js","utf8");
+const pause=fs.readFileSync("nu-gateway-pause.js","utf8");
+const manifest=fs.readFileSync("NU-GENERATION-1-MANIFEST.json","utf8");
 
 test("Gateway is mounted and remains available across Bag, Inventory, Wallet and Profile",()=>{
  assert.match(html,/id="nu-hex-gateway"/);
@@ -28,7 +30,10 @@ test("Gateway pause ownership preserves a pre-existing manual pause and resumes 
  assert.match(games,/gatewayPause\.open\(state\)/);
  assert.match(games,/gatewayPause\.close\(state\)/);
  assert.match(games,/gatewayPause\.ownsPause\(\)/);
- assert.match(games,/if\(state\.paused&&state\.turn<10/);
+ assert.match(pause,/if\(!state\|\|!state\.active\|\|state\.paused\)return false/);
+ assert.match(pause,/if\(!state\|\|!state\.paused\|\|state\.turn>=10\)return false/);
+ assert.ok(html.indexOf("nu-gateway-pause.js")<html.indexOf("nu-games.js"));
+ assert.match(manifest,/nu-gateway-pause.js/);
  assert.match(games,/window\.addEventListener\("nu:gateway-open",handleGatewayOpen\)/);
  assert.match(games,/window\.addEventListener\("nu:gateway-close",handleGatewayClose\)/);
 });
