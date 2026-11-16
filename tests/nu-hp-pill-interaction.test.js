@@ -146,7 +146,11 @@ test("Generation 1.29 places the phone HP capsule below a compact HP rail",()=>{
 
 test("Generation 1.30 refreshes the Store count immediately after Store-side capsule use",()=>{
   assert.match(games,/const isStoreUse=!!\(button&&button\.matches\("\[data-use-hp-pill\]"\)\)/);
-  assert.match(games,/if\(!persistWalletState\(result\.state\)\)return;if\(isStoreUse\)renderShop\("−1 HP Capsule · \+"\+result\.restored\+" HP restored\."\)/);
+  const useStart=games.indexOf('const isStoreUse=!!(button&&button.matches("[data-use-hp-pill]"))');
+  const persisted=games.indexOf("if(!persistWalletState(result.state))return;",useStart);
+  const healthRecorded=games.indexOf("window.NUHealth.recordMedicationUse",persisted);
+  const storeRefresh=games.indexOf('if(isStoreUse)renderShop("−1 HP Capsule · +"+result.restored+" HP restored.")',persisted);
+  assert.ok(useStart>=0&&persisted>useStart&&healthRecorded>persisted&&storeRefresh>healthRecorded);
   assert.match(games,/function renderShop\(feedback=""\)/);
   const result=wallet.useHpPill({hp:3,hpPills:3},{id:"store-refresh-test"});
   assert.equal(result.ok,true);
