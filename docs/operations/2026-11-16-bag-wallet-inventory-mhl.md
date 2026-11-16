@@ -2,7 +2,7 @@
 
 **Change ID:** NU-BAG-WALLET-01  
 **Date:** 2026-11-16  
-**Status:** IMPLEMENTED IN CANDIDATE · AUTOMATED CI PENDING · HUMAN QA PENDING · NOT DEPLOYED  
+**Status:** IMPLEMENTED IN CANDIDATE · AUTOMATED CI RUNNING · HUMAN QA PENDING · NOT DEPLOYED  
 **Repository:** `mobinabinshun-beep/mobinabinshun-beep`  
 **Candidate branch:** `feat/wallet-health-module-2026-11-15`  
 **Existing review:** https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/136
@@ -45,7 +45,8 @@ Wallet includes:
 - PROFILE — opens the existing demo player profile.
 - BALANCES — shared owned-asset projection.
 - TRANSACTIONS — concise signed deltas only, such as `-10 XP · +1 HP Capsule`. HP-only changes are omitted from the financial transaction list and remain in Health history.
-- HEALTH — reads the independent `nu-health-records-v1` store and keeps the four existing categories: medicine/item use, damage, healing and deaths. Each category retains its latest five records.
+- HEALTH — reads the independent `nu-health-records-v1` store and keeps medicine/item use, damage, healing, deaths and per-Wave summaries. The first four categories retain their latest five events; the Wave ledger retains the latest 20 settled Waves.
+- Per-Wave summaries accumulate all recorded damage and healing events for that Wave, then close on Wave settlement. Each row shows total damage, net HP change, successful interaction count and settlement reason. This supports entries such as `Chaos Attack · Wave … · +1 DAMAGE · -1 HP`.
 - MHL — **Mana History Ledger**. This is a separate Wallet view derived from Mana- and magic-linked deltas in the existing Wallet transaction ledger. It includes game and Store changes, for example `+10 Mana` or `-10 Mana · +1 N-BI Arcane Charge`. It does not duplicate or independently mutate Wallet transactions; it reflects the latest 24 wallet records.
 
 Bag and Inventory shortcuts remain available from Wallet. Inventory and Wallet navigation remains available from Bag and Inventory.
@@ -76,6 +77,7 @@ Bag and Inventory shortcuts remain available from Wallet. Inventory and Wallet n
 - `nu-hex-gateway.js` / `nu-hex-gateway.css` — Gateway availability and Back routing for Bag/Inventory/Wallet.
 - `nu-wallet.js` — read-only inventory projection.
 - `tests/nu-wallet.test.js` — inventory projection tests.
+- `nu-health.js` / `tests/nu-health.test.js` — independent per-Wave damage/healing accumulation, idempotent settlement and 20-Wave retention.
 - Existing Health module code from the preceding Wallet Health candidate remains in the same PR; its independent store and game event integration are not replaced.
 
 ## Automated verification
@@ -93,15 +95,18 @@ Bag and Inventory shortcuts remain available from Wallet. Inventory and Wallet n
 4. Confirm XP, Mana, HP and currency balances do not appear as Inventory items.
 5. Open Wallet → Balances and confirm balances remain consistent with the game.
 6. Open Transactions. Confirm purchase and consumption are separate rows and show only concise signed deltas; HP-only entries must not appear.
-7. Open Health. Confirm medicine use, damage, healing and death histories remain independent of financial transactions.
+7. Open Health. Confirm medicine use, damage, healing and death histories remain independent of financial transactions; after a Wave ends, confirm its total damage and net HP change appear in Wave Damage Summary.
 8. Open MHL. Confirm Mana Collector and Mana-linked Store changes appear with signed values and no invented entries.
 9. From Bag, Inventory and each Wallet tab, open Gateway. Confirm BACK, MENU and PROFILE work and the foreground controls remain readable.
 10. Confirm BACK returns Wallet/Inventory to Bag and Bag to the prior Home/Game view.
 11. Open Profile from Gateway, close it, and confirm return to the previous Bag/Wallet page. Confirm temporary profile values are cleared on close.
 12. Repeat on narrow portrait and landscape layouts, with keyboard focus and touch input.
 
-## Outstanding gates
+## Deployment blocker and outstanding gates
 
+- The repository has no branch-specific public-demo deployment workflow in `.github/workflows/`. The current public Pages site is the default-branch site.
+- The mandatory `docs/PUBLIC-DEMO-HUMAN-ACCEPTANCE-GATE.md` forbids treating a branch preview/PR as the public demo and forbids merging/promoting before explicit human acceptance. No separate staging target or deployment action is configured in this repository.
+- Therefore this candidate cannot yet be deployed to the required public demo without changing the deployment arrangement. Do not merge the PR or ask the owner to test the branch as a substitute.
 - Confirm CI and exact commit status.
 - Resolve any regression or workflow failure before demo deployment.
 - Deploy only to the designated public demo target after technical checks.
