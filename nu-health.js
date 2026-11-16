@@ -48,6 +48,7 @@
       if(!itemName)return false;
       return append("medicationUses",{
         gameId:text(event.gameId,64)||"unknown",
+        waveId:text(event.waveId,120)||"",
         itemName,
         itemType:text(event.itemType,32)||"health_item",
         effect:text(event.effect,48)||"used",
