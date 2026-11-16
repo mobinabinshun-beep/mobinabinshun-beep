@@ -62,23 +62,29 @@
       {key:"medicationUses",id:"health-medications",empty:"No medicine or health-item uses recorded."},
       {key:"damage",id:"health-damage",empty:"No damage events recorded."},
       {key:"healing",id:"health-healing",empty:"No healing events recorded."},
-      {key:"deaths",id:"health-deaths",empty:"No deaths recorded across games."}
+      {key:"deaths",id:"health-deaths",empty:"No deaths recorded across games."},
+      {key:"waveSummaries",id:"health-waves",empty:"No settled Wave summaries recorded yet."}
     ];
     groups.forEach(group=>{
       const root=$(group.id);if(!root)return;
       root.replaceChildren();
-      const events=window.NUHealth.getHistory(group.key).slice().reverse();
+      const events=group.key==="waveSummaries"?window.NUHealth.getWaveHistory().slice().reverse():window.NUHealth.getHistory(group.key).slice().reverse();
       if(!events.length){const empty=document.createElement("p");empty.className="health-history-empty";empty.textContent=group.empty;root.appendChild(empty);return;}
       events.forEach(item=>{
         const row=document.createElement("div"),title=document.createElement("strong"),detail=document.createElement("small");
         row.className="health-history-row";
+        const gameNames={bubble:"Bubble Hunt",mana:"Mana Collector",chaos:"Chaos Attack"};
         if(group.key==="medicationUses")title.textContent=String(item.itemName||"Health item")+" · "+String(item.effect||"used");
         else if(group.key==="damage")title.textContent="−"+String(item.amount||0)+" HP · "+String(item.reason||"Damage");
         else if(group.key==="healing")title.textContent="+"+String(item.amount||0)+" HP · "+String(item.source||"Healing");
-        else title.textContent="DEATH · "+String(item.reason||"Game event");
+        else if(group.key==="deaths")title.textContent="DEATH · "+String(item.reason||"Game event");
+        else title.textContent=(gameNames[item.gameId]||String(item.gameId||"Game"))+" · WAVE "+String(item.waveId||"").slice(-5);
         const date=item.at?new Date(item.at):null;
         const when=date&&!Number.isNaN(date.getTime())?date.toLocaleString():"Time unavailable";
-        detail.textContent=[when,"GAME "+String(item.gameId||"unknown"),item.hpAfter!==undefined&&item.hpAfter!==null?"HP "+item.hpAfter:"",item.effectAmount?"HEAL "+item.effectAmount+" HP":"",item.hpBefore!==undefined&&item.hpBefore!==null?"HP BEFORE "+item.hpBefore:""].filter(Boolean).join(" · ");
+        if(group.key==="waveSummaries"){
+          const damage=Number(item.damageTaken)||0,hpDelta=Number(item.hpDelta)||0;
+          detail.textContent=[(damage>0?"+":"")+damage+" DAMAGE",(hpDelta>0?"+":"")+hpDelta+" HP",String(item.successfulInteractions||0)+"/10 INTERACTIONS",String(item.reason||"settled"),when].join(" · ");
+        }else detail.textContent=[when,"GAME "+String(item.gameId||"unknown"),item.hpAfter!==undefined&&item.hpAfter!==null?"HP "+item.hpAfter:"",item.effectAmount?"HEAL "+item.effectAmount+" HP":"",item.hpBefore!==undefined&&item.hpBefore!==null?"HP BEFORE "+item.hpBefore:""].filter(Boolean).join(" · ");
         row.append(title,detail);root.appendChild(row);
       });
     });
@@ -377,6 +383,7 @@
     renderProfile();
   });
   window.addEventListener("nu:save-updated",()=>{if(walletView.classList.contains("active")){renderWallet();if(document.querySelector('[data-wallet-panel="mana"]')?.hidden===false)renderManaHistory();}if(inventoryView.classList.contains("active"))renderInventory();if(profileView.classList.contains("active"))renderProfile();});
+  window.addEventListener("nu:health-updated",()=>{if(walletView.classList.contains("active")&&document.querySelector('[data-wallet-panel="health"]')?.hidden===false)renderHealth();});
   window.addEventListener("nu:health-updated",()=>{if(walletView.classList.contains("active")&&document.querySelector('[data-wallet-panel="health"]')?.hidden===false)renderHealth();});
   window.addEventListener("storage",e=>{if(e.key==="nu-health-records-v1"&&walletView.classList.contains("active")&&document.querySelector('[data-wallet-panel="health"]')?.hidden===false)renderHealth();});
   window.addEventListener("storage",e=>{if(e.key==="nu-world-save-v1"){if(walletView.classList.contains("active"))renderWallet();if(profileView.classList.contains("active"))renderProfile();}});
