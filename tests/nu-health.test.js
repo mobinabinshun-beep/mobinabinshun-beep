@@ -1,6 +1,8 @@
 "use strict";
 const test=require("node:test");
 const assert=require("node:assert/strict");
+const fs=require("node:fs");
+const gameSource=fs.readFileSync(require.resolve("../nu-games.js"),"utf8");
 const health=require("../nu-health.js");
 function memoryStorage(){const values=new Map();return {getItem:key=>values.has(key)?values.get(key):null,setItem:(key,value)=>values.set(key,String(value)),dump:key=>values.get(key)};}
 
@@ -94,4 +96,11 @@ test("per-Wave totals accumulate all damage and healing before the Wave is settl
   assert.equal(summary.damageTaken,3);
   assert.equal(summary.hpDelta,1);
   assert.equal(store.getWaveHistory().length,1);
+});
+
+test("game Wave settlement writes independent health summaries after wallet persistence",()=>{
+  assert.ok(gameSource.includes("function settleActiveWave(reason)"));
+  assert.ok(gameSource.includes("window.NUHealth.recordWaveSummary({gameId:wave.gameId,waveId:wave.id"));
+  assert.ok(gameSource.includes("window.NUHealth.recordDamage({gameId:state.game,waveId:state.save.activeWave&&state.save.activeWave.id"));
+  assert.ok(gameSource.includes("window.NUHealth.recordHealing({gameId,waveId:state.save.activeWave&&state.save.activeWave.id"));
 });
