@@ -113,6 +113,7 @@
   }
   function startController(){if(open&&!controllerFrame)controllerFrame=requestAnimationFrame(pollController);}
   function activate(item){
+    if(!item||!item.dataset)return;
     const key=item.dataset.action,action=routes[key];
     if(!action||!open)return;
     clearTimeout(activationTimer);
