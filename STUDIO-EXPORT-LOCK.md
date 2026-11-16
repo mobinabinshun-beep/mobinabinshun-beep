@@ -48,3 +48,19 @@ The repository connector used for this repair does not expose GitHub branch-prot
 - **Future Creative Suite phases:** preserved in `docs/creative-studio/NU-CREATIVE-SUITE-FUTURE-ARCHIVE-2026-11-16.md`; archived only, not scheduled or implemented.
 
 This freeze is a repository workflow checkpoint. It does not by itself enable GitHub server-side branch protection; configure repository rules in GitHub Settings if technical enforcement is required.
+
+
+## 2026-11-17 — unified owner lock for 2D icon design
+- **Owner directive:** keep the current scope limited to the two-dimensional Pixel Art Studio and lock it so the owner can design the N.U application icon. Future Creative Suite phases remain archived and inactive.
+- **Frozen source commit:** `2f81cf268fe6b89338d6c8001a86538ea917d730`.
+- **Unified recovery/freeze branch:** `freeze/studio-2d-icon-design-2026-11-17` (verified identical to the frozen source commit).
+- **Pre-change backup branch:** `backup/pre-studio-icon-design-review-2026-11-17` (verified identical to the same source commit).
+- **Included scope:** current 2D drawing/editing tools, professional selection/layer/mask/gradient/brush features, PNG/SVG/ICO and Graphic IR exports.
+- **Excluded scope:** animation, spritesheets, tilesets/tilemaps, editable vector node authoring, project/package management and the future workflow-management application. These remain archived; no schedule or implementation authorization is implied.
+- **SVG defect boundary:** source contains visible-composite SVG export, blank-canvas guard and self-contained embedded-PNG fallback. The owner's specific blank output has not been reproduced because the faulty SVG sample was not attached; browser/viewer verification remains pending. Do not report the observed case as conclusively fixed until a real export is reopened and inspected.
+- **Verification evidence:** PR #162 workflow 43877235179 passed 245/245; PR #163 workflow 43881024031 passed 262/262. These are prior CI results, not a new run or browser QA.
+- **Human QA:** pending for real browser downloads, SVG visual reopening, ICO display in Windows shell and low-memory/mobile behavior.
+- **Deployment:** public Pages build identity was not independently verified in this review.
+- **Reopening:** only the owner may reopen this exact 2D scope by direct instruction. A request to change a dependency or excluded phase must be scoped separately before implementation.
+
+This is a repository-level scope lock and recoverable Git checkpoint. GitHub server-side branch protection/ruleset enforcement has not been configured or verified; contributors must treat the freeze branch as read-only and work only on a new authorized candidate branch after explicit reopening.
