@@ -16,7 +16,11 @@ test("HP capsule uses a direct native click listener for pointer, touch and keyb
 
 test("successful HUD use captures the icon position before wallet rerender can hide it",()=>{
   assert.match(games,/const anchor=button&&button\.id==="hp-pill-use"\?button\.getBoundingClientRect\(\):null/);
-  assert.match(games,/if\(!persistWalletState\(result\.state\)\)return;[\s\S]*?if\(anchor\)showHpPillInteraction\(anchor,result\.restored\)/);
+  const useStart=games.indexOf('const isStoreUse=!!(button&&button.matches("[data-use-hp-pill]"))');
+  const persisted=games.indexOf("if(!persistWalletState(result.state))return;",useStart);
+  const healthRecorded=games.indexOf("window.NUHealth.recordMedicationUse",persisted);
+  const storeRefresh=games.indexOf('if(isStoreUse)renderShop("−1 HP Capsule · +"+result.restored+" HP restored.")',persisted);
+  assert.ok(useStart>=0&&persisted>useStart&&healthRecorded>persisted&&storeRefresh>healthRecorded);
 });
 
 test("HP pill interaction pop uses viewport coordinates and cannot be clipped by game-stage overflow",()=>{
