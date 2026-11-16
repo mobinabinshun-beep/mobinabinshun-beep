@@ -19,3 +19,4 @@
 | `tests/nu-wallet.test.js` | `archive/pre-change/2026-11-16-NU-BAG-WALLET-01/original/tests/nu-wallet.test.js` | `d6ef704c9737dceeb44f432eb9afcdf97298adb2` |
 | `tests/nu-hex-gateway.test.js` | `archive/pre-change/2026-11-16-NU-BAG-WALLET-01/original/tests/nu-hex-gateway.test.js` | `c2d58c086f5140a85217f1783a9599389835d3bb` |
 | `tests/nu-hp-pill-interaction.test.js` | `archive/pre-change/2026-11-16-NU-BAG-WALLET-01/original/tests/nu-hp-pill-interaction.test.js` | `cf6ce0e168d3e593c94195e5c5a06de414b8c3da` |
+| `tests/nu-world-entry-calibration.test.js` | `archive/pre-change/2026-11-16-NU-BAG-WALLET-01/original/tests/nu-world-entry-calibration.test.js` | `5b6c584cdc355cbbc436292319016496d1c65836` |
