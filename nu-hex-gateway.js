@@ -4,6 +4,7 @@
   const root=document.getElementById("nu-hex-gateway");
   const scrim=document.querySelector(".nu-gateway-scrim");
   const gameView=document.getElementById("game-view");
+  const utilityViews=["bag-view","wallet-view","inventory-view"].map(id=>document.getElementById(id)).filter(Boolean);
   if(!root||!scrim||!gameView)return;
 
   const trigger=root.querySelector(".nu-gateway-trigger");
@@ -13,12 +14,15 @@
 
   function syncGatewayScope(){
     const active=gameView.classList.contains("active");
-    document.body.classList.toggle("nu-gateway-enabled",active);
+    const utility=utilityViews.some(view=>view.classList.contains("active"));
+    document.body.classList.toggle("nu-gateway-enabled",active||utility);
     document.body.classList.toggle("nu-main-game-page",active);
     document.body.classList.toggle("nu-game-active",active);
+    document.body.classList.toggle("nu-gateway-utility-active",utility);
   }
   syncGatewayScope();
-  new MutationObserver(syncGatewayScope).observe(gameView,{attributes:true,attributeFilter:["class"]});
+  const scopeObserver=new MutationObserver(syncGatewayScope);
+  [gameView,...utilityViews].forEach(view=>scopeObserver.observe(view,{attributes:true,attributeFilter:["class"]}));
 
   function layoutItems(){
     const compact=window.matchMedia("(max-width: 600px)").matches;
@@ -35,6 +39,12 @@
   window.addEventListener("orientationchange",layoutItems,{passive:true});
 
   function goHome(){
+    const activeUtility=utilityViews.find(view=>view.classList.contains("active"));
+    if(activeUtility){
+      const backId=activeUtility.id==="inventory-view"?"inventory-back":activeUtility.id==="wallet-view"?"wallet-back":"bag-back";
+      document.getElementById(backId)?.click();
+      return;
+    }
     const back=document.getElementById("back-home");
     if(back)back.click();else window.location.href="./index.html";
   }
@@ -89,6 +99,7 @@
     item.classList.add("is-selected","is-confirming");
     activationTimer=window.setTimeout(()=>{
       setOpen(false,false);
+      window.dispatchEvent(new Event("nu:gateway-close"));
       action();
     },120);
   }
@@ -137,5 +148,7 @@
   window.addEventListener("nu:game-view-exit",()=>{pausedByGateway=false;});
 
   const initialView=new URLSearchParams(window.location.search).get("view");
-  if(["store","wallet","profile"].includes(initialView))document.getElementById("menu-"+initialView)?.click();
+  if(["store","profile"].includes(initialView))document.getElementById("menu-"+initialView)?.click();
+  if(initialView==="bag")document.getElementById("menu-bag")?.click();
+  if(initialView==="wallet"){document.getElementById("menu-bag")?.click();document.querySelector('[data-bag-destination="wallet"]')?.click();}
 })();

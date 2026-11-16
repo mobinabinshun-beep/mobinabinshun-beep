@@ -1,0 +1,121 @@
+# N.U Bag, Inventory, Wallet and MHL — implementation record
+
+**Change ID:** NU-BAG-WALLET-01  
+**Date:** 2026-11-16  
+**Status:** IMPLEMENTED IN CANDIDATE · AUTOMATED CI PASS · PUBLIC DEMO DEPLOYMENT BLOCKED · HUMAN QA PENDING  
+**Repository:** `mobinabinshun-beep/mobinabinshun-beep`  
+**Candidate branch:** `feat/wallet-health-module-2026-11-15`  
+**Existing review:** https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/136
+
+## Owner request and acceptance intent
+
+Add a Bag destination to the main menu. Bag opens a dedicated page with Inventory and Wallet. Inventory lists owned items collected or acquired across supported games. Wallet exposes player Profile, balances, financial Transactions, independent Health history and Mana History. Navigation must remain available between Bag, Inventory and Wallet, and Gateway must be available on those pages without changing the already established main-game Gateway behavior.
+
+The owner retains final human and quality acceptance. This record does not imply human approval.
+
+## Change control and recovery
+
+- Pre-change candidate commit: `9aeac1936a2f163856c31c5782726e5508c1cbd6`
+- Backup branch: `backup/pre-bag-wallet-history-2026-11-16`
+- Pre-change archive: `archive/pre-change/2026-11-16-NU-BAG-WALLET-01/original/`
+- Archive manifest: `archive/pre-change/2026-11-16-NU-BAG-WALLET-01/original/MANIFEST.md`
+- The archive preserves the original versions of every existing file modified by this change. Git blob SHA-1 values are recorded in the manifest.
+- Implementation is isolated on the candidate branch. The public default branch and deployment have not been changed.
+
+## Implemented candidate behavior
+
+### 1. Menu → Bag
+
+- The main menu now presents BAG instead of a direct Wallet shortcut.
+- Bag is a separate view with two destinations: INVENTORY and WALLET.
+- The Bag view does not start a game or mutate game state.
+
+### 2. Inventory
+
+- Inventory is a projection of owned item assets registered in the shared wallet.
+- Eligible item groups: consumables, items, equipment, upgrades, collectibles and materials.
+- Only positive owned quantities appear.
+- XP, Mana, HP, Casino credits and exchange currencies are not treated as inventory items.
+- Current supported consumables include owned HP Capsules and Mana Capsules when they have a positive visible quantity. Future game items can register through the existing asset registry and appear by group.
+- Inventory does not create a second balance store; Wallet remains the source of truth.
+
+### 3. Wallet navigation and histories
+
+Wallet includes:
+- PROFILE — opens the existing demo player profile.
+- BALANCES — shared owned-asset projection.
+- TRANSACTIONS — concise signed deltas only, such as `-10 XP · +1 HP Capsule`. HP-only changes are omitted from the financial transaction list and remain in Health history.
+- HEALTH — reads the independent `nu-health-records-v1` store and keeps medicine/item use, damage, healing, deaths and per-Wave summaries. The first four categories retain their latest five events; the Wave ledger retains the latest 20 settled Waves.
+- Per-Wave summaries accumulate all recorded damage and healing events for that Wave, then close on Wave settlement. Each row shows total damage, net HP change, successful interaction count and settlement reason. This supports entries such as `Chaos Attack · Wave … · +1 DAMAGE · -1 HP`.
+- MHL — **Mana History Ledger**. This is a separate Wallet view derived from Mana- and magic-linked deltas in the existing Wallet transaction ledger. It includes game and Store changes, for example `+10 Mana` or `-10 Mana · +1 N-BI Arcane Charge`. It does not duplicate or independently mutate Wallet transactions; it reflects the latest 24 wallet records.
+
+Bag and Inventory shortcuts remain available from Wallet. Inventory and Wallet navigation remains available from Bag and Inventory.
+
+### 4. Gateway
+
+- Gateway is available on Bag, Inventory and Wallet, including Wallet tabs.
+- Its three existing commands remain BACK, MENU and PROFILE.
+- BACK returns Wallet/Inventory to Bag, and Bag to the previous Home/Game view.
+- PROFILE opens the existing demo profile; closing Profile returns to the page from which it was opened.
+- Gateway opening/closing continues to use the existing background-freeze events. Game pause ownership is only changed when the game view itself is active.
+- The existing main-game-only Gateway scope and actions are otherwise preserved.
+
+### 5. Exchange and data boundaries
+
+- Inventory is not a tradable-asset list.
+- Store-purchased assets retain their existing Exchange exclusion.
+- HP remains excluded from Exchange and is not shown as a financial transaction delta; HP events belong to Health history.
+- MHL is a filtered view of Wallet transactions, not a new currency or Exchange market.
+- No real-money payment, deposit or withdrawal path is introduced.
+- Health data remains separate from Wallet storage.
+
+## Files changed
+
+- `index.html` — Bag and Inventory views, Wallet MHL tab, menu entry and navigation shortcuts.
+- `nu-player-ui.js` — Bag/Inventory routing, item rendering, concise transaction rendering and MHL rendering.
+- `nu-world.css` — responsive Bag, Inventory and Wallet navigation styles; affordable zero-count HP Capsule state.
+- `nu-hex-gateway.js` / `nu-hex-gateway.css` — Gateway availability and Back routing for Bag/Inventory/Wallet.
+- `nu-wallet.js` — read-only inventory projection.
+- `nu-games.js` — Wave damage/healing aggregation and affordable zero-count HP Capsule HUD state.
+- `tests/nu-hp-pill-interaction.test.js` / `tests/nu-hud-layout.test.js` — HP Capsule visibility, click feedback and dock behavior.
+- `tests/nu-wallet.test.js` — inventory projection tests.
+- `nu-health.js` / `tests/nu-health.test.js` — independent per-Wave damage/healing accumulation, idempotent settlement and 20-Wave retention.
+- Existing Health module code from the preceding Wallet Health candidate remains in the same PR; its independent store and game event integration are not replaced.
+
+## Automated verification
+
+- Added wallet tests for owned item-group projection and exclusion of currencies/progression/vitals; Health tests cover per-Wave totals and idempotent settlement.
+- The Bag/Wallet implementation passed all 8 relevant checks on code commit `8207ca89c8d74a97ceeb0b4fab2db396e7a45bdb`.
+- Automated CI: **PASS** on code commit `746a1ced1142b0309b124ec373f0f0982eac3202` (all 8 relevant checks green). The later commit `176348b1f549f701c13039749e41810b8ddea7d4` adds only an explanatory code comment.
+- Browser execution, touch/keyboard checks, visual layout and live Pages deployment: **PENDING**.
+- No test result is inferred from a source diff or successful Git write.
+
+## Human test checklist
+
+1. Open Home → MENU → BAG. Confirm the page opens without starting a game.
+2. Open Inventory with no owned items. Confirm an honest empty state appears.
+3. When HP is below 10 and the player owns no HP Capsules, confirm the icon appears only if XP is at least 10, shows `×0`, and the game asset profile lists `0 HP Capsules`. Clicking it must show a clear Store-purchase notification, not a silent/no-op action. When XP is below 10, the zero-count icon must stay hidden. When a capsule is owned, confirm its positive count appears in Inventory.
+4. Confirm XP, Mana, HP and currency balances do not appear as Inventory items.
+5. Open Wallet → Balances and confirm balances remain consistent with the game.
+6. Open Transactions. Confirm purchase and consumption are separate rows and show only concise signed deltas; HP-only entries must not appear.
+7. Open Health. Confirm medicine use, damage, healing and death histories remain independent of financial transactions; after a Wave ends, confirm its total damage and net HP change appear in Wave Damage Summary.
+8. Open MHL. Confirm Mana Collector and Mana-linked Store changes appear with signed values and no invented entries.
+9. From Bag, Inventory and each Wallet tab, open Gateway. Confirm BACK, MENU and PROFILE work and the foreground controls remain readable.
+10. Confirm BACK returns Wallet/Inventory to Bag and Bag to the prior Home/Game view.
+11. Open Profile from Gateway, close it, and confirm return to the previous Bag/Wallet page. Confirm temporary profile values are cleared on close.
+12. Repeat on narrow portrait and landscape layouts, with keyboard focus and touch input.
+
+## Deployment and acceptance status — protocol corrected 2026-11-16
+
+- The owner has explicitly corrected the operating protocol: relevant machine checks PASS + verified machine backup authorize deployment to the public demo; human acceptance is collected after deployment, not before it.
+- The normative protocol is `docs/operations/NU-OPS-IMPLEMENT-01.md`; the dated owner decision is recorded in `docs/operations/OWNER-WORKFLOW-CORRECTION-2026-11-16.md`; the public gate is `docs/PUBLIC-DEMO-HUMAN-ACCEPTANCE-GATE.md`.
+- The current public Pages site is tied to the default branch. This candidate must reach that public demo through the repository's configured Pages publication path; a PR/branch preview is not a substitute.
+- Relevant workflows observed on the updated candidate documentation head `6e42bd499e4d4b88258f6df54677adc96b24200a`: wallet/profile regression, graphics preview smoke, Gateway regression, graphics integrity, Studio export, Generation 1 HUD layout and Exchange regression all completed successfully. The functional Bag/Wallet code commit `746a1ced1142b0309b124ec373f0f0982eac3202` previously passed all 8 relevant checks; Wallet 50/50, Gateway 12/12, Studio/export 219/219.
+- A new verified backup of the exact deployable candidate must be created before merge/publication. Record its exact ref and SHA in the deployment report.
+- After publication, verify the public URL serves the intended merge/build, run available public smoke checks, then provide the owner and testers the URL and scope.
+- Human QA remains pending until the owner/testers report. Keyboard/focus and real-device portrait/landscape behavior remain explicit human QA concerns.
+- Public demo deployment is not human acceptance, scope lock or promotion beyond the demo. Do not claim any of those states without the corresponding evidence.
+
+## Rollback
+
+The exact pre-change source checkpoint is `backup/pre-bag-wallet-history-2026-11-16` at `9aeac1936a2f163856c31c5782726e5508c1cbd6`. Original modified files are archived under the path above. Roll back by reverting the candidate commits or restoring the checkpoint/archive; do not force-push the public default branch.

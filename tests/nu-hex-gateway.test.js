@@ -40,16 +40,28 @@ test("Opening Gateway freezes the game and all ambient renderers until a decisio
 
 test("Menu is a centered, concise module directory with player modules before games",()=>{
  const items=html.slice(html.indexOf('<div class="menu-backdrop"'),html.indexOf('<div class="intro"'));
- const order=["menu-store","menu-profile","./exchange.html","menu-wallet","./pixel-art-studio.html","menu-random","menu-bubble","menu-mana","menu-chaos"].map(x=>items.indexOf(x));
+ const order=["menu-store","menu-profile","./exchange.html","menu-bag","./pixel-art-studio.html","menu-random","menu-bubble","menu-mana","menu-chaos"].map(x=>items.indexOf(x));
  assert.ok(order.every(x=>x>=0));
  assert.deepEqual(order.slice().sort((a,b)=>a-b),order);
  assert.match(items,/N\.U MENU/);
  assert.match(items,/<kbd>S<\/kbd>/);
  assert.match(items,/<kbd>P<\/kbd>/);
  assert.match(items,/<kbd>E<\/kbd>/);
- assert.match(items,/<kbd>W<\/kbd>/);
+ assert.match(items,/<kbd>G<\/kbd>/);
  assert.doesNotMatch(items,/<small>|Choose a destination|System profile|Original source/);
  assert.match(worldCss,/\.menu-panel\{width:min\(390px,100%\)/);
+});
+
+
+test("Bag provides Inventory and Wallet destinations with shared shortcuts",()=>{
+ assert.match(html,/id="bag-view"/);
+ assert.match(html,/id="inventory-view"/);
+ assert.match(html,/id="menu-bag"/);
+ assert.match(html,/data-bag-destination="inventory"/);
+ assert.match(html,/data-bag-destination="wallet"/);
+ assert.match(html,/data-wallet-tab="mana"/);
+ assert.match(js,/nu-gateway-utility-active/);
+ assert.match(css,/nu-gateway-utility-active #nu-hex-gateway/);
 });
 
 test("Painting leads the game list and Random Game selects only the three core prototypes",()=>{

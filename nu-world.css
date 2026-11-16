@@ -734,3 +734,50 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
 .wallet-report-button{margin:0 0 12px;min-height:38px;font-size:10px;letter-spacing:.08em}
 .wallet-transaction{gap:5px}
 .wallet-transaction small{line-height:1.55;overflow-wrap:anywhere}
+
+
+/* N.U Health module and wallet drawer contrast calibration */
+.wallet-panel{background:rgba(2,8,15,.97)!important;box-shadow:0 22px 70px rgba(0,0,0,.62),inset 0 1px rgba(150,225,255,.06)}
+.wallet-card-tabs::before{background:rgba(2,8,15,.99)}
+.wallet-tab-content{background:rgba(3,9,17,.92);border:1px solid rgba(113,224,255,.13);border-radius:12px;padding:16px}
+.wallet-card-tab{flex:1 1 0;width:auto;max-width:none}
+.wallet-hologram-title{margin-top:2px}
+.health-history-group{margin-top:16px;padding:13px;border:1px solid rgba(113,224,255,.12);border-radius:10px;background:rgba(1,6,12,.72)}
+.health-history-group h4{margin:0 0 9px;color:#8edfff;font:800 10px/1.4 ui-monospace,monospace;letter-spacing:.12em}
+.health-history-list{display:grid;gap:7px}
+.health-history-row{display:grid;gap:4px;padding:9px 10px;border:1px solid rgba(113,224,255,.09);border-radius:8px;background:rgba(8,18,29,.86);color:#d8eaf4;font-size:11px}
+.health-history-row small{color:#829bab;font-size:9px;line-height:1.5}
+.health-history-empty{margin:0;color:#829bab;font-size:11px;line-height:1.6}
+.intro-panel{max-width:480px;padding:31px 29px 28px}
+@media(max-width:520px){.wallet-tab-content{padding:12px}.wallet-card-tab{flex:1 1 0;width:auto;max-width:none;padding:10px 3px;font-size:8px}.intro-panel{padding:29px 22px 25px}}
+
+
+/* N.U Bag, cross-game Inventory and compact wallet navigation */
+.bag-panel,.inventory-items{padding:16px}
+.bag-destination-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
+.bag-destination{display:grid;gap:7px;min-height:94px;padding:16px;text-align:left;border:1px solid rgba(113,224,255,.22);border-radius:12px;background:rgba(7,22,35,.9);color:#e4f7ff}
+.bag-destination strong{font-size:12px;letter-spacing:.12em}
+.bag-destination span{color:#91aebe;font-size:11px;line-height:1.5}
+.bag-destination:hover,.bag-destination:focus-visible,.bag-shortcut:hover,.bag-shortcut:focus-visible{border-color:#85eaff;outline:2px solid rgba(133,234,255,.2);outline-offset:1px}
+.bag-shortcuts{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 12px}
+.bag-shortcut{min-height:34px;padding:7px 12px;border:1px solid rgba(122,199,225,.2);border-radius:8px;background:rgba(8,24,38,.84);color:#b9e9f5;font-size:9px;font-weight:800;letter-spacing:.1em}
+.bag-shortcut.is-active{border-color:#7fe5ff;color:#e8fbff;background:rgba(28,79,101,.7)}
+.wallet-card-tabs{display:flex;flex-wrap:wrap;gap:6px}
+.wallet-card-tab{flex:1 1 92px;min-width:0}
+.inventory-items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.inventory-item{display:grid;grid-template-columns:1fr auto;align-items:center;gap:5px 10px;padding:12px;border:1px solid rgba(113,224,255,.14);border-radius:10px;background:rgba(8,18,29,.86)}
+.inventory-item strong{font-size:11px;color:#dff5ff}
+.inventory-item span{font:800 13px ui-monospace,monospace;color:#a7ffb0}
+.inventory-item small{grid-column:1/-1;color:#829bab;font-size:8px;letter-spacing:.12em}
+@media(max-width:520px){
+ .bag-destination-grid,.inventory-items{grid-template-columns:1fr}
+ .bag-panel{padding:12px}
+ .bag-shortcuts{gap:5px}
+ .bag-shortcut{flex:1 1 auto;padding:7px 8px;font-size:8px}
+ .wallet-card-tab{flex:1 1 28%;font-size:8px;padding:9px 3px}
+}
+
+/* A zero-count HP Capsule is actionable only when the player can afford it. */
+.hp-pill-use.is-purchasable{border-color:#f3cb79;background:rgba(75,53,20,.9);color:#ffe2a0;box-shadow:0 0 13px rgba(243,203,121,.28)}
+.hp-pill-use.is-purchasable img{filter:drop-shadow(0 0 5px rgba(255,210,112,.65))}
+.hp-pill-use.is-purchasable:focus-visible{outline-color:#ffe2a0}

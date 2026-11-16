@@ -191,6 +191,10 @@
     }
     return rows.filter(row=>Number.isFinite(Number(row.value))&&Number(row.value)>0&&(row.key!=="manaCapsules"||Number(row.value)>1||s.mana>0));
   }
+  function inventoryRows(raw){
+    const allowedGroups=new Set(["consumables","items","equipment","upgrades","collectibles","materials"]);
+    return assetRows(raw).filter(row=>allowedGroups.has(String(row.group||"").toLowerCase())&&Number(row.value)>0);
+  }
   function isExchangeableAsset(raw,key){
     if(typeof key!=="string"||!key)return false;
     const s=normalizeSave(raw);
@@ -217,5 +221,5 @@
     if(!entries.length)points.push({id:"current",at:"",title:"Current balance · no recorded changes",delta:0,balance:current});
     return points;
   }
-  return {MAX_HP,HP_PILL_COST,MAX_TRANSACTIONS,normalizeSave,buyHpPill,useHpPill,grantXP,settleCasinoRound,settleWalletBet,casinoSpendableAssets,beginWave,recordWaveDelta,settleWave,registerAsset,registerGameAssets,assetRows,exchangeAssetRows,isExchangeableAsset,gameAssetRows,assetHistory};
+  return {MAX_HP,HP_PILL_COST,MAX_TRANSACTIONS,normalizeSave,buyHpPill,useHpPill,grantXP,settleCasinoRound,settleWalletBet,casinoSpendableAssets,beginWave,recordWaveDelta,settleWave,registerAsset,registerGameAssets,assetRows,inventoryRows,exchangeAssetRows,isExchangeableAsset,gameAssetRows,assetHistory};
 });

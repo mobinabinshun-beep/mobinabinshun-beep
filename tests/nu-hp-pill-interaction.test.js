@@ -8,7 +8,8 @@ const css=fs.readFileSync(require.resolve("../nu-world.css"),"utf8");
 const wallet=require("../nu-wallet.js");
 
 test("HP capsule uses a direct native click listener for pointer, touch and keyboard activation",()=>{
-  assert.match(games,/function bindHpPillButton\(\)\{const button=\$\("hp-pill-use"\);if\(!button\)return;button\.addEventListener\("click",e=>\{e\.preventDefault\(\);e\.stopPropagation\(\);if\(button\.hidden\)return;useHpPill\(e\);\}\);\}/);
+  assert.ok(games.includes('function bindHpPillButton(){const button=$("hp-pill-use");if(!button)return;button.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();if(button.hidden)return;if(state.save.hpPills<1){announceTransaction('));
+  assert.ok(games.includes("useHpPill(e);});}"));
   assert.match(games,/renderWallet\(\);bindHpPillButton\(\);bindGameAssetProfiles\(\)/);
   assert.doesNotMatch(games,/document\.addEventListener\("pointerup",handleHpPillPointerUp/);
   assert.doesNotMatch(games,/document\.addEventListener\("click",handleHpPillKeyboardClick/);
@@ -16,7 +17,11 @@ test("HP capsule uses a direct native click listener for pointer, touch and keyb
 
 test("successful HUD use captures the icon position before wallet rerender can hide it",()=>{
   assert.match(games,/const anchor=button&&button\.id==="hp-pill-use"\?button\.getBoundingClientRect\(\):null/);
-  assert.match(games,/if\(!persistWalletState\(result\.state\)\)return;[\s\S]*?if\(anchor\)showHpPillInteraction\(anchor,result\.restored\)/);
+  const useStart=games.indexOf('const isStoreUse=!!(button&&button.matches("[data-use-hp-pill]"))');
+  const persisted=games.indexOf("if(!persistWalletState(result.state))return;",useStart);
+  const healthRecorded=games.indexOf("window.NUHealth.recordMedicationUse",persisted);
+  const storeRefresh=games.indexOf('if(isStoreUse)renderShop("−1 HP Capsule · +"+result.restored+" HP restored.")',persisted);
+  assert.ok(useStart>=0&&persisted>useStart&&healthRecorded>persisted&&storeRefresh>healthRecorded);
 });
 
 test("HP pill interaction pop uses viewport coordinates and cannot be clipped by game-stage overflow",()=>{
@@ -43,11 +48,14 @@ test("HP capsule wallet rules consume exactly one capsule and cap healing at 10 
 });
 
 
-test("HP HUD capsule remains visible at zero inventory and reports unavailable state without losing clickability",()=>{
-  assert.doesNotMatch(games,/pill\.hidden=false/);
-  assert.ok(games.includes('button.hidden=hpPillTravelAnimation&&hpPillTravelAnimation.playState==="running"?true:next>=10'));
-  assert.match(games,/pill\.classList\.toggle\("unavailable",state\.save\.hp>=10\|\|state\.save\.hpPills<1\)/);
-  assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use\.unavailable\{[^}]*pointer-events:auto!important/);
+test("HP HUD shows a zero-count capsule only when purchase is affordable and keeps the click meaningful",()=>{
+  assert.ok(games.includes('const shouldShow=next<10&&(state.save.hpPills>0||state.save.xp>=NUWallet.HP_PILL_COST);'));
+  assert.ok(games.includes('pill.classList.toggle("is-purchasable",state.save.hp<10&&empty&&affordable)'));
+  assert.ok(games.includes("0 HP CAPSULES · BUY FOR 10 XP IN STORE"));
+  assert.ok(games.includes("0 HP CAPSULES · EARN 10 XP TO UNLOCK"));
+  assert.ok(games.includes('state.save.hp<10&&state.save.hpPills===0&&state.save.xp>=NUWallet.HP_PILL_COST&&!rows.some(row=>row.key==="hpPills")'));
+  assert.ok(css.includes(".hp-pill-use.is-purchasable{"));
+  assert.ok(css.includes("#game-view.active .hp-bar #hp-pill-use.unavailable{"));
 });
 
 
@@ -66,7 +74,7 @@ test("successful HP capsule use emits a radial interaction burst anchored to the
 
 test("HP capsule travel enters from the inside-right corner and returns along the same reversible path",()=>{
   assert.ok(games.includes("function animateHpPillTravel(direction)"));
-  assert.ok(games.includes("function syncHpPillDock(hp)"));
+  assert.ok(games.includes("function syncHpPillDock()"));
   assert.ok(games.includes("const corner={x:barRect.width-4"));
   assert.ok(games.includes("const dock=mobileDock?"));
   assert.ok(games.includes("hpPillTravelAnimation.reverse()"));
@@ -77,10 +85,10 @@ test("HP capsule travel enters from the inside-right corner and returns along th
 
 test("HP capsule is absent at full HP and remains hidden until its arrival animation finishes",()=>{
   assert.match(html,/<button class="hp-pill-use" id="hp-pill-use" type="button"[^>]*hidden/);
-  assert.ok(games.includes("lastRenderedHp=10;"));
+  assert.ok(games.includes("lastPillDockVisible=false;"));
   assert.ok(games.includes("const finishedDirection=hpPillTravelDirection;"));
   assert.ok(games.includes('button.hidden=finishedDirection==="out"'));
-  assert.ok(games.includes('if(lastRenderedHp>=10&&next<10){if(button)button.hidden=true;animateHpPillTravel("in");}'));
+  assert.ok(games.includes("if(lastPillDockVisible!==shouldShow)"));
   assert.ok(css.includes("#game-view.active .hp-bar #hp-pill-use[hidden]{display:none!important}"));
 });
 
@@ -97,7 +105,7 @@ test("Generation 1.26 widens the HP frame and keeps the pill dock inside its rig
 test("HP pill stays hidden during repeated damage and reverses the same in-flight animation when HP recovers",()=>{
   assert.ok(games.includes("hpPillTravelDirection=null"));
   assert.ok(games.includes("hpPillTravelAnimation.reverse()"));
-  assert.ok(games.includes('hpPillTravelAnimation.playState==="running"?true:next>=10'));
+  assert.ok(games.includes('hpPillTravelAnimation.playState==="running"?true:!shouldShow'));
   assert.ok(games.includes('button.hidden=finishedDirection==="out"'));
   assert.ok(games.includes("if(direction!==hpPillTravelDirection){hpPillTravelDirection=direction;hpPillTravelAnimation.reverse();}"));
 });
@@ -142,7 +150,11 @@ test("Generation 1.29 places the phone HP capsule below a compact HP rail",()=>{
 
 test("Generation 1.30 refreshes the Store count immediately after Store-side capsule use",()=>{
   assert.match(games,/const isStoreUse=!!\(button&&button\.matches\("\[data-use-hp-pill\]"\)\)/);
-  assert.match(games,/if\(!persistWalletState\(result\.state\)\)return;if\(isStoreUse\)renderShop\("−1 HP Capsule · \+"\+result\.restored\+" HP restored\."\)/);
+  const useStart=games.indexOf('const isStoreUse=!!(button&&button.matches("[data-use-hp-pill]"))');
+  const persisted=games.indexOf("if(!persistWalletState(result.state))return;",useStart);
+  const healthRecorded=games.indexOf("window.NUHealth.recordMedicationUse",persisted);
+  const storeRefresh=games.indexOf('if(isStoreUse)renderShop("−1 HP Capsule · +"+result.restored+" HP restored.")',persisted);
+  assert.ok(useStart>=0&&persisted>useStart&&healthRecorded>persisted&&storeRefresh>healthRecorded);
   assert.match(games,/function renderShop\(feedback=""\)/);
   const result=wallet.useHpPill({hp:3,hpPills:3},{id:"store-refresh-test"});
   assert.equal(result.ok,true);
