@@ -1,0 +1,11 @@
+NUVM/1
+# N.U declarative Generation 1 module sample
+GENERATION=1
+HOST_API=1
+TITLE=N.U Module Runtime Test
+TEXT=This module is interpreted by the built-in N.U VM.
+TEXT=It contains declarative instructions only.
+TEXT=No browser, JavaScript engine, native plug-in or network access is used.
+TEXT=Unknown opcodes and incompatible generations are rejected.
+TEXT=This is a runtime proof-of-concept, not a commercial game engine.
+END
