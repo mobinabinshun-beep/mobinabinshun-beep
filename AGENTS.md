@@ -1,6 +1,7 @@
 # Repository-wide agent instructions
 
 Before proposing or editing code, read `docs/operations/LOCKED-AREAS.md`.
+Also read the current owner directive, team governance and documentation protocol linked from the product README/archive, plus `CHANGE-AND-DEMO-PROTOCOL.md`. If repository-local wording conflicts with the dated owner directive, the latest explicit owner directive governs demo-eligible execution; do not override protected-area locks.
 
 ## Temporary protected area: classic resource HUD
 - The classic LV / XP / Mana HUD is temporarily locked.

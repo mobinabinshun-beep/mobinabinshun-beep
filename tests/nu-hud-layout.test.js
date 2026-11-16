@@ -10,7 +10,7 @@ test("N.U identity and game title remain unchanged; LV leads the lower resource 
   assert.ok(html.includes('class="brand">N.U'));
   assert.ok(html.includes("NIROO UNIVERSE"));
   assert.ok(html.includes('id="game-title"'));
-  assert.ok(html.includes('<div class="hud"><span class="hud-chip">N.U · GEN 01</span><span class="hud-chip">10 ACTIONS</span></div>'));
+  assert.doesNotMatch(html,/10 ACTIONS|N.U · GEN 01/);
   assert.ok(html.includes('<div class="bars"><span class="hud-chip" id="level-chip">LV 1</span><div class="bar-wrap">'));
   assert.ok(html.indexOf('id="level-chip"') < html.indexOf('bar-label">XP CAPSULE'));
   assert.ok(html.indexOf('bar-label">XP CAPSULE') < html.indexOf('bar-label">MANA CAPSULE'));

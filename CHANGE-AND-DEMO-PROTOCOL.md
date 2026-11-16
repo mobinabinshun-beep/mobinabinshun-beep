@@ -1,72 +1,56 @@
-# Change, Backup, Demo Testing & Feedback Protocol
+# Change, Backup, Public Demo & Human QA Protocol
 
-**Status:** Mandatory for all future changes in this repository  
-**Applies to:** Source code, assets, configuration, documentation, builds, and deployment changes.
+**Status:** Mandatory and owner-directed  
+**Effective:** 2026-11-16  
+**Canonical detailed directive:** [N.U Owner Directive & Demo Acceptance Backlog](https://github.com/mobinabinshun-beep/Repository/blob/main/Operations/2026-11-16/OWNER-DIRECTIVE-AND-DEMO-ACCEPTANCE-BACKLOG-fa.md)
 
-## Non-negotiable release sequence
+## Authority and roles
+- The project owner is the idea director and final human quality/acceptance authority.
+- The execution assistant/contributor is the operational arm responsible for scope analysis, implementation, debugging, machine tests, verified backups, public-demo deployment, link/build verification, reporting and documentation.
+- Machine validation is evidence only for the checks actually run. It is not an absolute guarantee of zero defects and never replaces human QA.
+- Public-demo deployment is specifically the environment for human testing. It is not human approval or authorization to promote beyond the demo.
 
-No change may be applied to the public demo or treated as ready for release until the following gates have been completed in order.
+## Required sequence for authorized, unlocked demo-eligible work
+1. **Read and scope:** read AGENTS.md, docs/operations/LOCKED-AREAS.md, relevant architecture/feature specs and the canonical owner directive. Identify locks, dependencies, exclusions and acceptance criteria.
+2. **Record:** create a dated change record with request, authority, scope, affected files, expected behavior and regression boundaries.
+3. **Implement in isolation:** use a dedicated candidate branch; keep unrelated changes out.
+4. **Machine test and debug:** run focused tests, syntax/build checks and relevant regression workflows. Fix failures before continuing. Record exact test names, environment and outcomes.
+5. **Machine backup:** after the candidate passes required checks, create a recoverable checkpoint/backup of the pre-release state and verify its commit/file identity and restoration path. Record the candidate commit too.
+6. **Publish to the public demo:** once machine checks and backup are verified, deploy the candidate to the designated public demo. **No additional human pre-approval is required** for changes already authorized and within an unlocked scope.
+7. **Verify and report:** check the public URL and actual build/commit identity. If the platform does not provide sufficient evidence, mark deployment UNVERIFIED; source merge alone is not proof of live deployment.
+8. **Human QA:** give the owner and invited testers the demo link, exact scope/build, test steps, expected outcomes, known limitations and rollback reference. Record device, OS, browser, orientation/input method and observed result.
+9. **Accept and lock:** only an explicit owner acceptance creates a lock. The lock applies only to the named item, section or pack and the exact accepted scope/build.
+10. **Correct and repeat:** rejected or failed items are corrected within the authorized scope and repeat machine tests → verified backup → public demo → link/build verification → human QA.
 
-1. **Record the request and conversation**
-   - Preserve the user's request, relevant decisions, assumptions, implementation plan, and acceptance criteria in a change record.
-   - Record the date, affected repository/branch, and responsible contributor.
-   - Do not include credentials, tokens, private keys, or other secrets in the record.
+**Canonical order:** Code → machine tests/debugging → verified machine backup → public demo → link-check/report → human QA/owner acceptance.
 
-2. **Back up and archive the pre-change state**
-   - Capture the exact pre-change commit SHA and branch.
-   - Create a recoverable Git checkpoint (commit/tag or equivalent immutable reference).
-   - Archive copies of every file that will be modified or removed, preserving its original path and recording checksums where practical.
-   - Store the archive under `archive/pre-change/<date>-<change-id>/` (or an equivalent repository-approved archive location).
-   - Verify that the checkpoint and archived files can be retrieved before proceeding.
-   - Never overwrite or delete the only recoverable copy of an earlier version.
+## Scope locks and reopening
+- Owner acceptance may lock one item, a section or a complete pack.
+- A lock remains in force until the owner explicitly and directly reopens that exact scope.
+- Reopening one item does not unlock adjacent components or dependencies.
+- If a requested edit to an unlocked item requires changing a locked dependency, stop before changing that dependency. Explain the relationship and impact, present three practical options with trade-offs, recommend the best option against the project specifications and wait for the owner's direction.
+- After the authorized correction, repeat the full release sequence and seek human acceptance again.
 
-3. **Implement in isolation**
-   - Make the change on a dedicated working branch or isolated demo candidate.
-   - Keep the archived baseline unchanged.
-   - Document all changed files and link the implementation commit to the change record.
+## Actions that still require explicit authorization
+Do not infer permission to expand scope, change a protected dependency, reopen a lock, make destructive/irreversible data changes, weaken security/privacy, incur costs, expose secrets, or take unrelated external actions. The no-preapproval rule applies only to implementation and demo deployment already covered by an explicit owner request and an unlocked scope.
 
-4. **Run technical checks**
-   - Run applicable automated tests, build/lint checks, asset-loading checks, and regression checks.
-   - Record exact commands, environment, results, and known limitations.
-   - A failed or skipped critical check blocks promotion to the public demo until explicitly resolved and documented.
-
-5. **Deploy to the public demo only**
-   - The first deployed target for a change must be the designated public demo/staging environment.
-   - Do not silently promote a candidate to production, the canonical release, or other stable/public distribution channels.
-   - If no clearly designated demo environment exists, stop and document the missing environment; do not substitute production.
-
-6. **Human testing and feedback collection**
-   - Publish concise test instructions and the expected outcomes for human testers.
-   - Collect feedback, reproduction steps, browser/device details where relevant, screenshots/logs when voluntarily provided, and severity/impact.
-   - Keep a dated feedback report linked to the change record.
-   - Do not treat deployment alone as acceptance.
-
-7. **Review, fix, and decide**
-   - Triage feedback; fix regressions through this same protocol, including a fresh backup/archive before each subsequent change.
-   - Record unresolved issues and their impact.
-   - Promote beyond the demo only after human-test results and feedback have been reviewed and the authorized project owner has explicitly approved the promotion.
-   - If approval is absent, the demo remains the highest permitted release stage.
-
-8. **Rollback**
-   - If the demo causes a critical regression, stop promotion and restore the verified pre-change checkpoint/archive.
-   - Record the rollback reason, affected commit, recovery point, and verification results.
+## Evidence states — never collapse them into “done”
+Use separate states: IMPLEMENTED; AUTOMATED-QA-PASSED/FAILED; BACKUP-VERIFIED; SOURCE-MERGED; DEPLOYMENT-VERIFIED/UNVERIFIED; POST-DEPLOY-SMOKE-PASSED/FAILED/NOT-RUN; HUMAN-QA-PENDING/PARTIAL/PASSED/FAILED; OWNER-APPROVED/REJECTED; SCOPE-LOCKED; PROMOTED.
 
 ## Required change record
+- Request, authority and date
+- Scope, exclusions, acceptance criteria and dependencies/locks checked
+- Changed files, branch and implementation commit
+- Exact automated tests/build/workflows and results
+- Debugging, failures, skipped checks and limitations
+- Backup/checkpoint reference and restore procedure
+- Public demo URL, deployment revision and live-verification evidence
+- Human QA instructions and results by tester/device/browser
+- Owner decision and exact lock scope
+- Open risks, rollback details and next safe action
 
-Each change must have a record (for example, `CHANGELOG/<change-id>.md`) containing:
+## Rollback
+If the demo has a critical regression, stop further rollout, restore the verified pre-release checkpoint, verify recovery and record the incident. Do not silently rewrite or erase historical evidence.
 
-- Request/conversation summary and acceptance criteria
-- Date, repository, branch, and change identifier
-- Pre-change commit SHA and backup/archive location
-- Files changed and implementation commit SHA
-- Automated test/build results and limitations
-- Public demo URL and deployment revision
-- Human test instructions, test period, and collected reports
-- Feedback triage, fixes, outstanding risks, and rollback details if applicable
-- Explicit approval decision for any promotion beyond the demo
-
-## Enforcement rule
-
-**Backup → archive → conversation/change record → isolated implementation → technical checks → public demo → human testing → feedback review → explicit approval → optional promotion.**
-
-Skipping a gate blocks the next stage. When evidence is unavailable, mark the gate as **NOT VERIFIED**; never claim it passed. This protocol supplements normal Git history and does not replace verified, recoverable backups.
+## Documentation rule
+A change is not closed until the canonical archive record and relevant repository index are updated. Do not store credentials, private keys, tokens or unnecessary personal information in project records.
