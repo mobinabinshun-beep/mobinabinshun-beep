@@ -5,7 +5,7 @@ const fs=require("node:fs");
 const read=name=>fs.readFileSync(name,"utf8");
 const html=read("index.html"),casino=read("casino.html"),launcher=read("launcher.html"),studio=read("pixel-art-studio.html");
 const js=read("nu-hex-gateway.js"),css=read("nu-hex-gateway.css"),worldCss=read("nu-world.css");
-const games=read("nu-games.js"),graphics=read("nu-graphics-runtime.js"),exchange=read("nu-exchange.js"),dynamic=read("nu-dynamic-layers.js");
+const games=read("nu-games.js"),playerUI=read("nu-player-ui.js"),graphics=read("nu-graphics-runtime.js"),exchange=read("nu-exchange.js"),dynamic=read("nu-dynamic-layers.js");
 
 test("Gateway controller is scoped only to active main-game view",()=>{
  assert.match(html,/id="nu-hex-gateway"/);
@@ -106,4 +106,28 @@ test("Gateway orbit exit bounds include the full vertical fan",()=>{
 test("A hidden tab cannot restart frozen game or ambient renderers",()=>{
  assert.match(games,/gatewayOpen=document\.body\.classList\.contains\("nu-gateway-open"\)/);
  assert.match(dynamic,/function resume\(\)\{if\(!profile\|\|!active\|\|frozen\|\|document\.hidden\)return/);
+});
+
+
+test("Main menu traps keyboard focus and restores its opener",()=>{
+ assert.match(games,/function openMenu\(\)/);
+ assert.match(games,/menuRoot\.addEventListener\("keydown"/);
+ assert.match(games,/focusable\[focusable\.length-1\]/);
+ assert.match(games,/menuReturnFocus/);
+ assert.match(games,/restoreMenuFocus\(\)/);
+});
+
+test("Player views manage focus, wallet tabs support arrow navigation, and Enter does not dismiss profile",()=>{
+ assert.match(playerUI,/previousFocus=document\.activeElement/);
+ assert.match(playerUI,/heading\.focus\(\{preventScroll:true\}\)/);
+ assert.match(playerUI,/event\.key==="Escape"&&profileView\.classList\.contains\("active"\)/);
+ assert.doesNotMatch(playerUI,/event\.key==="Enter"&&profileView\.classList\.contains\("active"\)/);
+ assert.match(playerUI,/ArrowLeft/);assert.match(playerUI,/ArrowRight/);assert.match(playerUI,/event\.key==="Home"/);assert.match(playerUI,/event\.key==="End"/);
+});
+
+test("Gateway focus loop wraps in both directions and Escape restores the trigger",()=>{
+ assert.match(js,/event\.key==="Escape"\)\{event\.preventDefault\(\);setOpen\(false\);trigger\.focus/);
+ assert.match(js,/event\.shiftKey&&document\.activeElement===first/);
+ assert.match(js,/!event\.shiftKey&&document\.activeElement===last/);
+ assert.match(css,/#nu-hex-gateway button:focus-visible/);
 });
