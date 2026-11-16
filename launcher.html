@@ -6,6 +6,7 @@
 <title>N.U Launcher — System Calibration</title>
 <link rel="stylesheet" href="./nu-launcher.css">
 <link rel="stylesheet" href="./nu-hex-gateway.css?v=20261113-hex-gateway-calibration-r2">
+<script src="./nu-motion.js"></script>
 </head>
 <body>
 <main class="launcher">
@@ -36,6 +37,23 @@
 <section class="panel settings" id="settings-panel">
 <div class="panel-head"><div><span class="eyebrow">LAUNCHER PREFERENCES</span><h2>How should setup behave?</h2></div><span class="state">CHANGE ANYTIME</span></div>
 <p class="muted">These controls only change when calibration runs and whether the choice screen appears. They never remove access to Settings.</p>
+<div class="motion-control" aria-labelledby="motion-title">
+ <div class="mode-title" id="motion-title">REDUCED MOTION · 10 COMFORT LEVELS</div>
+ <p class="muted">Level 1 is the calmest and most conservative setting. Higher levels progressively allow more visual movement. Game rules, controls and timing are unchanged. Your choice is saved on this device and also applies to the N.U demo.</p>
+ <div class="motion-level-grid" id="motion-level-grid" role="group" aria-label="Reduced Motion level">
+ <button type="button" class="motion-level" data-motion-level="1" aria-pressed="true"><b>1</b><small>STABLE</small></button>
+ <button type="button" class="motion-level" data-motion-level="2" aria-pressed="false"><b>2</b><small>CALM</small></button>
+ <button type="button" class="motion-level" data-motion-level="3" aria-pressed="false"><b>3</b><small>CALM</small></button>
+ <button type="button" class="motion-level" data-motion-level="4" aria-pressed="false"><b>4</b><small>BALANCED</small></button>
+ <button type="button" class="motion-level" data-motion-level="5" aria-pressed="false"><b>5</b><small>BALANCED</small></button>
+ <button type="button" class="motion-level" data-motion-level="6" aria-pressed="false"><b>6</b><small>BALANCED</small></button>
+ <button type="button" class="motion-level" data-motion-level="7" aria-pressed="false"><b>7</b><small>LIGHT</small></button>
+ <button type="button" class="motion-level" data-motion-level="8" aria-pressed="false"><b>8</b><small>LIGHT</small></button>
+ <button type="button" class="motion-level" data-motion-level="9" aria-pressed="false"><b>9</b><small>LIGHT</small></button>
+ <button type="button" class="motion-level" data-motion-level="10" aria-pressed="false"><b>10</b><small>LIGHTEST</small></button>
+ </div>
+ <p class="motion-current" id="motion-current" role="status" aria-live="polite">LEVEL 1 · STABLE — non-essential animation and transitions minimized.</p>
+</div>
 <label class="choice"><input type="checkbox" id="hide-chooser"><span><b>Remember my choice and hide this screen</b><small>Use the saved behavior next time. Reopen it from Launcher Settings → Calibration.</small></span></label>
 <label class="choice"><input type="checkbox" id="per-game"><span><b>Calibrate separately for each game</b><small>Preference saved for the next integration step. Per-game pause and calibration prompts are not yet connected to the existing game entry points in this preview.</small></span></label>
 <label class="choice"><input type="checkbox" id="ask-every"><span><b>Ask me every time the launcher opens</b><small>Show the level choices on each new launcher session.</small></span></label>
