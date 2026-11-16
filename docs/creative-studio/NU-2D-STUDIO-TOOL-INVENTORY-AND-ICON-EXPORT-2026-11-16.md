@@ -1,6 +1,6 @@
 # N.U Pixel Art Studio — 2D Tool Inventory & Icon Export
 **Record:** NU-STUDIO-2D-ICON-EXPORT-2026-11-16  
-**Status:** implemented candidate; Studio regression CI passed; owner visual acceptance pending  
+**Status:** 2D professional tool candidate implemented; CI passed (262/262); owner browser interaction acceptance pending  
 **Scope:** current Generation 1 browser-based 2D Studio only
 
 ## Owner-directed scope
@@ -60,3 +60,18 @@ For an application icon, the Windows icon container is .ico. .iso is a disk-imag
 - Per-layer blend modes, group assignment, and group-level visibility/opacity controls. Groups are named collections, not nested folder trees.
 - Selection and mask state are included in undo/redo snapshots; resizing and transforms preserve layer data.
 - This phase remains separate from animation, spritesheets, tilemaps, vector authoring and package management, which remain archived.
+
+
+## Phase A verification
+- Candidate commit: \`2dcb1eda62da24fbd1b871e704650442da08a133\`
+- Workflow: N.U Studio export regression gates
+- Run: https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/43881024031
+- Result: PASS — syntax checks and 262 Node tests, 262 passed / 0 failed.
+
+## Explicit limitations
+- Layer masks are binary (show/hide), not grayscale alpha masks.
+- Layer groups support named assignment, group visibility and group opacity; they are not nested folder trees.
+- Curve drawing is a one-shot quadratic Bezier stroke with a curvature control; editable path nodes/handles remain deferred.
+- Brush shape/texture presets are built-in; custom imported brush-tip files remain deferred.
+- No animation timeline, sprite-sheet/tileset/tilemap pipeline, editable vector path editor, project file/autosave or N.U package builder is included.
+- Actual pointer-driven browser QA and low-memory device QA remain owner acceptance tasks.
