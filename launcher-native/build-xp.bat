@@ -1,6 +1,6 @@
 @echo off
 setlocal
-where cl.exe >nul 2>nul
+cl.exe /? >nul 2>nul
 if errorlevel 1 (
   echo ERROR: cl.exe not found. Open the Visual Studio 2010 x86 Developer Command Prompt.
   exit /b 1
