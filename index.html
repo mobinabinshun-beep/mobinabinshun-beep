@@ -9,6 +9,7 @@
 <link rel="canonical" href="https://mobinabinshun-beep.github.io/mobinabinshun-beep/">
 <link rel="stylesheet" href="./nu-world.css?v=20261115-public-wallet-wave-r1">
 <link rel="stylesheet" href="./nu-hex-gateway.css?v=20261117-simulated-mouse-r2">
+<link rel="stylesheet" href="./nu-arcane-shield.css?v=20261118-arcane-shield-r1">
 <script src="./nu-motion.js"></script>
 </head>
 <body>
@@ -31,7 +32,13 @@
 <div class="game-stage" id="game-stage"><canvas id="game-canvas" tabindex="0" role="group" aria-label="Game field. Use arrow keys to select a target, then press Enter or Space to interact." aria-keyshortcuts="ArrowLeft ArrowRight ArrowUp ArrowDown Enter Space" aria-describedby="game-info"></canvas>
 
 <div class="hp-bar" id="hp-bar"><span>♥ PLAYER HP</span><div class="hp-track"><div id="hp-fill"></div></div><b id="hp-value">10/10</b><button class="hp-pill-use" id="hp-pill-use" type="button" hidden aria-label="Use HP pill"><img src="./assets/nu-hp-pill-golden-pixel.svg" alt=""><span id="hp-pill-count"></span></button></div><div class="bars"><span class="hud-chip" id="level-chip">LV 1</span><div class="bar-wrap"><span class="bar-label">XP CAPSULE</span><div class="bar-fill" id="xp-fill"></div><span class="bar-value" id="xp-value"></span></div><div class="bar-wrap"><span class="bar-label">MANA CAPSULE</span><div class="bar-fill mana" id="mana-fill"></div><span class="bar-value" id="mana-value"></span></div><span id="mana-capsules" class="mana-capsules">MANA CAPSULES 1</span></div>
-</div><div id="game-asset-profile" class="game-asset-profile" role="tooltip" hidden></div><div class="game-info" id="game-info" role="status" aria-live="polite" aria-atomic="true">Choose a target to interact.</div><div id="transaction-toast" class="transaction-toast" role="status" aria-live="polite" aria-atomic="true"></div><div id="floating-notifications" class="floating-notifications" aria-hidden="true"></div>
+</div>
+<div id="arcane-shield-panel" class="nu-arcane-shield" role="group" aria-label="Arcane Shield status" hidden>
+ <div class="nu-arcane-shield-heading"><strong>ARCANE SHIELD</strong><span id="arcane-shield-status">CHARGE AT STORE</span></div>
+ <div class="nu-arcane-shield-track" role="progressbar" aria-label="Arcane Shield defense" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0"><span id="arcane-shield-fill"></span></div>
+ <div class="nu-arcane-shield-footer"><span id="arcane-shield-value">0/10</span><button id="arcane-shield-charge" type="button" hidden disabled>CHARGE SHIELD · 10 MANA</button></div>
+</div>
+<div id="game-asset-profile" class="game-asset-profile" role="tooltip" hidden></div><div class="game-info" id="game-info" role="status" aria-live="polite" aria-atomic="true">Choose a target to interact.</div><div id="transaction-toast" class="transaction-toast" role="status" aria-live="polite" aria-atomic="true"></div><div id="floating-notifications" class="floating-notifications" aria-hidden="true"></div>
 
 </section>
 <section id="bag-view" class="view">
@@ -193,7 +200,7 @@ PRIVATE ACCESS &amp; RECOVERY (FUTURE)</summary>
 
 <div class="intro" id="intro"><div class="glass intro-panel"><button class="intro-close" id="intro-close" type="button" aria-label="Close field guide">×</button><div class="eyebrow">FIRST VISIT · FIELD GUIDE</div><h2>WELCOME TO N.U</h2><p>Open the menu to find the game library. Launch a game to begin a round of ten successful interactions. Missed clicks are harmless. Your XP and Mana are saved locally in this browser. The first version is experimental; do not clear browser storage if you want to keep this test save.</p><p id="calibration-status" class="calibration-status">CALIBRATING RENDER & CONNECTION · PLEASE WAIT</p><button class="btn primary" id="intro-start" disabled>CALIBRATING…</button></div></div>
 <script src="./nu-exchange-core.js?v=20261115-dual-engine-r2"></script><script src="./nu-exchange-engines.js?v=20261115-dual-engine-r2"></script>
-<script src="./nu-engine.js"></script><script src="./nu-graphics-core.js"></script><script src="./nu-background-engine.js?v=20261115-playable-fallback-r3"></script><script src="./nu-dynamic-layers.js"></script><script src="./nu-pixel-world.js"></script><script src="./nu-game-render-adapter.js"></script><script src="./nu-graphics-runtime.js"></script><script src="./nu-wallet.js?v=20261115-wave-casino-r1"></script><script src="./nu-health.js?v=20261115-health-module-r1"></script><script src="./nu-materials.js?v=20261113-mana-materials-r1"></script><script src="./nu-gateway-pause.js?v=20261117-gateway-return-freeze-r3"></script><script src="./nu-games.js?v=20261117-gateway-return-freeze-r3"></script><script src="./nu-player-ui.js?v=20261115-human-report-casino-r2"></script>
+<script src="./nu-engine.js"></script><script src="./nu-graphics-core.js"></script><script src="./nu-background-engine.js?v=20261115-playable-fallback-r3"></script><script src="./nu-dynamic-layers.js"></script><script src="./nu-pixel-world.js"></script><script src="./nu-game-render-adapter.js"></script><script src="./nu-graphics-runtime.js"></script><script src="./nu-wallet.js?v=20261118-arcane-shield-r1"></script><script src="./nu-health.js?v=20261115-health-module-r1"></script><script src="./nu-materials.js?v=20261113-mana-materials-r1"></script><script src="./nu-gateway-pause.js?v=20261117-gateway-return-freeze-r3"></script><script src="./nu-games.js?v=20261118-arcane-shield-r1"></script><script src="./nu-player-ui.js?v=20261115-human-report-casino-r2"></script>
 <div class="nu-gateway-scrim" aria-hidden="true"></div>
 <nav id="nu-hex-gateway" aria-label="N.U main game navigation gateway">
   <button class="nu-gateway-trigger" type="button" aria-expanded="false" aria-label="Open N.U navigation gateway">
