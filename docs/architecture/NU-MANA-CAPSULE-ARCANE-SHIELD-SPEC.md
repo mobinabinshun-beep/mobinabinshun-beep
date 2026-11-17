@@ -36,7 +36,7 @@ The final two columns are alternative uses of the same Mana balance, not cumulat
 - Arcane Shield is a real gameplay defense, not a decorative overlay. It is purple, has its own charge indicator, and is visible/active only during Chaos Attack.
 - One full 10-Mana container is transferred/attached to the shield charging interface. On successful application, that container's Mana balance becomes zero and the shield immediately activates at **10 defense/charge units**.
 - The consumed Mana is not also available to the cannon. A single 10-Mana container funds either one level-1 shot or one full shield charge.
-- Each incoming Chaos hit consumes one shield charge unit. Shield charge cannot fall below zero. Once depleted, subsequent Chaos damage passes to HP using the configured Chaos damage amount; do not invent or change the HP damage value in this feature.
+- Each incoming Chaos hit consumes one shield charge unit. The existing Generation 1 Chaos breach rule applies 1 HP per unblocked mass hit; after shield depletion, each subsequent mass applies that existing 1 HP damage. Do not change the existing damage amount as part of this feature.
 - Shield does not automatically refill. A partially charged shield carries its exact remaining charge into the next Wave. No automatic refill and no stacking/top-up over an existing non-zero shield charge.
 - If the shield reaches zero, later hits in that same Wave damage HP. The player cannot activate a second shield charge in the same Wave, even if the first charge is depleted.
 - **Shield charge limit:** one successful shield activation per gameplay Wave ID. This limit remains in force at every shield upgrade level.
