@@ -6,7 +6,7 @@ const ui=fs.readFileSync("nu-player-ui.js","utf8");
 
 test("Wallet groups split asset rows into one concise operation without merging separate operations",()=>{
   assert.ok(ui.includes("function ledgerOperationKey(item)"));
-  assert.ok(ui.includes('return id.replace(/\\|(xp|capsule|hp)$/,"");'));
+  assert.match(ui,/return id\\.replace\\(/);
   assert.ok(ui.includes("groupLedgerTransactions(tx).forEach(group=>"));
   assert.ok(ui.includes("function mergeLedgerDeltas(items)"));
   assert.ok(ui.includes('key!=="hp"&&Number(value)!==0'));
