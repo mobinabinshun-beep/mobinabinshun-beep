@@ -68,7 +68,7 @@
 - [ ] ثبت گزارش crash و rollback
 
 ### ساخت و آزمون
-- [x] ساخت Win32 با toolchain مدرن در GitHub Actions — run 43996529132 موفق؛ 3 تست قرارداد موفق؛ بسته portable شامل EXE و نمونه ماژول؛ SHA-256: 7f6b99298ff85cc05096db71c2876cb161efcba6c4e27859f09fd70ab01819f8
+- [x] ساخت Win32 با toolchain مدرن در GitHub Actions — run 43996600424 موفق؛ 3 تست قرارداد موفق؛ بسته portable شامل EXE و نمونه ماژول؛ SHA-256: 2bcd41c6fbb13bb0b0bc236f0edca4ea7c1e31074d4e132e81646d68d9817000
 - [ ] ساخت با Visual Studio 2010 x86 / Windows SDK 7.1
 - [ ] اجرای واقعی روی Windows XP SP3 x86
 - [ ] اجرای واقعی روی Windows 7/10/11
