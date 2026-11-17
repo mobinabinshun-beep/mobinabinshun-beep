@@ -29,7 +29,9 @@
 
 ### Operational action
 - Pause is applied immediately when Gateway opens. The active game round and background renderers freeze before Gateway options can be used.
-- Gateway releases only the pause it owns. A manual pause that existed before opening remains paused.
+- Pause exists only as a Gateway-owned operation; there is no independent/manual pause control or player-overlay pause owner.
+- Opening Gateway freezes the active round and background rendering before its options can be used.
+- Closing Gateway does **not** resume gameplay. The round and ambient renderers remain frozen until the first real gameplay-space interaction (mouse/touch press, gameplay keyboard input, or controller direction/confirm). That first input releases the Gateway-return hold; ordinary interaction then proceeds.
 - Gateway is the exclusive surface for the actions it provides; redundant page-level controls for those same actions are removed only on pages where Gateway is mounted.
 - Reload is not a Gateway action and is never automatic on page entry. A future module-specific exception requires an explicit owner decision.
 
@@ -70,7 +72,7 @@ The shared adapter file is `nu-controller-pointer.js`. It exposes `window.NUCont
 ## 6. Acceptance checks
 
 1. Opening Gateway freezes an active round and all designated background renderers before options are actionable.
-2. A pre-existing manual pause remains in force after Gateway closes.
+2. Closing Gateway keeps the round frozen until the first real gameplay-space input; that input resumes the round.
 3. Gateway does not expose Reload and does not auto-reload on entry.
 4. Duplicate Back/Pause controls are absent only where Gateway provides the equivalent action.
 5. Gateway Exit from game and utility views reaches the main/home page.

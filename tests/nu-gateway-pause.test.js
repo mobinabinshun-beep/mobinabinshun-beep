@@ -4,46 +4,50 @@ const assert=require("node:assert/strict");
 const {create}=require("../nu-gateway-pause.js");
 const makeState=(overrides={})=>({active:true,paused:false,turn:3,...overrides});
 
-test("Gateway pauses a running round and resumes exactly that pause",()=>{
+test("Gateway freezes the round immediately and transfers pause to first gameplay interaction",()=>{
  const pause=create(),state=makeState();
  assert.equal(pause.open(state),true);
  assert.deepEqual(state,{active:false,paused:true,turn:3});
  assert.equal(pause.ownsPause(),true);
  assert.equal(pause.close(state),true);
- assert.deepEqual(state,{active:true,paused:false,turn:3});
+ assert.deepEqual(state,{active:false,paused:true,turn:3});
  assert.equal(pause.ownsPause(),false);
+ assert.equal(pause.isAwaitingInteraction(),true);
+ assert.equal(pause.resumeOnInteraction(state),true);
+ assert.deepEqual(state,{active:true,paused:false,turn:3});
+ assert.equal(pause.isAwaitingInteraction(),false);
 });
 
-test("Gateway does not claim or release a pause that existed before opening",()=>{
+test("No pause can be created or released outside Gateway ownership",()=>{
  const pause=create(),state=makeState({active:false,paused:true});
  assert.equal(pause.open(state),false);
- assert.equal(pause.ownsPause(),false);
  assert.equal(pause.close(state),false);
+ assert.equal(pause.resumeOnInteraction(state),false);
  assert.deepEqual(state,{active:false,paused:true,turn:3});
 });
 
-test("Gateway does not create pause ownership when the game is inactive",()=>{
- const pause=create(),state=makeState({active:false,paused:false});
+test("A new Gateway opening while awaiting gameplay input preserves the freeze",()=>{
+ const pause=create(),state=makeState();
+ pause.open(state);pause.close(state);
  assert.equal(pause.open(state),false);
- assert.equal(pause.close(state),false);
- assert.deepEqual(state,{active:false,paused:false,turn:3});
+ assert.equal(pause.isAwaitingInteraction(),true);
+ assert.equal(pause.resumeOnInteraction(state),true);
 });
 
-test("Gateway does not resume a round that completed while its pause was held",()=>{
+test("Completed rounds cannot resume after Gateway closes",()=>{
  const pause=create(),state=makeState();
- assert.equal(pause.open(state),true);
- state.turn=10;
+ pause.open(state);state.turn=10;
  assert.equal(pause.close(state),false);
+ assert.equal(pause.resumeOnInteraction(state),false);
  assert.deepEqual(state,{active:false,paused:true,turn:10});
- assert.equal(pause.ownsPause(),false);
 });
 
-test("Repeated close events cannot resume twice and reset discards stale ownership",()=>{
+test("Repeated close events and reset cannot release stale pause ownership",()=>{
  const pause=create(),state=makeState();
- assert.equal(pause.open(state),true);
- assert.equal(pause.close(state),true);
+ pause.open(state);assert.equal(pause.close(state),true);
  assert.equal(pause.close(state),false);
- assert.equal(pause.open(state),true);
- pause.reset();
+ assert.equal(pause.resumeOnInteraction(state),true);
+ pause.open(state);pause.reset();
  assert.equal(pause.close(state),false);
+ assert.equal(pause.isAwaitingInteraction(),false);
 });

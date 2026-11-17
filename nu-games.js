@@ -20,12 +20,21 @@ function handleGatewayOpen(){
  stopGamepad();
  syncGatewayBackgrounds(true);
 }
+function resumeAfterGatewayReturn(fromGamepad=false){
+ if(!gatewayPause.resumeOnInteraction(state))return false;
+ state.lastFrame=0;
+ if(!document.hidden&&$("game-view").classList.contains("active"))state.raf=requestAnimationFrame(animateGame);
+ syncGatewayBackgrounds(false);
+ if(!fromGamepad)startGamepad();
+ $("game-info").textContent="Round resumed.";
+ return true;
+}
 function handleGatewayClose(){
- const resumed=gatewayPause.close(state);
- if(resumed&&$("game-view").classList.contains("active")){
-  state.lastFrame=0;
-  if(!document.hidden)state.raf=requestAnimationFrame(animateGame);
-  startGamepad();
+ const waiting=gatewayPause.close(state);
+ if(waiting&&$("game-view").classList.contains("active")){
+  if(state.raf)cancelAnimationFrame(state.raf);
+  state.raf=0;
+  startGamepad(); // listens for the first real directional/confirm input without advancing the round
  }
  syncGatewayBackgrounds(state.paused);
 }
@@ -243,12 +252,12 @@ function touchUp(e){if(!touchStart||e.pointerId!==touchStart.id)return;const was
 function mouseCameraBootstrap(e){if(e.pointerType!=="mouse")return;mouseCameraReady=true;window.removeEventListener("pointermove",mouseCameraBootstrap);window.addEventListener("pointermove",mouseMove,{passive:true});mouseMove(e);}
 window.addEventListener("pointermove",mouseCameraBootstrap,{passive:true});window.addEventListener("pointerdown",e=>{if(e.pointerType==="touch")touchDown(e);},{passive:true});
 window.addEventListener("beforeunload",()=>{settleActiveWave("page_unload");});
-document.addEventListener("visibilitychange",()=>{if(document.hidden){if(state.raf)cancelAnimationFrame(state.raf);state.raf=0;stopGamepad();syncGatewayBackgrounds(true);}else{const gatewayOpen=document.body.classList.contains("nu-gateway-open");if(!gatewayOpen){syncGatewayBackgrounds(false);if(state.active&&!state.paused){state.raf=requestAnimationFrame(animateGame);startGamepad();}}}});
-window.addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse"||e.target.closest("button,a,input,textarea,select,[role=button]"))return;if(state.active&&!state.paused)interact(e);},{passive:true});window.addEventListener("pointerup",e=>{if(e.pointerType!=="touch"||touchMoved||(window.NUPixelWorld&&window.NUPixelWorld.lastTouchWasDrag)){if(window.NUPixelWorld)window.NUPixelWorld.lastTouchWasDrag=false;return;}if(e.target.closest("button,a,input,textarea,select,[role=button]"))return;if(state.active&&!state.paused)interact(e);},{passive:true});window.addEventListener("resize",()=>{if($("game-view").classList.contains("active")){resize();initTargets();drawGame();}});
+document.addEventListener("visibilitychange",()=>{if(document.hidden){if(state.raf)cancelAnimationFrame(state.raf);state.raf=0;stopGamepad();syncGatewayBackgrounds(true);}else{const gatewayOpen=document.body.classList.contains("nu-gateway-open");if(!gatewayOpen){syncGatewayBackgrounds(state.paused||gatewayPause.isAwaitingInteraction());if(state.active&&!state.paused){state.raf=requestAnimationFrame(animateGame);startGamepad();}else if(gatewayPause.isAwaitingInteraction())startGamepad();}}});
+window.addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse"||!e.target.closest("#game-canvas")||e.target.closest("button,a,input,textarea,select,[role=button]"))return;if(state.paused&&gatewayPause.isAwaitingInteraction())resumeAfterGatewayReturn();if(state.active&&!state.paused)interact(e);},{passive:true});window.addEventListener("pointerup",e=>{if(e.pointerType!=="touch"||!e.target.closest("#game-canvas")||touchMoved||(window.NUPixelWorld&&window.NUPixelWorld.lastTouchWasDrag)){if(window.NUPixelWorld)window.NUPixelWorld.lastTouchWasDrag=false;return;}if(e.target.closest("button,a,input,textarea,select,[role=button]"))return;if(state.paused&&gatewayPause.isAwaitingInteraction())resumeAfterGatewayReturn();if(state.active&&!state.paused)interact(e);},{passive:true});window.addEventListener("resize",()=>{if($("game-view").classList.contains("active")){resize();initTargets();drawGame();}});
 window.addEventListener("pageshow",()=>{state.save=NUWallet.normalizeSave(NU.load());renderWallet();});
 window.addEventListener("storage",e=>{if(e.key==="nu-world-save-v1"){state.save=NUWallet.normalizeSave(NU.load());renderWallet();}});
 window.addEventListener("nu:identity-updated",e=>{const detail=e.detail||{};state.save.playerId=detail.playerId||state.save.playerId;state.save.displayName=detail.displayName||"";state.save.callsign=detail.callsign||"";});
-let playerOverlayPaused=false;window.addEventListener("nu:player-overlay-open",()=>{if(state.active){state.active=false;state.paused=true;playerOverlayPaused=true;cancelAnimationFrame(state.raf);}});window.addEventListener("nu:player-overlay-close",()=>{if(playerOverlayPaused&&!gatewayPause.ownsPause()&&state.paused&&state.turn<10){playerOverlayPaused=false;state.active=true;state.paused=false;state.raf=requestAnimationFrame(animateGame);}});
+// Player overlays are opened from Gateway; they do not own or create a separate pause.
 function openArticle(title,url){$("article-title").textContent=title;$("article-frame-link").href=url;chooseGame();if(window.NUPixelWorld)window.NUPixelWorld.setWeatherMode("study");$("game-view").classList.add("active");$("article-view").classList.add("active");document.body.classList.add("article-mode");resize();initTargets();drawGame();$("game-info").textContent="Background encounter active outside the reading column."; }
 function drawKeyboardTarget(){
  const target=state.targets[state.keyboardTargetIndex];if(!target||!target.alive)return;
@@ -270,7 +279,8 @@ function activateKeyboardTarget(){
 }
 function pollGamepad(timestamp){
  gamepadFrame=0;
- if(!state.active||state.paused||document.hidden||!$("game-view").classList.contains("active"))return;
+ const waiting=gatewayPause.isAwaitingInteraction();
+ if((!state.active&&!waiting)||document.hidden||!$("game-view").classList.contains("active"))return;
  const pads=navigator.getGamepads?Array.from(navigator.getGamepads()||[]):[];
  const pad=pads.find(Boolean);
  if(pad){
@@ -280,22 +290,38 @@ function pollGamepad(timestamp){
   const left=!!(buttons[14]&&buttons[14].pressed)||(Number(axes[0])<-.55);
   const right=!!(buttons[15]&&buttons[15].pressed)||(Number(axes[0])>.55);
   const direction=up||left?-1:down||right?1:0;
-  if(direction&&timestamp-lastGamepadMove>220){moveKeyboardTarget(direction);lastGamepadMove=timestamp;}
   const confirm=!!(buttons[0]&&buttons[0].pressed);
-  if(confirm&&!gamepadConfirmDown)activateKeyboardTarget();
+  if(waiting&&(direction||confirm))resumeAfterGatewayReturn(true);
+  if(state.active&&!state.paused){
+   if(direction&&timestamp-lastGamepadMove>220){moveKeyboardTarget(direction);lastGamepadMove=timestamp;}
+   if(confirm&&!gamepadConfirmDown)activateKeyboardTarget();
+  }
   gamepadConfirmDown=confirm;
  }
  gamepadFrame=requestAnimationFrame(pollGamepad);
 }
-function startGamepad(){if(!gamepadFrame&&state.active&&!state.paused&&!document.hidden&&$("game-view").classList.contains("active"))gamepadFrame=requestAnimationFrame(pollGamepad);}
+function startGamepad(){if(!gamepadFrame&&(state.active||gatewayPause.isAwaitingInteraction())&&!document.hidden&&$("game-view").classList.contains("active"))gamepadFrame=requestAnimationFrame(pollGamepad);}
 function stopGamepad(){if(gamepadFrame)cancelAnimationFrame(gamepadFrame);gamepadFrame=0;gamepadConfirmDown=false;}
 window.addEventListener("gamepadconnected",startGamepad);
 function handleGameKeydown(event){
- if(!state.active||state.paused||!$("game-view").classList.contains("active")||event.altKey||event.ctrlKey||event.metaKey)return;
+ if(!$("game-view").classList.contains("active")||event.altKey||event.ctrlKey||event.metaKey)return;
+ const gameplayKey=["ArrowRight","ArrowDown","ArrowLeft","ArrowUp","Enter"," "].includes(event.key);
+ if(state.paused&&gatewayPause.isAwaitingInteraction()&&gameplayKey)resumeAfterGatewayReturn();
+ if(!state.active||state.paused)return;
  if(event.key==="ArrowRight"||event.key==="ArrowDown"){event.preventDefault();moveKeyboardTarget(1);return;}
  if(event.key==="ArrowLeft"||event.key==="ArrowUp"){event.preventDefault();moveKeyboardTarget(-1);return;}
  if(event.key==="Enter"||event.key===" "){event.preventDefault();activateKeyboardTarget();}
 }
+document.addEventListener("keydown",event=>{
+ if(!gatewayPause.isAwaitingInteraction()||!$("game-view").classList.contains("active")||event.altKey||event.ctrlKey||event.metaKey)return;
+ const key=event.key;
+ if(!["ArrowRight","ArrowDown","ArrowLeft","ArrowUp","Enter"," "].includes(key))return;
+ event.preventDefault();event.stopImmediatePropagation();
+ if(!resumeAfterGatewayReturn())return;
+ if(key==="ArrowRight"||key==="ArrowDown")moveKeyboardTarget(1);
+ else if(key==="ArrowLeft"||key==="ArrowUp")moveKeyboardTarget(-1);
+ else activateKeyboardTarget();
+},true);
 canvas.addEventListener("keydown",handleGameKeydown);
 function showHome(){closeGame();$("article-view").classList.remove("active");$("shop-view").classList.remove("active");$("wallet-view").classList.remove("active");$("profile-view").classList.remove("active");$("home-view").classList.add("active");const heading=document.querySelector("#home-view .hero h1");if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}}
 
@@ -330,10 +356,7 @@ function renderLibrary(){
  $("game-library").querySelectorAll("[data-random-game]").forEach(b=>b.addEventListener("click",()=>chooseGame()));
 }
 $("back-home").addEventListener("click",showHome);
-let gatewayOwnsPause=false;
-window.addEventListener("nu:gateway-open",()=>{if(state.active){gatewayOwnsPause=true;state.active=false;state.paused=true;cancelAnimationFrame(state.raf);$("game-info").textContent="Round paused by Gateway. Close Gateway to resume.";}});
-window.addEventListener("nu:gateway-close",()=>{if(!gatewayOwnsPause)return;gatewayOwnsPause=false;if(state.paused&&state.turn<10){state.paused=false;state.active=true;$("game-info").textContent="Round resumed.";state.raf=requestAnimationFrame(animateGame);}});
-window.addEventListener("nu:game-view-exit",()=>{gatewayOwnsPause=false;});
+// Gateway pause ownership is centralized in NUGatewayPause; no parallel pause state exists.
 const menuRoot=$("menu"),menuPanel=menuRoot.querySelector(".menu-panel");
 let menuReturnFocus=null;
 if(menuPanel)menuPanel.tabIndex=-1;

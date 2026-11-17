@@ -25,11 +25,13 @@ test("Gateway is the only visible Back/Pause control in mounted views",()=>{
  assert.doesNotMatch(html,/id="finish-round"|PAUSE ROUND|RESUME ROUND/);
 });
 
-test("Gateway pause ownership preserves a pre-existing manual pause and resumes only its own pause",()=>{
+test("Gateway is the only pause authority and gameplay waits for the first return input",()=>{
  assert.match(games,/gatewayPause\.open\(state\)/);
  assert.match(games,/gatewayPause\.close\(state\)/);
  assert.match(games,/syncGatewayBackgrounds\(state\.paused\)/);
- assert.match(games,/gatewayPause\.ownsPause\(\)/);
+ assert.match(games,/gatewayPause.isAwaitingInteraction\(\)/);
+ assert.match(games,/resumeAfterGatewayReturn/);
+ assert.doesNotMatch(games,/playerOverlayPaused|gatewayOwnsPause/);
  assert.match(pause,/if\(!state\|\|!state\.active\|\|state\.paused\)return false/);
  assert.match(pause,/if\(!state\|\|!state\.paused\|\|state\.turn>=10\)return false/);
  assert.ok(html.indexOf("nu-gateway-pause.js")<html.indexOf("nu-games.js"));
@@ -83,6 +85,7 @@ test("Keyboard and gamepad share game target selection and activation",()=>{
  assert.match(games,/navigator\.getGamepads/);
  assert.match(games,/buttons\[0\]/);
  assert.match(games,/function startGamepad\(\)/);
+ assert.match(games,/document\.addEventListener\("keydown",event=>\{/);
 });
 
 test("Nested player navigation preserves Wallet → Profile → Wallet → Bag history",()=>{
@@ -95,7 +98,7 @@ test("Nested player navigation preserves Wallet → Profile → Wallet → Bag h
 
 test("Hidden tabs do not restart a Gateway-paused round or gamepad polling",()=>{
  assert.match(games,/if\(document\.hidden\).*stopGamepad\(\)/);
- assert.match(games,/!gatewayOpen\)\{syncGatewayBackgrounds\(false\)/);
+ assert.match(games,/!gatewayOpen\)\{syncGatewayBackgrounds\(state.paused\|\|gatewayPause.isAwaitingInteraction\(\)\)/);
  assert.match(games,/const shouldFreeze=!!frozen\|\|document\.hidden/);
  assert.match(games,/if\(state\.active&&!state\.paused\)/);
  assert.match(gateway,/window\.addEventListener\("blur"/);

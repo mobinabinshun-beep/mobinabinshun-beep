@@ -7,6 +7,9 @@ on:
       - "nu-hex-gateway.js"
       - "nu-hex-gateway.css"
       - "nu-games.js"
+      - "nu-gateway-pause.js"
+      - "tests/nu-gateway-pause.test.js"
+      - "tests/nu-gateway-exclusive-controls.test.js"
       - "nu-dynamic-layers.js"
       - "tests/nu-hex-gateway.test.js"
       - ".github/workflows/gateway-main-game.yml"
@@ -29,6 +32,7 @@ jobs:
         run: |
           node --check nu-hex-gateway.js
           node --check nu-games.js
+          node --check nu-gateway-pause.js
           node --check nu-dynamic-layers.js
       - name: Run Gateway main-game regression tests
-        run: node --test tests/nu-hex-gateway.test.js
+        run: node --test tests/nu-hex-gateway.test.js tests/nu-gateway-pause.test.js tests/nu-gateway-exclusive-controls.test.js tests/nu-gateway-controller-input.test.js
