@@ -15,14 +15,33 @@ Also read the current owner directive, team governance and documentation protoco
 This instruction applies to coding agents and future repository operations. It does not replace branch protection or GitHub permissions; maintain repository protections where available.
 
 
-## Mandatory cross-repository discovery before every change
-Before creating, editing, refactoring, renaming, cloning, or adding any feature/module/document:
-1. Read the canonical [Cross-repository inventory-first and reuse-first protocol](https://github.com/mobinabinshun-beep/Repository/blob/main/Governance/NU-CROSS-REPOSITORY-INVENTORY-AND-REUSE-FIRST-PROTOCOL-fa.md).
-2. Re-enumerate all repositories accessible to the project owner; do not rely on a prior chat, cached list, or repository name guess.
-3. Inspect each repository's full tree and relevant branches, open PRs, history, docs, tests, assets, manifests, workflows, interfaces, and configuration. For cross-cutting/architecture work, expand reading to all tracked files in every non-empty repository. If tool or size limits prevent complete coverage, record the unread scope and do not begin implementation.
-4. Search exact names plus Persian/English synonyms, acronyms, former names, technical names, and behavior-equivalent terms across all repositories and relevant branches.
-5. Map existing implementations as canonical/active/legacy/experimental/incomplete/conflicting/superseded. Prefer reuse, extension, modular refactoring, and integration in that order. A new clone or parallel implementation requires documented evidence that reuse is unsuitable or absent.
-6. Consolidate goals, accepted decisions, architecture, dependencies, and future vision before proposing a new design. Keep one canonical document per subject and link to it elsewhere; do not create divergent copies.
-7. Record repository inventory, read coverage, synonym searches, existing assets, duplicate/conflict map, reuse decision, vision alignment, tests, backup, and approval gates in the dated change record.
+## Speed-first, risk-based project execution (owner directive — 2026-11-17)
 
-If discovery is incomplete, mark the task BLOCKED — REPOSITORY DISCOVERY INCOMPLETE. Continue read-only research only; do not make implementation changes. This rule supplements the existing locked-area and owner-directive requirements and never overrides them.
+Development speed is a project priority. Unnecessary friction, duplicate work, ceremonial approvals, repeated manual checks, stale parallel implementations, and process steps that do not materially protect quality, security, data integrity, compatibility, or owner authority are prohibited. Contributors must remove or automate such friction rather than normalize it.
+
+This directive does NOT authorize careless changes, skipping relevant tests, weakening security/privacy, destructive data operations, touching locked areas, or silently reverting accepted behavior. Preserve the current approved baseline; never roll back to an earlier version merely because it is easier. A rollback requires a demonstrated critical regression, a verified recovery point, and a recorded reason. For ordinary defects, patch the current implementation with the smallest safe change.
+
+### Proportionate discovery — replaces exhaustive inventory as a universal gate
+Before work, read this file, `docs/operations/LOCKED-AREAS.md`, the change/demo protocol, and the canonical specification for the affected feature.
+- **Existing isolated feature:** inspect its implementation, direct callers/dependencies, relevant tests, and canonical docs. Search other repositories only for named/shared dependencies or likely reuse.
+- **Shared core, cross-module behavior, new module, data/schema/API change, or architecture change:** enumerate relevant repositories and inspect all directly connected implementations, interfaces, docs, tests, workflows and history. Expand to a full cross-repository inventory only when the dependency map cannot establish safety or reuse.
+- **Unrelated repositories/files:** do not read or change them merely to satisfy a checklist. Record what was checked and why the scope is sufficient.
+- **Tool/size limits:** state the exact unread dependency or uncertainty. Continue with a narrower, reversible, isolated change when safe; block only the specific risky operation that cannot be validated. Do not turn an unrelated unread file into a blanket project stop.
+- Prefer reuse and extension over duplication. If a parallel implementation is necessary, explain why the existing one cannot serve the requirement.
+
+### Execution defaults
+1. Define a narrow scope and observable acceptance criteria.
+2. Work on an isolated branch; preserve locked areas and unrelated behavior.
+3. Automate focused tests, regression tests and build checks; avoid repeated manual ceremony where machine checks are reliable.
+4. Create and verify a recovery checkpoint before demo deployment.
+5. After machine checks and backup pass, deploy authorized demo-eligible work without waiting for an extra human pre-approval.
+6. Report exact evidence and remaining human/device checks. Machine approval is not human approval.
+7. Lock only the exact scope explicitly accepted by the owner.
+
+### Anti-regression / no self-directed rollback
+- A previously accepted or explicitly directed behavior must not be removed, weakened, or reverted by a collaborator acting on personal preference.
+- If a new requirement conflicts with an earlier behavior, preserve both where possible and resolve the conflict through the smallest compatible extension. If impossible, document the concrete conflict and ask the owner only for that decision.
+- Never restore an old branch, commit, UI, interaction model, or module as a shortcut without explicit owner direction or a verified critical-regression recovery.
+- Keep a concise decision record linking the owner instruction, implementation, tests and affected modules.
+
+This section is an explicit owner-level replacement of the former universal exhaustive-read gate. It does not override protected-area locks or the required machine-test, verified-backup, demo-verification and human-acceptance distinctions.
