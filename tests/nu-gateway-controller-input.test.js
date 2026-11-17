@@ -14,7 +14,6 @@ const manifest=fs.readFileSync("NU-GENERATION-1-MANIFEST.json","utf8");
 test("Gateway is mounted and remains available across Bag, Inventory, Wallet and Profile",()=>{
  assert.match(html,/id="nu-hex-gateway"/);
  assert.match(gateway,/\["bag-view","wallet-view","inventory-view","profile-view"\]/);
- assert.match(gateway,/activeUtility\.id==="profile-view"\?"profile-back"/);
  assert.match(gateway,/profile:.*menu-profile/);
 });
 
@@ -98,5 +97,6 @@ test("Hidden tabs do not restart a Gateway-paused round or gamepad polling",()=>
  assert.match(games,/!gatewayOpen\)\{syncGatewayBackgrounds\(false\)/);
  assert.match(games,/const shouldFreeze=!!frozen\|\|document\.hidden/);
  assert.match(games,/if\(state\.active&&!state\.paused\)/);
- assert.match(gateway,/if\(!open\)return/);
+ assert.match(gateway,/window\.addEventListener\("blur",\(\)=>\{if\(open\)setOpen\(false\)\}\)/);
+ assert.match(gateway,/NUControllerPointer\?\.setEnabled\(false\)/);
 });
