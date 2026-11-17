@@ -54,7 +54,7 @@ The archived CSS snapshot is a point-in-time copy of the full stylesheet at the 
 ## Locked behavior
 
 - Gateway's selective actions are Menu/List, Back/Home/Main page, and Profile.
-- Gateway opening freezes the active round and background rendering before its options can be used. Closing it releases only Gateway-owned pause; a pre-existing manual pause remains active and its renderers remain frozen.
+- Gateway is the sole gameplay pause authority; there is no independent/manual or player-overlay pause owner. Opening Gateway freezes the active round and background rendering before its options can be used. Closing Gateway keeps the round and ambient renderers frozen until the first real gameplay-space input. For controllers, a fresh direction/confirm transition is required; an input held through Gateway closure cannot release the hold.
 - Reload is not a Gateway action and does not run automatically on page entry.
 - Exit = Back = Home = main/home page. Do not silently restore nested page history as Gateway Back.
 - Remove redundant controls only for actions Gateway actually provides and only on Gateway-mounted views.
