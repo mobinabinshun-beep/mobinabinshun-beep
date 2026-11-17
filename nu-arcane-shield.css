@@ -10,3 +10,9 @@
 .nu-arcane-shield-footer button:disabled{opacity:.45;cursor:not-allowed}
 @media(max-width:520px){.nu-arcane-shield{width:calc(100% - 12px);margin-top:8px;padding:9px 11px}.nu-arcane-shield-footer button{min-height:34px}}
 @media(prefers-reduced-motion:reduce){.nu-arcane-shield-track span{transition:none}}
+
+.nu-mana-drain-layer{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:3}
+.nu-mana-drain-ghost{position:absolute;right:18px;bottom:48px;padding:5px 9px;border:1px solid rgba(111,226,255,.72);border-radius:99px;background:rgba(9,52,76,.88);box-shadow:0 0 12px rgba(71,211,255,.38);color:#c9f5ff;font-size:9px;font-weight:800;letter-spacing:.08em;opacity:.95;transform:translateX(0) scale(1)}
+.nu-mana-drain-ghost.is-draining{animation:nu-mana-drain .34s ease-out forwards}
+@keyframes nu-mana-drain{to{opacity:0;transform:translateX(-22px) scale(.78)}}
+@media(prefers-reduced-motion:reduce){.nu-mana-drain-ghost.is-draining{animation:none;opacity:0}}
