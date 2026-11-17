@@ -31,6 +31,7 @@ test("D-pad and stick directions move the virtual pointer without activating tar
 });
 
 test("Confirm is a separate click; B remains Gateway cancel",()=>{
+ assert.match(pointer,/if\(!primed\)/);
  assert.match(pointer,/if\(input\.confirm&&!confirmDown\)clickTarget\(\)/);
  assert.match(pointer,/if\(input\.cancel&&!cancelDown\).*key:"Escape"/);
  assert.match(pointer,/new win\.MouseEvent\("click"/);
