@@ -1,0 +1,42 @@
+name: N.U native runtime foundation
+on:
+  push:
+    branches:
+      - work/nu-launcher-foundation-g1
+    paths:
+      - "runtime/**"
+      - "docs/architecture/NU-NATIVE-RUNTIME-FOUNDATION-G1.md"
+      - ".github/workflows/nu-native-runtime.yml"
+  pull_request:
+    paths:
+      - "runtime/**"
+      - ".github/workflows/nu-native-runtime.yml"
+  workflow_dispatch:
+jobs:
+  portable-vm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile with strict C99 warnings
+        run: gcc -std=c99 -Wall -Wextra -Werror -pedantic runtime/nu-core/nuvm.c runtime/tests/nuvm_test.c -o nuvm-test
+      - name: Run VM regression tests
+        run: ./nuvm-test
+  win32-shell:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install 32-bit MinGW-w64
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-mingw-w64-i686
+      - name: Build 32-bit Win32 GUI shell
+        run: |
+          i686-w64-mingw32-gcc -std=c99 -Os -Wall -Wextra -Werror \
+            -Wl,--subsystem,windows:5.01 -static-libgcc \
+            runtime/nu-core/nuvm.c runtime/win32/nu_launcher_win32.c \
+            -o NULauncher-G1.exe -lgdi32 -luser32
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NULauncher-G1-win32-x86
+          path: NULauncher-G1.exe
+          if-no-files-found: error
