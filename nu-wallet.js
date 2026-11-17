@@ -40,7 +40,7 @@
     next.settledWaveIds=Array.isArray(next.settledWaveIds)?next.settledWaveIds.filter(v=>typeof v==="string").slice(-500):[];
     next.casinoRoundIds=Array.isArray(next.casinoRoundIds)?next.casinoRoundIds.filter(v=>typeof v==="string").slice(-500):[];
     next.activeWave=next.activeWave&&typeof next.activeWave==="object"?next.activeWave:null;
-    if(next.activeWave)next.activeWave.resolvedChaosTargetIds=Array.isArray(next.activeWave.resolvedChaosTargetIds)?next.activeWave.resolvedChaosTargetIds.filter(v=>typeof v==="string").slice(-100):[];
+    if(next.activeWave){next.activeWave.resolvedChaosTargetIds=Array.isArray(next.activeWave.resolvedChaosTargetIds)?next.activeWave.resolvedChaosTargetIds.filter(v=>typeof v==="string").slice(-100):[];next.activeWave.pendingChaosTargetIds=Array.isArray(next.activeWave.pendingChaosTargetIds)?next.activeWave.pendingChaosTargetIds.filter(v=>typeof v==="string").slice(-100):[];next.activeWave.neutralizedChaosTargetIds=Array.isArray(next.activeWave.neutralizedChaosTargetIds)?next.activeWave.neutralizedChaosTargetIds.filter(v=>typeof v==="string").slice(-100):[];}
     next.nonExchangeableAssets=Array.isArray(next.nonExchangeableAssets)?Array.from(new Set(next.nonExchangeableAssets.filter(v=>typeof v==="string"&&/^[a-zA-Z][a-zA-Z0-9_-]{0,47}$/.test(v)))):[];
     return next;
   }
@@ -108,7 +108,7 @@
     const next=normalizeSave(raw);
     if(next.activeWave){const closed=settleWave(next,"superseded");return beginWave(closed.state,gameId,meta);}
     const id="nu-wave-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,9);
-    next.activeWave={id,gameId:String(gameId||"unknown"),playerId:String(next.playerId||"guest-local"),startedAt:new Date().toISOString(),successfulInteractions:0,aggregates:{},resolvedChaosTargetIds:[]};
+    next.activeWave={id,gameId:String(gameId||"unknown"),playerId:String(next.playerId||"guest-local"),startedAt:new Date().toISOString(),successfulInteractions:0,aggregates:{},resolvedChaosTargetIds:[],pendingChaosTargetIds:[],neutralizedChaosTargetIds:[]};
     if(next.activeWave.gameId==="chaos"&&next.arcaneShieldPrepared&&next.arcaneShieldCharge>0){next.arcaneShieldUsedWaveIds=next.arcaneShieldUsedWaveIds.concat(id).slice(-500);next.arcaneShieldPrepared=false;}
     return {ok:true,state:next,waveId:id};
   }
@@ -147,6 +147,30 @@
   }
 
 
+
+  function registerChaosTargets(raw,targetIds){
+    const next=normalizeSave(raw),wave=next.activeWave;
+    if(!wave||wave.gameId!=="chaos"||!wave.id)return {ok:false,reason:"NO_ACTIVE_CHAOS_WAVE",state:next};
+    const pending=new Set(wave.pendingChaosTargetIds||[]),resolved=new Set(wave.resolvedChaosTargetIds||[]),neutralized=new Set(wave.neutralizedChaosTargetIds||[]);
+    (Array.isArray(targetIds)?targetIds:[]).forEach(value=>{const id=String(value||"");if(id&&!resolved.has(id)&&!neutralized.has(id))pending.add(id);});
+    wave.pendingChaosTargetIds=Array.from(pending).slice(-100);
+    return {ok:true,state:next};
+  }
+  function fireNbiShot(raw,targetId){
+    const next=normalizeSave(raw),wave=next.activeWave,id=String(targetId||"");
+    if(!wave||wave.gameId!=="chaos"||!wave.id)return {ok:false,reason:"NO_ACTIVE_CHAOS_WAVE",state:next};
+    if(!id||!(wave.pendingChaosTargetIds||[]).includes(id))return {ok:false,reason:"TARGET_NOT_PENDING",state:next};
+    if(next.mana<10)return {ok:false,reason:"INSUFFICIENT_MANA",state:next};
+    if((wave.neutralizedChaosTargetIds||[]).includes(id)||(wave.resolvedChaosTargetIds||[]).includes(id))return {ok:false,reason:"TARGET_ALREADY_RESOLVED",state:next};
+    const spent=recordWaveDelta(next,"mana",-10,"N_BI_SHOT_COST",{rate:10});
+    if(!spent.ok)return {ok:false,reason:"MANA_SPEND_FAILED",state:next};
+    const rewarded=recordWaveDelta(spent.state,"xp",3,"GAME_REWARD",{successfulInteraction:true,rate:3});
+    if(!rewarded.ok)return {ok:false,reason:"XP_REWARD_FAILED",state:next};
+    const updated=rewarded.state,active=updated.activeWave;
+    active.pendingChaosTargetIds=(active.pendingChaosTargetIds||[]).filter(value=>value!==id);
+    active.neutralizedChaosTargetIds=Array.from(new Set([...(active.neutralizedChaosTargetIds||[]),id])).slice(-100);
+    return {ok:true,state:updated,manaSpent:10,xpAwarded:3,targetId:id};
+  }
   function chargeArcaneShield(raw,mode,meta){
     const next=normalizeSave(raw),details=meta||{},chargeMode=String(mode||"");
     if(next.arcaneShieldCharge>0)return {ok:false,reason:"SHIELD_ALREADY_CHARGED",state:next};
@@ -179,15 +203,16 @@
     const wave=next.activeWave;
     if(!wave||wave.gameId!=="chaos"||!wave.id)return {ok:false,reason:"NO_ACTIVE_CHAOS_WAVE",state:next,absorbed:0,hpDamage:0,resolvedCount:0,died:false};
     const ids=Array.isArray(targetIds)?targetIds.map(v=>String(v||"")).filter(Boolean):[];
-    const resolved=new Set(wave.resolvedChaosTargetIds||[]);
+    const resolved=new Set(wave.resolvedChaosTargetIds||[]),neutralized=new Set(wave.neutralizedChaosTargetIds||[]);
     let absorbed=0,hpDamage=0,hpRemaining=next.hp,resolvedCount=0;
     for(const id of ids){
-      if(resolved.has(id))continue;
+      if(resolved.has(id)||neutralized.has(id))continue;
       resolved.add(id);resolvedCount++;
       if(next.arcaneShieldCharge>0){next.arcaneShieldCharge=Math.max(0,next.arcaneShieldCharge-1);absorbed++;}
       else if(hpRemaining>0){hpRemaining--;hpDamage++;}
     }
     next.activeWave.resolvedChaosTargetIds=Array.from(resolved).slice(-100);
+    next.activeWave.pendingChaosTargetIds=(next.activeWave.pendingChaosTargetIds||[]).filter(id=>!resolved.has(id));
     if(hpDamage>0){
       const damage=recordWaveDelta(next,"hp",-hpDamage,"CHAOS_BREACH_DAMAGE",{rate:1});
       if(!damage.ok)return {ok:false,reason:"HP_DAMAGE_RECORD_FAILED",state:normalizeSave(raw),absorbed:0,hpDamage:0,resolvedCount:0,died:false};
@@ -277,5 +302,5 @@
     if(!entries.length)points.push({id:"current",at:"",title:"Current balance · no recorded changes",delta:0,balance:current});
     return points;
   }
-  return {MAX_HP,HP_PILL_COST,MAX_TRANSACTIONS,normalizeSave,buyHpPill,useHpPill,grantXP,settleCasinoRound,settleWalletBet,casinoSpendableAssets,beginWave,recordWaveDelta,settleWave,chargeArcaneShield,resolveChaosHits,registerAsset,registerGameAssets,assetRows,inventoryRows,exchangeAssetRows,isExchangeableAsset,gameAssetRows,assetHistory};
+  return {MAX_HP,HP_PILL_COST,MAX_TRANSACTIONS,normalizeSave,buyHpPill,useHpPill,grantXP,settleCasinoRound,settleWalletBet,casinoSpendableAssets,beginWave,recordWaveDelta,settleWave,chargeArcaneShield,resolveChaosHits,registerChaosTargets,fireNbiShot,registerAsset,registerGameAssets,assetRows,inventoryRows,exchangeAssetRows,isExchangeableAsset,gameAssetRows,assetHistory};
 });
