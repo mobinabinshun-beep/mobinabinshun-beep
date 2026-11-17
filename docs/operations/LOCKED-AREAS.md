@@ -40,3 +40,30 @@ This is a repository-level workflow instruction and audit record, not a GitHub b
 
 ## Archive integrity
 The archived CSS snapshot is a point-in-time copy of the full stylesheet at the lock commit. The canonical live file remains `nu-world.css`; the archive is read-only reference material and must not be loaded by the application.
+
+
+---
+
+# Owner lock — Gateway & simulated-mouse controller contract
+
+**Status:** LOCKED — owner-directed, effective 2026-11-17  
+**Canonical contract:** [Gateway & simulated-mouse controller contract](./GATEWAY-AND-CONTROLLER-INPUT-CONTRACT-2026-11-17.md)  
+**Implementation:** PR [#180](https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/180), merge commit `45803b784f7b10bacc1081644fe0895fc8c382af)  
+**Verified recovery point:** `backup/pre-gateway-simulated-mouse-2026-11-17`
+
+## Locked behavior
+
+- Gateway's selective actions are Menu/List, Back/Home/Main page, and Profile.
+- Gateway opening freezes the active round and background rendering before its options can be used. Closing it releases only Gateway-owned pause; a pre-existing manual pause remains active and its renderers remain frozen.
+- Reload is not a Gateway action and does not run automatically on page entry.
+- Exit = Back = Home = main/home page. Do not silently restore nested page history as Gateway Back.
+- Remove redundant controls only for actions Gateway actually provides and only on Gateway-mounted views.
+- Physical mouse and touch remain direct input. Controller directional input is simulated mouse: D-pad/stick moves a virtual pointer and highlights only; A/Enter performs the separate click; B/Escape cancels Gateway.
+- The shared launcher-core adapter remains the canonical input layer. Future controller families/modules extend it through documented capabilities; they do not fork or replace its semantics.
+- No contributor may self-direct a rollback, downgrade, or restoration of an older Gateway/controller behavior.
+
+## Change boundary
+
+This lock does not prohibit additive, backward-compatible support for future controller types or modules. Such extensions must preserve the locked base behavior, pass focused and relevant regression tests, and be documented against the canonical contract.
+
+Do not modify, weaken, bypass, or revert this locked contract unless the owner gives a new, direct instruction explicitly naming the Gateway/controller scope to be changed. If another approved feature appears to require a conflict, propose a forward-compatible extension; do not independently restore an older implementation.
