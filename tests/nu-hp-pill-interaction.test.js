@@ -138,12 +138,14 @@ test("Generation 1.28 makes the HP HUD frame visibly more compact on phone scree
 });
 
 
-test("Generation 1.29 places the phone HP capsule below a compact HP rail",()=>{
-  assert.match(css,/@media\(max-width:520px\)\{\s*#game-view\.active \.hp-bar\{\s*width:max-content;\s*max-width:calc\(100vw - 24px\);/);
-  assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use\{\s*left:50%;\s*right:auto;\s*top:auto;\s*bottom:3px;\s*transform:translateX\(-50%\)/);
-  assert.match(css,/#game-view\.active \.hp-bar #hp-pill-use img\{width:27px;height:27px/);
+test("phone HP capsule stays beside the HP rail and animation targets the visible right-side dock",()=>{
+  const dockStart=css.lastIndexOf("Owner-scoped HP rail correction");
+  assert.ok(dockStart>=0);
+  const dockCss=css.slice(dockStart);
+  assert.match(dockCss,/#game-view\.active \.hp-bar #hp-pill-use\{[\s\S]*?right:5px;[\s\S]*?top:50%;[\s\S]*?bottom:auto/);
   assert.ok(games.includes('const mobileDock=window.matchMedia&&window.matchMedia("(max-width:520px)").matches;'));
-  assert.ok(games.includes("y:barRect.height-21"));
+  assert.ok(games.includes("x:barRect.width-23,y:barRect.height/2"));
+  assert.ok(!games.includes("y:barRect.height-21"));
   assert.match(html,/nu-games\.js\?v=[^"]+/);
 });
 
