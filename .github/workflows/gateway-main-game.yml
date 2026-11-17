@@ -10,6 +10,7 @@ on:
       - "nu-gateway-pause.js"
       - "tests/nu-gateway-pause.test.js"
       - "tests/nu-gateway-exclusive-controls.test.js"
+      - "tests/nu-gateway-controller-input.test.js"
       - "nu-dynamic-layers.js"
       - "tests/nu-hex-gateway.test.js"
       - ".github/workflows/gateway-main-game.yml"
