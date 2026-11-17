@@ -312,6 +312,16 @@ function handleGameKeydown(event){
  if(event.key==="ArrowLeft"||event.key==="ArrowUp"){event.preventDefault();moveKeyboardTarget(-1);return;}
  if(event.key==="Enter"||event.key===" "){event.preventDefault();activateKeyboardTarget();}
 }
+document.addEventListener("keydown",event=>{
+ if(!gatewayPause.isAwaitingInteraction()||!$("game-view").classList.contains("active")||event.altKey||event.ctrlKey||event.metaKey)return;
+ const key=event.key;
+ if(!["ArrowRight","ArrowDown","ArrowLeft","ArrowUp","Enter"," "].includes(key))return;
+ event.preventDefault();event.stopImmediatePropagation();
+ if(!resumeAfterGatewayReturn())return;
+ if(key==="ArrowRight"||key==="ArrowDown")moveKeyboardTarget(1);
+ else if(key==="ArrowLeft"||key==="ArrowUp")moveKeyboardTarget(-1);
+ else activateKeyboardTarget();
+},true);
 canvas.addEventListener("keydown",handleGameKeydown);
 function showHome(){closeGame();$("article-view").classList.remove("active");$("shop-view").classList.remove("active");$("wallet-view").classList.remove("active");$("profile-view").classList.remove("active");$("home-view").classList.add("active");const heading=document.querySelector("#home-view .hero h1");if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}}
 
