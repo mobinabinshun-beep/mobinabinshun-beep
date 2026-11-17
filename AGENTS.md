@@ -30,7 +30,8 @@
 
 ## Gateway and controller invariants
 - Gateway is the exclusive surface for actions it provides; remove redundant duplicate controls only where Gateway is mounted.
-- Opening Gateway freezes active gameplay and background rendering before its options become actionable. Preserve any pause that existed before Gateway opened.
+- Gateway is the sole gameplay-pause authority; no independent/manual or player-overlay pause owner may pause or resume gameplay.
+- Opening Gateway freezes active gameplay and background rendering before its options become actionable. Closing Gateway does not resume gameplay; keep the round and ambient renderers frozen until the first real gameplay-space input (mouse/touch press, gameplay keyboard input, or controller direction/confirm).
 - Reload is not a Gateway action and never runs automatically on page entry unless a future explicit module-specific owner directive says otherwise.
 - Gateway Exit = Back = Home = the main/home page; do not silently restore an unrelated nested-history destination.
 - Direct physical mouse and direct touch remain direct input. Stepwise cursor movement through controller buttons is simulated mouse, irrespective of cursor artwork.
