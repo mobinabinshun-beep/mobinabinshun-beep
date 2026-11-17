@@ -25,3 +25,19 @@ Automated approval is not human acceptance, owner approval, scope lock, merge au
 - Human QA remains pending. The newly specified 0.50s/1.00s activation delays and the extra-down / held-down list-exit behavior are not proven by those seven workflows and remain open acceptance items.
 
 No runtime source file is changed by this documentation-only record. Do not interpret this record as implementation or test evidence for the newly specified timing/list-exit behavior.
+
+
+## Owner clarification — unified Gateway/controller contract (2026-11-18)
+
+The canonical archive now includes the owner's detailed, overriding acceptance addendum:
+- Remove duplicate controls only where Gateway provides the same function.
+- Selective actions: Menu/List, Back = Home = Exit (main page), Profile.
+- Pause exists only through Gateway; freeze before Gateway options appear. No automatic Reload on page/Gateway entry.
+- After Gateway closes, gameplay remains frozen until the first deliberate real interaction with the game. Preserve pre-existing pause.
+- Directional/click-step cursor movement is simulated mouse input. While Gateway is open, controller navigation takes over.
+- Down traverses options; one extra Down after the last option exits. Holding Down may pass through and exit without activating skipped options. Users may pause between options indefinitely.
+- On exit, the virtual pointer remains over Gateway; reopening requires leaving its bounds and re-entering.
+- Target activation delay: physical mouse/touch 0.50s; simulated mouse 1.00s. These remain unverified until dedicated timing tests pass.
+- Eight-direction first-use training remains FUTURE / NOT IMPLEMENTED until separately built and tested.
+
+**Implementation boundary:** PR #178 remains frozen at its recorded SHA. Follow-up implementation belongs on successor branch `owner/gateway-contract-successor-2026-11-18`, created from that exact SHA; it must not mutate PR #178. The addendum is a specification, not evidence that every behavior is implemented.
