@@ -77,3 +77,11 @@ Preferred rollback is to close/revert the scoped candidate PR. The exact pre-cha
 ## Conversation archive summary
 
 Owner authorized reopening the Gateway for the main game only. The user explicitly excluded all other pages from changes pending separate approval. This record captures the implemented scope and validation state; it does not claim that every file in every N.U repository has been exhaustively read.
+
+## 8. Mana / N-BI / Arcane Shield scope clarification (2026-11-18)
+The gateway implementation deliberately did not add a shield meter or fabricate shield state. The owner has now approved the complete Generation 1 behavior in [NU-MANA-CAPSULE-ARCANE-SHIELD-SPEC.md](../architecture/NU-MANA-CAPSULE-ARCANE-SHIELD-SPEC.md). This remains a separate follow-on implementation scope:
+- do not modify the locked classic LV/XP/Mana HUD or adaptive/network engine;
+- implement shield-specific presentation as a separate UI surface;
+- keep Mana container capacity (1–9 × 10 Mana) separate from N-BI cannon upgrade level;
+- add the new wallet transaction category and per-gameplay-Wave activation guard;
+- require automated regression and public-demo human acceptance before release.

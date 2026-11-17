@@ -155,3 +155,16 @@ N.U Casino bets are not core-game Waves. Each casino round is an independent ope
 - **Global N.U Wallet:** authoritative cross-game asset balances and consolidated transaction ledger.
 
 This document is the canonical reference whenever future design, implementation, QA, or code review asks what a Wave means or how positive and negative wallet transactions are recorded.
+
+## 10. Owner-confirmed Mana / Arcane Shield extension (2026-11-18)
+This extension preserves Sections 1–9 and the dual Wave meanings above. The detailed implementation contract is [Mana Capsule, N-BI Cannon & Arcane Shield Specification](NU-MANA-CAPSULE-ARCANE-SHIELD-SPEC.md).
+
+- A gameplay Wave is the round ID created at game launch; the HP-economy completion threshold remains 10 successful interactions. Wallet-income aggregation remains a separate settlement concern.
+- Arcane Shield's one-activation-per-Wave limit is keyed to that gameplay Wave ID, never to the number of ledger rows or page visits.
+- Mana container level 1–9 means 1–9 permanent refillable containers, each with fixed 10-Mana capacity (10–90 total). Mana Collector refills them; spending empties Mana but does not destroy a container slot.
+- One full container pays for one level-1 N-BI shot (10 Mana) or one full shield charge (10 Mana). These are mutually exclusive uses of the same resource.
+- A shield charge activates 10 defense immediately. Each Chaos hit consumes one charge unit; remaining charge carries to the next Wave, with no auto-refill or top-up.
+- Shield level 1 charges through Store only. Shield level 2 enables one manual holographic charge during gameplay per Wave. All charge attempts consume one full container.
+- Shield spend is a separate outgoing Mana transaction category from N-BI shot cost. Failed actions create no spend.
+- Remaining Chaos masses must resolve their damage when the player leaves the visible game surface; target resolution and wallet settlement must be idempotent.
+- Historical Wave settlement, +3 XP per successful N-BI neutralization, +1 HP for a completed 10-success HP Wave, and all existing wallet aggregation rules remain intact.
