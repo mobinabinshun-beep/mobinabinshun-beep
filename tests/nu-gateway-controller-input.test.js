@@ -68,10 +68,10 @@ test("Shared controller adapter maps D-pad/stick to virtual pointer and A/B to c
  const pointer=fs.readFileSync("nu-controller-pointer.js","utf8");
  assert.match(gateway,/NUControllerPointer\?\.setEnabled\(true\)/);
  assert.match(pointer,/navigator&&win\.navigator\.getGamepads/);
- assert.match(pointer,/buttons\[12\]/);
- assert.match(pointer,/buttons\[15\]/);
- assert.match(pointer,/buttons\[0\]/);
- assert.match(pointer,/buttons\[1\]/);
+ assert.match(pointer,/b\[12\]/);
+ assert.match(pointer,/b\[15\]/);
+ assert.match(pointer,/b\[0\]/);
+ assert.match(pointer,/b\[1\]/);
  assert.match(pointer,/key:"Escape"/);
 });
 
@@ -80,7 +80,7 @@ test("Keyboard and gamepad share game target selection and activation",()=>{
  assert.match(games,/function activateKeyboardTarget\(\)/);
  assert.match(games,/event\.key==="ArrowRight"\|\|event\.key==="ArrowDown"/);
  assert.match(games,/navigator\.getGamepads/);
- assert.match(games,/buttons\[0\]/);
+ assert.match(games,/b\[0\]/);
  assert.match(games,/function startGamepad\(\)/);
 });
 
