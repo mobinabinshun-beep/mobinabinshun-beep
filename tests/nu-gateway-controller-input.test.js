@@ -86,6 +86,9 @@ test("Keyboard and gamepad share game target selection and activation",()=>{
  assert.match(games,/buttons\[0\]/);
  assert.match(games,/function startGamepad\(\)/);
  assert.match(games,/document\.addEventListener\("keydown",event=>\{/);
+ assert.match(games,/gamepadReturnPrimed=false/);
+ assert.match(games,/freshDirection=direction!==0&&direction!==gamepadReturnDirection/);
+ assert.match(games,/freshConfirm=confirm&&!gamepadReturnConfirm/);
 });
 
 test("Nested player navigation preserves Wallet → Profile → Wallet → Bag history",()=>{
