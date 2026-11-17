@@ -1,0 +1,45 @@
+name: N.U Native Launcher Win32 Smoke Build
+
+on:
+  push:
+    branches:
+      - feat/nu-native-launcher-gen1-2026-11-17
+    paths:
+      - 'launcher-native/**'
+      - '.github/workflows/nu-native-launcher.yml'
+  pull_request:
+    paths:
+      - 'launcher-native/**'
+      - '.github/workflows/nu-native-launcher.yml'
+  workflow_dispatch:
+
+jobs:
+  win32-build:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x86
+      - name: Compile native Win32 host (modern toolchain smoke build)
+        shell: pwsh
+        working-directory: launcher-native
+        run: |
+          New-Item -ItemType Directory -Force build | Out-Null
+          cl /nologo /O1 /MT /EHsc /W4 /D_CRT_SECURE_NO_WARNINGS /DWINVER=0x0501 /D_WIN32_WINNT=0x0501 src\main.cpp /link /SUBSYSTEM:WINDOWS /OUT:build\NU-Launcher.exe user32.lib gdi32.lib comdlg32.lib kernel32.lib
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Assemble portable preview package
+        shell: pwsh
+        working-directory: launcher-native
+        run: |
+          Copy-Item README.md build/README.txt
+          Copy-Item -Recurse samples build/samples
+      - name: Verify sample module contract
+        shell: pwsh
+        working-directory: launcher-native
+        run: python -m unittest discover -s tests -v
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nu-native-launcher-win32-smoke-build
+          path: launcher-native/build/**
+          if-no-files-found: error

@@ -1,0 +1,6 @@
+# N.U VM Generation 1 sample program
+CLEAR 12 16 26
+RECT 40 140 260 120 40 112 176
+RECT 320 180 180 80 152 88 196
+TEXT 48 110 Hello from the N.U Generation 1 virtual machine
+TEXT 48 300 Instructions execute in a serialized CPU time slice.
