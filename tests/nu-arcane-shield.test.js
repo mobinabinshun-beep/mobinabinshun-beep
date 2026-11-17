@@ -94,3 +94,16 @@ test("unshielded Chaos hits reduce HP by one each and persist a Wave damage aggr
   assert.equal(result.state.activeWave.aggregates["OUTGOING|hp|CHAOS_BREACH_DAMAGE"].amount,-4);
   assert.equal(result.state.activeWave.resolvedChaosTargetIds.length,5);
 });
+
+test("game UI keeps shield controls separate from the locked classic resource HUD",()=>{
+  const html=fs.readFileSync("index.html","utf8");
+  const games=fs.readFileSync("nu-games.js","utf8");
+  const css=fs.readFileSync("nu-arcane-shield.css","utf8");
+  assert.match(html,/<div id="arcane-shield-panel" class="nu-arcane-shield"/);
+  assert.match(html,/<div class="bars"><span class="hud-chip" id="level-chip">LV 1<\/span>/);
+  assert.match(html,/nu-arcane-shield\.css/);
+  assert.match(games,/function renderArcaneShield\(/);
+  assert.match(games,/function resolveRemainingChaosMasses\(/);
+  assert.match(games,/resolveRemainingChaosMasses\("CHAOS_PLAYER_EXIT"\)/);
+  assert.match(css,/prefers-reduced-motion:reduce/);
+});
