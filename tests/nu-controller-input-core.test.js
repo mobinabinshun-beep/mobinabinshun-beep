@@ -47,7 +47,7 @@ test("Gamepad adapter uses the same logical pointer and explicit confirm",()=>{
  let confirms=0;
  const input=create({mode:"gamepad",step:5,onConfirm:()=>confirms++});
  input.gamepadInput({right:true,confirm:false});
- assert.equal(input.getState().x,0.5+5); // default normalized center is 0.5; default bounds are 0..1, so clamp at 1
+ assert.equal(input.getState().x,1); // default bounds are 0..1, so the step clamps at the edge
  input.gamepadInput({right:false,confirm:true});
  input.gamepadInput({right:false,confirm:true});
  assert.equal(confirms,1);
