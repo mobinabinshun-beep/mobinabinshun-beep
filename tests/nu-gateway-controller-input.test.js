@@ -14,7 +14,6 @@ const manifest=fs.readFileSync("NU-GENERATION-1-MANIFEST.json","utf8");
 test("Gateway is mounted and remains available across Bag, Inventory, Wallet and Profile",()=>{
  assert.match(html,/id="nu-hex-gateway"/);
  assert.match(gateway,/\["bag-view","wallet-view","inventory-view","profile-view"\]/);
- assert.match(gateway,/activeUtility\.id==="profile-view"\?"profile-back"/);
  assert.match(gateway,/profile:.*menu-profile/);
 });
 
@@ -29,6 +28,7 @@ test("Gateway is the only visible Back/Pause control in mounted views",()=>{
 test("Gateway pause ownership preserves a pre-existing manual pause and resumes only its own pause",()=>{
  assert.match(games,/gatewayPause\.open\(state\)/);
  assert.match(games,/gatewayPause\.close\(state\)/);
+ assert.match(games,/syncGatewayBackgrounds\(state\.paused\)/);
  assert.match(games,/gatewayPause\.ownsPause\(\)/);
  assert.match(pause,/if\(!state\|\|!state\.active\|\|state\.paused\)return false/);
  assert.match(pause,/if\(!state\|\|!state\.paused\|\|state\.turn>=10\)return false/);
@@ -65,12 +65,15 @@ test("Gateway mouse hover visibly selects and a click activates one destination"
  assert.match(gateway,/function activate\(item\)/);
 });
 
-test("Gamepad D-pad/stick navigates Gateway and A/B confirms or closes",()=>{
- assert.match(gateway,/navigator\.getGamepads/);
- assert.match(gateway,/buttons\[12\]/);
- assert.match(gateway,/buttons\[15\]/);
- assert.match(gateway,/buttons\[0\]/);
- assert.match(gateway,/buttons\[1\]/);
+test("Shared controller adapter maps D-pad/stick to virtual pointer and A/B to confirm/cancel",()=>{
+ const pointer=fs.readFileSync("nu-controller-pointer.js","utf8");
+ assert.match(gateway,/NUControllerPointer\?\.setEnabled\(true\)/);
+ assert.match(pointer,/navigator&&win\.navigator\.getGamepads/);
+ assert.match(pointer,/b\[12\]/);
+ assert.match(pointer,/b\[15\]/);
+ assert.match(pointer,/b\[0\]/);
+ assert.match(pointer,/b\[1\]/);
+ assert.match(pointer,/key:"Escape"/);
 });
 
 test("Keyboard and gamepad share game target selection and activation",()=>{
@@ -87,7 +90,7 @@ test("Nested player navigation preserves Wallet → Profile → Wallet → Bag h
  assert.match(player,/viewStack\.push\(\{view:activeView,focus:document\.activeElement\}\)/);
  assert.match(player,/const previous=viewStack\.pop\(\)/);
  assert.match(player,/if\(tab==="profile"\)\{open\(profileView\);return;\}/);
- assert.match(gateway,/activeUtility\.id==="wallet-view"\?"wallet-back"/);
+ assert.match(gateway,/else window\.location\.href="\.\/index\.html"/);
 });
 
 test("Hidden tabs do not restart a Gateway-paused round or gamepad polling",()=>{
@@ -95,5 +98,6 @@ test("Hidden tabs do not restart a Gateway-paused round or gamepad polling",()=>
  assert.match(games,/!gatewayOpen\)\{syncGatewayBackgrounds\(false\)/);
  assert.match(games,/const shouldFreeze=!!frozen\|\|document\.hidden/);
  assert.match(games,/if\(state\.active&&!state\.paused\)/);
- assert.match(gateway,/if\(!open\)return/);
+ assert.match(gateway,/window\.addEventListener\("blur"/);
+ assert.match(gateway,/NUControllerPointer\?\.setEnabled\(false\)/);
 });

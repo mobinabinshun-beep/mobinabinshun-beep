@@ -1,6 +1,6 @@
 # Gateway, navigation and controller integration — 2026-11-17
 
-**Status:** MACHINE VERIFIED AND MERGED TO DEFAULT/PAGES SOURCE BRANCH — live demo link-check UNVERIFIED; human/device QA pending  
+**Status:** HISTORICAL IMPLEMENTATION RECORD — original PR #166 remains preserved as history. Its Back/Gamepad behavior is superseded by [the owner-directed Gateway & simulated-mouse contract](./GATEWAY-AND-CONTROLLER-INPUT-CONTRACT-2026-11-17.md).  
 **Branch:** `feature/gateway-controller-navigation-2026-11-17`  
 **Baseline:** `2f81cf268fe6b89338d6c8001a86538ea917d730`  
 **Preservation branch:** `preservation/pre-gateway-controller-navigation-2026-11-17`  

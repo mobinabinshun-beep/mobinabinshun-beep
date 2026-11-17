@@ -47,3 +47,6 @@ body.nu-gateway-utility-active #bag-back,
 body.nu-gateway-utility-active #inventory-back,
 body.nu-gateway-utility-active #wallet-back,
 body.nu-gateway-utility-active #profile-back{display:none!important}
+
+/* The launcher calibration surface mounts its own Gateway instance. */
+body.nu-launcher-page #nu-hex-gateway,body.nu-launcher-page .nu-gateway-scrim{display:block}

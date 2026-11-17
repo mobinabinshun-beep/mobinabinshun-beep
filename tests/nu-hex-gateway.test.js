@@ -7,14 +7,16 @@ const html=read("index.html"),casino=read("casino.html"),launcher=read("launcher
 const js=read("nu-hex-gateway.js"),css=read("nu-hex-gateway.css"),worldCss=read("nu-world.css");
 const games=read("nu-games.js"),playerUI=read("nu-player-ui.js"),graphics=read("nu-graphics-runtime.js"),exchange=read("nu-exchange.js"),dynamic=read("nu-dynamic-layers.js");
 
-test("Gateway controller is scoped only to active main-game view",()=>{
+test("Gateway controller mounts on the main game and launcher surfaces",()=>{
  assert.match(html,/id="nu-hex-gateway"/);
- assert.match(js,/if\(!root\|\|!scrim\|\|!gameView\)return/);
+ assert.match(js,/if\(!root\|\|!scrim\)return/);
  assert.match(js,/classList\.toggle\("nu-game-active",active\)/);
  assert.match(css,/body\.nu-game-active #nu-hex-gateway/);
  assert.match(css,/body\.nu-game-active #menu-open/);
  assert.match(css,/body\.nu-game-active #back-home/);
  for(const page of [casino,launcher,studio])assert.match(page,/id="nu-hex-gateway"/);
+ assert.match(launcher,/<body class="nu-launcher-page">/);
+ assert.match(css,/body\.nu-launcher-page #nu-hex-gateway/);
 });
 
 test("Gateway exposes exactly Back, Menu and Profile as one-click actions",()=>{

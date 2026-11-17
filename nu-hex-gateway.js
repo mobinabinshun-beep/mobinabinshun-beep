@@ -5,14 +5,14 @@
   const scrim=document.querySelector(".nu-gateway-scrim");
   const gameView=document.getElementById("game-view");
   const utilityViews=["bag-view","wallet-view","inventory-view","profile-view"].map(id=>document.getElementById(id)).filter(Boolean);
-  if(!root||!scrim||!gameView)return;
+  if(!root||!scrim)return;
 
   const trigger=root.querySelector(".nu-gateway-trigger");
   const items=[...root.querySelectorAll(".nu-gateway-item")];
-  let open=false,selected=null,activationTimer=0,outsideSince=0,suppressClickUntil=0,controllerFrame=0,lastControllerMove=0,controllerConfirmDown=false,controllerCancelDown=false;
+  let open=false,selected=null,activationTimer=0,outsideSince=0,suppressClickUntil=0;
 
   function syncGatewayScope(){
-    const active=gameView.classList.contains("active");
+    const active=!!(gameView&&gameView.classList.contains("active"));
     const utility=utilityViews.some(view=>view.classList.contains("active"));
     document.body.classList.toggle("nu-gateway-enabled",active||utility);
     document.body.classList.toggle("nu-main-game-page",active);
@@ -21,7 +21,7 @@
   }
   syncGatewayScope();
   const scopeObserver=new MutationObserver(syncGatewayScope);
-  [gameView,...utilityViews].forEach(view=>scopeObserver.observe(view,{attributes:true,attributeFilter:["class"]}));
+  [ ...(gameView?[gameView]:[]), ...utilityViews ].forEach(view=>scopeObserver.observe(view,{attributes:true,attributeFilter:["class"]}));
 
   function layoutItems(){
     const compact=window.matchMedia("(max-width: 600px)").matches;
@@ -38,19 +38,21 @@
   window.addEventListener("orientationchange",layoutItems,{passive:true});
 
   function goHome(){
-    const activeUtility=utilityViews.find(view=>view.classList.contains("active"));
-    if(activeUtility){
-      const backId=activeUtility.id==="inventory-view"?"inventory-back":activeUtility.id==="wallet-view"?"wallet-back":activeUtility.id==="profile-view"?"profile-back":"bag-back";
-      document.getElementById(backId)?.click();
-      return;
-    }
     const back=document.getElementById("back-home");
-    if(back)back.click();else window.location.href="./index.html";
+    if(back&&!utilityViews.some(view=>view.classList.contains("active")))back.click();
+    else window.location.href="./index.html";
   }
   const routes={
     back:goHome,
-    menu:()=>document.getElementById("menu-open")?.click(),
-    profile:()=>document.getElementById("menu-profile")?.click()
+    menu:()=>{const menu=document.getElementById("menu-open");if(menu)menu.click();else window.location.href="./index.html#library-section";},
+    library:()=>window.location.href="./index.html#library-section",
+    store:()=>window.location.href="./index.html?view=store",
+    wallet:()=>window.location.href="./index.html?view=wallet",
+    profile:()=>{const profile=document.getElementById("menu-profile");if(profile)profile.click();else window.location.href="./index.html?view=profile";},
+    launcher:()=>{const settings=document.getElementById("open-settings");if(settings)settings.click();else window.location.href="./launcher.html";},
+    studio:()=>window.location.href="./pixel-art-studio.html",
+    casino:()=>window.location.href="./casino.html",
+    resume:()=>window.location.href="./index.html"
   };
 
   function releaseHeldState(){
@@ -68,11 +70,11 @@
     if(open){
       window.dispatchEvent(new Event("nu:gateway-open"));
       trigger.focus({preventScroll:true});
-      startController();
+      window.NUControllerPointer?.setEnabled(true);
     }else{
+      window.NUControllerPointer?.setEnabled(false);
       clearTimeout(activationTimer);activationTimer=0;selected=null;
       items.forEach(item=>{item.classList.remove("is-selected","is-confirming");item.setAttribute("aria-pressed","false");});
-      controllerConfirmDown=false;controllerCancelDown=false;
       if(shouldResume)releaseHeldState();
     }
     layoutItems();
@@ -91,37 +93,7 @@
     select(items[next]);
     items[next].focus({preventScroll:true});
   }
-  function pollController(timestamp){
-    controllerFrame=0;
-    if(!open)return;
-    const pads=navigator.getGamepads?Array.from(navigator.getGamepads()||[]):[];
-    const pad=pads.find(Boolean);
-    if(pad){
-      const buttons=pad.buttons||[],axes=pad.axes||[];
-      const up=!!(buttons[12]&&buttons[12].pressed)||(Number(axes[1])<-.55);
-      const down=!!(buttons[13]&&buttons[13].pressed)||(Number(axes[1])>.55);
-      const left=!!(buttons[14]&&buttons[14].pressed)||(Number(axes[0])<-.55);
-      const right=!!(buttons[15]&&buttons[15].pressed)||(Number(axes[0])>.55);
-      const direction=up||left?-1:down||right?1:0;
-      if(direction&&timestamp-lastControllerMove>220){moveControllerSelection(direction);lastControllerMove=timestamp;}
-      const confirm=!!(buttons[0]&&buttons[0].pressed),cancel=!!(buttons[1]&&buttons[1].pressed);
-      if(confirm&&!controllerConfirmDown)activate(selected||items[0]);
-      if(cancel&&!controllerCancelDown){setOpen(false);trigger.focus({preventScroll:true});}
-      controllerConfirmDown=confirm;controllerCancelDown=cancel;
-    }
-    if(open)controllerFrame=requestAnimationFrame(pollController);
-  }
-  function startController(){if(open&&!controllerFrame)controllerFrame=requestAnimationFrame(pollController);}
   let pendingItem=null;
-  function moveControllerSelection(direction){
-    const current=items.indexOf(selected);
-    if(direction>0&&current===items.length-1){
-      setOpen(false);
-      trigger.focus({preventScroll:true});
-      return;
-    }
-    moveSelection(direction);
-  }
   function activate(item){
     if(!item||!item.dataset)return;
     const key=item.dataset.action,action=routes[key];
@@ -203,7 +175,7 @@
   });
   window.addEventListener("blur",()=>{if(open)setOpen(false);});
   window.addEventListener("pagehide",()=>{if(open)setOpen(false);});
-  window.addEventListener("gamepadconnected",startController);
+
   window.addEventListener("nu:menu-dismissed",releaseHeldState);
   window.addEventListener("nu:player-overlay-close",releaseHeldState);
 
