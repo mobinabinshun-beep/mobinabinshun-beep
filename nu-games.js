@@ -27,7 +27,7 @@ function handleGatewayClose(){
   if(!document.hidden)state.raf=requestAnimationFrame(animateGame);
   startGamepad();
  }
- syncGatewayBackgrounds(false);
+ syncGatewayBackgrounds(state.paused);
 }
 window.addEventListener("nu:gateway-open",handleGatewayOpen);
 window.addEventListener("nu:gateway-close",handleGatewayClose);
