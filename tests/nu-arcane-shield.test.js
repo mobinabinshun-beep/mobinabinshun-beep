@@ -1,6 +1,7 @@
 "use strict";
 const test=require("node:test");
 const assert=require("node:assert/strict");
+const fs=require("node:fs");
 const Wallet=require("../nu-wallet.js");
 
 test("Mana container capacity is one to nine fixed 10-Mana containers",()=>{
