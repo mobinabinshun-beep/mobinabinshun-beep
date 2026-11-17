@@ -80,7 +80,7 @@ test("Keyboard and gamepad share game target selection and activation",()=>{
  assert.match(games,/function activateKeyboardTarget\(\)/);
  assert.match(games,/event\.key==="ArrowRight"\|\|event\.key==="ArrowDown"/);
  assert.match(games,/navigator\.getGamepads/);
- assert.match(games,/b\[0\]/);
+ assert.match(games,/buttons\[0\]/);
  assert.match(games,/function startGamepad\(\)/);
 });
 
