@@ -1,0 +1,11 @@
+[Module]
+format=NUMOD
+format_version=1
+id=org.example.template
+generation=1
+entry=main.nuvm
+runtime=NUVM
+runtime_version=1
+display_name=New N.U Module
+author=Your Name
+memory_mb=16
