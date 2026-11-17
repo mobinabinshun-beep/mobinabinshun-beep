@@ -101,6 +101,6 @@ test("per-Wave totals accumulate all damage and healing before the Wave is settl
 test("game Wave settlement writes independent health summaries after wallet persistence",()=>{
   assert.ok(gameSource.includes("function settleActiveWave(reason)"));
   assert.ok(gameSource.includes("window.NUHealth.recordWaveSummary({gameId:wave.gameId,waveId:wave.id"));
-  assert.ok(gameSource.includes("window.NUHealth.recordDamage({gameId:state.game,waveId:state.save.activeWave&&state.save.activeWave.id"));
+  assert.ok(gameSource.includes("window.NUHealth.recordDamage({gameId:\"chaos\",waveId,amount:result.hpDamage,hpAfter:state.save.hp"));
   assert.ok(gameSource.includes("window.NUHealth.recordHealing({gameId,waveId:state.save.activeWave&&state.save.activeWave.id"));
 });
