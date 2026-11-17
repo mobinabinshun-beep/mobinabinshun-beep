@@ -7,7 +7,7 @@
  function create(options){
   options=options||{};
   const doc=options.document||root.document,win=options.window||root;
-  let enabled=false,frame=0,lastMove=0,confirmDown=false,cancelDown=false,lastTarget=null,x=0,y=0,padIndex=null;
+  let enabled=false,frame=0,lastMove=0,confirmDown=false,cancelDown=false,primed=false,lastTarget=null,x=0,y=0,padIndex=null;
   let cursor=null,style=null;
   const step=Number(options.step)||28,repeat=Number(options.repeat)||170;
   function ensureCursor(){
@@ -56,10 +56,13 @@
      y=Math.max(1,Math.min(win.innerHeight-1,y+input.dy*step));
      updateTarget();lastMove=time;
     }
-    if(input.confirm&&!confirmDown)clickTarget();
-    if(input.cancel&&!cancelDown)doc.dispatchEvent(new win.KeyboardEvent("keydown",{key:"Escape",bubbles:true,cancelable:true}));
-    confirmDown=input.confirm;cancelDown=input.cancel;
-   }else{padIndex=null;confirmDown=false;}
+    if(!primed){confirmDown=input.confirm;cancelDown=input.cancel;primed=true;}
+    else{
+     if(input.confirm&&!confirmDown)clickTarget();
+     if(input.cancel&&!cancelDown)doc.dispatchEvent(new win.KeyboardEvent("keydown",{key:"Escape",bubbles:true,cancelable:true}));
+     confirmDown=input.confirm;cancelDown=input.cancel;
+    }
+   }else{padIndex=null;confirmDown=false;cancelDown=false;primed=false;}
    if(enabled)frame=win.requestAnimationFrame(tick);
   }
   function start(){
@@ -68,7 +71,7 @@
    if(!frame)frame=win.requestAnimationFrame(tick);
   }
   function stop(){
-   enabled=false;if(frame)win.cancelAnimationFrame(frame);frame=0;confirmDown=false;cancelDown=false;
+   enabled=false;if(frame)win.cancelAnimationFrame(frame);frame=0;confirmDown=false;cancelDown=false;primed=false;
    if(lastTarget&&lastTarget.classList)lastTarget.classList.remove("nu-simulated-mouse-target");
    lastTarget=null;if(cursor)cursor.style.display="none";
   }
