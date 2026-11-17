@@ -27,3 +27,17 @@ Generation 1 bytecode is interpreted by the built-in allow-listed VM. The protot
 
 ## Resource-control truth
 The host serializes VM work and enforces a cooperative 5–50 ms execution window per 100 ms timer period. This is a soft application-level CPU budget, not an OS-wide CPU quota. The host attempts a Windows Job Object commit-memory limit at 50% of detected physical RAM and reports whether it was applied. This limits committed memory for the job, not physical resident RAM and does not reserve memory; if job assignment fails, the cap is not active. GDI avoids a dedicated GPU workload, but Windows XP provides no generic vendor-independent GPU quota/telemetry API. Do not market these limits as hard guarantees.
+
+
+## Extensible package contracts (new)
+
+The repository now includes versioned contracts and an authoring template:
+- `docs/ARCHITECTURE.md` — host/runtime/translator/service boundaries and generation policy.
+- `docs/NUMOD-v1.md` — package manifest format and validation/security rules.
+- `docs/NUVM-v1.md` — current bytecode contract and compatibility policy.
+- `docs/EXTENDING.md` — steps for authoring modules, adding opcodes and future generations.
+- `samples/template/` — starter package that can be copied for a new module.
+
+Run contract tests with `python -m unittest discover -s tests -v`.
+
+**Important:** these documents establish the extension contract, but the current executable remains a single-translation-unit Generation 1 prototype. Dynamic plugins, external translators, a stable binary SDK/ABI, assets, dependency resolution, package signatures and sandboxing are not implemented yet. The template uses only opcodes already understood by the current host.
