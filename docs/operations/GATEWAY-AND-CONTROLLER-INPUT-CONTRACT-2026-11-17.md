@@ -31,7 +31,7 @@
 - Pause is applied immediately when Gateway opens. The active game round and background renderers freeze before Gateway options can be used.
 - Pause exists only as a Gateway-owned operation; there is no independent/manual pause control or player-overlay pause owner.
 - Opening Gateway freezes the active round and background rendering before its options can be used.
-- Closing Gateway does **not** resume gameplay. The round and ambient renderers remain frozen until the first real gameplay-space interaction (mouse/touch press, gameplay keyboard input, or controller direction/confirm). That first input releases the Gateway-return hold; ordinary interaction then proceeds.
+- Closing Gateway does **not** resume gameplay. The round and ambient renderers remain frozen until the first real gameplay-space interaction (mouse/touch press, gameplay keyboard input, or a fresh controller direction/confirm transition). The first controller state observed after close is only a baseline; an input held through Gateway closure cannot release the hold. That first fresh input releases the Gateway-return hold; ordinary interaction then proceeds.
 - Gateway is the exclusive surface for the actions it provides; redundant page-level controls for those same actions are removed only on pages where Gateway is mounted.
 - Reload is not a Gateway action and is never automatic on page entry. A future module-specific exception requires an explicit owner decision.
 
