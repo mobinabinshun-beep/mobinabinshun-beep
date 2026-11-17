@@ -9,7 +9,7 @@
 
   const trigger=root.querySelector(".nu-gateway-trigger");
   const items=[...root.querySelectorAll(".nu-gateway-item")];
-  let open=false,selected=null,activationTimer=0,outsideSince=0,suppressClickUntil=0,controllerFrame=0,lastControllerMove=0,controllerConfirmDown=false,controllerCancelDown=false;
+  let open=false,selected=null,activationTimer=0,outsideSince=0,suppressClickUntil=0;
 
   function syncGatewayScope(){
     const active=gameView.classList.contains("active");
@@ -68,7 +68,6 @@
       window.NUControllerPointer?.setEnabled(false);
       clearTimeout(activationTimer);activationTimer=0;selected=null;
       items.forEach(item=>{item.classList.remove("is-selected","is-confirming");item.setAttribute("aria-pressed","false");});
-      controllerConfirmDown=false;controllerCancelDown=false;
       if(shouldResume)releaseHeldState();
     }
     layoutItems();
@@ -87,37 +86,7 @@
     select(items[next]);
     items[next].focus({preventScroll:true});
   }
-  function pollController(timestamp){
-    controllerFrame=0;
-    if(!open)return;
-    const pads=navigator.getGamepads?Array.from(navigator.getGamepads()||[]):[];
-    const pad=pads.find(Boolean);
-    if(pad){
-      const buttons=pad.buttons||[],axes=pad.axes||[];
-      const up=!!(buttons[12]&&buttons[12].pressed)||(Number(axes[1])<-.55);
-      const down=!!(buttons[13]&&buttons[13].pressed)||(Number(axes[1])>.55);
-      const left=!!(buttons[14]&&buttons[14].pressed)||(Number(axes[0])<-.55);
-      const right=!!(buttons[15]&&buttons[15].pressed)||(Number(axes[0])>.55);
-      const direction=up||left?-1:down||right?1:0;
-      if(direction&&timestamp-lastControllerMove>220){moveControllerSelection(direction);lastControllerMove=timestamp;}
-      const confirm=!!(buttons[0]&&buttons[0].pressed),cancel=!!(buttons[1]&&buttons[1].pressed);
-      if(confirm&&!controllerConfirmDown)activate(selected||items[0]);
-      if(cancel&&!controllerCancelDown){setOpen(false);trigger.focus({preventScroll:true});}
-      controllerConfirmDown=confirm;controllerCancelDown=cancel;
-    }
-    if(open)controllerFrame=requestAnimationFrame(pollController);
-  }
-  function startController(){if(open&&!controllerFrame)controllerFrame=requestAnimationFrame(pollController);}
   let pendingItem=null;
-  function moveControllerSelection(direction){
-    const current=items.indexOf(selected);
-    if(direction>0&&current===items.length-1){
-      setOpen(false);
-      trigger.focus({preventScroll:true});
-      return;
-    }
-    moveSelection(direction);
-  }
   function activate(item){
     if(!item||!item.dataset)return;
     const key=item.dataset.action,action=routes[key];
