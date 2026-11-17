@@ -28,6 +28,7 @@ test("Gateway is the only visible Back/Pause control in mounted views",()=>{
 test("Gateway pause ownership preserves a pre-existing manual pause and resumes only its own pause",()=>{
  assert.match(games,/gatewayPause\.open\(state\)/);
  assert.match(games,/gatewayPause\.close\(state\)/);
+ assert.match(games,/syncGatewayBackgrounds\(state\.paused\)/);
  assert.match(games,/gatewayPause\.ownsPause\(\)/);
  assert.match(pause,/if\(!state\|\|!state\.active\|\|state\.paused\)return false/);
  assert.match(pause,/if\(!state\|\|!state\.paused\|\|state\.turn>=10\)return false/);
