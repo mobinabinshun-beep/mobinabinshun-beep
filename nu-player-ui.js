@@ -18,6 +18,27 @@
     if(!s.playerId){s.playerId=makePlayerId();s.displayName="";s.callsign="";if(persist(s))window.dispatchEvent(new CustomEvent("nu:identity-updated",{detail:{playerId:s.playerId,displayName:s.displayName,callsign:s.callsign}}));}
     return s;
   }
+  function ledgerOperationKey(item){
+    const id=String(item&&item.id||"");
+    return id.replace(/\\|(xp|capsule|hp)$/,"");
+  }
+  function groupLedgerTransactions(entries){
+    const groups=[];
+    entries.forEach(item=>{
+      const key=ledgerOperationKey(item),last=groups[groups.length-1];
+      if(key&&last&&last.key===key)last.items.push(item);
+      else groups.push({key,items:[item]});
+    });
+    return groups;
+  }
+  function mergeLedgerDeltas(items){
+    const totals=new Map();
+    items.forEach(item=>Object.entries(item&&item.deltas||{}).forEach(([key,value])=>{
+      const amount=Number(value);
+      if(Number.isFinite(amount))totals.set(key,(totals.get(key)||0)+amount);
+    }));
+    return Array.from(totals.entries());
+  }
   function renderWallet(){
     const s=load(),root=$("wallet-assets"),history=$("wallet-transactions");
     if(!root||!history)return;
@@ -44,12 +65,15 @@
     history.replaceChildren();
     const tx=s.transactions.slice(-24).reverse();
     if(!tx.length){const empty=document.createElement("p");empty.className="wallet-muted";empty.textContent="No recorded wallet transactions yet.";history.appendChild(empty);return;}
-    tx.forEach(item=>{
-      const visibleDeltas=Object.entries(item.deltas||{}).filter(([key,value])=>key!=="hp"&&Number(value)!==0);
-      if(!visibleDeltas.length)return;
+    groupLedgerTransactions(tx).forEach(group=>{
+      const deltas=mergeLedgerDeltas(group.items).filter(([key,value])=>key!=="hp"&&Number(value)!==0);
+      if(!deltas.length)return;
       const row=document.createElement("div"),title=document.createElement("span"),detail=document.createElement("small");
-      row.className="wallet-transaction";const source=String(item.gameId||item.source||"wallet");const sourceNames={bubble:"Bubble Hunt",mana:"Mana Collector",chaos:"Chaos Attack","nu.store":"Store","nu.casino":"Casino","nu.studio":"Studio"};title.textContent=sourceNames[source]||source.toUpperCase();
-      detail.textContent=visibleDeltas.map(([key,value])=>{
+      row.className="wallet-transaction";
+      const item=group.items[0],source=String(item.gameId||item.source||"wallet");
+      const sourceNames={bubble:"Bubble Hunt",mana:"Mana Collector",chaos:"Chaos Attack","nu.store":"Store","nu.casino":"Casino","nu.studio":"Studio"};
+      title.textContent=sourceNames[source]||source.toUpperCase();
+      detail.textContent=deltas.map(([key,value])=>{
         const label=key==="hpPills"?"HP Capsule":key==="xp"?"XP":key==="mana"?"Mana":key==="manaCapsules"?"Mana Capsule":key;
         return (Number(value)>0?"+":"")+Number(value)+" "+label;
       }).join(" · ");
@@ -83,7 +107,10 @@
         const when=date&&!Number.isNaN(date.getTime())?date.toLocaleString():"Time unavailable";
         if(group.key==="waveSummaries"){
           const damage=Number(item.damageTaken)||0,hpDelta=Number(item.hpDelta)||0;
-          detail.textContent=[(damage>0?"+":"")+damage+" DAMAGE",(hpDelta>0?"+":"")+hpDelta+" HP",String(item.successfulInteractions||0)+"/10 INTERACTIONS",String(item.reason||"settled"),when].join(" · ");
+          const signed=value=>(value>0?"+":"")+String(value);
+          const gameName=gameNames[item.gameId]||String(item.gameId||"Game");
+          title.textContent=gameName+": "+signed(damage)+" Damage · "+signed(hpDelta)+" HP";
+          detail.textContent="Wave "+String(item.waveId||"").slice(-5)+" · "+when;
         }else detail.textContent=[when,"GAME "+String(item.gameId||"unknown"),item.hpAfter!==undefined&&item.hpAfter!==null?"HP "+item.hpAfter:"",item.effectAmount?"HEAL "+item.effectAmount+" HP":"",item.hpBefore!==undefined&&item.hpBefore!==null?"HP BEFORE "+item.hpBefore:""].filter(Boolean).join(" · ");
         row.append(title,detail);root.appendChild(row);
       });
@@ -116,12 +143,14 @@
       root.appendChild(empty);return;
     }
     const labels={mana:"Mana",manaCapsules:"Mana Capsule",nbiCharge:"N-BI Arcane Charge",arcaneShieldCharge:"Arcane Shield Charge",shieldCharge:"Shield Charge"};
-    entries.forEach(item=>{
+    groupLedgerTransactions(entries).forEach(group=>{
+      const deltas=mergeLedgerDeltas(group.items).filter(([key,value])=>/mana|nbi|arcane|shield|magic/i.test(key)&&Number(value)!==0);
+      if(!deltas.length)return;
       const row=document.createElement("div"),title=document.createElement("span"),detail=document.createElement("small");
       row.className="wallet-transaction";
-      const source=String(item.gameId||item.source||"wallet"),names={bubble:"Bubble Hunt",mana:"Mana Collector",chaos:"Chaos Attack","nu.store":"Store","nu.casino":"Casino"};
-      title.textContent="MHL · "+(names[source]||source.toUpperCase());
-      detail.textContent=Object.entries(item.deltas).filter(([key,value])=>/mana|nbi|arcane|shield|magic/i.test(key)&&Number(value)!==0).map(([key,value])=>(Number(value)>0?"+":"")+Number(value)+" "+(labels[key]||key)).join(" · ");
+      const item=group.items[0],source=String(item.gameId||item.source||"wallet"),names={bubble:"Bubble Hunt",mana:"Mana Collector",chaos:"Chaos Attack","nu.store":"Store","nu.casino":"Casino"};
+      title.textContent=names[source]||source.toUpperCase();
+      detail.textContent=deltas.map(([key,value])=>(Number(value)>0?"+":"")+Number(value)+" "+(labels[key]||key)).join(" · ");
       row.append(title,detail);root.appendChild(row);
     });
   }
