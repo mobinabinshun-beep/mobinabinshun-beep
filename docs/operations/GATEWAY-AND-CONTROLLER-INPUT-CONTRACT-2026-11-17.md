@@ -1,6 +1,6 @@
 # N.U Gateway & simulated-mouse controller contract — 2026-11-17
 
-**Status:** IMPLEMENTED · AUTOMATED-QA-PASSED · BACKUP-VERIFIED · SOURCE-MERGED · PUBLIC-DEPLOYMENT-VERIFY-PENDING · HUMAN-QA-PENDING  
+**Status:** IMPLEMENTED · AUTOMATED-QA-PASSED · BACKUP-VERIFIED · SOURCE-MERGED · SCOPE-LOCKED · PUBLIC-DEPLOYMENT-UNVERIFIED · HUMAN-QA-PENDING  
 **Scope:** Gateway behavior and the shared launcher-core controller pointer adapter  
 **Supersedes:** conflicting earlier descriptions of nested Back history or direct Gamepad option execution  
 **Protected boundary:** Classic LV / XP / Mana HUD is untouched and remains locked.
@@ -89,7 +89,7 @@ This file is the normative owner-directed contract. The following implementation
 - Tested candidate: `42237a379e37b923697f056eaac58d9b04d5295a`.
 - Verified recovery branch: `backup/pre-gateway-simulated-mouse-2026-11-17`, identical to the tested candidate (0 ahead / 0 behind).
 - GitHub Actions: Gateway main-game regression #351 PASS; Studio export regression #1034 PASS; Generation 1 HUD layout #372 PASS; graphics preview smoke #1089 PASS; graphics integrity #655 PASS; Exchange regression #231 PASS; Wallet/Profile regression #382 PASS.
-- Public demo deployment and live build identity: pending verification after the merge/documentation push.
-- Human desktop/mobile QA: pending. No owner acceptance or scope lock is implied by CI or merge.
+- Public demo deployment and live build identity: **UNVERIFIED**. The repository source is merged and the public URL is available, but the live site could not be independently fetched/identified in this session.
+- Human desktop/mobile QA: pending. The owner explicitly requested this exact Gateway/controller contract be locked; that scoped lock is recorded in [LOCKED-AREAS.md](./LOCKED-AREAS.md). Human visual/device QA remains separate.
 
 The exact prior version is not to be restored unilaterally; future corrections must preserve this contract unless the owner explicitly changes it.
