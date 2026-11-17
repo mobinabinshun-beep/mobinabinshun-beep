@@ -63,7 +63,7 @@ The recovery branch `backup/pre-public-demo-gateway-controller-2026-11-17` was v
 2. Close Gateway. Confirm only a Gateway-created pause is released and the same round continues.
 3. Navigate Menu/Profile from Gateway and close the destination. Confirm the round remains paused until the destination is dismissed.
 4. Open Gateway in Bag, Inventory, Wallet and Profile. Confirm no duplicate Back control is visible.
-5. Test Menu → Bag → Wallet → Profile → Back → Wallet → Back → Bag. Confirm the exact prior view is restored at every step.
+5. Test Menu → Bag → Wallet → Profile → Back → Wallet → Back → Bag. Confirm Gateway Back from every mounted view resolves to the main Home destination.
 6. Mouse: hover each option to see the active highlight; click once to activate.
 7. Keyboard: use arrows to move, Enter/Space to activate, Tab to traverse, Escape to close.
 8. Gamepad: D-pad or left stick to move, A to activate, B to close. Repeat inside a game to select targets and use A to interact.
@@ -74,3 +74,12 @@ The recovery branch `backup/pre-public-demo-gateway-controller-2026-11-17` was v
 ## Exclusions
 
 No classic LV/XP/Mana HUD edits, game-rule/economy changes, save migration, Store/Exchange changes, unrelated module redesign, or production promotion.
+
+
+## Owner supersession — unified Back/Home and simulated-mouse core (2026-11-17)
+
+The owner has explicitly replaced the earlier nested-history interpretation: Gateway Back, Home and Exit are aliases for one action whose destination is the main Home page. Do not restore the former previous-view stack behavior through Gateway Back. Distinct in-page tabs and their own navigation remain separate.
+
+The owner also requires a speed-first, risk-based development process and a reusable Launcher Controller Core simulated-mouse mode: directional arrows move the logical pointer in discrete steps; Enter or a mapped confirm action activates separately; movement alone never executes a target. The canonical specification is [OWNER-DIRECTIVE-GATEWAY-SIMULATED-MOUSE-SPEED-2026-11-17.md](./OWNER-DIRECTIVE-GATEWAY-SIMULATED-MOUSE-SPEED-2026-11-17.md).
+
+This addendum supersedes conflicting Back/Home details above. It does not claim browser/device QA or public-demo verification.

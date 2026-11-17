@@ -38,14 +38,9 @@
   window.addEventListener("orientationchange",layoutItems,{passive:true});
 
   function goHome(){
-    const activeUtility=utilityViews.find(view=>view.classList.contains("active"));
-    if(activeUtility){
-      const backId=activeUtility.id==="inventory-view"?"inventory-back":activeUtility.id==="wallet-view"?"wallet-back":activeUtility.id==="profile-view"?"profile-back":"bag-back";
-      document.getElementById(backId)?.click();
-      return;
-    }
-    const back=document.getElementById("back-home");
-    if(back)back.click();else window.location.href="./index.html";
+    const home=document.getElementById("back-home");
+    if(home){home.click();return;}
+    window.location.href="./index.html";
   }
   const routes={
     back:goHome,
@@ -109,7 +104,7 @@
       if(cancel&&!controllerCancelDown){setOpen(false);trigger.focus({preventScroll:true});}
       controllerConfirmDown=confirm;controllerCancelDown=cancel;
     }
-    if(open)controllerFrame=requestAnimationFrame(pollController);
+    if(open&&pad)controllerFrame=requestAnimationFrame(pollController);
   }
   function startController(){if(open&&!controllerFrame)controllerFrame=requestAnimationFrame(pollController);}
   let pendingItem=null;

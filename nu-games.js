@@ -6,7 +6,7 @@ const state={save:NUWallet.normalizeSave(NU.load()),game:null,turn:0,active:fals
 const gatewayPause=window.NUGatewayPause.create();
 let gamepadFrame=0,lastGamepadMove=0,gamepadConfirmDown=false;
 function syncGatewayBackgrounds(frozen){
- const shouldFreeze=!!frozen||document.hidden;
+ const shouldFreeze=!!frozen||document.hidden||!!state.paused||!!(state.game&&!state.active);
  if(state.engine&&typeof state.engine[shouldFreeze?"pause":"resume"]==="function")state.engine[shouldFreeze?"pause":"resume"]();
  if(window.NUBackgroundEngine&&typeof window.NUBackgroundEngine.setFrozen==="function")window.NUBackgroundEngine.setFrozen(shouldFreeze);
  if(window.NUDynamicLayers&&typeof window.NUDynamicLayers.setFrozen==="function")window.NUDynamicLayers.setFrozen(shouldFreeze);
