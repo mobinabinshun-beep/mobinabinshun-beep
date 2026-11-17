@@ -12,6 +12,13 @@ on:
       - ".github/workflows/xp-launcher-build.yml"
   workflow_dispatch:
 jobs:
+  manifest-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Generation 1 pack manifest and owner policy
+        run: python3 native/test_gen1_pack_manifest.py
+
   vm-tests:
     runs-on: ubuntu-latest
     steps:
@@ -22,7 +29,7 @@ jobs:
           /tmp/nu-vm-test
 
   build-x86:
-    needs: vm-tests
+    needs: [manifest-tests, vm-tests]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
