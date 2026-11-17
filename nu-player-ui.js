@@ -20,7 +20,7 @@
   }
   function ledgerOperationKey(item){
     const id=String(item&&item.id||"");
-    return id.replace(/\\|(xp|capsule|hp)$/,"");
+    return id.replace(/\|(xp|capsule|hp)$/,"");
   }
   function groupLedgerTransactions(entries){
     const groups=[];
