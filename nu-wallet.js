@@ -20,11 +20,15 @@
   };
   function normalizeSave(raw){
     const source=raw&&typeof raw==="object"?raw:{};
-    const next=Object.assign({xp:0,level:1,mana:0,xCredits:0,nCredits:0,upgrade:0,hp:10,hpPills:0,manaCapsules:1,casinoCredits:100,transactions:[],rewardIds:[],nonExchangeableAssets:[],activeWave:null,settledWaveIds:[],casinoRoundIds:[]},source);
+    const next=Object.assign({xp:0,level:1,mana:0,xCredits:0,nCredits:0,upgrade:0,hp:10,hpPills:0,manaCapsules:1,arcaneShieldCharge:0,arcaneShieldLevel:1,arcaneShieldPrepared:false,arcaneShieldUsedWaveIds:[],casinoCredits:100,transactions:[],rewardIds:[],nonExchangeableAssets:[],activeWave:null,settledWaveIds:[],casinoRoundIds:[]},source);
     next.xp=number(next.xp,0);
     next.level=number(next.level,1,1);
-    next.manaCapsules=number(next.manaCapsules,1,1,10);
+    next.manaCapsules=number(next.manaCapsules,1,1,9);
     next.mana=number(next.mana,0,0,next.manaCapsules*10);
+    next.arcaneShieldCharge=number(next.arcaneShieldCharge,0,0,10);
+    next.arcaneShieldLevel=number(next.arcaneShieldLevel,1,1,2);
+    next.arcaneShieldPrepared=next.arcaneShieldPrepared===true;
+    next.arcaneShieldUsedWaveIds=Array.isArray(next.arcaneShieldUsedWaveIds)?next.arcaneShieldUsedWaveIds.filter(v=>typeof v==="string").slice(-500):[];
     next.hp=number(next.hp,10,0,MAX_HP);
     next.hpPills=number(next.hpPills,0);
     next.casinoCredits=number(next.casinoCredits,100,0,1000000000);
@@ -36,6 +40,7 @@
     next.settledWaveIds=Array.isArray(next.settledWaveIds)?next.settledWaveIds.filter(v=>typeof v==="string").slice(-500):[];
     next.casinoRoundIds=Array.isArray(next.casinoRoundIds)?next.casinoRoundIds.filter(v=>typeof v==="string").slice(-500):[];
     next.activeWave=next.activeWave&&typeof next.activeWave==="object"?next.activeWave:null;
+    if(next.activeWave)next.activeWave.resolvedChaosTargetIds=Array.isArray(next.activeWave.resolvedChaosTargetIds)?next.activeWave.resolvedChaosTargetIds.filter(v=>typeof v==="string").slice(-100):[];
     next.nonExchangeableAssets=Array.isArray(next.nonExchangeableAssets)?Array.from(new Set(next.nonExchangeableAssets.filter(v=>typeof v==="string"&&/^[a-zA-Z][a-zA-Z0-9_-]{0,47}$/.test(v)))):[];
     return next;
   }
@@ -103,7 +108,8 @@
     const next=normalizeSave(raw);
     if(next.activeWave){const closed=settleWave(next,"superseded");return beginWave(closed.state,gameId,meta);}
     const id="nu-wave-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,9);
-    next.activeWave={id,gameId:String(gameId||"unknown"),playerId:String(next.playerId||"guest-local"),startedAt:new Date().toISOString(),successfulInteractions:0,aggregates:{}};
+    next.activeWave={id,gameId:String(gameId||"unknown"),playerId:String(next.playerId||"guest-local"),startedAt:new Date().toISOString(),successfulInteractions:0,aggregates:{},resolvedChaosTargetIds:[]};
+    if(next.activeWave.gameId==="chaos"&&next.arcaneShieldPrepared&&next.arcaneShieldCharge>0){next.arcaneShieldUsedWaveIds=next.arcaneShieldUsedWaveIds.concat(id).slice(-500);next.arcaneShieldPrepared=false;}
     return {ok:true,state:next,waveId:id};
   }
   function recordWaveDelta(raw,asset,amount,category,meta){
@@ -140,6 +146,55 @@
     return {ok:true,state:next,wave:next.lastSettledWave,transactions:entries};
   }
 
+
+  function chargeArcaneShield(raw,mode,meta){
+    const next=normalizeSave(raw),details=meta||{},chargeMode=String(mode||"");
+    if(next.arcaneShieldCharge>0)return {ok:false,reason:"SHIELD_ALREADY_CHARGED",state:next};
+    if(next.mana<10)return {ok:false,reason:"INSUFFICIENT_MANA",state:next};
+    if(chargeMode==="store"){
+      if(next.activeWave)return {ok:false,reason:"STORE_CHARGE_REQUIRES_NO_ACTIVE_WAVE",state:next};
+      next.mana-=10;next.arcaneShieldCharge=10;next.arcaneShieldPrepared=true;
+      const at=String(details.at||new Date().toISOString()),id=String(details.id||("nu-arcane-shield-store-"+Date.now()+"-"+Math.random().toString(36).slice(2,8)));
+      const entry={id,at,kind:"consumption",title:"Arcane Shield · Mana container spent",playerId:String(next.playerId||"guest-local"),source:"nu.store",direction:"OUTGOING",asset:"mana",signedAmount:-10,category:"ARCANE_SHIELD_CHARGE",resultingBalance:next.mana,settlementStatus:"SETTLED",idempotencyKey:id,deltas:{mana:-10}};
+      if(next.transactions.some(tx=>tx&&tx.id===id))return {ok:false,reason:"DUPLICATE_TRANSACTION",state:normalizeSave(raw)};
+      next.transactions=next.transactions.concat(entry).slice(-MAX_TRANSACTIONS);
+      return {ok:true,state:next,charge:10,mode:chargeMode,transaction:entry};
+    }
+    if(chargeMode==="in_game"){
+      const wave=next.activeWave;
+      if(!wave||wave.gameId!=="chaos"||!wave.id)return {ok:false,reason:"NO_ACTIVE_CHAOS_WAVE",state:next};
+      if(next.arcaneShieldLevel<2)return {ok:false,reason:"SHIELD_UPGRADE_REQUIRED",state:next};
+      if(next.arcaneShieldUsedWaveIds.includes(wave.id))return {ok:false,reason:"WAVE_CHARGE_ALREADY_USED",state:next};
+      const spent=recordWaveDelta(next,"mana",-10,"ARCANE_SHIELD_CHARGE",{rate:10});
+      if(!spent.ok)return {ok:false,reason:"MANA_SPEND_FAILED",state:next};
+      const updated=spent.state;
+      updated.arcaneShieldCharge=10;updated.arcaneShieldPrepared=false;
+      updated.arcaneShieldUsedWaveIds=updated.arcaneShieldUsedWaveIds.concat(wave.id).slice(-500);
+      return {ok:true,state:updated,charge:10,mode:chargeMode,waveId:wave.id};
+    }
+    return {ok:false,reason:"INVALID_CHARGE_MODE",state:next};
+  }
+  function resolveChaosHits(raw,targetIds){
+    let next=normalizeSave(raw);
+    const wave=next.activeWave;
+    if(!wave||wave.gameId!=="chaos"||!wave.id)return {ok:false,reason:"NO_ACTIVE_CHAOS_WAVE",state:next,absorbed:0,hpDamage:0,resolvedCount:0,died:false};
+    const ids=Array.isArray(targetIds)?targetIds.map(v=>String(v||"")).filter(Boolean):[];
+    const resolved=new Set(wave.resolvedChaosTargetIds||[]);
+    let absorbed=0,hpDamage=0,hpRemaining=next.hp,resolvedCount=0;
+    for(const id of ids){
+      if(resolved.has(id))continue;
+      resolved.add(id);resolvedCount++;
+      if(next.arcaneShieldCharge>0){next.arcaneShieldCharge=Math.max(0,next.arcaneShieldCharge-1);absorbed++;}
+      else if(hpRemaining>0){hpRemaining--;hpDamage++;}
+    }
+    next.activeWave.resolvedChaosTargetIds=Array.from(resolved).slice(-100);
+    if(hpDamage>0){
+      const damage=recordWaveDelta(next,"hp",-hpDamage,"CHAOS_BREACH_DAMAGE",{rate:1});
+      if(!damage.ok)return {ok:false,reason:"HP_DAMAGE_RECORD_FAILED",state:normalizeSave(raw),absorbed:0,hpDamage:0,resolvedCount:0,died:false};
+      next=damage.state;
+    }
+    return {ok:true,state:next,absorbed,hpDamage,resolvedCount,died:hpRemaining===0&&hpDamage>0};
+  }
   function casinoSpendableAssets(raw){
     return assetRows(raw).filter(row=>!isHealthAssetKey(row.key)&&["progression","resources","currency","games"].includes(row.group)&&Number(row.value)>=1);
   }
@@ -222,5 +277,5 @@
     if(!entries.length)points.push({id:"current",at:"",title:"Current balance · no recorded changes",delta:0,balance:current});
     return points;
   }
-  return {MAX_HP,HP_PILL_COST,MAX_TRANSACTIONS,normalizeSave,buyHpPill,useHpPill,grantXP,settleCasinoRound,settleWalletBet,casinoSpendableAssets,beginWave,recordWaveDelta,settleWave,registerAsset,registerGameAssets,assetRows,inventoryRows,exchangeAssetRows,isExchangeableAsset,gameAssetRows,assetHistory};
+  return {MAX_HP,HP_PILL_COST,MAX_TRANSACTIONS,normalizeSave,buyHpPill,useHpPill,grantXP,settleCasinoRound,settleWalletBet,casinoSpendableAssets,beginWave,recordWaveDelta,settleWave,chargeArcaneShield,resolveChaosHits,registerAsset,registerGameAssets,assetRows,inventoryRows,exchangeAssetRows,isExchangeableAsset,gameAssetRows,assetHistory};
 });
