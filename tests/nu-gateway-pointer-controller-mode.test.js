@@ -25,8 +25,8 @@ test("Mouse hover activates a Gateway option directly and leaving cancels pendin
 test("Gamepad simulated mouse is delegated to the shared launcher-core adapter",()=>{
   const pointer=fs.readFileSync("nu-controller-pointer.js","utf8");
   assert.match(gateway,/NUControllerPointer\?\.setEnabled\(true\)/);
-  assert.match(pointer,/buttons\[12\]/);
-  assert.match(pointer,/buttons\[15\]/);
+  assert.match(pointer,/b\[12\]/);
+  assert.match(pointer,/b\[15\]/);
   assert.match(pointer,/if\(input\.confirm&&!confirmDown\)clickTarget\(\)/);
   assert.doesNotMatch(gateway,/function pollController\(/);
 });
