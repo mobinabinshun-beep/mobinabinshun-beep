@@ -45,11 +45,13 @@ struct RuntimeState {
     DWORD lastTick;
     FILETIME lastKernel, lastUser;
     double processCpuPercent;
+    bool memoryCapApplied;
 };
 
 static RuntimeState g;
 static HWND gWindow = NULL;
 static HWND gStatus = NULL;
+static HANDLE gJob = NULL;
 
 static DWORDLONG FileTimeValue(const FILETIME &ft) {
     ULARGE_INTEGER v;
@@ -89,8 +91,33 @@ static void SampleHardware() {
     }
 }
 
+static void ApplyRamCommitLimit() {
+    if (gJob || !g.totalRam) return;
+    HANDLE job = CreateJobObjectA(NULL, NULL);
+    if (!job) return;
+    JOBOBJECT_EXTENDED_LIMIT_INFORMATION limits;
+    ZeroMemory(&limits, sizeof(limits));
+    limits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_JOB_MEMORY | JOB_OBJECT_LIMIT_PROCESS_MEMORY;
+    DWORDLONG capBytes = g.totalRam / 2;
+    if (capBytes < 16ULL * 1024ULL * 1024ULL) {
+        CloseHandle(job);
+        return;
+    }
+    if (capBytes > (DWORDLONG)((SIZE_T)-1)) capBytes = (DWORDLONG)((SIZE_T)-1);
+    limits.JobMemoryLimit = (SIZE_T)capBytes;
+    limits.ProcessMemoryLimit = (SIZE_T)capBytes;
+    if (!SetInformationJobObject(job, JobObjectExtendedLimitInformation, &limits, sizeof(limits)) ||
+        !AssignProcessToJobObject(job, GetCurrentProcess())) {
+        CloseHandle(job);
+        return;
+    }
+    gJob = job;
+    g.memoryCapApplied = true;
+}
+
 static void Calibrate() {
     SampleHardware();
+    ApplyRamCommitLimit();
     int level = 8;
     if (!g.totalRam || g.totalRam <= 512ULL * 1024ULL * 1024ULL) level = 2;
     else if (g.totalRam <= 1024ULL * 1024ULL * 1024ULL) level = 4;
@@ -233,9 +260,9 @@ static void UpdateStatus() {
     char buf[512];
     double totalMb = (double)g.totalRam / (1024.0 * 1024.0);
     double freeMb = (double)g.freeRam / (1024.0 * 1024.0);
-    std::sprintf(buf, "CPU cores: %lu | Process CPU sample: %.1f%% | RAM: %.0f MB total / %.0f MB available | Level: %d/10 | CPU slice: %lu/100 ms | VM: %s",
+    std::sprintf(buf, "CPU cores: %lu | Process CPU sample: %.1f%% | RAM: %.0f MB total / %.0f MB available | Level: %d/10 | CPU slice: %lu/100 ms | RAM job cap: %s | VM: %s",
         (unsigned long)g.cpuCores, g.processCpuPercent, totalMb, freeMb, g.level,
-        (unsigned long)g.cpuWindowMs, g.running ? "RUNNING" : "IDLE");
+        (unsigned long)g.cpuWindowMs, g.memoryCapApplied ? "50% commit limit applied" : "not enforced", g.running ? "RUNNING" : "IDLE");
     if (gStatus) SetWindowTextA(gStatus, buf);
 }
 
@@ -296,6 +323,7 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
     }
     case WM_DESTROY:
         KillTimer(hwnd, TIMER_ID);
+        if (gJob) { CloseHandle(gJob); gJob = NULL; }
         PostQuitMessage(0); return 0;
     }
     return DefWindowProcA(hwnd, msg, wp, lp);
