@@ -2,7 +2,7 @@
 #define NOMINMAX
 #define WINVER 0x0501
 #define _WIN32_WINNT 0x0501
-#include <windows.h>
+// Generation 1 host: package/runtime contracts are documented in ../docs.\n#include <windows.h>
 #include <commdlg.h>
 #include <string>
 #include <vector>
