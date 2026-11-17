@@ -29,7 +29,9 @@ test("Gateway is the only pause authority and gameplay waits for the first retur
  assert.match(games,/gatewayPause\.open\(state\)/);
  assert.match(games,/gatewayPause\.close\(state\)/);
  assert.match(games,/syncGatewayBackgrounds\(state\.paused\)/);
- assert.match(games,/gatewayPause\.ownsPause\(\)/);
+ assert.match(games,/gatewayPause.isAwaitingInteraction\(\)/);
+ assert.match(games,/resumeAfterGatewayReturn/);
+ assert.doesNotMatch(games,/playerOverlayPaused|gatewayOwnsPause/);
  assert.match(pause,/if\(!state\|\|!state\.active\|\|state\.paused\)return false/);
  assert.match(pause,/if\(!state\|\|!state\.paused\|\|state\.turn>=10\)return false/);
  assert.ok(html.indexOf("nu-gateway-pause.js")<html.indexOf("nu-games.js"));
