@@ -93,8 +93,10 @@ This file is the normative owner-directed contract. The following implementation
 - GitHub Actions: Gateway main-game regression #351 PASS; Studio export regression #1034 PASS; Generation 1 HUD layout #372 PASS; graphics preview smoke #1089 PASS; graphics integrity #655 PASS; Exchange regression #231 PASS; Wallet/Profile regression #382 PASS.
 - Public demo deployment and live build identity: **UNVERIFIED**. The repository source is merged and the public URL is available, but the live site could not be independently fetched/identified in this session.
 - Follow-up owner directive and implementation: [PR #181](https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/181), merged as `49e354472227d3b3d65148c012614d9545a20e96`.
-- Verified pre-deployment recovery branch: `backup/pre-gateway-exclusive-pause-2026-11-17`, pinned to candidate `072b9e94235c689b4c493fff348c9b7ef5fa2945`.
+- Controller edge safeguard and regression coverage: [PR #182](https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/182), merged as `a72ca06ae166d95d35d80064f609f136c11a5ab8`; runtime edge fix is in `110162fd2f107931e8ef1837ae9e4bc457cf5ff0`.
+- Verified recovery branches: `backup/pre-gateway-exclusive-pause-2026-11-17` (initial candidate) and `backup/gateway-exclusive-pause-final-2026-11-17` (final merged state `a72ca06ae166d95d35d80064f609f136c11a5ab8`).
 - Follow-up CI on candidate `072b9e9`: Gateway main-game regression PASS; Studio export regression PASS; Exchange feature regression PASS; Generation 1 HUD layout PASS; graphics preview smoke PASS.
+- PR #182 final edge-coverage CI: Gateway main-game regression PASS; Studio export regression PASS; graphics preview smoke PASS.
 - Public Pages deployment/live browser build identity: **UNVERIFIED** in this session; the default branch now points to the merge commit, but the public URL could not be independently loaded.
 - Human desktop/mobile QA: pending. The owner directly updated and reaffirmed this Gateway/controller scope; the resulting behavior is locked again in [LOCKED-AREAS.md](./LOCKED-AREAS.md).
 
