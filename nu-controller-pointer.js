@@ -76,5 +76,5 @@
   win.addEventListener&&win.addEventListener("gamepadconnected",onConnected);
   return {start,stop,setEnabled(value){value?start():stop();},isEnabled(){return enabled;},getState(){return {enabled,x,y,padIndex,mode:"simulated-mouse"}},destroy(){stop();win.removeEventListener&&win.removeEventListener("gamepadconnected",onConnected);cursor&&cursor.remove();style&&style.remove();cursor=null;style=null;}};
  }
- root.NUControllerPointer={create,mode:"simulated-mouse",capabilities:{directionalPointer:true,separateConfirm:true,physicalMouseDirect:true,touchDirect:true}};
+ root.NUControllerPointer=Object.assign(create(),{create,mode:"simulated-mouse",capabilities:{directionalPointer:true,separateConfirm:true,physicalMouseDirect:true,touchDirect:true}});
 })(typeof window!=="undefined"?window:globalThis);
