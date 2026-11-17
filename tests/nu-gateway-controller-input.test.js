@@ -14,7 +14,7 @@ const manifest=fs.readFileSync("NU-GENERATION-1-MANIFEST.json","utf8");
 test("Gateway is mounted and remains available across Bag, Inventory, Wallet and Profile",()=>{
  assert.match(html,/id="nu-hex-gateway"/);
  assert.match(gateway,/\["bag-view","wallet-view","inventory-view","profile-view"\]/);
- assert.match(gateway,/activeUtility\.id==="profile-view"\?"profile-back"/);
+ assert.match(gateway,/function goHome\(\)[\s\S]*?document\.getElementById\("back-home"\)/);
  assert.match(gateway,/profile:.*menu-profile/);
 });
 
@@ -87,13 +87,13 @@ test("Nested player navigation preserves Wallet → Profile → Wallet → Bag h
  assert.match(player,/viewStack\.push\(\{view:activeView,focus:document\.activeElement\}\)/);
  assert.match(player,/const previous=viewStack\.pop\(\)/);
  assert.match(player,/if\(tab==="profile"\)\{open\(profileView\);return;\}/);
- assert.match(gateway,/activeUtility\.id==="wallet-view"\?"wallet-back"/);
+ assert.match(gateway,/function goHome\(\)[\s\S]*?home\.click\(\)/);
 });
 
 test("Hidden tabs do not restart a Gateway-paused round or gamepad polling",()=>{
  assert.match(games,/if\(document\.hidden\).*stopGamepad\(\)/);
  assert.match(games,/!gatewayOpen\)\{syncGatewayBackgrounds\(false\)/);
- assert.match(games,/const shouldFreeze=!!frozen\|\|document\.hidden/);
+ assert.match(games,/const shouldFreeze=!!frozen\|\|document\.hidden\|\|!!state\.paused\|\|!!\(state\.game&&!state\.active\)/);
  assert.match(games,/if\(state\.active&&!state\.paused\)/);
  assert.match(gateway,/if\(!open\)return/);
 });
