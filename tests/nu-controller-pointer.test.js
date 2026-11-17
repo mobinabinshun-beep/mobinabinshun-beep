@@ -22,7 +22,9 @@ test("D-pad and stick directions move the virtual pointer without activating tar
  assert.match(pointer,/x\+input\.dx\*step/);
  assert.match(pointer,/y\+input\.dy\*step/);
  assert.match(pointer,/updateTarget\(\);lastMove=time/);
- const movement=pointer.match(/if\(\(input\.dx\|\|input\.dy\)&&time-lastMove>=repeat\)\{[\s\S]*?updateTarget\(\);lastMove=time;\}/);\n assert.ok(movement);\n assert.doesNotMatch(movement[0],/clickTarget/);
+ const movement=pointer.match(/if\(\(input\.dx\|\|input\.dy\)&&time-lastMove>=repeat\)\{[\s\S]*?updateTarget\(\);lastMove=time;\}/);
+ assert.ok(movement);
+ assert.doesNotMatch(movement[0],/clickTarget/);
 });
 
 test("Confirm is a separate click; B remains Gateway cancel",()=>{
