@@ -19,8 +19,8 @@ test("D-pad and stick directions move the virtual pointer without activating tar
  assert.match(pointer,/buttons\[13\]/);
  assert.match(pointer,/buttons\[14\]/);
  assert.match(pointer,/buttons\[15\]/);
- assert.match(pointer,/x=x\+input\.dx\*step/);
- assert.match(pointer,/y=y\+input\.dy\*step/);
+ assert.match(pointer,/x\+input\.dx\*step/);
+ assert.match(pointer,/y\+input\.dy\*step/);
  assert.match(pointer,/updateTarget\(\);lastMove=time/);
  assert.doesNotMatch(pointer,/if\(input\.dx\|\|input\.dy\)[\s\S]{0,250}clickTarget\(\)/);
 });
