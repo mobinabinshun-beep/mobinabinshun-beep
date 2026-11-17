@@ -545,3 +545,7 @@ The archive repository is the canonical source for project-wide roles, owner dec
 - [Owner directive and demo acceptance backlog](https://github.com/mobinabinshun-beep/Repository/blob/main/Operations/2026-11-16/OWNER-DIRECTIVE-AND-DEMO-ACCEPTANCE-BACKLOG-fa.md)
 
 Authorized unlocked demo changes follow: code → machine tests/debugging → verified backup → public demo → link/build check and report → human QA/owner acceptance. Read AGENTS.md and docs/operations/LOCKED-AREAS.md before editing.
+
+
+## Mandatory cross-repository discovery before changes
+Before any implementation or new module, re-enumerate and inspect all accessible N.U repositories, search synonyms/parallel implementations, reuse existing assets first, and consolidate the canonical goals and future roadmap. See the [mandatory protocol](https://github.com/mobinabinshun-beep/Repository/blob/main/Governance/NU-CROSS-REPOSITORY-INVENTORY-AND-REUSE-FIRST-PROTOCOL-fa.md) and repository [AGENTS.md](./AGENTS.md).
