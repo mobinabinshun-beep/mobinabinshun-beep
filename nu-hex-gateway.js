@@ -38,14 +38,9 @@
   window.addEventListener("orientationchange",layoutItems,{passive:true});
 
   function goHome(){
-    const activeUtility=utilityViews.find(view=>view.classList.contains("active"));
-    if(activeUtility){
-      const backId=activeUtility.id==="inventory-view"?"inventory-back":activeUtility.id==="wallet-view"?"wallet-back":activeUtility.id==="profile-view"?"profile-back":"bag-back";
-      document.getElementById(backId)?.click();
-      return;
-    }
     const back=document.getElementById("back-home");
-    if(back)back.click();else window.location.href="./index.html";
+    if(back&&!utilityViews.some(view=>view.classList.contains("active")))back.click();
+    else window.location.href="./index.html";
   }
   const routes={
     back:goHome,
@@ -68,8 +63,9 @@
     if(open){
       window.dispatchEvent(new Event("nu:gateway-open"));
       trigger.focus({preventScroll:true});
-      startController();
+      window.NUControllerPointer?.setEnabled(true);
     }else{
+      window.NUControllerPointer?.setEnabled(false);
       clearTimeout(activationTimer);activationTimer=0;selected=null;
       items.forEach(item=>{item.classList.remove("is-selected","is-confirming");item.setAttribute("aria-pressed","false");});
       controllerConfirmDown=false;controllerCancelDown=false;
@@ -203,7 +199,7 @@
   });
   window.addEventListener("blur",()=>{if(open)setOpen(false);});
   window.addEventListener("pagehide",()=>{if(open)setOpen(false);});
-  window.addEventListener("gamepadconnected",startController);
+
   window.addEventListener("nu:menu-dismissed",releaseHeldState);
   window.addEventListener("nu:player-overlay-close",releaseHeldState);
 
