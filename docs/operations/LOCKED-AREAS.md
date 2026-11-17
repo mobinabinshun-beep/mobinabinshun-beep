@@ -49,7 +49,7 @@ The archived CSS snapshot is a point-in-time copy of the full stylesheet at the 
 **Status:** LOCKED — owner-directed, effective 2026-11-17  
 **Canonical contract:** [Gateway & simulated-mouse controller contract](./GATEWAY-AND-CONTROLLER-INPUT-CONTRACT-2026-11-17.md)  
 **Implementation:** PR [#180](https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/180), merge commit `45803b784f7b10bacc1081644fe0895fc8c382af)  
-**Verified recovery points:** `backup/pre-gateway-simulated-mouse-2026-11-17`; `backup/pre-gateway-exclusive-pause-2026-11-17` (candidate `072b9e94235c689b4c493fff348c9b7ef5fa2945`)
+**Verified recovery points:** `backup/pre-gateway-simulated-mouse-2026-11-17`; `backup/pre-gateway-exclusive-pause-2026-11-17` (candidate `072b9e94235c689b4c493fff348c9b7ef5fa2945`); `backup/gateway-exclusive-pause-final-2026-11-17` (final merged state `a72ca06ae166d95d35d80064f609f136c11a5ab8`)
 
 ## Locked behavior
 
