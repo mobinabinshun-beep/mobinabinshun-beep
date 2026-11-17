@@ -103,7 +103,7 @@
       const left=!!(buttons[14]&&buttons[14].pressed)||(Number(axes[0])<-.55);
       const right=!!(buttons[15]&&buttons[15].pressed)||(Number(axes[0])>.55);
       const direction=up||left?-1:down||right?1:0;
-      if(direction&&timestamp-lastControllerMove>220){moveSelection(direction);lastControllerMove=timestamp;}
+      if(direction&&timestamp-lastControllerMove>220){moveControllerSelection(direction);lastControllerMove=timestamp;}
       const confirm=!!(buttons[0]&&buttons[0].pressed),cancel=!!(buttons[1]&&buttons[1].pressed);
       if(confirm&&!controllerConfirmDown)activate(selected||items[0]);
       if(cancel&&!controllerCancelDown){setOpen(false);trigger.focus({preventScroll:true});}
@@ -112,23 +112,57 @@
     if(open)controllerFrame=requestAnimationFrame(pollController);
   }
   function startController(){if(open&&!controllerFrame)controllerFrame=requestAnimationFrame(pollController);}
+  let pendingItem=null;
+  function moveControllerSelection(direction){
+    const current=items.indexOf(selected);
+    if(direction>0&&current===items.length-1){
+      setOpen(false);
+      trigger.focus({preventScroll:true});
+      return;
+    }
+    moveSelection(direction);
+  }
   function activate(item){
     if(!item||!item.dataset)return;
     const key=item.dataset.action,action=routes[key];
     if(!action||!open)return;
     clearTimeout(activationTimer);
-    item.classList.add("is-selected","is-confirming");
+    pendingItem=item;
+    item.classList.add("is-confirming");
     activationTimer=window.setTimeout(()=>{
+      pendingItem=null;
+      item.classList.remove("is-confirming");
       setOpen(false,false);
       action();
     },120);
   }
 
+  trigger.addEventListener("pointerenter",event=>{
+    if(event.pointerType==="mouse"&&!open)setOpen(true);
+  });
+  trigger.addEventListener("pointerdown",event=>{
+    if(event.pointerType==="touch"){
+      event.preventDefault();
+      suppressClickUntil=Date.now()+900;
+      setOpen(true);
+    }
+  });
   trigger.addEventListener("click",event=>{
-    event.preventDefault();setOpen(!open);
+    event.preventDefault();
+    if(Date.now()<suppressClickUntil)return;
+    if(event.detail===0)setOpen(!open);
+    else if(!open)setOpen(true);
   });
   items.forEach(item=>{
-    item.addEventListener("pointerenter",event=>{if(event.pointerType==="mouse"&&open)select(item);});
+    item.addEventListener("pointerenter",event=>{
+      if(event.pointerType==="mouse"&&open)activate(item);
+    });
+    item.addEventListener("pointerleave",event=>{
+      if(event.pointerType==="mouse"&&pendingItem===item){
+        clearTimeout(activationTimer);activationTimer=0;pendingItem=null;
+        item.classList.remove("is-confirming");
+      }
+    });
     item.addEventListener("focus",()=>select(item));
     item.addEventListener("pointerup",event=>{
       if(event.pointerType!=="touch"||!open)return;
