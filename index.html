@@ -32,6 +32,7 @@
 <div class="game-stage" id="game-stage"><canvas id="game-canvas" tabindex="0" role="group" aria-label="Game field. Use arrow keys to select a target, then press Enter or Space to interact." aria-keyshortcuts="ArrowLeft ArrowRight ArrowUp ArrowDown Enter Space" aria-describedby="game-info"></canvas>
 
 <div class="hp-bar" id="hp-bar"><span>♥ PLAYER HP</span><div class="hp-track"><div id="hp-fill"></div></div><b id="hp-value">10/10</b><button class="hp-pill-use" id="hp-pill-use" type="button" hidden aria-label="Use HP pill"><img src="./assets/nu-hp-pill-golden-pixel.svg" alt=""><span id="hp-pill-count"></span></button></div><div class="bars"><span class="hud-chip" id="level-chip">LV 1</span><div class="bar-wrap"><span class="bar-label">XP CAPSULE</span><div class="bar-fill" id="xp-fill"></div><span class="bar-value" id="xp-value"></span></div><div class="bar-wrap"><span class="bar-label">MANA CAPSULE</span><div class="bar-fill mana" id="mana-fill"></div><span class="bar-value" id="mana-value"></span></div><span id="mana-capsules" class="mana-capsules">MANA CAPSULES 1</span></div>
+<div id="mana-drain-layer" class="nu-mana-drain-layer" aria-hidden="true"></div>
 </div>
 <div id="arcane-shield-panel" class="nu-arcane-shield" role="group" aria-label="Arcane Shield status" hidden>
  <div class="nu-arcane-shield-heading"><strong>ARCANE SHIELD</strong><span id="arcane-shield-status">CHARGE AT STORE</span></div>
