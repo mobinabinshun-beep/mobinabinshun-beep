@@ -105,3 +105,21 @@ For each failure, record:
 ## Acceptance gate
 
 Do not mark the candidate as human-accepted until the manual checklist has been run on supported devices, the public Pages deployment has been confirmed, and all blocker/major defects have been resolved or explicitly accepted by the project owner.
+
+## 10. Mana containers, N-BI and Arcane Shield acceptance
+Canonical rules: [Mana Capsule, N-BI Cannon & Arcane Shield Specification](../architecture/NU-MANA-CAPSULE-ARCANE-SHIELD-SPEC.md).
+
+- [ ] Verify container capacity levels 1, 2 and 9 represent 10, 20 and 90 Mana respectively; each individual container remains fixed at 10.
+- [ ] Collect Mana one unit at a time; confirm empty containers refill and full-capacity overflow is rejected without a successful interaction/reward.
+- [ ] At N-BI cannon level 1, fire one shot with exactly 10 Mana; verify exactly 10 is spent once, one Chaos mass is neutralized and +3 XP is awarded once.
+- [ ] Verify the lightweight Mana-drain animation does not control or delay the underlying wallet debit.
+- [ ] Charge Arcane Shield with one full container; verify the container is emptied and the purple shield activates immediately at 10 charge.
+- [ ] Verify one Chaos hit consumes one shield unit; after depletion, subsequent damage reaches HP.
+- [ ] Verify shield remainder carries unchanged to the next gameplay Wave; no automatic refill or top-up occurs.
+- [ ] Verify only one shield activation per gameplay Wave ID, including after depletion and at upgraded shield levels.
+- [ ] At shield level 1, confirm Store-only charging and no in-game charge control.
+- [ ] At shield level 2, confirm the holographic control permits one in-game charge per Wave only, requiring one full container.
+- [ ] Leave the visible Chaos Attack surface while masses remain; verify every remaining hit is resolved once and damage is not skipped or duplicated.
+- [ ] Verify shield charge spends are separate outgoing Mana ledger rows from N-BI costs; failed actions produce no spend row.
+- [ ] Repeat navigation, reload recovery and exit events; confirm no duplicate damage, XP, Mana spend or Wave settlement.
+- [ ] Re-run HP capsule, casino, existing Wave settlement, accessibility/reduced-motion, mobile touch and protected-HUD regression checks.
