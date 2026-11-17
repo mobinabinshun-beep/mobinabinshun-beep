@@ -5,14 +5,14 @@
   const scrim=document.querySelector(".nu-gateway-scrim");
   const gameView=document.getElementById("game-view");
   const utilityViews=["bag-view","wallet-view","inventory-view","profile-view"].map(id=>document.getElementById(id)).filter(Boolean);
-  if(!root||!scrim||!gameView)return;
+  if(!root||!scrim)return;
 
   const trigger=root.querySelector(".nu-gateway-trigger");
   const items=[...root.querySelectorAll(".nu-gateway-item")];
   let open=false,selected=null,activationTimer=0,outsideSince=0,suppressClickUntil=0;
 
   function syncGatewayScope(){
-    const active=gameView.classList.contains("active");
+    const active=!!(gameView&&gameView.classList.contains("active"));
     const utility=utilityViews.some(view=>view.classList.contains("active"));
     document.body.classList.toggle("nu-gateway-enabled",active||utility);
     document.body.classList.toggle("nu-main-game-page",active);
@@ -21,7 +21,7 @@
   }
   syncGatewayScope();
   const scopeObserver=new MutationObserver(syncGatewayScope);
-  [gameView,...utilityViews].forEach(view=>scopeObserver.observe(view,{attributes:true,attributeFilter:["class"]}));
+  [ ...(gameView?[gameView]:[]), ...utilityViews ].forEach(view=>scopeObserver.observe(view,{attributes:true,attributeFilter:["class"]}));
 
   function layoutItems(){
     const compact=window.matchMedia("(max-width: 600px)").matches;
@@ -44,8 +44,15 @@
   }
   const routes={
     back:goHome,
-    menu:()=>document.getElementById("menu-open")?.click(),
-    profile:()=>document.getElementById("menu-profile")?.click()
+    menu:()=>{const menu=document.getElementById("menu-open");if(menu)menu.click();else window.location.href="./index.html#library-section";},
+    library:()=>window.location.href="./index.html#library-section",
+    store:()=>window.location.href="./index.html?view=store",
+    wallet:()=>window.location.href="./index.html?view=wallet",
+    profile:()=>{const profile=document.getElementById("menu-profile");if(profile)profile.click();else window.location.href="./index.html?view=profile";},
+    launcher:()=>{const settings=document.getElementById("open-settings");if(settings)settings.click();else window.location.href="./launcher.html";},
+    studio:()=>window.location.href="./pixel-art-studio.html",
+    casino:()=>window.location.href="./casino.html",
+    resume:()=>window.location.href="./index.html"
   };
 
   function releaseHeldState(){
