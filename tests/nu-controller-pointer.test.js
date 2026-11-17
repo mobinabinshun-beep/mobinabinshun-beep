@@ -8,7 +8,7 @@ const index=fs.readFileSync("index.html","utf8");
 const launcher=fs.readFileSync("launcher.html","utf8");
 
 test("Launcher core exposes one reusable simulated-mouse controller adapter",()=>{
- assert.match(pointer,/root\.NUControllerPointer=\{create,mode:"simulated-mouse"/);
+ assert.match(pointer,/root\.NUControllerPointer=Object\.assign\(create\(\),\{create,mode:"simulated-mouse"/);
  assert.match(pointer,/capabilities:\{directionalPointer:true,separateConfirm:true/);
  assert.match(index,/nu-controller-pointer\.js/);
  assert.match(launcher,/nu-controller-pointer\.js/);
