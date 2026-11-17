@@ -1,0 +1,64 @@
+name: N.U Native Launcher Installer Preview
+
+on:
+  push:
+    branches:
+      - release/nu-launcher-installer-preview-2026-11-17
+    paths:
+      - 'launcher-native/**'
+      - '.github/workflows/nu-launcher-installer.yml'
+  pull_request:
+    paths:
+      - 'launcher-native/**'
+      - '.github/workflows/nu-launcher-installer.yml'
+  workflow_dispatch:
+
+jobs:
+  build-and-package:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x86
+      - name: Compile native Win32 launcher
+        shell: pwsh
+        working-directory: launcher-native
+        run: |
+          New-Item -ItemType Directory -Force build | Out-Null
+          cl /nologo /O1 /MT /EHsc /W4 /D_CRT_SECURE_NO_WARNINGS /DWINVER=0x0501 /D_WIN32_WINNT=0x0501 src\main.cpp /link /SUBSYSTEM:WINDOWS /OUT:build\NU-Launcher.exe user32.lib gdi32.lib comdlg32.lib kernel32.lib
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Copy-Item README.md build/README.txt
+          Copy-Item -Recurse samples build/samples
+      - name: Run module contract tests
+        shell: pwsh
+        working-directory: launcher-native
+        run: |
+          python -m unittest discover -s tests -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Install Inno Setup
+        shell: pwsh
+        run: choco install innosetup --yes --no-progress
+      - name: Build user-mode installer
+        shell: pwsh
+        run: |
+          $iscc = 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe'
+          if (!(Test-Path $iscc)) { throw "Inno Setup compiler not found: $iscc" }
+          & $iscc 'launcher-native\installer\N.U-Launcher.iss'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Verify installer and portable payload
+        shell: pwsh
+        run: |
+          $installer = 'launcher-native\build\N.U-Launcher-Setup-0.1.0.exe'
+          if (!(Test-Path $installer)) { throw 'Installer output missing' }
+          Get-FileHash $installer -Algorithm SHA256 | Format-List
+          Get-FileHash 'launcher-native\build\NU-Launcher.exe' -Algorithm SHA256 | Format-List
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nu-launcher-windows-installer-preview
+          path: |
+            launcher-native/build/N.U-Launcher-Setup-0.1.0.exe
+            launcher-native/build/NU-Launcher.exe
+            launcher-native/build/README.txt
+            launcher-native/build/samples/**
+          if-no-files-found: error

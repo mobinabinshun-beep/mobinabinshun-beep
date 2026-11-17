@@ -1,0 +1,4 @@
+[Module]
+id=org.nu.samples.hello
+generation=1
+entry=hello.nuvm

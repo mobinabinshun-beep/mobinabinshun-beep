@@ -545,3 +545,12 @@ The archive repository is the canonical source for project-wide roles, owner dec
 - [Owner directive and demo acceptance backlog](https://github.com/mobinabinshun-beep/Repository/blob/main/Operations/2026-11-16/OWNER-DIRECTIVE-AND-DEMO-ACCEPTANCE-BACKLOG-fa.md)
 
 Authorized unlocked demo changes follow: code → machine tests/debugging → verified backup → public demo → link/build check and report → human QA/owner acceptance. Read AGENTS.md and docs/operations/LOCKED-AREAS.md before editing.
+
+
+## N.U Native Launcher — Generation 1 candidate (2026-11-17)
+- [Implementation and engineering record](./NU-LAUNCHER-NATIVE-GEN1-IMPLEMENTATION-fa.md) — native Win32 host, NUVM/1 contract, resource-control limits, build and QA status.
+- [Native launcher source](./launcher-native/) — source, sample module, build script and contract tests.
+- [Code candidate PR #168](https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/168).
+- [Latest portable Win32 preview artifact](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/43996600424).
+
+The CI artifact is a modern Win32 preview, not an XP-certified binary or production installer. XP SP3 x86 and human QA remain pending.
