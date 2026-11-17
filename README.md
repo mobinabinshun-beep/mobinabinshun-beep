@@ -549,3 +549,7 @@ Authorized unlocked demo changes follow: code → machine tests/debugging → ve
 
 ## Mandatory cross-repository discovery before changes
 Before any implementation or new module, re-enumerate and inspect all accessible N.U repositories, search synonyms/parallel implementations, reuse existing assets first, and consolidate the canonical goals and future roadmap. See the [mandatory protocol](https://github.com/mobinabinshun-beep/Repository/blob/main/Governance/NU-CROSS-REPOSITORY-INVENTORY-AND-REUSE-FIRST-PROTOCOL-fa.md) and repository [AGENTS.md](./AGENTS.md).
+
+
+## Public demo = human test laboratory
+The public Generation 1 demo is the mandatory shared surface for real human testing, observation, feedback and reporting—not an optional preview. For every explicitly authorized, unlocked and demo-eligible candidate, follow machine tests → verified backup → public-demo deployment → live URL/build verification → post-deploy smoke checks → human QA on that exact public build. Do not ask for redundant pre-deployment confirmation for this standing authorized demo step. A deployed candidate may remain HUMAN-QA-PENDING; deployment is not human acceptance or production promotion. See [NU-OPS-IMPLEMENT-01](./docs/operations/NU-OPS-IMPLEMENT-01.md), Section 11.

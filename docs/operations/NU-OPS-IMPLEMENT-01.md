@@ -111,3 +111,18 @@ These are option categories, not automatic prescriptions. Adapt the three option
 ## 10. Canonical record
 
 Every substantive change must have a dated implementation record with request, scope, design decisions, affected files, tests, backup refs, deployment evidence, human report/acceptance state, lock state, dependencies and rollback. This document is the canonical execution protocol; older documents that conflict with it are superseded for deployment sequencing and must be corrected when next touched.
+
+
+## 11. Binding owner clarification — public demo is the human test laboratory (2026-11-17)
+
+The owner explicitly confirms that the **public Generation 1 demo is the project's shared test laboratory and the required surface for human testing, observation, feedback and reporting**. It is not merely a showcase, optional preview, or a production-release gate.
+
+- For every explicitly authorized, unlocked, demo-eligible implementation, the execution path is: inspect and scope → implement on an isolated candidate → machine tests/debugging → verified backup → deploy the candidate to the public demo → verify the live URL/build identity → perform available post-deploy machine smoke checks → hand the exact public build to the owner/testers for human QA → record the human report and decision.
+- Do not ask the owner to reconfirm that a normal eligible candidate should be placed on the public demo. This permission is part of the standing protocol. Ask only when the target, scope, deployment path, risk, protected dependency, irreversible effect, or required authority is genuinely ambiguous or outside the recorded authorization.
+- A branch preview, PR diff, screenshot, local build, or CI result is not a substitute for the public demo. Human findings must identify the exact public URL and deployed commit/build.
+- The public demo may intentionally contain a candidate that is **HUMAN-QA-PENDING**. That status is expected and is not equivalent to acceptance, approval, locking, or production promotion.
+- Keep the demo safe and reversible: do not deploy if relevant machine checks fail, the backup is not verified, or the change crosses a protected/locked boundary without authorization. If deployment cannot be verified, report **DEMO-DEPLOYMENT-BLOCKED** or **DEPLOYMENT-UNVERIFIED**; never imply that source changes are live.
+- Human QA and owner acceptance remain real, separate gates. Only the owner (or explicitly delegated tester within scope) can supply human findings; only the owner can approve/lock scope unless authority is explicitly delegated.
+- This clarification does not authorize direct edits to the default branch, bypass of PR/review protections, Generation 2 activation, or production promotion.
+
+This section records the owner's clarification of the existing Section 7 demo-QA rule; it makes the operational meaning explicit and does not weaken any safety, backup, machine-test, protected-area or human-acceptance requirement.
