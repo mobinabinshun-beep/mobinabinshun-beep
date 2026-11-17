@@ -4,7 +4,7 @@
 const $=id=>document.getElementById(id);
 const state={save:NUWallet.normalizeSave(NU.load()),game:null,turn:0,active:false,paused:false,quality:5,engine:null,roundSeed:0,targets:[],shots:0,raf:0,lastFrame:0,keyboardTargetIndex:-1,keyboardMode:false};
 const gatewayPause=window.NUGatewayPause.create();
-let gamepadFrame=0,lastGamepadMove=0,gamepadConfirmDown=false;
+let gamepadFrame=0,lastGamepadMove=0,gamepadConfirmDown=false,gamepadReturnPrimed=false,gamepadReturnDirection=0,gamepadReturnConfirm=false;
 function syncGatewayBackgrounds(frozen){
  const shouldFreeze=!!frozen||document.hidden;
  if(state.engine&&typeof state.engine[shouldFreeze?"pause":"resume"]==="function")state.engine[shouldFreeze?"pause":"resume"]();
@@ -22,6 +22,7 @@ function handleGatewayOpen(){
 }
 function resumeAfterGatewayReturn(fromGamepad=false){
  if(!gatewayPause.resumeOnInteraction(state))return false;
+ gamepadReturnPrimed=false;gamepadReturnDirection=0;gamepadReturnConfirm=false;
  state.lastFrame=0;
  if(!document.hidden&&$("game-view").classList.contains("active"))state.raf=requestAnimationFrame(animateGame);
  syncGatewayBackgrounds(false);
@@ -30,6 +31,7 @@ function resumeAfterGatewayReturn(fromGamepad=false){
  return true;
 }
 function handleGatewayClose(){
+ gamepadReturnPrimed=false;gamepadReturnDirection=0;gamepadReturnConfirm=false;
  const waiting=gatewayPause.close(state);
  if(waiting&&$("game-view").classList.contains("active")){
   if(state.raf)cancelAnimationFrame(state.raf);
@@ -291,7 +293,15 @@ function pollGamepad(timestamp){
   const right=!!(buttons[15]&&buttons[15].pressed)||(Number(axes[0])>.55);
   const direction=up||left?-1:down||right?1:0;
   const confirm=!!(buttons[0]&&buttons[0].pressed);
-  if(waiting&&(direction||confirm))resumeAfterGatewayReturn(true);
+  if(waiting){
+   if(!gamepadReturnPrimed){gamepadReturnPrimed=true;gamepadReturnDirection=direction;gamepadReturnConfirm=confirm;}
+   else{
+    const freshDirection=direction!==0&&direction!==gamepadReturnDirection;
+    const freshConfirm=confirm&&!gamepadReturnConfirm;
+    if(freshDirection||freshConfirm)resumeAfterGatewayReturn(true);
+    gamepadReturnDirection=direction;gamepadReturnConfirm=confirm;
+   }
+  }
   if(state.active&&!state.paused){
    if(direction&&timestamp-lastGamepadMove>220){moveKeyboardTarget(direction);lastGamepadMove=timestamp;}
    if(confirm&&!gamepadConfirmDown)activateKeyboardTarget();
