@@ -108,3 +108,33 @@ test("game UI keeps shield controls separate from the locked classic resource HU
   assert.match(games,/resolveRemainingChaosMasses\("CHAOS_PLAYER_EXIT"\)/);
   assert.match(css,/prefers-reduced-motion:reduce/);
 });
+
+test("N-BI level-one shot atomically spends 10 Mana, neutralizes one target and awards 3 XP",()=>{
+  const wave=Wallet.beginWave({mana:20,manaCapsules:2,xp:0},"chaos");
+  const registered=Wallet.registerChaosTargets(wave.state,["mass-a","mass-b"]);
+  const shot=Wallet.fireNbiShot(registered.state,"mass-a");
+  assert.equal(shot.ok,true);
+  assert.equal(shot.manaSpent,10);
+  assert.equal(shot.xpAwarded,3);
+  assert.equal(shot.state.mana,10);
+  assert.equal(shot.state.xp,3);
+  assert.deepEqual(shot.state.activeWave.pendingChaosTargetIds,["mass-b"]);
+  assert.ok(shot.state.activeWave.neutralizedChaosTargetIds.includes("mass-a"));
+  assert.equal(shot.state.activeWave.successfulInteractions,1);
+  const later=Wallet.resolveChaosHits(shot.state,["mass-a","mass-b"]);
+  assert.equal(later.resolvedCount,1);
+  assert.equal(later.hpDamage,1);
+});
+
+test("pending Chaos targets survive save normalization and are resolved exactly once",()=>{
+  const wave=Wallet.beginWave({mana:0,hp:5},"chaos");
+  const registered=Wallet.registerChaosTargets(wave.state,["pending-1","pending-2"]);
+  const saved=Wallet.normalizeSave(JSON.parse(JSON.stringify(registered.state)));
+  const recovered=Wallet.resolveChaosHits(saved,saved.activeWave.pendingChaosTargetIds);
+  assert.equal(recovered.resolvedCount,2);
+  assert.equal(recovered.hpDamage,2);
+  assert.deepEqual(recovered.state.activeWave.pendingChaosTargetIds,[]);
+  const duplicate=Wallet.resolveChaosHits(recovered.state,["pending-1","pending-2"]);
+  assert.equal(duplicate.resolvedCount,0);
+  assert.equal(duplicate.hpDamage,0);
+});
