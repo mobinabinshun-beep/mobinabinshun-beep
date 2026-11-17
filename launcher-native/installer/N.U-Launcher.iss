@@ -19,7 +19,6 @@ SolidCompression=yes
 WizardStyle=modern
 UninstallDisplayIcon={app}\{#MyAppExeName}
 ArchitecturesAllowed=x86 x64
-ArchitecturesInstallIn64BitMode=
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
