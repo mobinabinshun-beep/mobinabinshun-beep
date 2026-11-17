@@ -15,7 +15,7 @@ test("Gateway is the only visible gameplay pause control",()=>{
  assert.match(games,/window\.addEventListener\("nu:gateway-open"/);
  assert.match(games,/window\.addEventListener\("nu:gateway-close"/);
 });
-test("Gateway closing resumes only a pause it created",()=>{
+test("Gateway closing transfers pause to first gameplay interaction",()=>{
  assert.match(games,/gatewayPause\.open\(state\)/);
  assert.match(games,/gatewayPause\.close\(state\)/);
  assert.doesNotMatch(games,/playerOverlayPaused|gatewayOwnsPause/);
