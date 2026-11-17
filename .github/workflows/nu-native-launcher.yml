@@ -28,6 +28,12 @@ jobs:
           New-Item -ItemType Directory -Force build | Out-Null
           cl /nologo /O1 /MT /EHsc /W4 /D_CRT_SECURE_NO_WARNINGS /DWINVER=0x0501 /D_WIN32_WINNT=0x0501 src\main.cpp /link /SUBSYSTEM:WINDOWS /OUT:build\NU-Launcher.exe user32.lib gdi32.lib comdlg32.lib kernel32.lib
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Assemble portable preview package
+        shell: pwsh
+        working-directory: launcher-native
+        run: |
+          Copy-Item README.md build/README.txt
+          Copy-Item -Recurse samples build/samples
       - name: Verify sample module contract
         shell: pwsh
         working-directory: launcher-native
@@ -35,5 +41,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: nu-native-launcher-win32-smoke-build
-          path: launcher-native/build/NU-Launcher.exe
+          path: launcher-native/build/**
           if-no-files-found: error
