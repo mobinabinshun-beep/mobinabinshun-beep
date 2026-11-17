@@ -1,0 +1,26 @@
+{
+  "product": "N.U / Niroo Universe Native Launcher",
+  "version": "0.1.0-foundation",
+  "generation": 1,
+  "status": "ci-built-device-qa-pending",
+  "entry": "nu-launcher.exe",
+  "artifact": {
+    "workflow_run_id": 44002703860,
+    "artifact_id": 14293112041,
+    "exe_size_bytes": 128970,
+    "exe_sha256": "62bde8eb0ad3697387e072b0314bc328fca7503fd05d96fc256035aa0c85a7e2",
+    "pe": "PE32 GUI Intel i386; subsystem 5.01",
+    "xp_runtime_verified": false
+  },
+  "browser_dependency": false,
+  "dynamic_module_loading": false,
+  "resource_policy": {
+    "ram_ceiling_fraction": 0.5,
+    "stable_ram_fraction_of_total": 0.3333333,
+    "cpu_dispatch": "single-threaded-cooperative",
+    "stable_cpu_target_fraction": 0.3333333,
+    "hard_cpu_limit_on_windows_xp": false,
+    "gpu_telemetry": "unknown",
+    "gpu_hard_limit": false
+  }
+}
