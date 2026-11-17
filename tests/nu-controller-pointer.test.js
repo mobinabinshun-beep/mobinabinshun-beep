@@ -6,12 +6,16 @@ const pointer=fs.readFileSync("nu-controller-pointer.js","utf8");
 const gateway=fs.readFileSync("nu-hex-gateway.js","utf8");
 const index=fs.readFileSync("index.html","utf8");
 const launcher=fs.readFileSync("launcher.html","utf8");
+const gatewayCss=fs.readFileSync("nu-hex-gateway.css","utf8");
 
 test("Launcher core exposes one reusable simulated-mouse controller adapter",()=>{
  assert.match(pointer,/root\.NUControllerPointer=Object\.assign\(create\(\),\{create,mode:"simulated-mouse"/);
  assert.match(pointer,/capabilities:\{directionalPointer:true,separateConfirm:true/);
  assert.match(index,/nu-controller-pointer\.js/);
  assert.match(launcher,/nu-controller-pointer\.js/);
+ assert.match(launcher,/<body class="nu-launcher-page">/);
+ assert.match(gatewayCss,/body\.nu-launcher-page #nu-hex-gateway/);
+ assert.doesNotMatch(gateway,/if\(!root\|\|!scrim\|\|!gameView\)return/);
 });
 
 test("D-pad and stick directions move the virtual pointer without activating targets",()=>{
