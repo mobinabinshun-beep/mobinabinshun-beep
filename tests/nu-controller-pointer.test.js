@@ -19,10 +19,10 @@ test("Launcher core exposes one reusable simulated-mouse controller adapter",()=
 });
 
 test("D-pad and stick directions move the virtual pointer without activating targets",()=>{
- assert.match(pointer,/buttons\[12\]/);
- assert.match(pointer,/buttons\[13\]/);
- assert.match(pointer,/buttons\[14\]/);
- assert.match(pointer,/buttons\[15\]/);
+ assert.match(pointer,/b\[12\]/);
+ assert.match(pointer,/b\[13\]/);
+ assert.match(pointer,/b\[14\]/);
+ assert.match(pointer,/b\[15\]/);
  assert.match(pointer,/x\+input\.dx\*step/);
  assert.match(pointer,/y\+input\.dy\*step/);
  assert.match(pointer,/updateTarget\(\);lastMove=time/);
