@@ -9,6 +9,7 @@
 #include <sstream>
 #include <algorithm>
 #include <cstdlib>
+#include <cstdio>
 
 #pragma comment(lib, "comdlg32.lib")
 
@@ -114,6 +115,9 @@ static std::string DirectoryOf(const std::string &path) {
 static bool LoadModule(const char *manifestPath) {
     std::ifstream mf(manifestPath);
     if (!mf) { g.status = "Cannot open module manifest."; return false; }
+    g.running = false;
+    g.program.clear();
+    g.pc = 0;
     std::string line, id, entry;
     int generation = 0;
     bool inModule = false;
@@ -128,7 +132,7 @@ static bool LoadModule(const char *manifestPath) {
         else if (key == "generation") generation = atoi(value.c_str());
         else if (key == "entry") entry = value;
     }
-    if (id.empty() || generation != 1 || !SafeRelativePath(entry)) {
+    if (id.empty() || generation != 1 || !SafeRelativePath(entry) || entry.size() < 5 || entry.substr(entry.size() - 5) != ".nuvm") {
         g.status = "Rejected module: invalid id, generation, or entry path.";
         return false;
     }
@@ -146,6 +150,8 @@ static bool LoadModule(const char *manifestPath) {
         std::istringstream in(line);
         std::string op;
         Instruction ins;
+        ins.a = ins.b = ins.c = ins.d = 0;
+        ins.r = ins.g = ins.blue = 0;
         in >> op;
         if (op == "CLEAR") {
             ins.op = OP_CLEAR;
@@ -226,7 +232,7 @@ static void UpdateStatus() {
     char buf[512];
     double totalMb = (double)g.totalRam / (1024.0 * 1024.0);
     double freeMb = (double)g.freeRam / (1024.0 * 1024.0);
-    wsprintfA(buf, "CPU cores: %lu | Process CPU sample: %.1f%% | RAM: %.0f MB total / %.0f MB available | Level: %d/10 | CPU slice: %lu/100 ms | VM: %s",
+    std::sprintf(buf, "CPU cores: %lu | Process CPU sample: %.1f%% | RAM: %.0f MB total / %.0f MB available | Level: %d/10 | CPU slice: %lu/100 ms | VM: %s",
         (unsigned long)g.cpuCores, g.processCpuPercent, totalMb, freeMb, g.level,
         (unsigned long)g.cpuWindowMs, g.running ? "RUNNING" : "IDLE");
     if (gStatus) SetWindowTextA(gStatus, buf);
