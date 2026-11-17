@@ -40,5 +40,6 @@
 
 ## Documentation
 - Keep one canonical implementation contract per subject; link secondary notes rather than creating competing rules.
+- The current Gateway/controller contract is [GATEWAY-AND-CONTROLLER-INPUT-CONTRACT-2026-11-17.md](./docs/operations/GATEWAY-AND-CONTROLLER-INPUT-CONTRACT-2026-11-17.md). The older Gateway navigation report is historical only.
 - Record decisions, affected files, focused tests, backup/recovery, demo status and remaining risks in the relevant change record.
 - Do not claim tests, backup, deployment, human acceptance or locks that were not actually verified.
