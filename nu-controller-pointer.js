@@ -7,7 +7,7 @@
  function create(options){
   options=options||{};
   const doc=options.document||root.document,win=options.window||root;
-  let enabled=false,frame=0,lastMove=0,confirmDown=false,lastTarget=null,x=0,y=0,padIndex=null;
+  let enabled=false,frame=0,lastMove=0,confirmDown=false,cancelDown=false,lastTarget=null,x=0,y=0,padIndex=null;
   let cursor=null,style=null;
   const step=Number(options.step)||28,repeat=Number(options.repeat)||170;
   function ensureCursor(){
@@ -32,7 +32,7 @@
    const down=!!(b[13]&&b[13].pressed)||Number(a[1])>threshold;
    const left=!!(b[14]&&b[14].pressed)||Number(a[0])< -threshold;
    const right=!!(b[15]&&b[15].pressed)||Number(a[0])>threshold;
-   return {dx:(right?1:0)-(left?1:0),dy:(down?1:0)-(up?1:0),confirm:!!(b[0]&&b[0].pressed)};
+   return {dx:(right?1:0)-(left?1:0),dy:(down?1:0)-(up?1:0),confirm:!!(b[0]&&b[0].pressed),cancel:!!(b[1]&&b[1].pressed)};
   }
   function clickTarget(){
    const target=targetAt();if(!target)return false;
@@ -67,7 +67,7 @@
    if(!frame)frame=win.requestAnimationFrame(tick);
   }
   function stop(){
-   enabled=false;if(frame)win.cancelAnimationFrame(frame);frame=0;confirmDown=false;
+   enabled=false;if(frame)win.cancelAnimationFrame(frame);frame=0;confirmDown=false;cancelDown=false;
    if(lastTarget&&lastTarget.classList)lastTarget.classList.remove("nu-simulated-mouse-target");
    lastTarget=null;if(cursor)cursor.style.display="none";
   }
