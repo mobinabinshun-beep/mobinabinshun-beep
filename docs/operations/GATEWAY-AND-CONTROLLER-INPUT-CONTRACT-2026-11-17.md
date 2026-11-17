@@ -92,6 +92,10 @@ This file is the normative owner-directed contract. The following implementation
 - Verified recovery branch: `backup/pre-gateway-simulated-mouse-2026-11-17`, identical to the tested candidate (0 ahead / 0 behind).
 - GitHub Actions: Gateway main-game regression #351 PASS; Studio export regression #1034 PASS; Generation 1 HUD layout #372 PASS; graphics preview smoke #1089 PASS; graphics integrity #655 PASS; Exchange regression #231 PASS; Wallet/Profile regression #382 PASS.
 - Public demo deployment and live build identity: **UNVERIFIED**. The repository source is merged and the public URL is available, but the live site could not be independently fetched/identified in this session.
-- Human desktop/mobile QA: pending. The owner explicitly requested this exact Gateway/controller contract be locked; that scoped lock is recorded in [LOCKED-AREAS.md](./LOCKED-AREAS.md). Human visual/device QA remains separate.
+- Follow-up owner directive and implementation: [PR #181](https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/181), merged as `49e354472227d3b3d65148c012614d9545a20e96`.
+- Verified pre-deployment recovery branch: `backup/pre-gateway-exclusive-pause-2026-11-17`, pinned to candidate `072b9e94235c689b4c493fff348c9b7ef5fa2945`.
+- Follow-up CI on candidate `072b9e9`: Gateway main-game regression PASS; Studio export regression PASS; Exchange feature regression PASS; Generation 1 HUD layout PASS; graphics preview smoke PASS.
+- Public Pages deployment/live browser build identity: **UNVERIFIED** in this session; the default branch now points to the merge commit, but the public URL could not be independently loaded.
+- Human desktop/mobile QA: pending. The owner directly updated and reaffirmed this Gateway/controller scope; the resulting behavior is locked again in [LOCKED-AREAS.md](./LOCKED-AREAS.md).
 
 The exact prior version is not to be restored unilaterally; future corrections must preserve this contract unless the owner explicitly changes it.
