@@ -57,7 +57,8 @@
      updateTarget();lastMove=time;
     }
     if(input.confirm&&!confirmDown)clickTarget();
-    confirmDown=input.confirm;
+    if(input.cancel&&!cancelDown)doc.dispatchEvent(new win.KeyboardEvent("keydown",{key:"Escape",bubbles:true,cancelable:true}));
+    confirmDown=input.confirm;cancelDown=input.cancel;
    }else{padIndex=null;confirmDown=false;}
    if(enabled)frame=win.requestAnimationFrame(tick);
   }
