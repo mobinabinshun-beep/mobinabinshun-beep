@@ -14,7 +14,9 @@ test("Gateway controller mounts on the main game and launcher surfaces",()=>{
  assert.match(css,/body\.nu-game-active #nu-hex-gateway/);
  assert.match(css,/body\.nu-game-active #menu-open/);
  assert.match(css,/body\.nu-game-active #back-home/);
- for(const page of [casino,launcher,studio])assert.match(page,/id="nu-hex-gateway"/);\n assert.match(launcher,/<body class="nu-launcher-page">/);\n assert.match(css,/body\.nu-launcher-page #nu-hex-gateway/);
+ for(const page of [casino,launcher,studio])assert.match(page,/id="nu-hex-gateway"/);
+ assert.match(launcher,/<body class="nu-launcher-page">/);
+ assert.match(css,/body\.nu-launcher-page #nu-hex-gateway/);
 });
 
 test("Gateway exposes exactly Back, Menu and Profile as one-click actions",()=>{
