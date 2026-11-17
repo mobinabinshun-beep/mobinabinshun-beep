@@ -5,10 +5,10 @@
   "status": "ci-built-device-qa-pending",
   "entry": "nu-launcher.exe",
   "artifact": {
-    "workflow_run_id": 44002703860,
-    "artifact_id": 14293112041,
+    "workflow_run_id": 44002998286,
+    "artifact_id": 14292239834,
     "exe_size_bytes": 128970,
-    "exe_sha256": "62bde8eb0ad3697387e072b0314bc328fca7503fd05d96fc256035aa0c85a7e2",
+    "exe_sha256": "ed639067e3794dd42f7feeb0ba8ff27418582bd7d3e87a79bea734124393b3e3",
     "pe": "PE32 GUI Intel i386; subsystem 5.01",
     "xp_runtime_verified": false
   },
