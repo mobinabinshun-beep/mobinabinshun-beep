@@ -207,7 +207,7 @@ function renderArcaneShield(){
  const active=state.game==="chaos"&&$("game-view").classList.contains("active");
  panel.hidden=!active;if(!active)return;
  const charge=Math.max(0,Math.min(10,Number(state.save.arcaneShieldCharge)||0)),fill=$("arcane-shield-fill"),value=$("arcane-shield-value"),status=$("arcane-shield-status"),button=$("arcane-shield-charge");
- if(fill)fill.style.width=(charge*10)+"%";
+ if(fill)fill.style.width=(charge*10)+"%";const track=panel.querySelector('[role="progressbar"]');if(track)track.setAttribute("aria-valuenow",String(charge));
  if(value)value.textContent=charge+"/10";
  const waveId=state.save.activeWave&&state.save.activeWave.id,used=!!(waveId&&state.save.arcaneShieldUsedWaveIds.includes(waveId));
  if(status)status.textContent=charge>0?"ACTIVE · "+charge+" DEFENSE":used?"CHARGE USED THIS WAVE":state.save.arcaneShieldLevel>=2?"READY · MANUAL CHARGE":"CHARGE AT STORE";
