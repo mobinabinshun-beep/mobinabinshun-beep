@@ -40,7 +40,7 @@ test("Store shield charge rejects insufficient Mana, active Wave, and stacking",
 test("Level one cannot recharge in-game; level two can charge once per gameplay Wave",()=>{
   const wave1=Wallet.beginWave({mana:20,arcaneShieldLevel:1},"chaos");
   assert.equal(Wallet.chargeArcaneShield(wave1.state,"in_game").reason,"SHIELD_UPGRADE_REQUIRED");
-  const wave2=Wallet.beginWave({mana:20,arcaneShieldLevel:2},"chaos");
+  const wave2=Wallet.beginWave({mana:20,manaCapsules:2,arcaneShieldLevel:2},"chaos");
   const charged=Wallet.chargeArcaneShield(wave2.state,"in_game");
   assert.equal(charged.ok,true);
   assert.equal(charged.state.mana,10);
@@ -70,7 +70,7 @@ test("Shield absorbs hits before HP and duplicate target resolution is idempoten
 });
 
 test("partial shield charge carries to the next Wave and can be recharged once after depletion",()=>{
-  const firstWave=Wallet.beginWave({mana:30,hp:10,arcaneShieldLevel:2},"chaos");
+  const firstWave=Wallet.beginWave({mana:30,manaCapsules:3,hp:10,arcaneShieldLevel:2},"chaos");
   const charged=Wallet.chargeArcaneShield(firstWave.state,"in_game");
   const partial=Wallet.resolveChaosHits(charged.state,["1","2","3","4"]);
   assert.equal(partial.state.arcaneShieldCharge,6);
