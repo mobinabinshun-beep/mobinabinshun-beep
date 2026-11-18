@@ -7,15 +7,6 @@ on:
     paths:
       - "index.html"
       - "nu-controller-pointer.js"
-name: N.U Gateway main-game regression
-
-on:
-  push:
-    branches:
-      - "**"
-    paths:
-      - "index.html"
-      - "nu-controller-pointer.js"
       - "nu-interaction-core.js"
       - "nu-games.js"
       - "tests/nu-gateway-controller-input.test.js"
