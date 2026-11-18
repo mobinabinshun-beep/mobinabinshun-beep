@@ -33,10 +33,23 @@
   function targetAt(){return doc&&typeof doc.elementFromPoint==="function"?doc.elementFromPoint(x,y):null;}
   function updateTarget(source){
    const next=targetAt();
-   if(lastTarget&&lastTarget.classList)lastTarget.classList.remove("nu-simulated-mouse-target");
+   const common={bubbles:true,cancelable:true,view:win,clientX:x,clientY:y,pointerId:1,pointerType:"mouse",isPrimary:true,buttons:0};
+   if(lastTarget&&lastTarget!==next){
+    if(typeof win.PointerEvent==="function"){
+     lastTarget.dispatchEvent(new win.PointerEvent("pointerout",Object.assign({},common,{relatedTarget:next})));
+     lastTarget.dispatchEvent(new win.PointerEvent("pointerleave",Object.assign({},common,{bubbles:false,relatedTarget:next})));
+    }
+    if(lastTarget.classList)lastTarget.classList.remove("nu-simulated-mouse-target");
+   }
+   if(next&&lastTarget!==next&&typeof win.PointerEvent==="function"){
+    next.dispatchEvent(new win.PointerEvent("pointerover",Object.assign({},common,{relatedTarget:lastTarget})));
+    next.dispatchEvent(new win.PointerEvent("pointerenter",Object.assign({},common,{bubbles:false,relatedTarget:lastTarget})));
+   }
    lastTarget=next;
    if(next&&next.classList&&String(next.tagName||"").toUpperCase()!=="CANVAS")next.classList.add("nu-simulated-mouse-target");
    if(cursor){cursor.style.left=x+"px";cursor.style.top=y+"px";cursor.style.display=pointerVisible?"block":"none";}
+   if(next&&typeof win.PointerEvent==="function")next.dispatchEvent(new win.PointerEvent("pointermove",common));
+   else if(next&&typeof win.MouseEvent==="function")next.dispatchEvent(new win.MouseEvent("mousemove",Object.assign({},common,{detail:0})));
    emit("nu:simulated-pointer-move",{x:x,y:y,target:next,source:source||"controller"});
   }
   function start(){
