@@ -247,7 +247,7 @@ function resolveChaosMasses(targetIds,reason){
  renderArcaneShield();return result;
 }
 function resolveRemainingChaosMasses(reason){
- if(state.game!=="chaos"||!state.save.activeWave||state.save.activeWave.gameId!=="chaos")return {ok:true,resolvedCount:0};
+ if(!state.save.activeWave||state.save.activeWave.gameId!=="chaos")return {ok:true,resolvedCount:0};
  const remaining=state.targets.filter(target=>target.alive),ids=Array.from(new Set([...(state.save.activeWave.pendingChaosTargetIds||[]),...remaining.map(target=>target.id)]));
  if(!ids.length)return {ok:true,resolvedCount:0};
  const result=resolveChaosMasses(ids,reason||"CHAOS_EXIT_DAMAGE");
