@@ -151,3 +151,20 @@ This section is the newer owner instruction and supersedes conflicting input/exi
 - Human QA: `PENDING`.
 - Owner acceptance / final scope lock: `PENDING`.
 
+
+
+## 9. Human finding — keyboard-emulated click-controller pointer bridge (2026-11-18)
+
+The 2026-11-18 human report states that the hierarchical Gateway options respond to directional input but the simulated pointer does not move. Inspection of the previous candidate showed that its runtime test dispatched synthetic custom events directly; it did not exercise a real keydown path. The shared adapter listened for custom directional events and Gamepad API polling, but ordinary arrow-key events were still consumed by the Generation 1 game-target keyboard handler.
+
+The successor candidate adds a capture-phase keyboard bridge in `nu-controller-pointer.js`:
+- Outside Gateway, ArrowUp/Down/Left/Right start the simulated pointer if needed and move it one discrete step.
+- Enter, Space, and NumpadEnter perform the separate click at the virtual pointer.
+- The bridge ignores modified/repeated key events.
+- While Gateway navigation is active, the bridge yields all direction and confirmation keys to Gateway. The Gateway's hierarchical selection, extra-Down exit, and pause behavior are not rewritten.
+- The bridge runs in the shared adapter, not as per-page controller code.
+
+Regression coverage now includes actual keydown-shaped input without a connected Gamepad API device and verifies that Gateway retains exclusive ownership while open. This corrects the earlier test gap: synthetic custom-event coverage alone was insufficient evidence for keyboard-emulated click-controller behavior.
+
+**Successor branch:** `fix/gateway-real-keyboard-pointer-bridge-2026-11-18`  
+**Approval state at authoring:** implementation candidate; CI and exact-SHA machine approval pending. The previous frozen candidate `96b549d0f53fc0f69cc1ea2494250196cef6f87d` remains unchanged. Live-device human QA is still required after CI.
