@@ -208,3 +208,33 @@ The Win32 host now routes its known large allocations through the N.U RAM reserv
 - displays the current N.U reservation total in the host window.
 
 This is real host-path accounting, not a complete memory sandbox. GDI/driver internal allocations are only approximated by the file-size reservation; C runtime, cache, future renderer and all module allocations still need to use a central allocator/budget broker. No claim of system-wide RAM enforcement is made.
+
+ 
+## 20. NUDb/1 portable user-data bundle
+
+The portable C90 module `nu_data_bundle.c/.h` defines the non-executable NUDb/1 user-data container.
+
+### Container header (20 bytes, little-endian)
+- bytes 0–3: ASCII `NUDB`
+- byte 4: format major = 1
+- byte 5: format minor = 0
+- byte 6: entry count (1–32)
+- byte 7: reserved = 0
+- bytes 8–11: payload length after the 20-byte header
+- bytes 12–15: CRC32 of the complete entry payload
+- bytes 16–19: product tag `N.U.`
+
+### Entry record (12-byte header + ID + data)
+- byte 0: data class (1 Save, 2 Wallet, 3 Profile, 4 User Asset, 5 Settings)
+- byte 1: ID length (1–63)
+- byte 2: schema major (must be nonzero)
+- byte 3: schema minor
+- bytes 4–7: data length (maximum 16 MiB per entry)
+- bytes 8–11: CRC32 of entry data
+- followed by stable ASCII ID and raw data bytes.
+
+The complete bundle is limited to 64 MiB and 32 entries. IDs allow lowercase ASCII letters, digits, dot, dash and underscore; IDs must be globally unique. The parser validates the entire container and all entry CRCs before publishing pointers into the input buffer. No executable/module, cache or installer class is allowed. CRC32 detects accidental corruption only and does not authenticate the owner or prevent deliberate modification.
+
+### Integration boundary
+
+The builder/parser and portable unit tests are implemented. The host does not yet write bundle files, perform atomic export, preview imports, merge/replace profiles, or migrate the browser localStorage save. Browser key `nu-world-save-v1` requires an explicit browser export/import bridge; the Native process cannot read a browser profile's localStorage directly. Do not advertise backup/migration UI until filesystem and user-flow integration passes.
