@@ -20,7 +20,7 @@ Only this master index determines document precedence. Dated reports and paralle
 - Disk-backed FIFO cache with CRC-protected chunks (max 64 KiB) and quota enforcement.
 - Unsigned NUPK/1 development-container builder carrying NUVM/1 bytecode; structural manifest parser.
 - Fail-closed crypto-provider boundary; no production signing keys/trust roots.
-- Bounded dependency resolver, cleanup planner, component reconciliation and in-memory journal state model.
+- Bounded dependency resolver, cleanup planner, component reconciliation, in-memory journal state model, and NUDb/1 user-data bundle builder/parser for Save/Wallet/Profile/Assets/Settings classes.
 - Minimal Win32/GDI host targeting XP-era subsystem metadata; loads one canonical still BMP from beside the executable and scales it with GDI. No animation, Canvas, WebGL, shader, browser or decorative image layers.
 
 ## Important format compatibility warning
