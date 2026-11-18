@@ -6,6 +6,8 @@ const pointer=fs.readFileSync("nu-controller-pointer.js","utf8");
 const gateway=fs.readFileSync("nu-hex-gateway.js","utf8");
 const index=fs.readFileSync("index.html","utf8");
 const launcher=fs.readFileSync("launcher.html","utf8");
+const casino=fs.readFileSync("casino.html","utf8");
+const studio=fs.readFileSync("pixel-art-studio.html","utf8");
 const gatewayCss=fs.readFileSync("nu-hex-gateway.css","utf8");
 
 test("Launcher core exposes one reusable simulated-mouse controller adapter",()=>{
