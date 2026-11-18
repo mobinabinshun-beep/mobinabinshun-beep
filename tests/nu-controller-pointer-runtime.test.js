@@ -8,7 +8,7 @@ const source=fs.readFileSync("nu-controller-pointer.js","utf8");
 function harness(){
  const listeners=new Map();
  const makeElement=()=>({style:{},className:"",attributes:{},children:[],classList:{add(){},remove(){}},setAttribute(k,v){this.attributes[k]=v;},appendChild(child){this.children.push(child);},remove(){},dispatchEvent(){return true;}});
- const target={classList:{add(){},remove(){}}};
+ const target={classList:{add(){},remove(){}},events:[],dispatchEvent(event){this.events.push(event);return true;}};
  const document={head:makeElement(),body:makeElement(),createElement(){return makeElement();},elementFromPoint(){return target;},dispatchEvent(){return true;}};
  class CustomEvent{constructor(type,options){this.type=type;this.detail=options&&options.detail;}}
  const window={document,innerWidth:800,innerHeight:600,navigator:{getGamepads(){return [];}},
@@ -18,7 +18,7 @@ function harness(){
   dispatchEvent(event){for(const fn of listeners.get(event.type)||[])fn(event);return true;},
   requestAnimationFrame(){return 1;},cancelAnimationFrame(){}};
  vm.runInNewContext(source,{window,globalThis:window,Math,Number,Array,Object,String});
- return {window,adapter:window.NUControllerPointer,dispatch(type,detail){window.dispatchEvent(new CustomEvent(type,{detail}));}};
+ return {window,target,adapter:window.NUControllerPointer,dispatch(type,detail){window.dispatchEvent(new CustomEvent(type,{detail}));}};
 }
 
 test("Click-controller starts the simulated cursor without a connected Gamepad API device",()=>{
@@ -64,4 +64,27 @@ test("Gateway keeps exclusive ownership of arrow keys while hierarchical navigat
  h.window.dispatchEvent(event);const after=h.adapter.getState();
  assert.equal(after.x,before.x);assert.equal(after.y,before.y);assert.equal(event.defaultPrevented,undefined);
  h.adapter.setGatewayNavigation(false);h.adapter.destroy();
+});
+
+test("setEnabled starts the simulated pointer for keyboard-emulated controllers without Gamepad API",()=>{
+ const h=harness();h.adapter.setEnabled(true);
+ assert.equal(h.adapter.isEnabled(),true);
+ assert.equal(h.adapter.getState().x,400);
+ h.adapter.destroy();
+});
+test("Virtual pointer movement dispatches pointermove and mousemove to the hit-tested game target",()=>{
+ const h=harness();h.adapter.startClickController();h.target.events.length=0;
+ assert.equal(h.adapter.move(1,0),true);
+ assert.ok(h.target.events.some(event=>event.type==="pointermove"));
+ assert.ok(h.target.events.some(event=>event.type==="mousemove"));
+ h.adapter.destroy();
+});
+test("Held keyboard-emulated direction repeat events continue moving the virtual pointer",()=>{
+ const h=harness();h.adapter.startClickController();
+ const event={type:"keydown",key:"ArrowRight",repeat:true,altKey:false,ctrlKey:false,metaKey:false,
+  preventDefault(){this.defaultPrevented=true;},stopImmediatePropagation(){this.stopped=true;}};
+ h.window.dispatchEvent(event);
+ assert.equal(h.adapter.getState().x,428);
+ assert.equal(event.defaultPrevented,true);
+ h.adapter.destroy();
 });
