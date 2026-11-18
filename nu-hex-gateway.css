@@ -50,3 +50,6 @@ body.nu-gateway-utility-active #profile-back{display:none!important}
 
 /* The launcher calibration surface mounts its own Gateway instance. */
 body.nu-launcher-page #nu-hex-gateway,body.nu-launcher-page .nu-gateway-scrim{display:block}
+
+/* During Gateway navigation, keep the simulated pointer behind the Gateway layer. */
+body.nu-gateway-open .nu-simulated-mouse-cursor{z-index:105!important;opacity:.28;}
