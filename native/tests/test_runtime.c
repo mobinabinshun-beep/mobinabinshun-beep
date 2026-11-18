@@ -120,6 +120,7 @@ int main(void){
   assert(plan.installer_preserved==0u && plan.installer_bytes==800u);
   assert(plan.delete_count==5u && plan.delete_bytes==2100u);
   assert(!NU_CleanupPlanBuild(items,8u,0x80000000u,0,&plan));
+  assert(!NU_CleanupPlanBuild(items,8u,remove_mask,2,&plan));
   items[0].data_class=99u;
   assert(!NU_CleanupPlanBuild(items,8u,remove_mask,0,&plan));
  }
