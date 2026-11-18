@@ -15,6 +15,10 @@ test("Launcher core exposes one reusable simulated-mouse controller adapter",()=
  assert.match(pointer,/capabilities:\{directionalPointer:true,separateConfirm:true/);
  assert.match(index,/nu-controller-pointer\.js/);
  assert.match(launcher,/nu-controller-pointer\.js/);
+ assert.match(casino,/nu-controller-pointer\\.js/);
+ assert.match(studio,/nu-controller-pointer\\.js/);
+ assert.ok(casino.indexOf("nu-controller-pointer.js")<casino.indexOf("nu-hex-gateway.js"));
+ assert.ok(studio.indexOf("nu-controller-pointer.js")<studio.indexOf("nu-hex-gateway.js"));
  assert.match(launcher,/<body class="nu-launcher-page">/);
  assert.match(gatewayCss,/body\.nu-launcher-page #nu-hex-gateway/);
  assert.doesNotMatch(gateway,/if\(!root\|\|!scrim\|\|!gameView\)return/);
