@@ -22,9 +22,13 @@ test("core exposes independent direct mouse, touch, selective and virtual transl
 test("physical mouse and touch are normalized without conflating sources",()=>{
  const h=harness(),seen=[];h.core.on("interaction",r=>seen.push(r));
  h.emit("pointerdown",{pointerType:"mouse",button:0});
+ h.emit("pointermove",{pointerType:"mouse",clientX:120,clientY:80});
  h.emit("pointerdown",{pointerType:"touch",pointerId:4});
+ h.emit("pointermove",{pointerType:"touch",pointerId:4,clientX:20,clientY:30});
  h.emit("pointerup",{pointerType:"touch",pointerId:4});
+ assert.ok(seen.some(r=>r.source==="physical-mouse"&&r.action==="hover"));
  assert.ok(seen.some(r=>r.source==="physical-mouse"&&r.action==="press"));
+ assert.ok(seen.some(r=>r.source==="direct-touch"&&r.action==="move"));
  assert.ok(seen.some(r=>r.source==="direct-touch"&&r.action==="activate"));
 });
 test("selective click and select events produce semantic actions",()=>{
