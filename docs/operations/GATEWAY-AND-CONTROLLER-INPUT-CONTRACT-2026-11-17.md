@@ -194,7 +194,7 @@ Regression coverage now includes actual keydown-shaped input without a connected
 
 ### Forward correction
 - The shared adapter now dispatches `pointermove` and `mousemove` to the element under the virtual pointer, so canvas aiming and pointer-aware game controls receive movement rather than only a CSS target outline.
-- `setEnabled(true)` force-starts the adapter for keyboard-emulated click controllers that do not expose the Gamepad API.
+- Keyboard-emulated direction keydown starts the adapter directly even when no Gamepad API device exists; Gateway keeps exclusive ownership of those keys while open. Physical mouse input remains direct and does not force-enable simulated mode.
 - Repeated keydown direction events are accepted, allowing held directional input to continue moving the pointer.
 - All four mounted pages use the new cache key `20261118-interaction-r7`.
 
