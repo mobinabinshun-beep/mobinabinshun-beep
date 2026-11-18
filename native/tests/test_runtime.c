@@ -11,7 +11,7 @@
 #include "../nu_install_plan.h"
 int main(void){
  NU_Budget b;uint8_t code[]={1,0,42,0,0,0,1,1,8,0,0,0,3,0,1,0};
- uint8_t pkg[16+sizeof(code)];NU_PackageView view;NU_VM vm;int result;unsigned int i;
+ uint8_t pkg[NU_PACKAGE_HEADER_SIZE+sizeof(code)];NU_PackageView view;NU_VM vm;int result;unsigned int i;
  NU_BudgetInit(&b,1024u*1024u*1024u,1024u*1024u*1024u,1u);
  assert(b.ram_limit_bytes==NU_DEFAULT_RAM_CAP);assert(b.shared_cache_bytes==250u*1024u*1024u);
  assert(b.short_cache_bytes+b.pattern_cache_bytes==b.shared_cache_bytes);
@@ -32,8 +32,11 @@ int main(void){
  assert(NU_PackageValidate(pkg,sizeof(pkg),&view));NU_VMInit(&vm,view.code,view.code_size,100u);
  result=1;for(i=0u;i<20u&&result>0;++i)result=NU_VMStep(&vm);
  assert(vm.halted&&vm.registers[0]==50u);
- pkg[16u]^=1u;assert(!NU_PackageValidate(pkg,sizeof(pkg),&view));pkg[16u]^=1u;
- pkg[5u]=1u;assert(!NU_PackageValidate(pkg,sizeof(pkg),&view));pkg[5u]=0u;
+ pkg[NU_PACKAGE_HEADER_SIZE]^=1u;assert(!NU_PackageValidate(pkg,sizeof(pkg),&view));pkg[16u]^=1u;
+ pkg[4u]=2u;assert(!NU_PackageValidate(pkg,sizeof(pkg),&view));pkg[4u]=1u;
+ pkg[11u]=1u;assert(!NU_PackageValidate(pkg,sizeof(pkg),&view));pkg[11u]=0u;
+ pkg[0]='N';pkg[1]='U';pkg[2]='V';pkg[3]='M';assert(!NU_PackageValidate(pkg,sizeof(pkg),&view));
+ pkg[0]='N';pkg[1]='U';pkg[2]='P';pkg[3]='K';
  {uint8_t bad[]={255u};NU_VMInit(&vm,bad,1u,10u);assert(NU_VMStep(&vm)==-1&&vm.fault);}
  {
   NU_DiskCache cache;NU_IRInstruction ir[4];uint8_t translated[64];size_t translated_size;uint8_t first[]={1u,2u,3u,4u};uint8_t second[]={9u,8u,7u};uint8_t output[16];uint32_t output_size;FILE *probe;uint8_t staged[sizeof(pkg)];uint32_t staged_size;FILE *source;
