@@ -20,6 +20,8 @@ typedef enum NU_BundleDataClass {
 
 typedef struct NU_BundleEntry {
  uint8_t data_class;
+ uint8_t schema_major;
+ uint8_t schema_minor;
  char id[NU_BUNDLE_ID_SIZE];
  const uint8_t *data;
  uint32_t size;
