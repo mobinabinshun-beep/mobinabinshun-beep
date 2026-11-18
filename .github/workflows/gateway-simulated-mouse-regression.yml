@@ -1,0 +1,44 @@
+name: Gateway simulated-mouse and hierarchical input regression
+on:
+  push:
+    branches:
+      - "fix/gateway-simulated-mouse-human-review-2026-11-18"
+  pull_request:
+    paths:
+      - "nu-controller-pointer.js"
+      - "nu-hex-gateway.js"
+      - "nu-hex-gateway.css"
+      - "nu-games.js"
+      - "index.html"
+      - "launcher.html"
+      - "casino.html"
+      - "pixel-art-studio.html"
+      - "tests/nu-controller-pointer-runtime.test.js"
+      - "tests/nu-gateway-simulated-mouse.test.js"
+      - "tests/nu-hex-gateway.test.js"
+      - ".github/workflows/gateway-simulated-mouse-regression.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  gateway-input-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check JavaScript syntax
+        run: |
+          node --check nu-controller-pointer.js
+          node --check nu-hex-gateway.js
+          node --check nu-games.js
+      - name: Run Gateway and gameplay input regression tests
+        run: |
+          node --test \
+            tests/nu-controller-pointer-runtime.test.js \
+            tests/nu-gateway-simulated-mouse.test.js \
+            tests/nu-hex-gateway.test.js \
+            tests/nu-keyboard-gameplay.test.js
