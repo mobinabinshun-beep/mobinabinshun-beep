@@ -7,7 +7,7 @@
  "use strict";
  const LIMIT=240,records=[];
  const listeners=new Map();
- let sequence=0,installed=false,lastTouchAt=0;
+ let sequence=0,installed=false,lastTouchAt=0,lastMouseMoveAt=0;
  const INTERACTIVE='button,a,input,select,textarea,[role="button"],[role="option"],[role="menuitem"],[tabindex],canvas,[data-nu-interactive]';
  function now(){return Date.now();}
  function describe(node){
@@ -27,11 +27,13 @@
  }
  function on(type,fn){if(typeof fn!=="function")return()=>{};if(!listeners.has(type))listeners.set(type,[]);listeners.get(type).push(fn);return()=>listeners.set(type,(listeners.get(type)||[]).filter(x=>x!==fn));}
  function targetOf(event){return event&&event.target&&event.target.closest?event.target.closest(INTERACTIVE):event&&event.target;}
- function mouse(event){if(!event||event.pointerType==="touch"||event.type==="click")return;if(event.type==="pointermove"||event.type==="mousemove")return;publish(event.type==="pointerdown"?"press":"release","physical-mouse",targetOf(event),{button:event.button,detail:event.detail||0});}
+ function mouse(event){if(!event||event.pointerType==="touch"||event.type==="click")return;if(event.type==="pointermove"){if(now()-lastMouseMoveAt>=80){lastMouseMoveAt=now();publish("hover","physical-mouse",targetOf(event),{x:event.clientX,y:event.clientY});}return;}if(event.type==="mousemove")return;publish(event.type==="pointerdown"?"press":"release","physical-mouse",targetOf(event),{button:event.button,detail:event.detail||0});}
  function touch(event){
   if(!event||event.pointerType!=="touch")return;
   if(event.type==="pointerdown"){lastTouchAt=now();publish("press","direct-touch",targetOf(event),{pointerId:event.pointerId});}
+  if(event.type==="pointermove")publish("move","direct-touch",targetOf(event),{pointerId:event.pointerId,x:event.clientX,y:event.clientY});
   if(event.type==="pointerup")publish("activate","direct-touch",targetOf(event),{pointerId:event.pointerId});
+  if(event.type==="pointercancel")publish("cancel","direct-touch",targetOf(event),{pointerId:event.pointerId});
  }
  function selective(event){
   if(!event)return;
@@ -54,6 +56,8 @@
  function install(){
   if(installed||!root.addEventListener)return api;installed=true;
   root.addEventListener("pointerdown",event=>{mouse(event);touch(event);},true);
+  root.addEventListener("pointermove",event=>{mouse(event);touch(event);},true);
+  root.addEventListener("pointercancel",touch,true);
   root.addEventListener("pointerup",touch,true);
   root.addEventListener("click",event=>{mouse(event);selective(event);},true);
   root.addEventListener("change",selective,true);
