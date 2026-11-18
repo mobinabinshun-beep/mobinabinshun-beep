@@ -20,7 +20,7 @@ function handleGatewayOpen(){
  stopGamepad();
  syncGatewayBackgrounds(true);
 }
-let gatewayAwaitingInteraction=false,gatewayResumeFrame=0,gatewayResumeArmed=false,gatewayResumeButtons=[];
+let gatewayAwaitingInteraction=false,gatewayResumeFrame=0,gatewayResumeArmed=false;
 function resumeAfterGatewayInteraction(){
  if(!gatewayAwaitingInteraction||!state.paused||state.turn>=10)return false;
  gatewayAwaitingInteraction=false;
@@ -39,6 +39,7 @@ function watchFreshGamepadInput(){
  const poll=()=>{
   gatewayResumeFrame=0;if(!gatewayAwaitingInteraction)return;
   const pad=(navigator.getGamepads?Array.from(navigator.getGamepads()||[]):[]).find(Boolean);
+  if(!pad)return;
   if(pad){
    const buttons=pad.buttons||[],axes=pad.axes||[];
    const pressed=buttons.some(button=>button&&button.pressed)||Math.abs(Number(axes[0])||0)>.55||Math.abs(Number(axes[1])||0)>.55;
@@ -344,6 +345,7 @@ function pollGamepad(timestamp){
 function startGamepad(){if(!gamepadFrame&&state.active&&!state.paused&&!document.hidden&&$("game-view").classList.contains("active"))gamepadFrame=requestAnimationFrame(pollGamepad);}
 function stopGamepad(){if(gamepadFrame)cancelAnimationFrame(gamepadFrame);gamepadFrame=0;gamepadConfirmDown=false;}
 window.addEventListener("gamepadconnected",startGamepad);
+window.addEventListener("gamepadconnected",()=>{if(gatewayAwaitingInteraction)watchFreshGamepadInput();});
 function handleGameKeydown(event){
  if(gatewayAwaitingInteraction&&!event.repeat&&!event.altKey&&!event.ctrlKey&&!event.metaKey&&["ArrowRight","ArrowDown","ArrowLeft","ArrowUp","Enter"," "].includes(event.key)){event.preventDefault();if(resumeAfterGatewayInteraction()){if(event.key==="Enter"||event.key===" ")activateKeyboardTarget();else moveKeyboardTarget(event.key==="ArrowRight"||event.key==="ArrowDown"?1:-1);}return;}
  if(!state.active||state.paused||!$("game-view").classList.contains("active")||event.altKey||event.ctrlKey||event.metaKey)return;
