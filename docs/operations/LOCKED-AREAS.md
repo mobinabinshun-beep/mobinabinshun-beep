@@ -47,7 +47,8 @@ The archived CSS snapshot is a point-in-time copy of the full stylesheet at the 
 # Owner lock — Gateway & simulated-mouse controller contract
 
 **Status:** LOCKED — owner-directed, effective 2026-11-17  
-**Canonical contract:** [Gateway & simulated-mouse controller contract](./GATEWAY-AND-CONTROLLER-INPUT-CONTRACT-2026-11-17.md)  
+**Historical baseline contract (behavior superseded):** [2026-11-17 implementation contract](./GATEWAY-AND-CONTROLLER-INPUT-CONTRACT-2026-11-17.md)  
+**Current normative contract:** [Unified Gateway owner contract](https://github.com/mobinabinshun-beep/Repository/blob/docs/gateway-human-approval-lock-2026-11-18/Operations/2026-11-18/GATEWAY-MACHINE-APPROVAL-LOCK-AND-HUMAN-QA-fa.md)  
 **Implementation:** PR [#180](https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/180), merge commit `45803b784f7b10bacc1081644fe0895fc8c382af)  
 **Verified recovery points:** `backup/pre-gateway-simulated-mouse-2026-11-17`; `backup/pre-gateway-exclusive-pause-2026-11-17` (candidate `072b9e94235c689b4c493fff348c9b7ef5fa2945`); `backup/gateway-exclusive-pause-final-2026-11-17` (final merged state `a72ca06ae166d95d35d80064f609f136c11a5ab8`)
 
@@ -67,3 +68,29 @@ The archived CSS snapshot is a point-in-time copy of the full stylesheet at the 
 This lock does not prohibit additive, backward-compatible support for future controller types or modules. Such extensions must preserve the locked base behavior, pass focused and relevant regression tests, and be documented against the canonical contract.
 
 Do not modify, weaken, bypass, or revert this locked contract unless the owner gives a new, direct instruction explicitly naming the Gateway/controller scope to be changed. If another approved feature appears to require a conflict, propose a forward-compatible extension; do not independently restore an older implementation.
+
+
+---
+
+## Owner update — unified Gateway contract and exact-SHA machine lock (2026-11-18)
+
+The 2026-11-17 behavior summary above is retained as a historical lock/recovery record. Any conflicting behavior clauses are superseded by the current [Unified Gateway owner contract](https://github.com/mobinabinshun-beep/Repository/blob/docs/gateway-human-approval-lock-2026-11-18/Operations/2026-11-18/GATEWAY-MACHINE-APPROVAL-LOCK-AND-HUMAN-QA-fa.md). No runtime code is changed by this documentation update.
+
+### Current required behavior
+- Selective commands: Menu/List, Back=Home=Exit to the main page, Profile.
+- Pause/Freeze is available only through Gateway and is applied before options appear or become actionable. Reload is not a Gateway command and is never automatic on page/Gateway entry.
+- Closing Gateway leaves the game frozen until the first deliberate real interaction with gameplay space.
+- Directional/click-step pointer movement is simulated mouse. Controller-selective navigation traverses the Gateway list downward; one extra Down exits; held Down may traverse and exit without activating skipped options. Pauses between options are unrestricted.
+- After exit, the virtual pointer remains over Gateway; reopening requires leaving and re-entering its bounds.
+- Entry timing targets are 0.50s for physical mouse/touch and 1.00s for simulated mouse; not accepted until measured tests pass.
+- Eight-direction first-use training is FUTURE / NOT IMPLEMENTED until separately implemented and tested.
+
+### Machine-passed candidate handoff
+- PR #178: https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/178
+- Branch: `owner/gateway-speed-and-simulated-mouse-2026-11-17`
+- SHA: `78d25edbc6e2fed31a8925c7e33f5949af50bef5`
+- Status for the seven recorded successful workflows only: `AUTOMATED-QA-PASSED · HUMAN-QA-PENDING · MACHINE-LOCKED`.
+- New timing, extra/held Down, pointer leave/re-enter and training are not proven by those seven workflows.
+- Preserve this SHA. No automated change is allowed. Corrections require human feedback, explicit owner command, and a successor branch from this SHA.
+
+This machine lock is process-level; do not claim GitHub branch-protection enforcement unless it is separately enabled and verified. Machine lock is not `OWNER-APPROVED` or `SCOPE-LOCKED`.
