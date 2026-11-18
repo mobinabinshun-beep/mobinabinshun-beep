@@ -35,9 +35,11 @@ test("Opening Gateway freezes the game and all ambient renderers until a decisio
  assert.match(games,/NUPixelWorld\.setEnabled/);
  assert.match(graphics,/nu-gateway-open/);
  assert.match(graphics,/NUDynamicLayers&&g\.NUDynamicLayers\.setFrozen/);
- assert.match(js,/setOpen\(false,false\)/);
- assert.match(js,/nu:menu-dismissed/);
- assert.match(js,/nu:player-overlay-close/);
+ assert.match(js,/window\.dispatchEvent\(new Event\("nu:gateway-close"\)\)/);
+ assert.match(games,/gatewayAwaitingInteraction=true/);
+ assert.match(games,/function resumeAfterGatewayInteraction\(\)/);
+ assert.doesNotMatch(js,/nu:menu-dismissed/);
+ assert.doesNotMatch(js,/nu:player-overlay-close/);
 });
 
 test("Menu is a centered, concise module directory with player modules before games",()=>{
@@ -132,8 +134,10 @@ test("Player views manage focus, wallet tabs support arrow navigation, and Enter
  assert.match(playerUI,/ArrowLeft/);assert.match(playerUI,/ArrowRight/);assert.match(playerUI,/event\.key==="Home"/);assert.match(playerUI,/event\.key==="End"/);
 });
 
-test("Gateway focus loop wraps in both directions and Escape restores the trigger",()=>{
- assert.match(js,/event\.key==="Escape"\)\{event\.preventDefault\(\);setOpen\(false\);trigger\.focus/);
+test("Gateway focus loop stays trapped, arrow navigation is bounded, and Escape closes",()=>{
+ assert.match(js,/event\.key==="Escape"\)\{event\.preventDefault\(\);closeGateway\(\);trigger\.focus/);
+ assert.match(js,/exitAtEnd&&direction>0&&current===items.length-1/);
+ assert.doesNotMatch(js,/\(current\+direction\+items\.length\)%items\.length/);
  assert.match(js,/event\.shiftKey&&document\.activeElement===first/);
  assert.match(js,/!event\.shiftKey&&document\.activeElement===last/);
  assert.match(css,/#nu-hex-gateway button:focus-visible/);
