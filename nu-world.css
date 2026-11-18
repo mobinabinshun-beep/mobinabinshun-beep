@@ -822,3 +822,15 @@ body[data-nu-graphics-tier="ultra"] #nu-background-image img{filter:saturate(1) 
   }
   #game-view.active .hp-bar #hp-pill-use img{width:27px;height:27px}
 }
+
+
+/* Profile is a Wallet subview: keep Wallet sections available without a duplicate Home button. */
+.profile-wallet-tabs{margin:0 0 18px;padding:0;min-height:0;justify-content:flex-start}
+.profile-wallet-tabs .wallet-card-tab{flex:1 1 18%;min-width:70px}
+body.nu-gateway-utility-active #menu-open,
+body.nu-gateway-utility-active #bag-back,
+body.nu-gateway-utility-active #inventory-back,
+body.nu-gateway-utility-active #wallet-back,
+body.nu-gateway-utility-active #profile-back,
+body.nu-game-active #menu-profile,
+body.nu-gateway-utility-active #menu-profile{display:none!important}
