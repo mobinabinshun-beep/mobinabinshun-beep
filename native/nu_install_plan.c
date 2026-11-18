@@ -39,7 +39,7 @@ int NU_InstallPlanBuild(const NU_InstallComponent *target, size_t target_count,
                         NU_InstallPlanEntry *entries, size_t capacity,
                         NU_InstallPlan *plan) {
  size_t i,j; NU_InstallPlan p;
- if (!target || !installed || !entries || !plan ||
+ if (!target || (!installed && installed_count != 0u) || !entries || !plan ||
      target_count==0u || target_count>NU_INSTALL_MAX_COMPONENTS ||
      installed_count>NU_INSTALL_MAX_COMPONENTS ||
      capacity<target_count || !nu_unique(target,target_count) ||
