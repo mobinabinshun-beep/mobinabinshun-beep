@@ -168,3 +168,22 @@ Regression coverage now includes actual keydown-shaped input without a connected
 
 **Successor branch:** `fix/gateway-real-keyboard-pointer-bridge-2026-11-18`  
 **Approval state at authoring:** implementation candidate; CI and exact-SHA machine approval pending. The previous frozen candidate `96b549d0f53fc0f69cc1ea2494250196cef6f87d` remains unchanged. Live-device human QA is still required after CI.
+
+
+## 10. Owner amendment — utility-page exclusivity and Profile/Wallet navigation (2026-11-18)
+
+- Wherever Gateway is mounted on a game or utility page, the independent Menu opener and duplicate Profile entry are suppressed; redundant Home/Back controls are removed when Gateway or the existing Bag destination shortcuts provide the route.
+- Bag remains the parent of Wallet and Inventory. Wallet keeps its Bag/Inventory destination shortcuts and its own section tabs.
+- Player Profile is reached through Wallet and remains a Wallet subview. The Profile view exposes persistent Wallet section tabs: Profile, Wallet/Balances, Transactions, Health and MHL. Choosing a Wallet section returns to Wallet without creating a duplicate history entry; closing Profile returns to the exact prior Wallet view.
+- Do not create a parallel Profile page, wallet store, or identity record. The existing player identity and shared Wallet remain the single source of truth.
+- The Profile page has no independent Home/Back button beside Gateway. Bag/Inventory/Wallet navigation uses explicit destination tabs, not duplicate Back controls.
+
+### Acceptance checks
+1. On every Gateway-mounted utility page, independent Menu/Profile/Home controls that duplicate Gateway are absent.
+2. Bag → Wallet → Profile works; Profile exposes Wallet/Balances, Transactions, Health and MHL destinations.
+3. Returning from Profile to Wallet preserves the selected Wallet section and the parent Bag return path.
+4. Profile opened from Gateway can navigate to Wallet and close back to the originating game view without a broken history stack.
+5. Wallet, Profile and Inventory continue to read the existing shared save; no parallel identity or balance store is created.
+6. Keyboard focus, touch targets and responsive layouts remain usable.
+
+**Successor candidate:** `fix/gateway-pointer-bridge-successor-2026-11-18` · **Status:** `MACHINE-QA-PENDING` · Human QA and public demo deployment remain pending.
