@@ -5,6 +5,7 @@ on:
     paths:
       - "index.html"
       - "nu-hex-gateway.js"
+      - "nu-controller-pointer.js"
       - "nu-hex-gateway.css"
       - "nu-games.js"
       - "nu-gateway-pause.js"
@@ -32,6 +33,7 @@ jobs:
       - name: Check Gateway and renderer lifecycle syntax
         run: |
           node --check nu-hex-gateway.js
+          node --check nu-controller-pointer.js
           node --check nu-games.js
           node --check nu-gateway-pause.js
           node --check nu-dynamic-layers.js
