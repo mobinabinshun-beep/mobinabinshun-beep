@@ -169,3 +169,12 @@ test("capacity upgrade rejects missing X Credit, active Wave and level-nine capa
   assert.equal(unchanged.mana,0);
   assert.equal(unchanged.manaCapsules,1);
 });
+
+
+test("Store exposes capacity upgrade only as an X Credit upgrade, never a Mana sale",()=>{
+  const games=fs.readFileSync("nu-games.js","utf8");
+  assert.match(games,/data-upgrade-mana-capacity/);
+  assert.match(games,/UPGRADE · 1 X CREDIT/);
+  assert.match(games,/Mana itself is never sold/);
+  assert.match(games,/NUWallet\.upgradeManaCapacity\(state\.save/);
+});
