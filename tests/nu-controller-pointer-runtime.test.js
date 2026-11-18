@@ -28,7 +28,7 @@ test("Click-controller starts the simulated cursor without a connected Gamepad A
 test("Click-controller direction moves the virtual pointer and reports the new position",()=>{
  const h=harness();h.adapter.startClickController();const before=h.adapter.getState();
  assert.equal(h.adapter.move(1,0),true);const after=h.adapter.getState();
- assert.equal(after.x,before.x+28);assert.equal(after.y,before.y);h.adapter.destroy();
+ assert.equal(after.x,428);assert.equal(after.y,300);h.adapter.destroy();
 });
 test("Directional events from the click-controller translator move the pointer",()=>{
  const h=harness();h.adapter.startClickController();const before=h.adapter.getState();
