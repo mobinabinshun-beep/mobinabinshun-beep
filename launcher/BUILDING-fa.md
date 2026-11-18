@@ -1,0 +1,52 @@
+# ساخت و آزمون هستهٔ N.U Launcher
+
+## وضعیت فعلی
+
+سورس اولیه ثبت شده، اما هنوز فایل اجرایی یا نصاب تولید نشده است. هیچ ادعایی دربارهٔ اجرای تأییدشده روی Windows XP مطرح نیست.
+
+## هدف کامپایلر
+
+برای XP SP3 از یک toolchain سازگار با PE/COFF و APIهای Windows XP استفاده کنید. مسیر مرجع اولیه Visual C++ 2010 با Windows SDK مناسب یا MinGW-w64 با هدف i686 و حداقل subsystem نسخهٔ 5.01 است. از APIهای Vista+، C++11 و وابستگی‌های runtime جدید استفاده نکنید.
+
+نمونهٔ فرمان MinGW (پس از نصب toolchain سازگار):
+
+```bat
+i686-w64-mingw32-g++ -D_WIN32_WINNT=0x0501 -DWINVER=0x0501 -O2 -mwindows -static-libgcc -static-libstdc++ windows-xp\nu_launcher_win32.cpp -o NU-Launcher.exe -luser32 -lgdi32
+```
+
+ساخت ماژول نمونه به‌صورت DLL:
+
+```bat
+i686-w64-mingw32-g++ -D_WIN32_WINNT=0x0501 -O2 -shared -Wl,--kill-at modules\sample-module.cpp -o modules\sample-module.dll -luser32
+```
+
+در `modules/modules.ini` این خط را اضافه کنید:
+
+```ini
+sample.g1|Generation 1 Sample Module|modules\sample-module.dll
+```
+
+این فرمان‌ها فقط نقطهٔ شروع هستند؛ سازگاری runtime و DLLهای واردشده باید با ابزارهایی مانند Dependency Walker روی XP بررسی شود. `-static` به‌تنهایی تضمین سازگاری XP نیست.
+
+## اجرای محلی
+
+1. کنار فایل اجرایی، پوشه‌های `modules` و در صورت نیاز `assets` بسازید.
+2. `modules.ini.example` را به `modules/modules.ini` کپی کنید.
+3. DLL ماژول‌های مورداعتماد را در پوشهٔ `modules` قرار دهید و مسیر نسبی آن‌ها را در فایل ثبت کنید.
+4. برای پس‌زمینهٔ ثابت اختیاری، تصویر BMP را با نام `assets/launcher-background.bmp` قرار دهید. این نسخه فقط یک تصویر ثابت می‌خواند؛ لایه و انیمیشن پس‌زمینه ندارد.
+5. `NU-Launcher.exe` را اجرا کنید.
+6. ماژول را انتخاب و Launch را بزنید؛ Exit Module به میزبان برمی‌گردد.
+
+## آزمون پذیرش لازم
+
+- Windows XP SP3 x86 واقعی/VM، Windows 7، 10، 11.
+- اجرای بدون DLLهای اضافی و با تصویر پس‌زمینهٔ غایب.
+- مسیرهای دارای فاصله و مسیر نصب غیر ASCII.
+- بارگذاری DLL خراب، ABI نامعتبر و توقف غیرعادی ماژول.
+- بررسی اینکه ماژول فقط در ناحیهٔ محتوای میزبان قرار می‌گیرد.
+- آزمون حافظه، teardown و بازگشت به فهرست.
+- هیچ ماژول ناشناس یا تأییدنشده‌ای را در فرایند اصلی بارگذاری نکنید.
+
+## نصاب
+
+پس از تثبیت binary، امضای کد، مسیر نصب، uninstall، repair، rollback و آزمون ارتقای نسخه، می‌توان بستهٔ نصب تولید کرد. ساخت نصاب قبل از داشتن binary آزموده‌شده فقط یک بسته‌بندی ظاهری خواهد بود.
