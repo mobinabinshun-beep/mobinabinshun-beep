@@ -189,3 +189,10 @@ The package-container/VM-ISA naming collision in the binary runtime path has bee
 The validator rejects the previous pre-release binary envelope with NUVM container magic, unsupported container version, unsupported ABI minor, nonzero flags, bad length and payload CRC mismatch. The legacy text-based NUVM samples in the older shell branches remain separate incompatible formats and are not silently imported.
 
 This is a breaking pre-release format correction; no public user data or published package compatibility is claimed. Golden fixtures and cross-host interoperability tests are still required before release.
+
+
+## 18. XP-first static image host presentation
+
+The Win32 host now loads the one canonical still image from `background.bmp` beside the executable and draws it with GDI StretchBlt while preserving its aspect ratio. The build extracts the embedded PNG payload from the canonical SVG into a 24-bit BMP and validates the expected 1536×1024 dimensions. No dynamic background layer, particle system, Canvas, WebGL, shader, browser or animation is loaded by the native host. Foreground OS-native buttons remain separate controls. This is a low-cost image presentation path, not a native game renderer or GPU quota.
+
+The CI artifact is a loose test payload (EXE + BMP + README + SHA-256 manifest), not an installer. XP API cross-build and PE subsystem inspection do not replace an actual XP SP3 execution test.
