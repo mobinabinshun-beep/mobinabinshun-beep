@@ -14,7 +14,8 @@
 
   function syncGatewayScope(){
     const active=!!(gameView&&gameView.classList.contains("active"));
-    const utility=utilityViews.some(view=>view.classList.contains("active"));
+    const standalone=!gameView&&utilityViews.length===0;
+    const utility=standalone||utilityViews.some(view=>view.classList.contains("active"));
     document.body.classList.toggle("nu-gateway-enabled",active||utility);
     document.body.classList.toggle("nu-main-game-page",active);
     document.body.classList.toggle("nu-game-active",active);
