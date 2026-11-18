@@ -60,3 +60,12 @@
 - Canonical execution lifecycle and checklists: [NU-UNIFIED-OPERATING-PROTOCOL-fa.md](https://github.com/mobinabinshun-beep/Repository/blob/main/Operations/2026-11-18/NU-UNIFIED-OPERATING-PROTOCOL-fa.md).
 - Apply its scope-aware discovery, reuse-first, change-record, test, verified backup/restore, deployment, human-QA and handoff requirements to every task.
 - This guide supplements these repository-specific rules; protected areas, owner decisions and exact candidate locks remain in force. For scoped work, inspect the directly affected files and demonstrated dependencies; use full cross-repository discovery for architecture, shared contracts, data, security or multi-repository changes.
+
+
+## Branch discipline and failed human QA
+- Prefer improving the existing default/development line and existing issue/PR record. Do not create a new branch for every defect; branch proliferation is prohibited as a routine workflow.
+- Create a branch only when isolation is materially required by an existing protected lock, parallel release, or destructive-risk boundary. Explain why and reuse an existing candidate branch whenever safe.
+- A human report that interaction still fails overrides a prior machine-pass label for the affected behavior: reopen the defect, preserve the machine evidence as historical, and do not claim human acceptance.
+- Machine approval means automated checks passed and the exact build was deployed to the demo for human testing. It is not final acceptance.
+- The exact machine-approved candidate is immutable to unrelated automation. A correction to a failed candidate must be made as a scoped forward fix on the existing working line; after re-testing, record a new exact machine-approved checkpoint and keep the human QA state open until the owner reports acceptance.
+- Simulated pointer movement must deliver pointermove and mousemove to the hit-tested target in addition to updating the visible cursor and highlight. Keyboard-emulated direction repeats must continue moving; Gateway exclusively owns directional input while open.
