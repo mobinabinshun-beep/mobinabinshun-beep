@@ -24,7 +24,7 @@ static void load_background(void){
  slash=strrchr(path,'\\');
  if(!slash)slash=strrchr(path,'/');
  if(!slash)return;
- slash[1]='\\0';
+ slash[1]='\0';
  if(lstrlenA(path)+lstrlenA("background.bmp")>=MAX_PATH)return;
  lstrcatA(path,"background.bmp");
  background_bitmap=(HBITMAP)LoadImageA(NULL,path,IMAGE_BITMAP,0,0,
