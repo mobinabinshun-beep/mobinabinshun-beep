@@ -47,7 +47,8 @@
     });
   }
   layoutItems();
-  window.addEventListener("resize",()=>{layoutItems();if(core)core.setPosition(Math.min(innerWidth,core.getState().x),Math.min(innerHeight,core.getState().y));},{passive:true});
+  window.addEventListener("resize",layoutItems,{passive:true});
+  window.addEventListener("resize",()=>{if(core)core.setPosition(Math.min(innerWidth,core.getState().x),Math.min(innerHeight,core.getState().y));},{passive:true});
   window.addEventListener("orientationchange",layoutItems,{passive:true});
 
   function goHome(){
