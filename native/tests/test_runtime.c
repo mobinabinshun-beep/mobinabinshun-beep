@@ -11,7 +11,9 @@
 #include "../nu_install_plan.h"
 int main(void){
  NU_Budget b;uint8_t code[]={1,0,42,0,0,0,1,1,8,0,0,0,3,0,1,0};
- uint8_t pkg[NU_PACKAGE_HEADER_SIZE+sizeof(code)];NU_PackageView view;NU_VM vm;int result;unsigned int i;
+ uint8_t pkg[NU_PACKAGE_HEADER_SIZE+sizeof(code)];
+ uint8_t golden_header[NU_PACKAGE_HEADER_SIZE]={0x4eu,0x55u,0x50u,0x4bu,1u,0u,1u,0u,1u,0u,0u,0u,16u,0u,0u,0u,0xe0u,0x82u,0x72u,0x7du};
+ NU_PackageView view;NU_VM vm;int result;unsigned int i;
  NU_BudgetInit(&b,1024u*1024u*1024u,1024u*1024u*1024u,1u);
  assert(b.ram_limit_bytes==NU_DEFAULT_RAM_CAP);assert(b.shared_cache_bytes==250u*1024u*1024u);
  assert(b.short_cache_bytes+b.pattern_cache_bytes==b.shared_cache_bytes);
@@ -28,12 +30,17 @@ int main(void){
  assert(!NU_SchedulerGrantSlot(0u)&&NU_SchedulerGrantSlot(1u));
  assert(!NU_SchedulerGrantGpuSlot(0u)&&NU_SchedulerGrantGpuSlot(1u));
  assert(NU_PackageBuild(code,sizeof(code),pkg,sizeof(pkg))==sizeof(pkg));
+ assert(memcmp(pkg,golden_header,sizeof(golden_header))==0);
+ assert(!NU_PackageValidate(pkg,NU_PACKAGE_HEADER_SIZE-1u,&view));
 
  assert(NU_PackageValidate(pkg,sizeof(pkg),&view));NU_VMInit(&vm,view.code,view.code_size,100u);
  result=1;for(i=0u;i<20u&&result>0;++i)result=NU_VMStep(&vm);
  assert(vm.halted&&vm.registers[0]==50u);
  pkg[NU_PACKAGE_HEADER_SIZE]^=1u;assert(!NU_PackageValidate(pkg,sizeof(pkg),&view));pkg[NU_PACKAGE_HEADER_SIZE]^=1u;
  pkg[4u]=2u;assert(!NU_PackageValidate(pkg,sizeof(pkg),&view));pkg[4u]=1u;
+ pkg[5u]=1u;assert(!NU_PackageValidate(pkg,sizeof(pkg),&view));pkg[5u]=0u;
+ pkg[6u]=2u;assert(!NU_PackageValidate(pkg,sizeof(pkg),&view));pkg[6u]=1u;
+ pkg[7u]=1u;assert(!NU_PackageValidate(pkg,sizeof(pkg),&view));pkg[7u]=0u;
  pkg[11u]=1u;assert(!NU_PackageValidate(pkg,sizeof(pkg),&view));pkg[11u]=0u;
  pkg[0]='N';pkg[1]='U';pkg[2]='V';pkg[3]='M';assert(!NU_PackageValidate(pkg,sizeof(pkg),&view));
  pkg[0]='N';pkg[1]='U';pkg[2]='P';pkg[3]='K';
