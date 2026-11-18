@@ -33,8 +33,10 @@ test("physical mouse and touch are normalized without conflating sources",()=>{
 });
 test("selective click and select events produce semantic actions",()=>{
  const h=harness(),seen=[];h.core.on("interaction",r=>seen.push(r));
- h.emit("click",{detail:1});h.emit("change",{});
+ h.emit("click",{detail:1});h.emit("click",{detail:1,nuSimulated:true});h.emit("change",{});
  assert.ok(seen.some(r=>r.action==="activate"&&r.source==="selective-click"));
+ assert.ok(seen.some(r=>r.action==="activate"&&r.source==="simulated-mouse"));
+ assert.equal(seen.filter(r=>r.source==="physical-mouse").length,0);
  assert.ok(seen.some(r=>r.action==="select"&&r.source==="selective-control"));
 });
 test("virtual mouse and Gateway hierarchy events enter the shared debug ledger",()=>{
