@@ -34,3 +34,5 @@ No native playable ports of Bubble Hunt, Mana Collector or Chaos Attack; no comp
 The current Win32 executable is not an installer and does not contain playable games. The build extracts the canonical SVG's embedded PNG to a single BMP; the host draws only that still image using software GDI scaling. This is not a GPU game renderer. PE subsystem 5.01 is not XP certification.
 
 Build artwork: `python3 native/build.py` (requires Pillow). The CI artifact contains `NULauncher.exe`, `background.bmp`, `README.txt` and `SHA256SUMS.txt`; these files are a test payload, not a setup installer.
+
+NUDb/1 entries carry their own schema major/minor as well as the data-class ID, stable entry ID, length and CRC32. The bundle has a product tag and independent container version. This allows Save and Wallet migrations to evolve separately.
