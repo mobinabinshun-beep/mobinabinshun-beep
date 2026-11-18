@@ -42,6 +42,13 @@ function handleGatewayClose(){
 }
 window.addEventListener("nu:gateway-open",handleGatewayOpen);
 window.addEventListener("nu:gateway-close",handleGatewayClose);
+window.addEventListener("nu:controller-direction",event=>{
+ const detail=event&&event.detail||{};
+ if(gatewayPause.isAwaitingInteraction()&&(Number(detail.dx)||Number(detail.dy)))resumeAfterGatewayReturn();
+});
+window.addEventListener("nu:controller-confirm",()=>{
+ if(gatewayPause.isAwaitingInteraction())resumeAfterGatewayReturn();
+});
 const games=[
  {id:"bubble",name:"Bubble Hunt",desc:"Find the rain-glass droplets and collect XP.",status:"PLAYABLE"},
  {id:"mana",name:"Mana Collector",desc:"Collect luminous hexagonal Mana particles.",status:"PLAYABLE"},
@@ -340,29 +347,45 @@ function pollGamepad(timestamp){
  const waiting=gatewayPause.isAwaitingInteraction();
  if((!state.active&&!waiting)||document.hidden||!$("game-view").classList.contains("active"))return;
  const pads=navigator.getGamepads?Array.from(navigator.getGamepads()||[]):[];
- const pad=pads.find(Boolean);
+ const pad=pads.find(p=>p&&p.connected!==false);
  if(pad){
   const buttons=pad.buttons||[],axes=pad.axes||[];
   const up=!!(buttons[12]&&buttons[12].pressed)||(Number(axes[1])<-.55);
   const down=!!(buttons[13]&&buttons[13].pressed)||(Number(axes[1])>.55);
   const left=!!(buttons[14]&&buttons[14].pressed)||(Number(axes[0])<-.55);
   const right=!!(buttons[15]&&buttons[15].pressed)||(Number(axes[0])>.55);
-  const direction=up||left?-1:down||right?1:0;
+  const dx=(right?1:0)-(left?1:0),dy=(down?1:0)-(up?1:0);
+  const directionKey=dx+","+dy,hasDirection=!!(dx||dy);
   const confirm=!!(buttons[0]&&buttons[0].pressed);
   if(waiting){
-   if(!gamepadReturnPrimed){gamepadReturnPrimed=true;gamepadReturnDirection=direction;gamepadReturnConfirm=confirm;}
+   if(!gamepadReturnPrimed){gamepadReturnPrimed=true;gamepadReturnDirection=directionKey;gamepadReturnConfirm=confirm;}
    else{
-    const freshDirection=direction!==0&&direction!==gamepadReturnDirection;
+    const freshDirection=hasDirection&&directionKey!==gamepadReturnDirection;
     const freshConfirm=confirm&&!gamepadReturnConfirm;
-    if(freshDirection||freshConfirm)resumeAfterGatewayReturn(true);
-    gamepadReturnDirection=direction;gamepadReturnConfirm=confirm;
+    if(freshDirection||freshConfirm){
+     const resumed=resumeAfterGatewayReturn(true);
+     if(resumed){
+      if(freshDirection&&window.NUControllerPointer)window.NUControllerPointer.move(dx,dy,"gamepad");
+      else if(freshConfirm&&window.NUControllerPointer)window.NUControllerPointer.click("gamepad");
+     }
+    }
+    gamepadReturnDirection=directionKey;gamepadReturnConfirm=confirm;
+   }
+  }else if(state.active&&!state.paused){
+   if(hasDirection&&timestamp-lastGamepadMove>220){
+    if(window.NUControllerPointer)window.NUControllerPointer.move(dx,dy,"gamepad");
+    else moveKeyboardTarget(dy!==0?Math.sign(dy):Math.sign(dx));
+    lastGamepadMove=timestamp;
+   }
+   if(confirm&&!gamepadConfirmDown){
+    if(window.NUControllerPointer)window.NUControllerPointer.click("gamepad");
+    else activateKeyboardTarget();
    }
   }
-  if(state.active&&!state.paused){
-   if(direction&&timestamp-lastGamepadMove>220){moveKeyboardTarget(direction);lastGamepadMove=timestamp;}
-   if(confirm&&!gamepadConfirmDown)activateKeyboardTarget();
-  }
   gamepadConfirmDown=confirm;
+ }else{
+  gamepadConfirmDown=false;
+  if(waiting){gamepadReturnPrimed=false;gamepadReturnDirection="0,0";gamepadReturnConfirm=false;}
  }
  gamepadFrame=requestAnimationFrame(pollGamepad);
 }
