@@ -90,6 +90,10 @@
     if(!item)return;
     if(selected&&selected!==item){selected.classList.remove("is-selected","is-confirming");selected.setAttribute("aria-pressed","false");}
     selected=item;item.classList.add("is-selected");item.setAttribute("aria-pressed","true");
+    if(core&&core.getState().mode==="simulated-mouse"){
+      const rect=item.getBoundingClientRect();
+      core.setPosition(rect.left+rect.width/2,rect.top+rect.height/2);
+    }
   }
   function moveSelection(direction,exitAtEnd=false){
     if(!items.length)return;
@@ -150,7 +154,18 @@
   }
   window.NUGatewayControllerInput={
     setMode:setControllerMode,
-    move:(dx,dy)=>!!(core&&core.move(Number(dx)||0,Number(dy)||0)),
+    move:(dx,dy)=>{
+      if(!core)return false;
+      dx=Number(dx)||0;dy=Number(dy)||0;
+      if(open){
+        const direction=dy>0?1:dy<0?-1:dx>0?1:dx<0?-1:0;
+        if(direction)moveSelection(direction,dy>0);
+        if(open&&selected){const rect=selected.getBoundingClientRect();core.setPosition(rect.left+rect.width/2,rect.top+rect.height/2);}
+        else{const rect=trigger.getBoundingClientRect();core.setPosition(rect.left+rect.width/2,rect.top+rect.height/2);}
+        return true;
+      }
+      return core.move(dx,dy);
+    },
     setPosition:(x,y)=>!!(core&&core.setPosition(Number(x),Number(y))),
     confirm:()=>{if(core)core.keyDown({key:"Enter"});},
     cancel:()=>{if(core)core.keyDown({key:"Escape"});},
@@ -164,9 +179,14 @@
     if(detail.cancel)window.NUGatewayControllerInput.cancel();
   });
   window.addEventListener("keydown",event=>{
-    if(core&&core.getState().mode==="simulated-mouse"){
-      if(core.keyDown(event))event.stopImmediatePropagation();
+    if(!core||core.getState().mode!=="simulated-mouse")return;
+    const directions={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]};
+    if(directions[event.key]){
+      event.preventDefault();event.stopImmediatePropagation();
+      window.NUGatewayControllerInput.move(...directions[event.key]);return;
     }
+    if(event.key==="Enter"){event.preventDefault();event.stopImmediatePropagation();window.NUGatewayControllerInput.confirm();return;}
+    if(event.key==="Escape"||event.key==="Backspace"){event.preventDefault();event.stopImmediatePropagation();window.NUGatewayControllerInput.cancel();}
   },true);
   window.addEventListener("keyup",event=>{if(core&&core.getState().mode==="simulated-mouse")core.keyUp(event);},true);
 
