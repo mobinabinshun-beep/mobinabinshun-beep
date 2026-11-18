@@ -87,3 +87,11 @@ After the exact candidate passes automated QA and a verified backup is created:
 5. Corrections use a successor branch and repeat machine validation, backup, deployment verification and human QA.
 
 **Enforcement boundary:** the current GitHub connector exposes repository content, branches, commits, pull requests and Actions evidence, but no branch-protection/ruleset mutation capability. This lock is therefore enforced by the documented agent workflow and exact immutable commit reference; it is not represented as a GitHub server-side branch protection rule. Existing GitHub protections must not be weakened.
+
+
+## Owner amendment — Profile/Wallet navigation and Gateway utility controls (2026-11-18)
+
+- Gateway remains the only top-level Menu/Home/Profile control on mounted game and utility pages. Hide duplicate utility-page Menu and Profile entry points and redundant Home/Back buttons.
+- Keep the Bag → Wallet → Profile hierarchy. Profile exposes Wallet section tabs and returns to the selected Wallet page; Wallet destination shortcuts preserve Bag/Inventory navigation.
+- This is a forward-compatible amendment to the existing Gateway lock, not a rollback. The classic LV/XP/Mana HUD remains untouched.
+- Successor candidate: `fix/gateway-pointer-bridge-successor-2026-11-18`. Machine QA, backup of the final candidate, public demo deployment and human QA are pending until the exact candidate checks complete.
