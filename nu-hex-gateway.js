@@ -1,4 +1,4 @@
-/* N.U Hex Gateway — single-gate, single-action navigation for active gameplay */
+/* N.U Hex Gateway — single-gate navigation with delayed entry and selective input. */
 (() => {
   "use strict";
   const root=document.getElementById("nu-hex-gateway");
@@ -9,7 +9,20 @@
 
   const trigger=root.querySelector(".nu-gateway-trigger");
   const items=[...root.querySelectorAll(".nu-gateway-item")];
-  let open=false,selected=null,activationTimer=0,outsideSince=0,suppressClickUntil=0,controllerFrame=0,lastControllerMove=0,controllerConfirmDown=false,controllerCancelDown=false;
+  let open=false,selected=null,activationTimer=0,entryTimer=0,outsideSince=0,suppressClickUntil=0;
+  let controllerFrame=0,lastControllerMove=0,controllerConfirmDown=false,controllerCancelDown=false;
+  let entryPointerId=null,virtualInside=false;
+  const core=window.NUControllerInputCore?window.NUControllerInputCore.create({
+    mode:"physical-mouse",bounds:{left:0,top:0,right:Math.max(1,innerWidth),bottom:Math.max(1,innerHeight)},
+    x:trigger.getBoundingClientRect().left+trigger.getBoundingClientRect().width/2,
+    y:trigger.getBoundingClientRect().top+trigger.getBoundingClientRect().height/2,
+    step:24,onMove:updateVirtualPointer,onConfirm:()=>activate(selected||items[0]),onCancel:()=>closeGateway()
+  }):null;
+  const virtualPointer=document.createElement("span");
+  virtualPointer.className="nu-gateway-virtual-pointer";
+  virtualPointer.setAttribute("aria-hidden","true");
+  Object.assign(virtualPointer.style,{position:"fixed",left:"0",top:"0",width:"14px",height:"14px",border:"2px solid #d9f6ff",borderRadius:"50%",boxShadow:"0 0 12px rgba(80,220,255,.9)",pointerEvents:"none",zIndex:"10000",transform:"translate(-50%,-50%)",display:"none"});
+  document.body.appendChild(virtualPointer);
 
   function syncGatewayScope(){
     const active=gameView.classList.contains("active");
@@ -34,7 +47,7 @@
     });
   }
   layoutItems();
-  window.addEventListener("resize",layoutItems,{passive:true});
+  window.addEventListener("resize",()=>{layoutItems();if(core)core.setPosition(Math.min(innerWidth,core.getState().x),Math.min(innerHeight,core.getState().y));},{passive:true});
   window.addEventListener("orientationchange",layoutItems,{passive:true});
 
   function goHome(){
@@ -42,18 +55,16 @@
     if(home){home.click();return;}
     window.location.href="./index.html";
   }
-  const routes={
-    back:goHome,
-    menu:()=>document.getElementById("menu-open")?.click(),
-    profile:()=>document.getElementById("menu-profile")?.click()
-  };
-
-  function releaseHeldState(){
-    if(open)return;
-    window.dispatchEvent(new Event("nu:gateway-close"));
+  const routes={back:goHome,menu:()=>document.getElementById("menu-open")?.click(),profile:()=>document.getElementById("menu-profile")?.click()};
+  function clearEntry(){if(entryTimer){clearTimeout(entryTimer);entryTimer=0;}entryPointerId=null;}
+  function scheduleEntry(delay,pointerId=null){
+    clearEntry();
+    entryPointerId=pointerId;
+    entryTimer=window.setTimeout(()=>{entryTimer=0;entryPointerId=null;setOpen(true);},delay);
   }
-  function setOpen(next,shouldResume=true){
+  function setOpen(next){
     if(open===next)return;
+    if(next)window.dispatchEvent(new Event("nu:gateway-open"));
     open=next;outsideSince=0;
     root.classList.toggle("is-open",open);
     document.body.classList.toggle("nu-gateway-open",open);
@@ -61,34 +72,35 @@
     trigger.setAttribute("aria-label",open?"Close N.U navigation gateway":"Open N.U navigation gateway");
     items.forEach(item=>{item.tabIndex=open?0:-1;});
     if(open){
-      window.dispatchEvent(new Event("nu:gateway-open"));
+      clearEntry();
       trigger.focus({preventScroll:true});
       startController();
     }else{
-      clearTimeout(activationTimer);activationTimer=0;selected=null;
+      clearTimeout(activationTimer);activationTimer=0;
+      selected=null;
       items.forEach(item=>{item.classList.remove("is-selected","is-confirming");item.setAttribute("aria-pressed","false");});
       controllerConfirmDown=false;controllerCancelDown=false;
-      if(shouldResume)releaseHeldState();
+      stopController();
+      window.dispatchEvent(new Event("nu:gateway-close"));
     }
     layoutItems();
   }
+  function closeGateway(){setOpen(false);}
   function select(item){
     if(!item)return;
     if(selected&&selected!==item){selected.classList.remove("is-selected","is-confirming");selected.setAttribute("aria-pressed","false");}
-    selected=item;
-    item.classList.add("is-selected");
-    item.setAttribute("aria-pressed","true");
+    selected=item;item.classList.add("is-selected");item.setAttribute("aria-pressed","true");
   }
   function moveSelection(direction){
     if(!items.length)return;
     const current=items.indexOf(selected);
-    const next=current<0?(direction>0?0:items.length-1):(current+direction+items.length)%items.length;
-    select(items[next]);
-    items[next].focus({preventScroll:true});
+    if(direction>0&&current===items.length-1){closeGateway();trigger.focus({preventScroll:true});return;}
+    const next=current<0?(direction>0?0:items.length-1):Math.max(0,Math.min(items.length-1,current+direction));
+    select(items[next]);items[next].focus({preventScroll:true});
   }
+  function moveControllerSelection(direction){moveSelection(direction);}
   function pollController(timestamp){
-    controllerFrame=0;
-    if(!open)return;
+    controllerFrame=0;if(!open)return;
     const pads=navigator.getGamepads?Array.from(navigator.getGamepads()||[]):[];
     const pad=pads.find(Boolean);
     if(pad){
@@ -97,72 +109,95 @@
       const down=!!(buttons[13]&&buttons[13].pressed)||(Number(axes[1])>.55);
       const left=!!(buttons[14]&&buttons[14].pressed)||(Number(axes[0])<-.55);
       const right=!!(buttons[15]&&buttons[15].pressed)||(Number(axes[0])>.55);
-      const direction=up||left?-1:down||right?1:0;
+      const direction=down?1:up?-1:right?1:left?-1:0;
       if(direction&&timestamp-lastControllerMove>220){moveControllerSelection(direction);lastControllerMove=timestamp;}
       const confirm=!!(buttons[0]&&buttons[0].pressed),cancel=!!(buttons[1]&&buttons[1].pressed);
       if(confirm&&!controllerConfirmDown)activate(selected||items[0]);
-      if(cancel&&!controllerCancelDown){setOpen(false);trigger.focus({preventScroll:true});}
+      if(cancel&&!controllerCancelDown)closeGateway();
       controllerConfirmDown=confirm;controllerCancelDown=cancel;
     }
-    if(open&&pad)controllerFrame=requestAnimationFrame(pollController);
+    if(open)controllerFrame=requestAnimationFrame(pollController);
   }
   function startController(){if(open&&!controllerFrame)controllerFrame=requestAnimationFrame(pollController);}
-  let pendingItem=null;
-  function moveControllerSelection(direction){
-    const current=items.indexOf(selected);
-    if(direction>0&&current===items.length-1){
-      setOpen(false);
-      trigger.focus({preventScroll:true});
-      return;
-    }
-    moveSelection(direction);
-  }
+  function stopController(){if(controllerFrame)cancelAnimationFrame(controllerFrame);controllerFrame=0;}
   function activate(item){
-    if(!item||!item.dataset)return;
-    const key=item.dataset.action,action=routes[key];
-    if(!action||!open)return;
-    clearTimeout(activationTimer);
-    pendingItem=item;
-    item.classList.add("is-confirming");
-    activationTimer=window.setTimeout(()=>{
-      pendingItem=null;
-      item.classList.remove("is-confirming");
-      setOpen(false,false);
-      action();
-    },120);
+    if(!item||!item.dataset||!open)return;
+    const action=routes[item.dataset.action];if(!action)return;
+    clearTimeout(activationTimer);item.classList.add("is-confirming");
+    activationTimer=window.setTimeout(()=>{item.classList.remove("is-confirming");setOpen(false);action();},120);
   }
+  function updateVirtualPointer(position){
+    if(!core)return;
+    const {x,y}=position;
+    virtualPointer.style.left=x+"px";virtualPointer.style.top=y+"px";
+    const target=document.elementFromPoint(x,y);
+    const onTrigger=!!(target&&(target===trigger||trigger.contains(target)));
+    if(onTrigger&&!open&&!virtualInside)scheduleEntry(1000);
+    if(!onTrigger&&!open)clearEntry();
+    virtualInside=onTrigger;
+    if(open){
+      const item=target&&target.closest?target.closest(".nu-gateway-item"):null;
+      if(item&&items.includes(item))select(item);
+    }
+  }
+  function setControllerMode(mode){
+    if(!core||!["physical-mouse","touch","gamepad","simulated-mouse","keyboard"].includes(mode))return false;
+    core.setMode(mode);
+    virtualPointer.style.display=mode==="simulated-mouse"?"block":"none";
+    if(mode==="simulated-mouse")updateVirtualPointer(core.getState());
+    else{clearEntry();virtualInside=false;}
+    return true;
+  }
+  window.NUGatewayControllerInput={
+    setMode:setControllerMode,
+    move:(dx,dy)=>!!(core&&core.move(Number(dx)||0,Number(dy)||0)),
+    setPosition:(x,y)=>!!(core&&core.setPosition(Number(x),Number(y))),
+    confirm:()=>{if(core)core.keyDown({key:"Enter"});},
+    cancel:()=>{if(core)core.keyDown({key:"Escape"});},
+    getState:()=>core?core.getState():null
+  };
+  window.addEventListener("nu:simulated-mouse-input",event=>{
+    if(!core||core.getState().mode!=="simulated-mouse")return;
+    const detail=event.detail||{};
+    if(detail.dx||detail.dy)core.move(Number(detail.dx)||0,Number(detail.dy)||0);
+    if(detail.confirm)window.NUGatewayControllerInput.confirm();
+    if(detail.cancel)window.NUGatewayControllerInput.cancel();
+  });
+  window.addEventListener("keydown",event=>{
+    if(core&&core.getState().mode==="simulated-mouse"){
+      if(core.keyDown(event))event.stopImmediatePropagation();
+    }
+  },true);
+  window.addEventListener("keyup",event=>{if(core&&core.getState().mode==="simulated-mouse")core.keyUp(event);},true);
 
   trigger.addEventListener("pointerenter",event=>{
-    if(event.pointerType==="mouse"&&!open)setOpen(true);
+    if(event.pointerType==="mouse"&&!open)scheduleEntry(500,event.pointerId);
   });
+  trigger.addEventListener("pointerleave",event=>{if(event.pointerType==="mouse"&&!open)clearEntry();});
   trigger.addEventListener("pointerdown",event=>{
     if(event.pointerType==="touch"){
-      event.preventDefault();
-      suppressClickUntil=Date.now()+900;
-      setOpen(true);
+      event.preventDefault();suppressClickUntil=Date.now()+900;scheduleEntry(500,event.pointerId);
     }
   });
+  trigger.addEventListener("pointerup",event=>{if(event.pointerType==="touch"&&!open)clearEntry();});
+  trigger.addEventListener("pointercancel",clearEntry);
   trigger.addEventListener("click",event=>{
     event.preventDefault();
     if(Date.now()<suppressClickUntil)return;
     if(event.detail===0)setOpen(!open);
-    else if(!open)setOpen(true);
+    else if(!open)scheduleEntry(500);
   });
   items.forEach(item=>{
-    item.addEventListener("pointerenter",event=>{
-      if(event.pointerType==="mouse"&&open)activate(item);
-    });
+    item.addEventListener("pointerenter",event=>{if(event.pointerType==="mouse"&&open)activate(item);});
     item.addEventListener("pointerleave",event=>{
-      if(event.pointerType==="mouse"&&pendingItem===item){
-        clearTimeout(activationTimer);activationTimer=0;pendingItem=null;
-        item.classList.remove("is-confirming");
+      if(event.pointerType==="mouse"&&item.classList.contains("is-confirming")){
+        clearTimeout(activationTimer);activationTimer=0;item.classList.remove("is-confirming");
       }
     });
     item.addEventListener("focus",()=>select(item));
     item.addEventListener("pointerup",event=>{
       if(event.pointerType!=="touch"||!open)return;
-      event.preventDefault();event.stopPropagation();
-      suppressClickUntil=Date.now()+900;activate(item);
+      event.preventDefault();event.stopPropagation();suppressClickUntil=Date.now()+900;activate(item);
     });
     item.addEventListener("click",event=>{
       event.preventDefault();event.stopPropagation();
@@ -170,38 +205,32 @@
       activate(item);
     });
   });
-
-  scrim.addEventListener("click",()=>setOpen(false));
+  scrim.addEventListener("click",closeGateway);
   document.addEventListener("pointermove",event=>{
     if(!open||!["mouse","touch","pen"].includes(event.pointerType))return;
-    const tolerance=10,rect=root.getBoundingClientRect();
-    const orbit=window.matchMedia("(max-width: 600px)").matches?112:126;
-    const inside=event.clientX>=rect.left-orbit-tolerance&&event.clientX<=rect.right+tolerance&&
-      event.clientY>=rect.top-orbit-tolerance&&event.clientY<=rect.bottom+orbit+tolerance;
+    const tolerance=10,rect=root.getBoundingClientRect(),orbit=window.matchMedia("(max-width: 600px)").matches?112:126;
+    const inside=event.clientX>=rect.left-orbit-tolerance&&event.clientX<=rect.right+tolerance&&event.clientY>=rect.top-orbit-tolerance&&event.clientY<=rect.bottom+orbit+tolerance;
     if(inside)outsideSince=0;
     else if(!outsideSince)outsideSince=performance.now();
-    else if(performance.now()-outsideSince>110)setOpen(false);
+    else if(performance.now()-outsideSince>110)closeGateway();
   },{passive:true});
-
   document.addEventListener("keydown",event=>{
     if(!open)return;
-    if(event.key==="Escape"){event.preventDefault();setOpen(false);trigger.focus({preventScroll:true});return;}
-    if(event.key==="ArrowDown"||event.key==="ArrowRight"){event.preventDefault();moveSelection(1);return;}
-    if(event.key==="ArrowUp"||event.key==="ArrowLeft"){event.preventDefault();moveSelection(-1);return;}
+    if(event.key==="Escape"){event.preventDefault();closeGateway();trigger.focus({preventScroll:true});return;}
+    if(event.key==="ArrowDown"){event.preventDefault();moveSelection(1);return;}
+    if(event.key==="ArrowUp"){event.preventDefault();moveSelection(-1);return;}
+    if(event.key==="ArrowRight"){event.preventDefault();moveSelection(1);return;}
+    if(event.key==="ArrowLeft"){event.preventDefault();moveSelection(-1);return;}
     if(event.key==="Enter"||event.key===" "){event.preventDefault();activate(selected||items[0]);return;}
     if(event.key==="Tab"){
-      const focusable=[trigger,...items].filter(item=>item.tabIndex>=0);
-      const first=focusable[0],last=focusable[focusable.length-1];
+      const focusable=[trigger,...items].filter(item=>item.tabIndex>=0),first=focusable[0],last=focusable[focusable.length-1];
       if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
       else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
     }
   });
-  window.addEventListener("blur",()=>{if(open)setOpen(false);});
-  window.addEventListener("pagehide",()=>{if(open)setOpen(false);});
+  window.addEventListener("blur",()=>{if(open)closeGateway();clearEntry();});
+  window.addEventListener("pagehide",()=>{if(open)closeGateway();clearEntry();});
   window.addEventListener("gamepadconnected",startController);
-  window.addEventListener("nu:menu-dismissed",releaseHeldState);
-  window.addEventListener("nu:player-overlay-close",releaseHeldState);
-
 
   const initialView=new URLSearchParams(window.location.search).get("view");
   if(["store","profile"].includes(initialView))document.getElementById("menu-"+initialView)?.click();
