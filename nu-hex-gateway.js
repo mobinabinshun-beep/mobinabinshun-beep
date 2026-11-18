@@ -81,7 +81,7 @@
       if(source!=="simulated-pointer")trigger.focus({preventScroll:true});
     }else{
       window.NUControllerPointer?.setGatewayNavigation(false);
-      window.NUControllerPointer?.setEnabled(false);
+      // Keep the virtual pointer alive after Gateway closes so it can leave and re-enter the trigger zone.
       clearTimeout(activationTimer);activationTimer=0;pendingItem=null;
       items.forEach(item=>{item.classList.remove("is-selected","is-confirming");item.setAttribute("aria-pressed","false");});
       if(shouldResume)releaseHeldState();
