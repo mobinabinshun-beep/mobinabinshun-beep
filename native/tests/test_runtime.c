@@ -12,7 +12,7 @@ int main(void){
  NU_BudgetInit(&b,1024u*1024u*1024u,1024u*1024u*1024u,1u);
  assert(b.ram_limit_bytes==NU_DEFAULT_RAM_CAP);assert(b.shared_cache_bytes==250u*1024u*1024u);
  assert(b.short_cache_bytes+b.pattern_cache_bytes==b.shared_cache_bytes);
- assert(b.disk_cache_limit_bytes==1024u*1024u*1024u);
+ assert(b.disk_cache_limit_bytes==1024u*1024u*1024u);\n assert(b.ram_reserved_bytes==0u);\n assert(NU_BudgetReserve(&b,100u*1024u*1024u));\n assert(NU_BudgetReserve(&b,150u*1024u*1024u));\n assert(!NU_BudgetReserve(&b,1u));\n NU_BudgetRelease(&b,150u*1024u*1024u);\n assert(b.ram_reserved_bytes==100u*1024u*1024u);\n NU_BudgetRelease(&b,100u*1024u*1024u);\n assert(b.ram_reserved_bytes==0u);
  assert(b.cpu_slot_numerator==1u&&b.cpu_slot_denominator==2u);
  assert(!NU_SchedulerGrantSlot(0u)&&NU_SchedulerGrantSlot(1u));
  assert(!NU_SchedulerGrantGpuSlot(0u)&&NU_SchedulerGrantGpuSlot(1u));
