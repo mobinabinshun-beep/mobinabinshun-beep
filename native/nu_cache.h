@@ -15,5 +15,9 @@ typedef struct NU_DiskCache {
 int NU_CacheInit(NU_DiskCache *cache, const char *path, uint64_t disk_limit_bytes);
 int NU_CachePush(NU_DiskCache *cache, const uint8_t *data, uint32_t length);
 int NU_CachePop(NU_DiskCache *cache, uint8_t *buffer, uint32_t capacity, uint32_t *length);
+/* Stage a file as <=64 KiB CRC-protected records; returns bytes staged, zero on failure. */
+uint64_t NU_CacheStageFile(NU_DiskCache *cache, const char *source_path);
+/* Drain records in order into one caller-owned module buffer. */
+int NU_CacheLoadAll(NU_DiskCache *cache, uint8_t *output, uint32_t capacity, uint32_t *length);
 void NU_CacheClear(NU_DiskCache *cache);
 #endif
