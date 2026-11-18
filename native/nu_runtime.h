@@ -19,7 +19,7 @@ typedef unsigned __int64 uint64_t;
 #define NU_DEFAULT_DISK_CACHE (1024u * 1024u * 1024u)
 typedef struct NU_Budget {
  uint64_t ram_limit_bytes, shared_cache_bytes, disk_cache_limit_bytes;
- uint64_t short_cache_bytes, pattern_cache_bytes;
+ uint64_t short_cache_bytes, pattern_cache_bytes;\n uint64_t ram_reserved_bytes;
  uint32_t cpu_slot_numerator, cpu_slot_denominator;
  uint32_t render_width, render_height, target_fps, logical_processors;
 } NU_Budget;
@@ -33,7 +33,7 @@ typedef struct NU_VM {
  const uint8_t *code; uint32_t code_size, ip, steps, step_limit;
  int halted, fault;
 } NU_VM;
-void NU_BudgetInit(NU_Budget *, uint64_t, uint64_t, uint32_t);
+void NU_BudgetInit(NU_Budget *, uint64_t, uint64_t, uint32_t);\nint NU_BudgetReserve(NU_Budget *, uint64_t);\nvoid NU_BudgetRelease(NU_Budget *, uint64_t);
 int NU_SchedulerGrantSlot(uint32_t);
 int NU_SchedulerGrantGpuSlot(uint32_t);
 uint32_t NU_CRC32(const uint8_t *, size_t);
