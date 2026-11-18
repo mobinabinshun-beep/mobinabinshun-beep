@@ -143,3 +143,11 @@ This is the graph-validation primitive only. It does not yet parse dependency de
 ## User data cleanup planning (development increment)
 
 `nu_cleanup.c/.h` adds a portable C90 inventory planner for uninstall. It separates core, game modules, disposable cache, saves, wallet/profile, user assets, settings and the downloaded installer archive. The planner calculates bytes/counts for deletion and preservation. The downloaded installer archive is always preserved by the ordinary removal mask; deleting it requires a separate explicit argument. This is a planning API only: it does not yet delete files, render the three-stage UI, discover prior installations, create portable identity-marked backups or provide a transaction journal. See `docs/architecture/NU-PACK-1-USER-LIFECYCLE.md` for the required user flow.
+
+## Full-pack reconciliation and journal state model
+
+`nu_install_plan.c/.h` adds a bounded component reconciler for complete offline packs. Components are matched by stable ID and version: identical components are kept, absent components are added, changed versions are updated, and installed components not present in the incoming pack are left untouched. Duplicate/invalid IDs, malformed versions, invalid required flags and capacity overruns fail closed.
+
+The same module includes a small install-journal state-transition model covering prepared, staging, verified, activated, rollback-required and rolled-back states. It rejects skipped/invalid transitions and refuses to mark a transaction verified before all planned items are complete.
+
+These are portable planning/state primitives, not filesystem transactions. Durable journal persistence, verified installation identity discovery, staged file copying, atomic activation, rollback file operations, dependency fields in manifests and the three-stage graphical installer/uninstaller remain unfinished. The installer archive remains a separate user-owned file and must never be placed inside the uninstall root.
