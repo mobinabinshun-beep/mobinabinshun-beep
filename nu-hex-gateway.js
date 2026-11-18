@@ -126,7 +126,7 @@
   },100);
  }
  function onNativePointerMove(event){
-  if(!["mouse","touch","pen"].includes(event.pointerType))return;
+  if(event.isTrusted===false||!["mouse","touch","pen"].includes(event.pointerType))return;
   lastPointer={x:event.clientX,y:event.clientY,source:event.pointerType};
   if(!open){
    if(requiresExit&&!insideTrigger(event.clientX,event.clientY))requiresExit=false;
