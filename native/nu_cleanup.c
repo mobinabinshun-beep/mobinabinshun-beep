@@ -7,7 +7,8 @@ int NU_CleanupPlanBuild(const NU_CleanupItem *items, size_t count,
  size_t i;
  NU_CleanupPlan p;
  if (!items || !plan || count > NU_CLEANUP_MAX_ITEMS ||
-     (remove_mask & 0xffffff80u) != 0u) return 0;
+     (remove_mask & 0xffffff80u) != 0u ||
+     (delete_installer != 0 && delete_installer != 1)) return 0;
  memset(&p, 0, sizeof(p));
  for (i = 0u; i < count; ++i) {
   uint32_t cls = items[i].data_class;
