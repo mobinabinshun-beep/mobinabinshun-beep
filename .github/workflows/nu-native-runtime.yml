@@ -1,0 +1,22 @@
+name: N.U Native Runtime
+on:
+  push:
+    branches:
+      - feat/nu-native-runtime-gen1-foundation
+  pull_request:
+    paths:
+      - "native/**"
+      - ".github/workflows/nu-native-runtime.yml"
+jobs:
+  portable-core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install CMake and compiler
+        run: sudo apt-get update && sudo apt-get install -y cmake build-essential
+      - name: Configure C90 build
+        run: cmake -S native -B build -DCMAKE_C_FLAGS="-Wall -Wextra -Werror -pedantic"
+      - name: Build
+        run: cmake --build build --parallel
+      - name: Run tests
+        run: ctest --test-dir build --output-on-failure
