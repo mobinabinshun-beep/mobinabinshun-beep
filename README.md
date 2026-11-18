@@ -19,19 +19,43 @@ The root GitHub Pages site contains an experimental browser-first game hub.
 
 Each selected round has 10 successful target interactions. Missed clicks do not consume an interaction. The round remains on the selected game until completion or page reload. A fresh launch chooses a random game from the active pool.
 
-## Prototype limitations — read before team testing
-- XP and Mana are stored in this browser's localStorage. Clearing browser data or changing browser/device can remove or separate saves.
-- N-BI consumes 10 Mana per successful Chaos shot in the current prototype; upgrade-based cost reduction and the complete economy are not wired yet.
-- Level increases are based on each 100 cumulative XP.
-- The visual world is a source-informed procedural pixel-art interpretation, not an approved canonical NirooCity map or definitive geography.
-- The capability sampler is a conservative heuristic, not a CPU/GPU benchmark or hardware safety guarantee.
-- Ten quality levels currently adjust the ambient particle renderer only; game-specific adaptive budgets remain future work.
-- This prototype is browser-first. It does not yet provide a native Windows, Android, macOS, legacy Java, or downloadable offline launcher.
-- Publication cards link to original Medium sources; original text is not copied.
-- No online accounts, cloud saves, comments, paid economy, multiplayer economy or downloadable launcher is included. The experimental local Store currently supports the HP Capsule transaction only; other upgrades remain unimplemented.
+## Current Generation 1 public-demo contract — 2026-11-18
 
-## Team test
-Open the GitHub Pages site and choose **START A RANDOM GAME**. Click targets in the field. Test missed clicks (they should not consume one of the ten successful interactions), then return to the game library and select the same game again to start a fresh round. Reload to verify local save persistence and confirm that a new round selects a random game.
+The public Pages site is the **experimental test lab**, not a production release. The current candidate includes the three Generation 1 games, shared local Wallet, Mana capacity upgrades, N-BI and Arcane Shield.
+
+### Mana, containers and capacity
+- Mana is **not sold** by the Store. It is collected through Mana Collector (+1 per successful collection) or earned through the virtual Casino rules.
+- A Mana capsule/container is a permanent storage slot with a fixed capacity of **10 Mana**. Capacity levels 1–9 mean 1–9 permanent slots and 10–90 total Mana.
+- Spending Mana empties its balance; it does not remove the permanent slot.
+- One X Credit upgrades capacity by one level, adds one permanent 10-Mana slot and grants 10 Mana as the upgrade grant. The maximum is nine slots.
+- Overflow collection at full capacity is not a successful interaction and must not grant rewards or advance successful-interaction counts.
+
+### N-BI and Arcane Shield
+- N-BI level 1 spends exactly 10 Mana per successful shot, neutralizes one Chaos mass and grants +3 XP.
+- A Store shield charge spends 10 Mana from the shared Mana balance and immediately activates 10 defense units. Shield absorption itself awards no cannon XP.
+- Each incoming Chaos hit consumes one defense unit. Shield is applied before HP; once charge reaches zero, later Chaos hits remove the existing 1 HP per mass.
+- A partially charged shield carries its exact remaining charge into the next gameplay Wave. There is no automatic refill or top-up.
+- Only one successful shield activation is allowed per gameplay Wave ID at every shield level.
+- Shield Level 1 is Store/pre-round only. Runtime support for Level 2 allows one in-game manual charge per Wave, but its Store price/purchase path is not approved and remains hidden. Do not invent a price or bypass it by editing local save data.
+
+### Wave, settlement and exit
+- Gameplay/HP Wave completion requires 10 successful interactions; the current prototype completion reward remains +1 HP, capped at 10.
+- Wallet-income Wave aggregation is a separate accounting boundary. Earnings and costs are aggregated by asset/category and settled idempotently; it is not the gameplay activation counter.
+- Remaining Chaos masses must resolve when the player exits or reloads, exactly once. Leaving the visible game does not cancel damage.
+- Wallet, saves and transactions are browser-local (localStorage); this is a test economy, not a server-authoritative ledger or real-money system.
+
+### Current prototype limitations
+- No online account, cloud save, cross-device synchronization, real-money payment, deposit, withdrawal or cash-out exists.
+- N-BI upgrade pricing/cost curve and X/N Credit issuance/conversion are not active because their prices/rates are not approved.
+- Shield Level 2 purchase price/path is not approved; only its runtime gate is present.
+- The visual world is a procedural pixel-art interpretation, not an approved canonical NirooCity map.
+- The capability sampler is a conservative browser heuristic, not a CPU/GPU benchmark or hardware-safety guarantee.
+- Ten quality levels currently adjust the ambient renderer; per-game adaptive budgets remain future work.
+- The browser demo is not a native Windows, Android, macOS, legacy Java or downloadable offline launcher.
+- Publication cards link to original Medium sources; original text is not copied.
+
+## Human test entry point
+Open the [public demo](https://mobinabinshun-beep.github.io/mobinabinshun-beep/) in a separate test-browser profile. Use [Issue #204 — Mana / N-BI / Arcane Shield human QA](https://github.com/mobinabinshun-beep/mobinabinshun-beep/issues/204) to record build SHA, device, OS, browser, viewport, input method, expected/actual result and evidence. CI success is not human acceptance.
 
 N.U — Niroo Universe
 
@@ -59,14 +83,11 @@ The runtime does not stress-test CPU/GPU, does not guarantee hardware safety, an
 - The skyline is a visual placeholder, not a confirmed canonical depiction of Niroo City.
 - Camera updates are throttled; hidden tabs pause the ambient runtime and game animation.
 
-### Known limitations after source review
+### Historical limitations — superseded by the current contract above
 
-- The current game economy remains a prototype: Credits, upgrades, capsule filling and the full progression economy are not implemented in the current game module.
-- Mana Collector stops accepting rewards when all configured Mana storage is full; a spend/upgrade interface is not yet available.
-- Chaos consumes 10 Mana per successful shot in the current prototype. Upgrade-based cost reduction is not yet implemented.
-- Chaos damage is a simple one-time boundary encounter per target, not a full collision or enemy-HP simulation.
-- Saves remain browser-local. Cross-device synchronization and offline installation are not yet available.
-- Real-device visual, touch and accessibility testing is still required; source review alone is not proof of runtime correctness.
+The following notes describe an earlier prototype snapshot and are retained as project history only. They are not the current implementation status. For active Mana, N-BI, Arcane Shield, Store and Wave rules, use **Current Generation 1 public-demo contract** at the top of this README and the canonical specification in docs/architecture/NU-MANA-CAPSULE-ARCANE-SHIELD-SPEC.md.
+
+Real-device visual, touch, keyboard/controller and accessibility acceptance remains a human-test task; source review and CI are not proof of device behavior.
 
 ### QA focus for team testing
 
