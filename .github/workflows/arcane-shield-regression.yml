@@ -1,5 +1,8 @@
 name: N.U Arcane Shield and Mana regression
 on:
+  push:
+    branches:
+      - "feat/arcane-shield-demo-icon-human-qa-20261118"
   pull_request:
     paths:
       - "nu-wallet.js"
