@@ -37,8 +37,8 @@ jobs:
         run: |
           i686-w64-mingw32-objdump -p nu-launcher-xp-candidate.exe > pe-report.txt
           grep -E "Subsystem|MajorSubsystemVersion|MinorSubsystemVersion|DLL Name" pe-report.txt
-          grep -q "MajorSubsystemVersion 5" pe-report.txt
-          grep -q "MinorSubsystemVersion 1" pe-report.txt
+          grep -Eq "MajorSubsystemVersion[[:space:]]+5" pe-report.txt
+          grep -Eq "MinorSubsystemVersion[[:space:]]+1" pe-report.txt
       - name: Upload Windows candidate executable
         uses: actions/upload-artifact@v4
         with:
