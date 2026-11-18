@@ -68,7 +68,7 @@ N.U یک محیط اجرای مستقل و افزونه‌پذیر است. سی�
 - `NUVM/1`: فقط ISA/bytecode runtime؛ نسخهٔ ISA از نسخهٔ container مستقل است.
 - `NUPACK-MANIFEST/1`: فهرست کامل اجزای یک انتشار و سیاست نصب.
 
-کد PR #195 فعلاً نام‌گذاری تاریخی magic را دارد؛ مهاجرت آن باید با نسخهٔ container جدید، تست golden files و رد/تشخیص صریح قالب قدیمی انجام شود. نباید فایل‌های قدیمی بی‌صدا به قالب جدید تفسیر شوند. تا پیش از این اصلاح، shellهای PR #151/#175 به‌عنوان hostهای جداگانه و غیرقابل ترکیب باقی می‌مانند.
+در همین شاخهٔ پیش‌انتشار، ظرف باینری به NUPK/1 با header بیست‌بایتی مهاجرت داده شد و NUVM/1 فقط شناسهٔ ISA/bytecode باقی ماند. validator قالب باینری قدیمی با magic=NUVM را رد می‌کند. نمونه‌های متنی PR #151/#175 همچنان قالب‌های legacy جدا هستند و به‌صورت خودکار تبدیل نمی‌شوند. Golden fixtures و تست interoperability بین hostها هنوز لازم است. تا پیش از این اصلاح، shellهای PR #151/#175 به‌عنوان hostهای جداگانه و غیرقابل ترکیب باقی می‌مانند.
 
 ## 6. قرارداد معماری واحد
 
@@ -164,3 +164,8 @@ N.U یک محیط اجرای مستقل و افزونه‌پذیر است. سی�
 CRC فقط خطای تصادفی را تشخیص می‌دهد، امضای ناشر نیست. parser ساختاری به‌تنهایی اعتماد ایجاد نمی‌کند. هیچ package unsigned نباید authenticated معرفی شود. تا قبل از crypto provider واقعی، نصب عمومی باید به بسته‌های development کنترل‌شده محدود بماند.
 
 هر تغییر مخرب باید journal و rollback داشته باشد. دادهٔ کاربر هیچ‌وقت در کنار فایل‌های اجرایی versioned نگهداری نمی‌شود. cache قابل بازسازی است و در پاک‌سازی قابل حذف؛ installer archive مستقل و تحت اختیار کاربر باقی می‌ماند.
+
+
+### NUPK/1 format correction applied
+
+The C90 package builder and validator now use a distinct NUPK/1 container (20-byte header) with separate container version, generation, flags and NUVM ABI fields. CRC32 protects against accidental corruption only. Unit tests cover unsupported container version, unsupported VM ABI minor, legacy NUVM container-magic rejection and payload CRC failure. The old pre-release binary format is intentionally not treated as a published compatibility target.
