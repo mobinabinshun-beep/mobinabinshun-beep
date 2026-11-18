@@ -178,7 +178,7 @@
   window.addEventListener("nu:simulated-mouse-input",event=>{
     if(!core||core.getState().mode!=="simulated-mouse")return;
     const detail=event.detail||{};
-    if(detail.dx||detail.dy)core.move(Number(detail.dx)||0,Number(detail.dy)||0);
+    if(detail.dx||detail.dy)window.NUGatewayControllerInput.move(Number(detail.dx)||0,Number(detail.dy)||0);
     if(detail.confirm)window.NUGatewayControllerInput.confirm();
     if(detail.cancel)window.NUGatewayControllerInput.cancel();
   });
