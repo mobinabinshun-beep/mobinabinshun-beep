@@ -242,6 +242,8 @@
     });
   });
   scrim.addEventListener("click",closeGateway);
+  document.addEventListener("pointerdown",event=>{if(["mouse","touch","pen"].includes(event.pointerType))lastPhysicalPointer={x:event.clientX,y:event.clientY,type:event.pointerType};},{capture:true,passive:true});
+  document.addEventListener("pointerup",event=>{if(["mouse","touch","pen"].includes(event.pointerType))lastPhysicalPointer={x:event.clientX,y:event.clientY,type:event.pointerType};},{capture:true,passive:true});
   document.addEventListener("pointermove",event=>{
     if(!["mouse","touch","pen"].includes(event.pointerType))return;
     lastPhysicalPointer={x:event.clientX,y:event.clientY,type:event.pointerType};
