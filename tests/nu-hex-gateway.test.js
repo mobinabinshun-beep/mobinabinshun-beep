@@ -151,10 +151,11 @@ test("Gateway focus loop wraps in both directions and Escape restores the trigge
 
 
 test("Gateway removes redundant utility-page menu and back controls while Profile keeps Wallet tabs",()=>{
-  assert.match(css,/body\\.nu-gateway-utility-active #menu-open/);
-  assert.match(css,/body\\.nu-gateway-utility-active #bag-back/);
-  assert.match(css,/body\\.nu-gateway-utility-active #wallet-back/);
-  assert.match(css,/body\\.nu-gateway-utility-active #menu-profile/);
+  assert.ok(worldCss.includes("body.nu-gateway-utility-active #menu-open"));
+  assert.ok(worldCss.includes("body.nu-gateway-utility-active #menu-profile"));
+  assert.ok(worldCss.includes("body.nu-game-active #menu-profile"));
+  assert.ok(css.includes("body.nu-gateway-utility-active #bag-back"));
+  assert.ok(css.includes("body.nu-gateway-utility-active #wallet-back"));
   assert.match(html,/profile-wallet-tabs/);
   assert.doesNotMatch(html,/id="profile-back"/);
 });
