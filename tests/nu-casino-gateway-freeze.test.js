@@ -13,7 +13,8 @@ test("Casino round timers pause while Gateway is open and remain paused after cl
 });
 
 test("Casino outcome and result transitions use Gateway-aware timers",()=>{
- const run=casino.slice(casino.indexOf("function runRound"),casino.indexOf('document.querySelectorAll("[data-coin]")'));
+ const start=casino.indexOf("function runRound");
+ const run=casino.slice(start,start+1200);
  assert.match(run,/scheduleGatewayTask\(\(\)=>\{/);
  assert.match(run,/\},170\)/);
  assert.match(run,/\},360\)/);
