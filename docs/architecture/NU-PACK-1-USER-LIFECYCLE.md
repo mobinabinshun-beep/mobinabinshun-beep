@@ -1,0 +1,89 @@
+# N.U Pack 1 — User Lifecycle and Storage Contract
+
+- Revision: draft 1
+- Status: implementation contract; not a release claim
+- Applies to: initial public experimental pack and compatible future full-pack upgrades
+
+## 1. Product promise
+
+The first download is a complete, self-contained installation pack. It installs the N.U host and the modules included in that release. Later releases are also distributed as complete packs so a user can install from scratch. When a compatible N.U host is already installed, setup discovers it, validates its product identity and version, then applies only missing or changed components. It must not overwrite player data.
+
+A future plug-in is a separately described module with a stable module ID, generation/ABI, dependencies, capability declarations, package digest and publisher signature. The host owns lifecycle and resource policy; the plug-in owns its game/content logic. An add-on must not raise the host's resource ceiling or bypass module isolation.
+
+## 2. Installation experience
+
+The installer has three clear stages, with large icons, short labels and optional spoken/accessibility prompts:
+
+1. **Choose destination / detect previous N.U.** Search only known N.U install markers and registered install locations; show the detected location and version. If several valid installs exist, ask which one. Never guess by matching a folder name alone.
+2. **Choose what to install.** Show the core and each game/add-on as separate choices, with required dependencies marked. Explain required disk space before writing. A full pack can be installed cleanly or used as an upgrade source.
+3. **Review and install.** Show a simple summary, then stage files, verify every package, write a recovery journal, and activate atomically. If any step fails, restore the previous active version and keep user data intact.
+
+No silent migration of save formats. If a game requires a save migration, retain a verified backup and provide a recoverable path.
+
+## 3. Upgrade contract
+
+- Every release has a pack ID, release version, compatible host range and component inventory.
+- Setup detects a previous host by a signed/verified install identity record, not by folder-name heuristics.
+- Compare component IDs and versions. Downloaded full-pack media remains available as the complete offline installer; installed content is reconciled component-by-component.
+- Stage new files beside the active version, verify digest/signature and dependencies, then switch the active version in one recoverable transaction.
+- Keep the previous known-good version until the new host launches successfully or the rollback window expires.
+- Never place cache, save data or wallet data inside a versioned executable directory.
+
+## 4. Storage classes
+
+Every file created by N.U must be assigned one class in the install inventory:
+
+| Class | Meaning | Default uninstall action |
+|---|---|---|
+| Core/runtime | N.U-owned program files | Delete |
+| Game/add-on | Separately installed module files | Delete if selected; otherwise keep only if dependencies permit |
+| Temporary cache | Re-creatable transient data | Delete |
+| Save data | Player progress and save slots | Keep |
+| Wallet/profile | Player-owned wallet and profile state | Keep |
+| User assets | User-imported/custom content | Keep |
+| Settings | User preferences and accessibility choices | Keep unless selected |
+| Downloaded installer pack | Original complete setup archive | **Always keep** |
+
+The downloaded installer archive is outside the managed install root and is not part of ordinary uninstall. It may only be deleted from a separate, explicit “Delete downloaded installer” action with a second confirmation. This action is not preselected and is not reachable by “Select all” in the uninstall checklist.
+
+## 5. Three-stage uninstall experience
+
+The uninstall flow is intentionally understandable without reading technical documentation:
+
+1. **Choose removal.** One large “Remove N.U from this computer” action. A separate “Manage downloaded installer” action is not bundled into uninstall.
+2. **Choose what happens to personal data.** Show simple icons and plain labels for saves, wallet/profile, user assets and settings. Default is to keep them. Show a distinct “Remove temporary files and cache” choice. Show estimated space recovered. The installer archive is shown as “Kept” and cannot be selected here.
+3. **Review and finish.** Summarize what will be removed and what will remain, with large Back and Remove buttons. After completion, show the exact location of the retained, identity-marked backup bundle so it can be copied into a later version.
+
+A “Remove everything managed by N.U” preset may select all removable classes, but it must still preserve the downloaded installer archive and require the user to explicitly confirm deletion of personal saves/wallet/assets. The installer archive remains an independent user decision.
+
+## 6. Portable identity-marked data bundle
+
+Preserved data is exported to a clearly named, versioned folder/file with a machine-readable manifest containing product ID, schema versions, component IDs, sizes and digests. The bundle must not contain executable code or cache. It should be copyable to USB or another folder and importable by a later N.U version after validation.
+
+The bundle must be written atomically: create a temporary sibling, write and verify all content, then rename into place. Never overwrite a previous valid bundle without an explicit choice. Import must reject path traversal, unknown schema versions and digest mismatches. Wallet data needs integrity protection and a documented migration policy; no claim of cryptographic authenticity until the signature provider and trust roots are implemented.
+
+## 7. Low-resource policy
+
+- Keep only the active game module resident; stage other modules on disk.
+- Cache is disposable and bounded; clear it on uninstall and when it cannot be safely reused after upgrade.
+- Reserve memory before N.U-owned allocations; reject allocation requests that exceed the current adaptive budget.
+- Use bounded VM instruction slices and yield to the host scheduler.
+- Load graphics/audio assets on demand, release them when a module exits, and provide a low-resolution/low-effects mode.
+- Avoid background polling and automatic update checks while a game is running. Updates are user-initiated for the public demo unless the user explicitly opts in.
+- Measure actual peak RAM, CPU time, disk I/O and frame pacing on low-end test machines; publish measurements, not assumed hardware percentages.
+
+## 8. Non-negotiable safety rules
+
+- Never delete outside the verified N.U-owned inventory roots.
+- Reject symlinks/reparse-point escapes and path traversal before file operations.
+- Never classify an unknown file as disposable cache.
+- Keep the installer archive out of the uninstall root.
+- Journal every destructive operation; recover safely after power loss.
+- Verify the final inventory after deletion and report leftovers rather than claiming a clean uninstall if any owned files remain.
+- User data deletion requires explicit opt-in and a clear summary.
+
+## 9. Current code status
+
+native/nu_cleanup.c and native/nu_cleanup.h currently implement a portable C90 cleanup planning primitive. It classifies inventory entries, calculates delete/preserve counts and byte totals, and preserves the installer archive unless a separate explicit argument is supplied. Unit tests cover keep/delete planning and explicit installer deletion.
+
+This primitive does not perform filesystem deletion, discover installations, build the identity bundle, display the three-stage UI, implement a transaction journal or guarantee zero leftovers. Those require the platform installer/host integration and human QA. The public demo must not be advertised as supporting complete uninstall until those paths are implemented and tested.
