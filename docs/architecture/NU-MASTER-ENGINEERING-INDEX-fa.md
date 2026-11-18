@@ -45,7 +45,7 @@ N.U یک محیط اجرای مستقل و افزونه‌پذیر است. سی�
 شامل شناسه‌های رسمی سه بازی، قرارداد مترجم چندنسلی، IR، Pulse، سیاست hard/soft resource budget و تست پذیرش. این اسناد اکنون به شاخهٔ مرجع PR #195 منتقل شده‌اند. manifest فعلی صریحاً می‌گوید payload هر سه بازی هنوز به بستهٔ Native متصل نیست.
 
 ### PR #195 — Portable Runtime Foundation
-مبنای فعلی توسعهٔ هسته است: C90 portable core، NUVM bytecode، translator subset، disk cache، parser ساختاری manifest، dependency resolver، cleanup planner، component reconciliation و مدل وضعیت journal. CI برای commit ثبت‌شده موفق است؛ اما این شاخه هنوز UI کامل، نصب‌کنندهٔ واقعی و بازی Native ندارد.
+مبنای فعلی توسعهٔ هسته است: C90 portable core، NUPK/1 container حامل NUVM bytecode، translator subset، disk cache، parser ساختاری manifest، dependency resolver، cleanup planner، component reconciliation و مدل وضعیت journal. میزبان Win32 اکنون تصویر ثابت canonical را با GDI نمایش می‌دهد و کنترل‌های پایهٔ Open/Exit دارد؛ اما Library کامل، نصب‌کنندهٔ واقعی و بازی Native ندارد. CI برای commit ثبت‌شده موفق است.
 
 ### PR #175 — Installer Preview
 دارای پروژهٔ C++/Win32 و دستور Inno Setup است. workflow آن با runner و toolchain جدیدتر اجرا می‌شود؛ وجود build script جداگانهٔ MSVC 2010 به معنی تولید و تأیید artifact نهایی XP نیست. قرارداد uninstall آن نیز هنوز تجربهٔ سه‌مرحله‌ای و حفاظت/انتقال دادهٔ کامل را پیاده نمی‌کند.
@@ -130,7 +130,7 @@ N.U یک محیط اجرای مستقل و افزونه‌پذیر است. سی�
 - dependency graph resolver محدود.
 - cleanup planning و component reconciliation.
 - مدل in-memory journal.
-- build/test portable و cross-build میزبان Win32 با PE subsystem 5.01.
+- build/test portable و cross-build میزبان Win32 با PE subsystem 5.01؛ استخراج تصویر ثابت canonical و نمایش GDI نیز در build آزموده شده است.
 
 ### طراحی/ثبت شده، اما هنوز اجرایی نیست
 - مترجم‌های واقعی بازی، Canonical IR کامل و registry.
@@ -173,3 +173,8 @@ The C90 package builder and validator now use a distinct NUPK/1 container (20-by
 
 ### Static image host increment
 The PR #195 host now extracts and displays the canonical still image through GDI StretchBlt, with aspect-preserving scaling. No animation/decorative layers or browser engine are used. The build artifact includes the EXE and its BMP/README/checksum sidecars. This is a test payload, not a setup installer or game renderer.
+
+
+## 13. انتقال ذخیرهٔ نسخهٔ وب به Native
+
+نسخهٔ وب فعلی از localStorage با کلید `nu-world-save-v1` استفاده می‌کند و Wallet/transaction ledger، XP/Mana/HP، وضعیت Shield، شناسه‌های reward و Wave را نگه می‌دارد. پردازش Native به localStorage مرورگر دسترسی مستقیم ندارد. برای حفظ پیشرفت، export کاربرمحور از مرورگر و import اعتبارسنجی‌شده به بستهٔ داده لازم است؛ تا آن زمان نباید ادعای انتقال خودکار Save یا Wallet شود. جزئیات در قرارداد Pack 1 آمده است.
