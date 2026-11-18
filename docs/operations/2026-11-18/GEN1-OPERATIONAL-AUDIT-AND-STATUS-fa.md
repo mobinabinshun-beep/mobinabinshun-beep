@@ -63,3 +63,16 @@ Tests above ran on candidate tree `381cab60be3ce5d9b2d4adb36581ceceeb54d97a`, su
 https://github.com/mobinabinshun-beep/mobinabinshun-beep/issues/204
 
 **وضعیت نهایی فعلی:** CODE-MERGED · MACHINE-TEST-PASSED · BACKUP-VERIFIED · PAGES-WORKFLOW-DEPLOY-SUCCEEDED · LIVE-HTTP-CHECK-UNVERIFIED · HUMAN-QA-PENDING · OWNER-ACCEPTANCE-PENDING.
+
+
+## الحاقیهٔ اصلاح پایداری خروج/reload توده‌های Chaos — 2026-11-18
+
+- ممیزی PRهای باز نشان داد شرط `state.game === "chaos"` در `resolveRemainingChaosMasses` می‌توانست بازیابی توده‌های pending را پس از reload و پیش از ورود مجدد به view متوقف کند.
+- همچنین handler قبلی `beforeunload` بدون بررسی موفقیت resolve/persist، Wave را تسویه می‌کرد. این مسیر اکنون اصلاح شده است.
+- PR #207 ادغام شد: https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/207
+- merge commit: `c687e4be7c4935ebff1b82640b341d1bcd7122bb`.
+- تست دقیق candidate: 83/83 focused و 309/309 full Generation 1 PASS: https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44367406189
+- backup پیش از تغییر: `backup/pre-chaos-exit-persistence-fix-2026-11-18` → `27b59a2c593752ba5c9d21cfe41f43af8fb4e9b9`.
+- backup کاندید تست‌شده: `backup/post-chaos-exit-persistence-candidate-2026-11-18` → `fb8b80cb1cfa44f4ce6f34ce076307dc7f0df889`.
+- Pages build/deploy برای merge commit موفق شد: https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44367521993
+- HTTP/live HTML verification از این محیط همچنان قابل انجام نبود؛ Human QA روی دمو عمومی همچنان PENDING است.
