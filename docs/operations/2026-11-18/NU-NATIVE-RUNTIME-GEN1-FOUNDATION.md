@@ -1,7 +1,7 @@
 # N.U Native Runtime — Generation 1 foundation
 
 - Date: 2026-11-18
-- Status: IMPLEMENTED-CANDIDATE / AUTOMATED-QA-PENDING / XP-VERIFICATION-PENDING / HUMAN-QA-PENDING
+- Status: IMPLEMENTED-CANDIDATE / PORTABLE-CI-PASSED / XP-CROSS-COMPILE-PASSED / XP-EXECUTION-UNVERIFIED / HUMAN-QA-PENDING
 - Branch: feat/nu-native-runtime-gen1-foundation
 - Scope: isolated native runtime foundation; no existing game, HUD, adaptive baseline or public demo changed.
 
@@ -48,11 +48,18 @@ Start a browser-independent, modular N.U execution substrate, prioritize low-cap
 
 ## Automated validation
 
-PENDING. The GitHub Actions workflow is configured to build the portable core in strict C90 mode and run the unit tests. Record the exact run and result here after CI completes. A successful Linux core test is not evidence of Windows XP compatibility.
+- Portable C90 build and unit tests: PASSED, 1/1 test, GitHub Actions run [44228203925](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44228203925).
+- 32-bit MinGW Win32 host cross-build with WINVER/_WIN32_WINNT 0x0501 and PE subsystem 5.01: PASSED in the same run.
+- A second run adds explicit PE subsystem inspection and artifact upload: [44228295525](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44228295525), pending at the time of this record update.
+- These checks prove source compilation and target metadata only; they do not prove the executable starts on a real Windows XP installation.
 
 ## Recovery and release boundary
 
 All changes are isolated on the candidate branch. The default branch and public Pages deployment were not modified. Do not merge or publish this candidate as a playable launcher until the three game modules, package manager, XP toolchain compatibility, and human QA gates are completed.
+
+## Pull request
+
+Draft PR: [#195 — N.U native runtime Generation 1 foundation](https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/195). The PR remains draft because game ports, installer/package manager, cryptographic signing and actual XP execution are not complete.
 
 ## Human QA checklist
 
