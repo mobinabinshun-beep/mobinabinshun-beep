@@ -14,6 +14,7 @@ test("Every page mounting Gateway exposes only Back, Menu and Profile",()=>{
   assert.ok(start>=0&&end>start,path+" must mount Gateway");
   const actions=[...html.slice(start,end).matchAll(/data-action="([^"]+)"/g)].map(match=>match[1]);
   assert.deepEqual(actions,["back","menu","profile"],path+" must expose only the shared command set");
+  assert.match(html,/nu-controller-input-core\.js/,path+" must load simulated mouse core");
  }
 });
 
