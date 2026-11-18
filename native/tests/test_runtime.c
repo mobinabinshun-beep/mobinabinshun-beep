@@ -21,7 +21,7 @@ int main(void){
  assert(NU_PackageValidate(pkg,sizeof(pkg),&view));NU_VMInit(&vm,view.code,view.code_size,100u);
  result=1;for(i=0u;i<20u&&result>0;++i)result=NU_VMStep(&vm);
  assert(vm.halted&&vm.registers[0]==50u);
- pkg[16u]^=1u;assert(!NU_PackageValidate(pkg,sizeof(pkg),&view));
+ pkg[16u]^=1u;assert(!NU_PackageValidate(pkg,sizeof(pkg),&view));pkg[16u]^=1u;\n pkg[5u]=1u;assert(!NU_PackageValidate(pkg,sizeof(pkg),&view));pkg[5u]=0u;
  {uint8_t bad[]={255u};NU_VMInit(&vm,bad,1u,10u);assert(NU_VMStep(&vm)==-1&&vm.fault);}
  {
   NU_DiskCache cache;NU_IRInstruction ir[4];uint8_t translated[64];size_t translated_size;uint8_t first[]={1u,2u,3u,4u};uint8_t second[]={9u,8u,7u};uint8_t output[16];uint32_t output_size;FILE *probe;uint8_t staged[sizeof(pkg)];uint32_t staged_size;FILE *source;
@@ -48,7 +48,7 @@ int main(void){
   assert(fwrite(pkg,1u,sizeof(pkg),source)==sizeof(pkg));assert(fclose(source)==0);
   assert(NU_CacheInit(&cache,"nu-stage-cache.bin",1024u));
   assert(NU_CacheStageFile(&cache,"nu-stage-test.nup")==sizeof(pkg));
-  assert(NU_CacheLoadAll(&cache,staged,(uint32_t)sizeof(staged),&staged_size)==1);
+  assert(NU_CacheLoadAll(&cache,staged,(uint32_t)sizeof(staged)-1u,&staged_size)==-2);\n  assert(cache.queued_items>0u);\n  assert(NU_CacheLoadAll(&cache,staged,(uint32_t)sizeof(staged),&staged_size)==1);
   assert(staged_size==sizeof(pkg)&&NU_PackageValidate(staged,staged_size,&view));
   remove("nu-stage-test.nup");
  }
