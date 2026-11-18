@@ -26,12 +26,14 @@ test("Gateway is the only visible Back/Pause control in mounted views",()=>{
  assert.doesNotMatch(html,/id="finish-round"|PAUSE ROUND|RESUME ROUND/);
 });
 
-test("Gateway pause ownership preserves a pre-existing manual pause and resumes only its own pause",()=>{
+test("Gateway pause ownership captures only an active round and close leaves it frozen for fresh input",()=>{
  assert.match(games,/gatewayPause\.open\(state\)/);
  assert.match(games,/gatewayPause\.close\(state\)/);
  assert.match(games,/gatewayPause\.ownsPause\(\)/);
  assert.match(pause,/if\(!state\|\|!state\.active\|\|state\.paused\)return false/);
- assert.match(pause,/if\(!state\|\|!state\.paused\|\|state\.turn>=10\)return false/);
+ assert.match(pause,/close\(\)[\s\S]*?ownsPause=false;[\s\S]*?return true/);
+ assert.match(games,/gatewayAwaitingInteraction=true/);
+ assert.match(games,/resumeAfterGatewayInteraction\(\)/);
  assert.ok(html.indexOf("nu-gateway-pause.js")<html.indexOf("nu-games.js"));
  assert.match(manifest,/nu-gateway-pause.js/);
  assert.match(games,/window\.addEventListener\("nu:gateway-open",handleGatewayOpen\)/);
@@ -50,11 +52,13 @@ test("Gateway freezes gameplay and ambient renderers while keeping foreground co
  assert.match(games,/document\.body\.classList\.contains\("nu-gateway-open"\)/);
 });
 
-test("Gateway keyboard controls move through options and confirm the selected destination",()=>{
+test("Gateway keyboard controls move through options, extra-down exits, and confirm is separate",()=>{
  assert.match(gateway,/event\.key==="ArrowDown"\|\|event\.key==="ArrowRight"/);
  assert.match(gateway,/event\.key==="ArrowUp"\|\|event\.key==="ArrowLeft"/);
  assert.match(gateway,/event\.key==="Enter"\|\|event\.key===" "/);
  assert.match(gateway,/function moveSelection\(direction\)/);
+ assert.match(gateway,/direction>0&&current===items.length-1\)\{closeGateway\(\)/);
+ assert.doesNotMatch(gateway,/\(current\+direction\+items\.length\)%items\.length/);
 });
 
 test("Gateway mouse hover visibly selects and a click activates one destination",()=>{
@@ -96,4 +100,24 @@ test("Hidden tabs do not restart a Gateway-paused round or gamepad polling",()=>
  assert.match(games,/const shouldFreeze=!!frozen\|\|document\.hidden\|\|!!state\.paused\|\|!!\(state\.game&&!state\.active\)/);
  assert.match(games,/if\(state\.active&&!state\.paused\)/);
  assert.match(gateway,/if\(!open\)return/);
+});
+
+
+test("Gateway entry delays physical mouse and touch by 500ms and simulated mouse by 1000ms",()=>{
+ assert.match(gateway,/scheduleEntry\(500/);
+ assert.match(gateway,/scheduleEntry\(1000/);
+});
+
+test("Simulated mouse is wired to the shared controller core and never activates on movement",()=>{
+ assert.match(gateway,/NUControllerInputCore\.create/);
+ assert.match(gateway,/nu:simulated-mouse-input/);
+ assert.match(gateway,/onMove:updateVirtualPointer/);
+ assert.match(gateway,/onConfirm:\(\)=>activate/);
+});
+
+test("Gateway close does not resume gameplay until fresh play-space input",()=>{
+ assert.match(games,/function handleGatewayClose\(\)[\s\S]*?gatewayAwaitingInteraction=true/);
+ assert.match(games,/function resumeAfterGatewayInteraction\(\)/);
+ assert.match(games,/syncGatewayBackgrounds\(!!state\.paused\|\|!!gatewayAwaitingInteraction\)/);
+ assert.doesNotMatch(games,/let gatewayOwnsPause=false/);
 });
