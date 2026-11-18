@@ -41,6 +41,6 @@
 
 ## Documentation
 - Keep one canonical implementation contract per subject; link secondary notes rather than creating competing rules.
-- The current Gateway/controller contract is [GATEWAY-AND-CONTROLLER-INPUT-CONTRACT-2026-11-17.md](./docs/operations/GATEWAY-AND-CONTROLLER-INPUT-CONTRACT-2026-11-17.md). The older Gateway navigation report is historical only.
+- The single normative Gateway/controller contract is the [Unified Gateway owner contract in the archive](https://github.com/mobinabinshun-beep/Repository/blob/docs/gateway-human-approval-lock-2026-11-18/Operations/2026-11-18/GATEWAY-MACHINE-APPROVAL-LOCK-AND-HUMAN-QA-fa.md). Read it before any Gateway/controller work. Product-repository Gateway documents are implementation evidence or pointers only; they must not define divergent behavior. The 2026-11-17 product contract is historical implementation evidence and its behavior clauses are superseded by the 2026-11-18 owner contract.
 - Record decisions, affected files, focused tests, backup/recovery, demo status and remaining risks in the relevant change record.
 - Do not claim tests, backup, deployment, human acceptance or locks that were not actually verified.
