@@ -16,13 +16,16 @@
 3. **Implement in isolation:** use the existing authorized working line by default and avoid a new branch for every defect. Create a dedicated candidate branch only when a protected lock, parallel release, destructive risk, security boundary or explicit owner direction materially requires isolation. A direct owner instruction may authorize the existing default/development line for that exact scope only.
 4. **Machine test and debug:** run focused tests, syntax/build checks and relevant regression workflows. Fix failures before continuing. Record exact test names, environment and outcomes.
 5. **PRE-RELEASE backup:** after the candidate passes required checks and before deploy, create or reuse a recoverable checkpoint for the exact candidate SHA and verify its ref and restoration path. This is separate from the PRE-CHANGE BASELINE created before editing; never report one as the other.
-6. **Publish to the public demo:** once machine checks and backup are verified, deploy the candidate to the designated public demo. **No additional human pre-approval is required** for changes already authorized and within an unlocked scope.
+6. **Publish a human-test candidate:** once machine checks and PRE-RELEASE backup are verified, deploy the exact candidate to the designated public demo/preview. Display the visible label **TEST CANDIDATE — NOT HUMAN-APPROVED** together with its version/full commit SHA and known limitations. If the public demo cannot safely host an isolated candidate, use a controlled preview and do not imply the stable demo contains the change. **No additional human pre-approval is required** for changes already authorized and within an unlocked scope.
 7. **Verify and report:** check the public URL and actual build/commit identity. If the platform does not provide sufficient evidence, mark deployment UNVERIFIED; source merge alone is not proof of live deployment.
-8. **Human QA:** give the owner and invited testers the demo link, exact scope/build, test steps, expected outcomes, known limitations and rollback reference. Record device, OS, browser, orientation/input method and observed result.
+8. **Human QA:** give the owner and invited testers the demo/preview link, exact scope/build SHA, test steps, expected outcomes, known limitations and rollback reference. Each report must identify the candidate SHA/URL, test date, device/OS/browser/version, viewport/orientation, input method, scenario, expected and actual result, PASS/FAIL/BLOCKED outcome, and reproducible evidence where possible. Never collect credentials or unnecessary personal data.
 9. **Accept and lock:** only an explicit owner acceptance creates a lock. The lock applies only to the named item, section or pack and the exact accepted scope/build.
 10. **Correct and repeat:** rejected or failed items are corrected within the authorized scope and repeat machine tests → verified backup → public demo → link/build verification → human QA.
 
 **Canonical order:** Code → machine tests/debugging → verified machine backup → public demo → link-check/report → human QA/owner acceptance.
+
+## DOC-ONLY and non-runtime documentation
+A documentation-only clarification that does not alter product behavior is recorded as DOC-ONLY, verified by PR review and fetch-back, and does not trigger a runtime deployment. If documentation changes product requirements or public behavior, treat it as a product change and follow the full candidate/QA lifecycle.
 
 ## Scope locks and reopening
 - Owner acceptance may lock one item, a section or a complete pack.
