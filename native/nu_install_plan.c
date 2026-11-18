@@ -75,7 +75,7 @@ int NU_InstallJournalAdvance(NU_InstallJournal *j,NU_InstallJournalState next,
  if(!j||j->state==NU_JOURNAL_EMPTY||completed>j->total_items||
     completed<j->completed_items) return 0;
  if(next==NU_JOURNAL_ROLLBACK_REQUIRED &&
-    j->state!=NU_JOURNAL_ACTIVATED && j->state!=NU_JOURNAL_ROLLED_BACK)
+    j->state>=NU_JOURNAL_PREPARED && j->state<=NU_JOURNAL_ACTIVATED)
   allowed=1;
  else if(next==NU_JOURNAL_ROLLED_BACK &&
          j->state==NU_JOURNAL_ROLLBACK_REQUIRED) allowed=1;
