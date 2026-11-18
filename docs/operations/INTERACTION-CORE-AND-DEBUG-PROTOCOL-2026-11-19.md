@@ -4,6 +4,8 @@
 **Scope:** Shared launcher/game interaction pipeline, independent input translators, Gateway, game objects and durable debugging evidence.  
 **Protected boundary:** Classic LV / XP / Mana HUD remains locked. Do not alter its markup, style, layout or semantics.
 
+**Living coverage list:** [INTERACTION-DEBUG-BACKLOG-2026-11-19.md](./INTERACTION-DEBUG-BACKLOG-2026-11-19.md). Update its checkboxes only when implementation/test evidence exists; do not treat a checkbox as human acceptance.
+
 ## 1. Architecture: translators are independent; the core is shared
 
 Each physical or logical input translator owns only its source-specific interpretation. Translators publish normalized semantic events to `NUInteractionCore`; the core records and broadcasts them. Existing page/game handlers remain the action owners until explicitly migrated, so observation does not silently replace gameplay behavior.
