@@ -30,8 +30,7 @@ static int nu_bundle_id_length(const char *s,size_t *length){
 static int nu_bundle_duplicate(const NU_BundleEntry *e,size_t index){
  size_t i;
  for(i=0u;i<index;++i)
-  if(e[i].data_class==e[index].data_class&&
-     strcmp(e[i].id,e[index].id)==0)return 1;
+  if(strcmp(e[i].id,e[index].id)==0)return 1;
  return 0;
 }
 size_t NU_BundleBuild(const NU_BundleEntry *entries,size_t count,
@@ -119,8 +118,7 @@ int NU_BundleParse(const uint8_t *data,size_t length,NU_BundleView *view){
   if(NU_CRC32(entry->data,(size_t)entry->size)!=entry_crc)return 0;
   pos+=(size_t)entry->size;
   for(j=0u;j<i;++j)
-   if(parsed.entries[j].data_class==entry->data_class&&
-      strcmp(parsed.entries[j].id,entry->id)==0)return 0;
+   if(strcmp(parsed.entries[j].id,entry->id)==0)return 0;
  }
  if(pos!=length)return 0;
  *view=parsed;return 1;
