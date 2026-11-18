@@ -115,3 +115,5 @@ The portable core now defines a bounded NUDb/1 (magic `NUDB`) container for user
 The format does not accept executable modules, installer archives or cache entries. CRC32 detects accidental corruption; it is not a cryptographic signature or tamper-proof wallet seal.
 
 The C90 build/parse primitive and unit tests are implemented. Host-level file writing, atomic sibling-file replacement, export UI, import preview, merge/replace decisions, migration from browser localStorage and post-import recovery are still not wired. Do not yet advertise a working Save/Wallet backup button.
+
+Each NUDb/1 entry now carries its own schema major/minor in addition to the class and stable ID. Save and Wallet schemas can therefore migrate independently inside the same portable identity-marked bundle.
