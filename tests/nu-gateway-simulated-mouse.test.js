@@ -66,6 +66,8 @@ test("Mouse, touch and simulated click all reach the existing gameplay interacti
  assert.match(games,/window\.addEventListener\("pointerup",e=>\{[\s\S]*?interact\(e\)/);
  assert.match(games,/nu:controller-direction/);
  assert.match(games,/nu:controller-confirm/);
+ assert.match(games,/nu:simulated-pointer-move/);
+ assert.match(games,/target\.closest\("#game-canvas"\)/);
 });
 
 test("Reload is not exposed as a Gateway action",()=>{
