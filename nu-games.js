@@ -4,7 +4,7 @@
 const $=id=>document.getElementById(id);
 const state={save:NUWallet.normalizeSave(NU.load()),game:null,turn:0,active:false,paused:false,quality:5,engine:null,roundSeed:0,targets:[],targetSequence:0,shots:0,raf:0,lastFrame:0,keyboardTargetIndex:-1,keyboardMode:false};
 const gatewayPause=window.NUGatewayPause.create();
-let gamepadFrame=0,lastGamepadMove=0,gamepadConfirmDown=false,gamepadReturnPrimed=false,gamepadReturnDirection=0,gamepadReturnConfirm=false;
+
 function syncGatewayBackgrounds(frozen){
  const shouldFreeze=!!frozen||document.hidden;
  if(state.engine&&typeof state.engine[shouldFreeze?"pause":"resume"]==="function")state.engine[shouldFreeze?"pause":"resume"]();
@@ -17,31 +17,28 @@ function handleGatewayOpen(){
   if(state.raf)cancelAnimationFrame(state.raf);
   state.raf=0;
  }
- stopGamepad();
+ 
  syncGatewayBackgrounds(true);
 }
-function resumeAfterGatewayReturn(fromGamepad=false){
+function resumeAfterGatewayReturn(){
  if(!gatewayPause.resumeOnInteraction(state))return false;
- gamepadReturnPrimed=false;gamepadReturnDirection=0;gamepadReturnConfirm=false;
  state.lastFrame=0;
  if(!document.hidden&&$("game-view").classList.contains("active"))state.raf=requestAnimationFrame(animateGame);
  syncGatewayBackgrounds(false);
- if(!fromGamepad)startGamepad();
  $("game-info").textContent="Round resumed.";
  return true;
 }
 function handleGatewayClose(){
- gamepadReturnPrimed=false;gamepadReturnDirection=0;gamepadReturnConfirm=false;
  const waiting=gatewayPause.close(state);
  if(waiting&&$("game-view").classList.contains("active")){
   if(state.raf)cancelAnimationFrame(state.raf);
   state.raf=0;
-  startGamepad(); // listens for the first real directional/confirm input without advancing the round
  }
  syncGatewayBackgrounds(state.paused);
 }
 window.addEventListener("nu:gateway-open",handleGatewayOpen);
 window.addEventListener("nu:gateway-close",handleGatewayClose);
+window.addEventListener("nu:simulated-pointer-move",()=>{if(gatewayPause.isAwaitingInteraction())resumeAfterGatewayReturn();});
 const games=[
  {id:"bubble",name:"Bubble Hunt",desc:"Find the rain-glass droplets and collect XP.",status:"PLAYABLE"},
  {id:"mana",name:"Mana Collector",desc:"Collect luminous hexagonal Mana particles.",status:"PLAYABLE"},
@@ -300,8 +297,8 @@ function initTargets(){
  if(state.game==="chaos"&&state.save.activeWave){const registered=NUWallet.registerChaosTargets(state.save,state.targets.map(target=>target.id));if(registered.ok)persistWalletState(registered.state);}
 }
 function animateGame(t){if(!state.active)return;const minFrame=state.quality<=3?70:state.quality<=6?45:30;if(t-state.lastFrame>=minFrame){state.lastFrame=t;const w=canvas.clientWidth,h=canvas.clientHeight;state.targets.forEach(o=>{if(!state.active||!o.alive)return;o.x+=o.vx;if(state.game==="chaos"){o.y+=o.speed;if(o.x<o.r+8||o.x>w-o.r-8)o.vx*=-1;if(!o.damaged&&o.y>h-92){const hit=resolveChaosMasses([o.id],"CHAOS_BREACH_DAMAGE");if(!hit||!hit.ok)return;o.damaged=true;o.alive=false;if(hit.died)return;}}else{o.y+=o.vy;if(o.y<55||o.y>h-o.r-40)o.vy*=-1;}});drawGame();}state.raf=requestAnimationFrame(animateGame);}
-function chooseGame(id){window.dispatchEvent(new Event("nu:gateway-close"));if(window.NUPixelWorld)window.NUPixelWorld.setWeatherMode("game");if(state.raf)cancelAnimationFrame(state.raf);const exitResolution=resolveRemainingChaosMasses("CHAOS_NEW_ROUND_EXIT");if(exitResolution&&exitResolution.ok===false){$("game-info").textContent="Unable to save remaining Chaos damage. Please retry.";return;}settleActiveWave("new_round");state.game=id||games[Math.floor(Math.random()*games.length)].id;const started=NUWallet.beginWave(state.save,state.game);if(started.ok)persistWalletState(started.state);state.turn=0;state.active=true;state.paused=false;state.shots=0;initTargets();$("home-view").classList.remove("active");$("article-view").classList.remove("active");$("game-view").classList.add("active");state.keyboardTargetIndex=state.targets.findIndex(target=>target.alive);state.keyboardMode=false;canvas.focus({preventScroll:true});startGamepad();$("game-title").textContent=games.find(g=>g.id===state.game).name;renderRoundProgress();$("game-info").textContent=state.game==="chaos"?"Tap a Chaos mass to mark it. N-BI fires automatically and consumes one full 10-Mana capsule per mass." :"Tap a target to interact.";renderWallet();requestAnimationFrame(()=>{resize();initTargets();drawGame();state.lastFrame=0;state.raf=requestAnimationFrame(animateGame);});}
-function closeGame(){const exitResolution=resolveRemainingChaosMasses("CHAOS_PLAYER_EXIT");if(exitResolution&&exitResolution.ok===false){$("game-info").textContent="Unable to save remaining Chaos damage. Please retry.";return;}settleActiveWave("player_exit");window.dispatchEvent(new Event("nu:gateway-close"));window.dispatchEvent(new Event("nu:game-view-exit"));stopGamepad();gatewayPause.reset();if(window.NUPixelWorld)window.NUPixelWorld.setWeatherMode("sleep");state.active=false;state.paused=false;if(state.raf)cancelAnimationFrame(state.raf);state.raf=0;$("game-view").classList.remove("active");$("home-view").classList.add("active");document.body.classList.remove("article-mode");}
+function chooseGame(id){window.dispatchEvent(new Event("nu:gateway-close"));if(window.NUPixelWorld)window.NUPixelWorld.setWeatherMode("game");if(state.raf)cancelAnimationFrame(state.raf);const exitResolution=resolveRemainingChaosMasses("CHAOS_NEW_ROUND_EXIT");if(exitResolution&&exitResolution.ok===false){$("game-info").textContent="Unable to save remaining Chaos damage. Please retry.";return;}settleActiveWave("new_round");state.game=id||games[Math.floor(Math.random()*games.length)].id;const started=NUWallet.beginWave(state.save,state.game);if(started.ok)persistWalletState(started.state);state.turn=0;state.active=true;state.paused=false;state.shots=0;initTargets();$("home-view").classList.remove("active");$("article-view").classList.remove("active");$("game-view").classList.add("active");state.keyboardTargetIndex=state.targets.findIndex(target=>target.alive);state.keyboardMode=false;canvas.focus({preventScroll:true});$("game-title").textContent=games.find(g=>g.id===state.game).name;renderRoundProgress();$("game-info").textContent=state.game==="chaos"?"Tap a Chaos mass to mark it. N-BI fires automatically and consumes one full 10-Mana capsule per mass." :"Tap a target to interact.";renderWallet();requestAnimationFrame(()=>{resize();initTargets();drawGame();state.lastFrame=0;state.raf=requestAnimationFrame(animateGame);});}
+function closeGame(){const exitResolution=resolveRemainingChaosMasses("CHAOS_PLAYER_EXIT");if(exitResolution&&exitResolution.ok===false){$("game-info").textContent="Unable to save remaining Chaos damage. Please retry.";return;}settleActiveWave("player_exit");window.dispatchEvent(new Event("nu:gateway-close"));window.dispatchEvent(new Event("nu:game-view-exit"));gatewayPause.reset();if(window.NUPixelWorld)window.NUPixelWorld.setWeatherMode("sleep");state.active=false;state.paused=false;if(state.raf)cancelAnimationFrame(state.raf);state.raf=0;$("game-view").classList.remove("active");$("home-view").classList.add("active");document.body.classList.remove("article-mode");}
 function drawGame(){const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;ctx.clearRect(0,0,w,h);ctx.save();ctx.globalAlpha=.22;for(let i=0;i<30;i++){let x=(i*97+Date.now()*.004)%w,y=(i*61)%h;ctx.fillStyle="#9cddff";ctx.fillRect(x,y,1,1);}ctx.restore();state.targets.forEach((o,i)=>{if(!o.alive)return;o.phase+=.015;const bob=Math.sin(o.phase)*2;ctx.save();if(state.game==="bubble"){const g=ctx.createRadialGradient(o.x-o.r*.3,o.y-o.r*.4,1,o.x,o.y,o.r*1.4);g.addColorStop(0,"rgba(255,255,255,.7)");g.addColorStop(.3,"rgba(255,180,210,.18)");g.addColorStop(.75,"rgba(96,185,255,.13)");g.addColorStop(1,"rgba(255,196,95,.03)");ctx.fillStyle=g;ctx.strokeStyle="rgba(255,202,111,.85)";ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(o.x,o.y+bob,o.r,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.beginPath();ctx.strokeStyle="rgba(255,255,255,.52)";ctx.lineWidth=Math.max(1,o.r*.035);ctx.arc(o.x-o.r*.22,o.y-o.r*.24+bob,o.r*.22,-Math.PI*.78,Math.PI*.18);ctx.stroke();}else if(state.game==="mana"){ctx.translate(o.x,o.y+bob);ctx.rotate(Math.PI/6);ctx.fillStyle="rgba(64,190,255,.16)";ctx.strokeStyle="#68dfff";ctx.lineWidth=1.5;ctx.shadowBlur=5;ctx.shadowColor="#43cfff";ctx.beginPath();ctx.moveTo(0,-o.r);for(let j=1;j<6;j++)ctx.lineTo(Math.cos(j*Math.PI/3)*o.r,Math.sin(j*Math.PI/3)*o.r);ctx.closePath();ctx.fill();ctx.stroke();ctx.shadowBlur=0;ctx.fillStyle="#d9faff";ctx.fillRect(-1,-2,2,4);if(window.NUMaterials)window.NUMaterials.drawMana(ctx,0,0,o.r,o.phase);}else{ctx.translate(o.x,o.y+bob);ctx.fillStyle="rgba(255,54,85,.16)";ctx.strokeStyle="#ff526c";ctx.lineWidth=1.5;ctx.shadowBlur=13;ctx.shadowColor="#ff3658";ctx.beginPath();for(let j=0;j<9;j++){const a=j*Math.PI*2/9,rr=o.r*(j%2?.78:1);if(!j)ctx.moveTo(Math.cos(a)*rr,Math.sin(a)*rr);else ctx.lineTo(Math.cos(a)*rr,Math.sin(a)*rr);}ctx.closePath();ctx.fill();ctx.stroke();ctx.shadowBlur=0;ctx.fillStyle="#ffd6df";ctx.font="10px sans-serif";ctx.textAlign="center";}ctx.restore();});if(window.NUMaterials)window.NUMaterials.drawEffects(ctx);if(state.game==="chaos"){ctx.save();ctx.strokeStyle="rgba(255,174,96,.5)";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(w-18,h-18);ctx.lineTo(w-90,h-75);ctx.stroke();ctx.fillStyle="#ffca75";ctx.shadowBlur=12;ctx.shadowColor="#ffb44e";ctx.beginPath();ctx.arc(w-18,h-18,4,0,Math.PI*2);ctx.fill();ctx.restore();}if(state.keyboardMode&&document.activeElement===canvas)drawKeyboardTarget();}
 function interact(e){if(!state.active||state.paused||state.turn>=10)return;
 
@@ -364,7 +361,7 @@ function mouseCameraBootstrap(e){if(e.pointerType!=="mouse")return;mouseCameraRe
 window.addEventListener("pointermove",mouseCameraBootstrap,{passive:true});window.addEventListener("pointerdown",e=>{if(e.pointerType==="touch")touchDown(e);},{passive:true});
 function settleAfterPageExit(){const resolution=resolveRemainingChaosMasses("CHAOS_PAGE_UNLOAD");if(!resolution||resolution.ok===false)return false;return settleActiveWave("page_unload");}
 window.addEventListener("beforeunload",()=>{settleAfterPageExit();});
-document.addEventListener("visibilitychange",()=>{if(document.hidden){if(state.raf)cancelAnimationFrame(state.raf);state.raf=0;stopGamepad();syncGatewayBackgrounds(true);}else{const gatewayOpen=document.body.classList.contains("nu-gateway-open");if(!gatewayOpen){syncGatewayBackgrounds(state.paused||gatewayPause.isAwaitingInteraction());if(state.active&&!state.paused){state.raf=requestAnimationFrame(animateGame);startGamepad();}else if(gatewayPause.isAwaitingInteraction())startGamepad();}}});
+document.addEventListener("visibilitychange",()=>{if(document.hidden){if(state.raf)cancelAnimationFrame(state.raf);state.raf=0;syncGatewayBackgrounds(true);}else{const gatewayOpen=document.body.classList.contains("nu-gateway-open");if(!gatewayOpen){syncGatewayBackgrounds(state.paused||gatewayPause.isAwaitingInteraction());if(state.active&&!state.paused)state.raf=requestAnimationFrame(animateGame);}}});
 window.addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse"||!e.target.closest("#game-canvas")||e.target.closest("button,a,input,textarea,select,[role=button]"))return;if(state.paused&&gatewayPause.isAwaitingInteraction())resumeAfterGatewayReturn();if(state.active&&!state.paused)interact(e);},{passive:true});window.addEventListener("pointerup",e=>{if(e.pointerType!=="touch"||!e.target.closest("#game-canvas")||touchMoved||(window.NUPixelWorld&&window.NUPixelWorld.lastTouchWasDrag)){if(window.NUPixelWorld)window.NUPixelWorld.lastTouchWasDrag=false;return;}if(e.target.closest("button,a,input,textarea,select,[role=button]"))return;if(state.paused&&gatewayPause.isAwaitingInteraction())resumeAfterGatewayReturn();if(state.active&&!state.paused)interact(e);},{passive:true});window.addEventListener("resize",()=>{if($("game-view").classList.contains("active")){resize();initTargets();drawGame();}});
 window.addEventListener("pageshow",()=>{state.save=NUWallet.normalizeSave(NU.load());renderWallet();});
 window.addEventListener("storage",e=>{if(e.key==="nu-world-save-v1"){state.save=NUWallet.normalizeSave(NU.load());renderWallet();}});
@@ -389,40 +386,6 @@ function activateKeyboardTarget(){
  const rect=canvas.getBoundingClientRect();
  interact({clientX:rect.left+target.x,clientY:rect.top+target.y,keyboard:true});
 }
-function pollGamepad(timestamp){
- gamepadFrame=0;
- const waiting=gatewayPause.isAwaitingInteraction();
- if((!state.active&&!waiting)||document.hidden||!$("game-view").classList.contains("active"))return;
- const pads=navigator.getGamepads?Array.from(navigator.getGamepads()||[]):[];
- const pad=pads.find(Boolean);
- if(pad){
-  const buttons=pad.buttons||[],axes=pad.axes||[];
-  const up=!!(buttons[12]&&buttons[12].pressed)||(Number(axes[1])<-.55);
-  const down=!!(buttons[13]&&buttons[13].pressed)||(Number(axes[1])>.55);
-  const left=!!(buttons[14]&&buttons[14].pressed)||(Number(axes[0])<-.55);
-  const right=!!(buttons[15]&&buttons[15].pressed)||(Number(axes[0])>.55);
-  const direction=up||left?-1:down||right?1:0;
-  const confirm=!!(buttons[0]&&buttons[0].pressed);
-  if(waiting){
-   if(!gamepadReturnPrimed){gamepadReturnPrimed=true;gamepadReturnDirection=direction;gamepadReturnConfirm=confirm;}
-   else{
-    const freshDirection=direction!==0&&direction!==gamepadReturnDirection;
-    const freshConfirm=confirm&&!gamepadReturnConfirm;
-    if(freshDirection||freshConfirm)resumeAfterGatewayReturn(true);
-    gamepadReturnDirection=direction;gamepadReturnConfirm=confirm;
-   }
-  }
-  if(state.active&&!state.paused){
-   if(direction&&timestamp-lastGamepadMove>220){moveKeyboardTarget(direction);lastGamepadMove=timestamp;}
-   if(confirm&&!gamepadConfirmDown)activateKeyboardTarget();
-  }
-  gamepadConfirmDown=confirm;
- }
- gamepadFrame=requestAnimationFrame(pollGamepad);
-}
-function startGamepad(){if(!gamepadFrame&&(state.active||gatewayPause.isAwaitingInteraction())&&!document.hidden&&$("game-view").classList.contains("active"))gamepadFrame=requestAnimationFrame(pollGamepad);}
-function stopGamepad(){if(gamepadFrame)cancelAnimationFrame(gamepadFrame);gamepadFrame=0;gamepadConfirmDown=false;}
-window.addEventListener("gamepadconnected",startGamepad);
 function handleGameKeydown(event){
  if(!$("game-view").classList.contains("active")||event.altKey||event.ctrlKey||event.metaKey)return;
  const gameplayKey=["ArrowRight","ArrowDown","ArrowLeft","ArrowUp","Enter"," "].includes(event.key);

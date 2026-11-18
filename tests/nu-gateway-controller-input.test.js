@@ -101,19 +101,17 @@ test("Gateway options are frozen before they become actionable and remain contro
  assert.match(gateway,/setGatewayNavigation\(true\)/);
  assert.match(gateway,/setGatewayNavigation\(false\)/);
 });
-test("Keyboard and gamepad share game target selection and activation",()=>{
+test("One shared adapter owns gamepad pointer movement and activation",()=>{
+ const pointer=fs.readFileSync("nu-controller-pointer.js","utf8");
+ assert.match(pointer,/navigator&&win\.navigator\.getGamepads/);
+ assert.match(pointer,/function tick\(time\)/);
+ assert.match(pointer,/buttons\[0\]/);
+ assert.match(pointer,/target\.dispatchEvent\(down\)/);
+ assert.match(games,/window\.addEventListener\("nu:simulated-pointer-move"/);
+ assert.doesNotMatch(games,/navigator\.getGamepads|function pollGamepad|gamepadconnected|startGamepad|stopGamepad/);
  assert.match(games,/function moveKeyboardTarget\(direction\)/);
- assert.match(games,/function activateKeyboardTarget\(\)/);
  assert.match(games,/event\.key==="ArrowRight"\|\|event\.key==="ArrowDown"/);
- assert.match(games,/navigator\.getGamepads/);
- assert.match(games,/buttons\[0\]/);
- assert.match(games,/function startGamepad\(\)/);
- assert.match(games,/document\.addEventListener\("keydown",event=>\{/);
- assert.match(games,/gamepadReturnPrimed=false/);
- assert.match(games,/freshDirection=direction!==0&&direction!==gamepadReturnDirection/);
- assert.match(games,/freshConfirm=confirm&&!gamepadReturnConfirm/);
 });
-
 test("Nested player navigation preserves Wallet → Profile → Wallet → Bag history",()=>{
  assert.match(player,/const viewStack=\[\]/);
  assert.match(player,/viewStack\.push\(\{view:activeView,focus:document\.activeElement\}\)/);
@@ -122,11 +120,12 @@ test("Nested player navigation preserves Wallet → Profile → Wallet → Bag h
  assert.match(gateway,/else window\.location\.href="\.\/index\.html"/);
 });
 
-test("Hidden tabs do not restart a Gateway-paused round or gamepad polling",()=>{
- assert.match(games,/if\(document\.hidden\).*stopGamepad\(\)/);
- assert.match(games,/!gatewayOpen\)\{syncGatewayBackgrounds\(state.paused\|\|gatewayPause.isAwaitingInteraction\(\)\)/);
- assert.match(games,/const shouldFreeze=!!frozen\|\|document\.hidden/);
+test("Hidden tabs freeze gameplay while the shared pointer adapter remains the only gamepad poller",()=>{
+ const pointer=fs.readFileSync("nu-controller-pointer.js","utf8");
+ assert.match(games,/document\.addEventListener\("visibilitychange"/);
+ assert.doesNotMatch(games,/stopGamepad|startGamepad|pollGamepad|navigator\.getGamepads/);
  assert.match(games,/if\(state\.active&&!state\.paused\)/);
  assert.match(gateway,/window\.addEventListener\("blur"/);
  assert.match(gateway,/setGatewayNavigation\(false\)/);
+ assert.match(pointer,/function tick\(time\)/);
 });

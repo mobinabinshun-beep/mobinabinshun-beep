@@ -5,20 +5,22 @@ const fs=require("node:fs");
 const vm=require("node:vm");
 const source=fs.readFileSync("nu-controller-pointer.js","utf8");
 
-function harness(){
- const listeners=new Map();
+function harness(gamepad=null){
+ const listeners=new Map(),frames=new Map();let frameId=0;
  const makeElement=()=>({style:{},className:"",attributes:{},children:[],classList:{add(){},remove(){}},setAttribute(k,v){this.attributes[k]=v;},appendChild(child){this.children.push(child);},remove(){},dispatchEvent(){return true;}});
  const target={classList:{add(){},remove(){}},events:[],dispatchEvent(event){this.events.push(event);return true;}};
  const document={head:makeElement(),body:makeElement(),createElement(){return makeElement();},elementFromPoint(){return target;},dispatchEvent(){return true;}};
  class CustomEvent{constructor(type,options){this.type=type;this.detail=options&&options.detail;}}
- const window={document,innerWidth:800,innerHeight:600,navigator:{getGamepads(){return [];}},
+ const window={document,innerWidth:800,innerHeight:600,navigator:{getGamepads(){return gamepad?[gamepad]:[];}},
   CustomEvent,MouseEvent:CustomEvent,PointerEvent:CustomEvent,
   addEventListener(type,fn){if(!listeners.has(type))listeners.set(type,new Set());listeners.get(type).add(fn);},
   removeEventListener(type,fn){listeners.get(type)?.delete(fn);},
   dispatchEvent(event){for(const fn of listeners.get(event.type)||[])fn(event);return true;},
-  requestAnimationFrame(){return 1;},cancelAnimationFrame(){}};
+  requestAnimationFrame(fn){const id=++frameId;frames.set(id,fn);return id;},
+  cancelAnimationFrame(id){frames.delete(id);}};
  vm.runInNewContext(source,{window,globalThis:window,Math,Number,Array,Object,String});
- return {window,target,adapter:window.NUControllerPointer,dispatch(type,detail){window.dispatchEvent(new CustomEvent(type,{detail}));}};
+ return {window,target,adapter:window.NUControllerPointer,dispatch(type,detail){window.dispatchEvent(new CustomEvent(type,{detail}));},
+  step(time){const entry=frames.entries().next().value;if(!entry)return false;frames.delete(entry[0]);entry[1](time);return true;}};
 }
 
 test("Click-controller starts the simulated cursor without a connected Gamepad API device",()=>{
@@ -81,5 +83,21 @@ test("Held keyboard-emulated direction repeat events continue moving the virtual
  h.window.dispatchEvent(event);
  assert.equal(h.adapter.getState().x,428);
  assert.equal(event.defaultPrevented,true);
+ h.adapter.destroy();
+});
+
+test("A connected gamepad sends direction and one confirm through the shared pointer adapter",()=>{
+ const buttons=Array.from({length:16},()=>({pressed:false}));
+ const pad={index:0,connected:true,buttons,axes:[0,0]};
+ const h=harness(pad);let moves=0;
+ h.window.addEventListener("nu:simulated-pointer-move",()=>moves++);
+ assert.equal(h.step(0),true);
+ buttons[15].pressed=true;assert.equal(h.step(200),true);
+ assert.equal(moves,1);assert.equal(h.adapter.getState().x,428);
+ buttons[15].pressed=false;assert.equal(h.step(400),true);
+ buttons[0].pressed=true;assert.equal(h.step(600),true);
+ assert.equal(h.target.events.filter(event=>event.type==="pointerdown").length,1);
+ assert.equal(h.target.events.filter(event=>event.type==="pointerup").length,1);
+ assert.equal(h.target.events.filter(event=>event.type==="click").length,1);
  h.adapter.destroy();
 });
