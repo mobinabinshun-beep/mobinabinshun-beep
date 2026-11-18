@@ -24,3 +24,17 @@ test("store and shield interactions reuse the shared transaction toast", () => {
   assert.match(games, /announceTransaction\("ARCANE SHIELD CHARGED · −10 MANA","success"\)/);
   assert.match(games, /function announceTransaction\(message,tone="success"\)/);
 });
+
+
+test("game target interactions announce successful and blocked outcomes", () => {
+  assert.match(games, /announceTransaction\("BUBBLE HUNT · \+1 XP","success"\)/);
+  assert.match(games, /announceTransaction\("MANA COLLECTED · \+1","success"\)/);
+  assert.match(games, /announceTransaction\("N-BI FIRED · −10 MANA","success"\)/);
+  assert.match(games, /announceTransaction\("MANA STORAGE FULL · UPGRADE OR SPEND A CAPSULE","warning"\)/);
+  assert.match(games, /announceTransaction\("N-BI UNAVAILABLE · NEED 10 MANA","warning"\)/);
+});
+
+test("Arcane Shield failure paths announce non-blocking feedback", () => {
+  assert.match(games, /announceTransaction\(notice,"warning"\)/);
+  assert.match(games, /announceTransaction\("ARCANE SHIELD CHARGE FAILED","warning"\)/);
+});
