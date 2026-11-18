@@ -17,6 +17,7 @@ on:
       - feat/studio-persian-plain-labels-2026-11-12
       - feat/studio-native-dimension-import-2026-11-12
       - Official-public-information-and-discovery-hub-for-N.U-(Niroo-Universe),-its-publishing-network,-projects,-publications-and-related-creative-works
+      - fix/gen1-xp-rail-icon-feedback-2026-11-18
       - fix/gen1-hp-pill-click-feedback-2026-11-13
       - fix/gen1-hp-pill-event-delegation-overlay-2026-11-13
       - fix/gen1-hp-pill-direct-click-2026-11-13
@@ -55,6 +56,8 @@ jobs:
         run: node --test tests/nu-bubble-round.test.js
       - name: Test HP capsule HUD click interaction and feedback
         run: node --test tests/nu-hp-pill-interaction.test.js
+      - name: Test restored XP rail and icon interaction feedback
+        run: node --test tests/nu-hud-layout.test.js && node --test tests/nu-game-icon-feedback.test.js
       - name: Test canonical background engine and visual-layer quarantine
         run: node --test tests/nu-background-engine.test.js
       - name: Test SVG contour vectorizer
