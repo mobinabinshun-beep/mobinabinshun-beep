@@ -11,7 +11,7 @@
   const items=[...root.querySelectorAll(".nu-gateway-item")];
   let open=false,selected=null,activationTimer=0,entryTimer=0,outsideSince=0,suppressClickUntil=0;
   let controllerFrame=0,lastControllerMove=0,controllerConfirmDown=false,controllerCancelDown=false;
-  let entryPointerId=null,virtualInside=false,requireVirtualLeave=false;
+  let entryPointerId=null,virtualInside=false,requireVirtualLeave=false,requirePhysicalLeave=false,lastPhysicalPointer=null;
   const core=window.NUControllerInputCore?window.NUControllerInputCore.create({
     mode:"physical-mouse",bounds:{left:0,top:0,right:Math.max(1,innerWidth),bottom:Math.max(1,innerHeight)},
     x:trigger.getBoundingClientRect().left+trigger.getBoundingClientRect().width/2,
@@ -63,6 +63,7 @@
     menu:()=>{const button=document.getElementById("menu-open");if(button){button.click();return;}window.location.href="./index.html?view=menu";},
     profile:()=>{const button=document.getElementById("menu-profile");if(button){button.click();return;}window.location.href="./index.html?view=profile";}
   };
+  function isInsideGatewayBounds(x,y){const rect=root.getBoundingClientRect(),orbit=window.matchMedia("(max-width: 600px)").matches?112:126;return x>=rect.left-orbit&&x<=rect.right+orbit&&y>=rect.top-orbit&&y<=rect.bottom+orbit;}
   function clearEntry(){if(entryTimer){clearTimeout(entryTimer);entryTimer=0;}entryPointerId=null;}
   function scheduleEntry(delay,pointerId=null){
     clearEntry();
@@ -72,6 +73,7 @@
   function setOpen(next){
     if(open===next)return;
     if(next)window.dispatchEvent(new Event("nu:gateway-open"));
+    if(!next&&lastPhysicalPointer&&isInsideGatewayBounds(lastPhysicalPointer.x,lastPhysicalPointer.y))requirePhysicalLeave=true;
     open=next;outsideSince=0;
     if(!open&&core&&core.getState().mode==="simulated-mouse")requireVirtualLeave=true;
     root.classList.toggle("is-open",open);
@@ -202,21 +204,24 @@
   window.addEventListener("keyup",event=>{if(core&&core.getState().mode==="simulated-mouse")core.keyUp(event);},true);
 
   trigger.addEventListener("pointerenter",event=>{
-    if(event.pointerType==="mouse"&&!open)scheduleEntry(500,event.pointerId);
+    if(["mouse","touch","pen"].includes(event.pointerType))lastPhysicalPointer={x:event.clientX,y:event.clientY,type:event.pointerType};
+    if(event.pointerType==="mouse"&&!open&&!requirePhysicalLeave)scheduleEntry(500,event.pointerId);
   });
   trigger.addEventListener("pointerleave",event=>{if(event.pointerType==="mouse"&&!open)clearEntry();});
   trigger.addEventListener("pointerdown",event=>{
+    if(["mouse","touch","pen"].includes(event.pointerType))lastPhysicalPointer={x:event.clientX,y:event.clientY,type:event.pointerType};
     if(event.pointerType==="touch"){
-      event.preventDefault();suppressClickUntil=Date.now()+900;scheduleEntry(500,event.pointerId);
+      event.preventDefault();suppressClickUntil=Date.now()+900;
+      if(!requirePhysicalLeave)scheduleEntry(500,event.pointerId);
     }
   });
-  trigger.addEventListener("pointerup",event=>{if(event.pointerType==="touch"&&!open){/* keep the 500ms contact timer running after a valid tap */}});
+  trigger.addEventListener("pointerup",event=>{if(["mouse","touch","pen"].includes(event.pointerType))lastPhysicalPointer={x:event.clientX,y:event.clientY,type:event.pointerType};});
   trigger.addEventListener("pointercancel",clearEntry);
   trigger.addEventListener("click",event=>{
     event.preventDefault();
     if(Date.now()<suppressClickUntil)return;
     if(event.detail===0)setOpen(!open);
-    else if(!open)scheduleEntry(500);
+    else if(!open&&!requirePhysicalLeave)scheduleEntry(500);
   });
   items.forEach(item=>{
     item.addEventListener("pointerenter",event=>{if(event.pointerType==="mouse"&&open)activate(item);});
@@ -238,7 +243,10 @@
   });
   scrim.addEventListener("click",closeGateway);
   document.addEventListener("pointermove",event=>{
-    if(!open||!["mouse","touch","pen"].includes(event.pointerType))return;
+    if(!["mouse","touch","pen"].includes(event.pointerType))return;
+    lastPhysicalPointer={x:event.clientX,y:event.clientY,type:event.pointerType};
+    if(requirePhysicalLeave&&!isInsideGatewayBounds(event.clientX,event.clientY))requirePhysicalLeave=false;
+    if(!open)return;
     const tolerance=10,rect=root.getBoundingClientRect(),orbit=window.matchMedia("(max-width: 600px)").matches?112:126;
     const inside=event.clientX>=rect.left-orbit-tolerance&&event.clientX<=rect.right+tolerance&&event.clientY>=rect.top-orbit-tolerance&&event.clientY<=rect.bottom+orbit+tolerance;
     if(inside)outsideSince=0;
