@@ -4,6 +4,9 @@ on:
   pull_request:
     paths:
       - "index.html"
+      - "casino.html"
+      - "launcher.html"
+      - "pixel-art-studio.html"
       - "nu-hex-gateway.js"
       - "nu-controller-pointer.js"
       - "nu-hex-gateway.css"
@@ -12,6 +15,8 @@ on:
       - "tests/nu-gateway-pause.test.js"
       - "tests/nu-gateway-exclusive-controls.test.js"
       - "tests/nu-gateway-controller-input.test.js"
+      - "tests/nu-controller-pointer.test.js"
+      - "tests/nu-gateway-pointer-controller-mode.test.js"
       - "nu-dynamic-layers.js"
       - "tests/nu-hex-gateway.test.js"
       - ".github/workflows/gateway-main-game.yml"
@@ -38,4 +43,4 @@ jobs:
           node --check nu-gateway-pause.js
           node --check nu-dynamic-layers.js
       - name: Run Gateway main-game regression tests
-        run: node --test tests/nu-hex-gateway.test.js tests/nu-gateway-pause.test.js tests/nu-gateway-exclusive-controls.test.js tests/nu-gateway-controller-input.test.js
+        run: node --test tests/nu-hex-gateway.test.js tests/nu-gateway-pause.test.js tests/nu-gateway-exclusive-controls.test.js tests/nu-gateway-controller-input.test.js tests/nu-controller-pointer.test.js tests/nu-gateway-pointer-controller-mode.test.js
