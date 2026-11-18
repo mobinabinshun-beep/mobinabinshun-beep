@@ -79,7 +79,7 @@ uint64_t NU_CacheStageFile(NU_DiskCache *c,const char *source_path) {
   if(!NU_CachePush(c,chunk,(uint32_t)n)){fclose(source);NU_CacheClear(c);return 0u;}
   total+=(uint64_t)n;
  }
- if(ferror(source)||fclose(source)!=0||!total){NU_CacheClear(c);return 0u;}
+ { int read_error=ferror(source);int close_error=fclose(source);if(read_error||close_error||!total){NU_CacheClear(c);return 0u;} }
  return total;
 }
 int NU_CacheLoadAll(NU_DiskCache *c,uint8_t *output,uint32_t capacity,uint32_t *length) {
