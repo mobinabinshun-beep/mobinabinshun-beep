@@ -98,9 +98,9 @@ int main(void){
   uint8_t order[3];
   assert(NU_DependencyResolve(nodes,3u,graph,sizeof(graph),order,3u));
   assert(order[0]==2u && order[1]==1u && order[2]==0u);
-  graph[2]=1u;
+  graph[6]=1u;
   assert(!NU_DependencyResolve(nodes,3u,graph,sizeof(graph),order,3u));
-  graph[2]=0u;nodes[1].generation=2u;
+  graph[6]=0u;nodes[1].generation=2u;
   assert(!NU_DependencyResolve(nodes,3u,graph,sizeof(graph),order,3u));
  }
  puts("N.U native runtime tests passed");return 0;
