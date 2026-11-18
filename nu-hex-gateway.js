@@ -149,7 +149,7 @@
   else if(!insideTrigger(x,y))clearDwell();
  }
  trigger.addEventListener("pointerenter",event=>{
-  if(event.pointerType!=="mouse"||open)return;
+  if(event.isTrusted===false||event.pointerType!=="mouse"||open)return;
   lastPointer={x:event.clientX,y:event.clientY,source:"mouse"};
   if(!requiresExit)scheduleOpen("mouse",500);
  });
@@ -176,7 +176,7 @@
  });
  items.forEach(item=>{
   item.addEventListener("pointerenter",event=>{
-   if(event.pointerType==="mouse"&&open)select(item);
+   if(event.isTrusted!==false&&event.pointerType==="mouse"&&open)select(item);
   });
   item.addEventListener("pointerup",event=>{
    if(event.pointerType!=="touch"||!open)return;
