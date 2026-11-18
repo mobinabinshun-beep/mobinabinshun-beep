@@ -71,6 +71,7 @@ test("Virtual pointer movement dispatches pointermove and mousemove to the hit-t
  assert.equal(h.adapter.move(1,0),true);
  assert.ok(h.target.events.some(event=>event.type==="pointermove"));
  assert.ok(h.target.events.some(event=>event.type==="mousemove"));
+ assert.ok(h.target.events.filter(event=>event.type==="pointermove"||event.type==="mousemove").every(event=>event.nuSimulated===true));
  h.adapter.destroy();
 });
 test("Held keyboard-emulated direction repeat events continue moving the virtual pointer",()=>{
