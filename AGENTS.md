@@ -53,7 +53,7 @@
 ## Documentation
 - Keep one canonical implementation contract per subject; link secondary notes rather than creating competing rules.
 - The current Gateway/controller contract is [GATEWAY-AND-CONTROLLER-INPUT-CONTRACT-2026-11-17.md](./docs/operations/GATEWAY-AND-CONTROLLER-INPUT-CONTRACT-2026-11-17.md). The older Gateway navigation report is historical only.
-- The shared input-translator architecture and durable debug evidence protocol is [INTERACTION-CORE-AND-DEBUG-PROTOCOL-2026-11-19.md](./docs/operations/INTERACTION-CORE-AND-DEBUG-PROTOCOL-2026-11-19.md). `nu-interaction-core.js` is loaded before the controller/Gateway adapters on the main game, launcher, casino and studio pages.
+- The shared input-translator architecture and durable debug evidence protocol is [INTERACTION-CORE-AND-DEBUG-PROTOCOL-2026-11-19.md](./docs/operations/INTERACTION-CORE-AND-DEBUG-PROTOCOL-2026-11-19.md); the live coverage checklist is [INTERACTION-DEBUG-BACKLOG-2026-11-19.md](./docs/operations/INTERACTION-DEBUG-BACKLOG-2026-11-19.md). `nu-interaction-core.js` is loaded before the controller/Gateway adapters on the main game, launcher, casino and studio pages.
 - Record decisions, affected files, focused tests, backup/recovery, demo status and remaining risks in the relevant change record.
 - Do not claim tests, backup, deployment, human acceptance or locks that were not actually verified.
 
