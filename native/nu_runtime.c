@@ -9,11 +9,21 @@ void NU_BudgetInit(NU_Budget *b,uint64_t physical,uint64_t available,uint32_t pr
  if(b->ram_limit_bytes>(uint64_t)NU_DEFAULT_RAM_CAP)b->ram_limit_bytes=(uint64_t)NU_DEFAULT_RAM_CAP;
  b->shared_cache_bytes=b->ram_limit_bytes;
  b->short_cache_bytes=b->shared_cache_bytes/2u;
- b->pattern_cache_bytes=b->shared_cache_bytes-b->short_cache_bytes;
+ b->pattern_cache_bytes=b->shared_cache_bytes-b->short_cache_bytes;\n b->ram_reserved_bytes=0u;
  b->disk_cache_limit_bytes=(uint64_t)NU_DEFAULT_DISK_CACHE;
  b->cpu_slot_numerator=1u;b->cpu_slot_denominator=2u;
  b->render_width=640u;b->render_height=480u;b->target_fps=30u;
  b->logical_processors=processors?processors:1u;
+}
+int NU_BudgetReserve(NU_Budget *b,uint64_t bytes) {
+ if(!b||b->ram_reserved_bytes>b->ram_limit_bytes||
+    bytes>b->ram_limit_bytes-b->ram_reserved_bytes)return 0;
+ b->ram_reserved_bytes+=bytes;return 1;
+}
+void NU_BudgetRelease(NU_Budget *b,uint64_t bytes) {
+ if(!b)return;
+ if(bytes>=b->ram_reserved_bytes)b->ram_reserved_bytes=0u;
+ else b->ram_reserved_bytes-=bytes;
 }
 int NU_SchedulerGrantSlot(uint32_t slot) { return (slot&1u)!=0u; }
 int NU_SchedulerGrantGpuSlot(uint32_t nu_slot) { return (nu_slot&1u)!=0u; }
