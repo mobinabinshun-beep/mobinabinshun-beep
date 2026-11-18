@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "../nu_runtime.h"
+#include "../nu_cache.h"
 static void put32(uint8_t *p,uint32_t v){p[0]=(uint8_t)v;p[1]=(uint8_t)(v>>8);p[2]=(uint8_t)(v>>16);p[3]=(uint8_t)(v>>24);}
 int main(void){
  NU_Budget b;uint8_t code[]={1,0,42,0,0,0,1,1,8,0,0,0,3,0,1,0};
@@ -20,5 +21,18 @@ int main(void){
  assert(vm.halted&&vm.registers[0]==50u);
  pkg[16u]^=1u;assert(!NU_PackageValidate(pkg,sizeof(pkg),&view));
  {uint8_t bad[]={255u};NU_VMInit(&vm,bad,1u,10u);assert(NU_VMStep(&vm)==-1&&vm.fault);}
+ {
+  NU_DiskCache cache;uint8_t first[]={1u,2u,3u,4u};uint8_t second[]={9u,8u,7u};uint8_t output[16];uint32_t output_size;FILE *probe;
+  NU_CacheInit(&cache,"nu-cache-test.bin",64u);
+  assert(NU_CachePush(&cache,first,4u));assert(NU_CachePush(&cache,second,3u));
+  assert(cache.queued_items==2u);
+  assert(NU_CachePop(&cache,output,sizeof(output),&output_size)==1);
+  assert(output_size==4u&&memcmp(output,first,4u)==0&&cache.queued_items==1u);
+  assert(NU_CachePop(&cache,output,sizeof(output),&output_size)==1);
+  assert(output_size==3u&&memcmp(output,second,3u)==0&&cache.queued_items==0u);
+  probe=fopen("nu-cache-test.bin","rb");assert(probe==NULL);
+  assert(NU_CachePush(&cache,first,4u));assert(!NU_CachePush(&cache,first,60u));
+  NU_CacheClear(&cache);
+ }
  puts("N.U native runtime tests passed");return 0;
 }
