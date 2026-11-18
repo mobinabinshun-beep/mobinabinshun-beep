@@ -16,21 +16,23 @@ test("N.U identity and game title remain unchanged; LV leads the lower resource 
   assert.ok(html.indexOf('bar-label">XP CAPSULE') < html.indexOf('bar-label">MANA CAPSULE'));
 });
 
-test("XP and Mana retain classic labels above their bars and values in the rails", () => {
+test("XP rail spans the bottom edge while Mana remains a compact left rail", () => {
   assert.ok(html.includes('bar-label">XP CAPSULE'));
   assert.ok(html.includes('bar-label">MANA CAPSULE'));
   assert.ok(html.includes('id="xp-value"'));
   assert.ok(html.includes('id="mana-value"'));
-  assert.ok(css.includes("Classic resource HUD restoration"));
-  assert.ok(css.includes("flex-direction:column;align-items:stretch"));
-  assert.ok(css.includes("bottom:15px"));
-  assert.ok(css.includes("left:50%;right:auto;top:50%"));
+  assert.ok(css.includes("Owner-authorized restoration — XP rail spans the full bottom edge in all three Gen 1 games."));
+  assert.ok(css.includes("position:fixed;left:0;right:0;bottom:0;width:100vw;"));
+  assert.ok(css.includes("order:3;width:100vw;max-width:none;height:12px;flex-basis:12px;"));
+  assert.ok(css.includes("order:1;width:min(232px,calc(100vw - 24px));margin-left:12px;"));
+  assert.ok(css.includes("order:2;position:static;display:flex;align-self:flex-start;"));
+  assert.ok(css.includes("@media(prefers-reduced-motion:reduce)"));
 });
 
-test("classic lower HUD stacks LV, XP and Mana and adapts to mobile", () => {
-  assert.ok(css.includes("width:min(232px,calc(100vw - 24px))"));
+test("full-width XP rail and compact Mana rail adapt to mobile", () => {
   assert.ok(css.includes("@media(max-width:700px)"));
-  assert.ok(css.includes("width:min(204px,calc(100vw - 16px))"));
+  assert.ok(css.includes("width:min(204px,calc(100vw - 16px));margin-left:8px;"));
+  assert.ok(css.includes("width:100vw;max-width:none;margin:0;border-radius:0;"));
 });
 
 test("HP capsule dock remains state-driven and reversibly animated", () => {
