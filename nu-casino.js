@@ -18,7 +18,7 @@ function scheduleGatewayTask(callback,delay){
 function pauseGatewayTasks(){gatewayTimers.forEach(task=>task.pause());}
 function resumeGatewayTasks(){gatewayTimers.forEach(task=>task.resume());}
 function resumeCasinoAfterFreshInput(event){
- if(!gatewayAwaitingInteraction||gatewayOpen||event.target.closest("#nu-hex-gateway"))return;
+ if(!gatewayAwaitingInteraction||gatewayOpen||(event.target&&event.target.closest&&event.target.closest("#nu-hex-gateway")))return;
  gatewayAwaitingInteraction=false;resumeGatewayTasks();
 }
 window.addEventListener("nu:gateway-open",()=>{gatewayOpen=true;pauseGatewayTasks();});
