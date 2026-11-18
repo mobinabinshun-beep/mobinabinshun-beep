@@ -55,6 +55,28 @@
     next.transactions=next.transactions.concat(entry).slice(-MAX_TRANSACTIONS);
     return entry;
   }
+  function upgradeManaCapacity(raw,meta){
+    const next=normalizeSave(raw),details=meta||{};
+    const baseId=String(details.id||"");
+    if(!baseId)return {ok:false,reason:"IDEMPOTENCY_KEY_REQUIRED",state:next};
+    const ids=[baseId+"|x-credit",baseId+"|capacity",baseId+"|mana-grant"];
+    if(next.transactions.some(tx=>tx&&ids.includes(String(tx.id||""))))return {ok:false,reason:"DUPLICATE_TRANSACTION",state:next};
+    if(next.activeWave)return {ok:false,reason:"UPGRADE_REQUIRES_NO_ACTIVE_WAVE",state:next};
+    if(next.manaCapsules>=9)return {ok:false,reason:"MAX_MANA_CAPACITY",state:next};
+    if(next.xCredits<1)return {ok:false,reason:"INSUFFICIENT_X_CREDITS",state:next};
+    const at=String(details.at||new Date().toISOString()),beforeX=next.xCredits;
+    next.xCredits-=1;
+    next.manaCapsules+=1;
+    next.mana=Math.min(next.mana+10,next.manaCapsules*10);
+    const common={at,kind:"capacity-upgrade",source:"nu.store",playerId:String(next.playerId||"guest-local"),settlementStatus:"SETTLED"};
+    const entries=[
+      {...common,id:ids[0],title:"Mana capacity upgrade · X Credit spent",direction:"OUTGOING",asset:"xCredits",signedAmount:-1,category:"MANA_CAPACITY_UPGRADE_COST",resultingBalance:next.xCredits,idempotencyKey:ids[0],deltas:{xCredits:-1}},
+      {...common,id:ids[1],title:"Mana capacity upgrade · permanent container added",direction:"INCOMING",asset:"manaCapsules",signedAmount:1,category:"MANA_CAPACITY_UPGRADE",resultingBalance:next.manaCapsules,idempotencyKey:ids[1],deltas:{manaCapsules:1}},
+      {...common,id:ids[2],title:"Mana capacity upgrade · initial full-container grant",direction:"INCOMING",asset:"mana",signedAmount:10,category:"MANA_CAPACITY_UPGRADE_GRANT",resultingBalance:next.mana,idempotencyKey:ids[2],deltas:{mana:10}}
+    ];
+    next.transactions=next.transactions.concat(entries).slice(-MAX_TRANSACTIONS);
+    return {ok:true,state:next,capacity:next.manaCapsules,maxMana:next.manaCapsules*10,manaGranted:10,xCreditsSpent:1,transactions:entries};
+  }
   function buyHpPill(raw,meta){
     const next=normalizeSave(raw),details=meta||{};
     if(next.xp<HP_PILL_COST)return {ok:false,reason:"INSUFFICIENT_XP",state:next};
@@ -302,5 +324,5 @@
     if(!entries.length)points.push({id:"current",at:"",title:"Current balance · no recorded changes",delta:0,balance:current});
     return points;
   }
-  return {MAX_HP,HP_PILL_COST,MAX_TRANSACTIONS,normalizeSave,buyHpPill,useHpPill,grantXP,settleCasinoRound,settleWalletBet,casinoSpendableAssets,beginWave,recordWaveDelta,settleWave,chargeArcaneShield,resolveChaosHits,registerChaosTargets,fireNbiShot,registerAsset,registerGameAssets,assetRows,inventoryRows,exchangeAssetRows,isExchangeableAsset,gameAssetRows,assetHistory};
+  return {MAX_HP,HP_PILL_COST,MAX_TRANSACTIONS,normalizeSave,buyHpPill,upgradeManaCapacity,useHpPill,grantXP,settleCasinoRound,settleWalletBet,casinoSpendableAssets,beginWave,recordWaveDelta,settleWave,chargeArcaneShield,resolveChaosHits,registerChaosTargets,fireNbiShot,registerAsset,registerGameAssets,assetRows,inventoryRows,exchangeAssetRows,isExchangeableAsset,gameAssetRows,assetHistory};
 });
