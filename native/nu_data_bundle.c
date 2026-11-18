@@ -27,8 +27,7 @@ static int nu_bundle_id_length(const char *s,size_t *length){
  if(n>=2u&&s[0]=='.'&&s[1]=='.')return 0;
  *length=n;return 1;
 }
-static int nu_bundle_duplicate(const NU_BundleEntry *e,size_t count,
-                               size_t index){
+static int nu_bundle_duplicate(const NU_BundleEntry *e,size_t index){
  size_t i;
  for(i=0u;i<index;++i)
   if(e[i].data_class==e[index].data_class&&
@@ -45,7 +44,7 @@ size_t NU_BundleBuild(const NU_BundleEntry *entries,size_t count,
      !nu_bundle_id_length(entries[i].id,&id_length)||
      (!entries[i].data&&entries[i].size!=0u)||
      entries[i].size>NU_BUNDLE_MAX_ENTRY_SIZE||
-     nu_bundle_duplicate(entries,count,i))return 0u;
+     nu_bundle_duplicate(entries,i))return 0u;
   if(total>NU_BUNDLE_MAX_SIZE-NU_BUNDLE_ENTRY_HEADER_SIZE-id_length||
      entries[i].size>NU_BUNDLE_MAX_SIZE-total-
        NU_BUNDLE_ENTRY_HEADER_SIZE-id_length)return 0u;
