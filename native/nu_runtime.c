@@ -27,7 +27,7 @@ int NU_PackageValidate(const uint8_t *data,size_t length,NU_PackageView *view) {
  uint32_t n,crc;
  if(!data||!view||length<16u)return 0;
  if(data[0]!='N'||data[1]!='U'||data[2]!='V'||data[3]!='M')return 0;
- if(data[4]!=NU_ABI_MAJOR||data[6]!=NU_GENERATION||data[7]!=0u)return 0;
+ if(data[4]!=NU_ABI_MAJOR||data[5]!=NU_ABI_MINOR||data[6]!=NU_GENERATION||data[7]!=0u)return 0;
  n=nu_read_u32(data+8u);crc=nu_read_u32(data+12u);
  if(!n||n>NU_PACKAGE_MAX_CODE||length!=(size_t)16u+(size_t)n)return 0;
  if(NU_CRC32(data+16u,(size_t)n)!=crc)return 0;
