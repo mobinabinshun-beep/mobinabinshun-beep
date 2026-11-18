@@ -38,6 +38,11 @@ test("D-pad and stick directions move the virtual pointer without activating tar
  assert.doesNotMatch(pointer,/if\(\(input\.dx\|\|input\.dy\)[^}]*clickTarget/);
 });
 
+test("A held Down used to exit Gateway cannot move the virtual pointer away from the trigger",()=>{
+ assert.match(pointer,/if\(gatewayBlockedUntilNeutral\)\{if\(!input\.dx&&!input\.dy\)/);
+ assert.match(pointer,/gatewayBlockedUntilNeutral=!!\(current\.dx\|\|current\.dy\)/);
+ assert.match(pointer,/setGatewayNavigation\(false\)/);
+});
 test("Confirm is a separate click; B remains Gateway cancel",()=>{
  assert.match(pointer,/if\(!primed\)/);
  assert.match(pointer,/if\(input\.confirm&&!confirmDown\)\{if\(gatewayNavigation\)emit\("nu:gateway-confirm",\{\}\);else clickTarget\(\);\}/);
