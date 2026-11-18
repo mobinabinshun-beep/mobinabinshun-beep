@@ -104,10 +104,10 @@ Implemented candidate:
 - N.U-owned RAM reservation ledger with over-budget rejection and saturating release.
 
 Not yet implemented:
-- manifest dependency-field parsing and Package Manager integration;
+- manifest dependency-field parsing and full Package Manager integration;
 - SHA-256 publisher digest/signature verification and managed trust roots;
-- atomic install/update/rollback, three-stage uninstall UI and crash-recovery journal;
-- previous-install discovery, complete-pack upgrade reconciliation and portable identity-marked data export/import;
+- durable filesystem install/update/rollback, three-stage uninstall UI and crash-recovery journal;
+- previous-install discovery and portable identity-marked data export/import (component reconciliation planning is implemented);
 - native game ports and game-specific translators;
 - GPU renderer and platform graphics adapters;
 - complete reservation-ledger integration across all N.U allocations and measured, OS-specific resource telemetry/enforcement;
@@ -134,7 +134,7 @@ A PE subsystem value of 5.01 or a successful cross-build is not proof of Windows
 
 ## 11. Engineering sequence
 
-1. Build the transactional Package Manager: parse manifest dependencies, validate package inventories, discover compatible existing hosts, reconcile complete-pack component manifests, stage changes and journal atomic activation/rollback.
+1. Complete the transactional Package Manager: parse manifest dependencies, validate package inventories, discover compatible existing hosts, persist the journal, stage files and implement atomic activation/rollback. The component keep/add/update reconciliation planner and in-memory journal transition model are implemented.
 2. Complete three-stage install/uninstall UI, safe inventory-constrained deletion, separate installer archive management, and portable identity-marked save/wallet/profile export/import.
 3. Integrate RAM reservations into every N.U allocation/cache path; add on-demand asset loading, release-on-exit and measured low-end resource telemetry.
 4. Complete native Runtime Host input and low-cost renderer; define the stable module presentation/input API.
@@ -164,3 +164,10 @@ The user-facing lifecycle is defined in docs/architecture/NU-PACK-1-USER-LIFECYC
 The native C90 cleanup planner classifies inventory entries as core, module, cache, save, wallet, user asset, profile/settings or installer. It calculates delete/preserve counts and bytes. Unit tests verify that ordinary cleanup preserves the installer and that a separate explicit flag is required to include it in a deletion plan. This planner does not yet perform filesystem operations.
 
 Still required before promising this experience: safe inventory discovery, previous-host detection, full-pack component reconciliation, staged atomic activation, durable recovery journal, filesystem deletion constrained to verified N.U roots, portable identity-marked data bundle export/import, a simple three-stage Win32 UI, and real uninstall/reinstall QA. The installer archive must remain outside the uninstall root. Unknown files must never be treated as cache.
+
+ 
+## 15. Full-pack reconciliation and transaction-state model — candidate increment
+
+`native/nu_install_plan.c/.h` now provides a bounded (64-component) full-pack reconciliation planner. It matches stable component IDs and versions, classifies components as keep/add/update, and deliberately leaves installed components not present in the incoming full pack untouched. It rejects duplicate IDs, invalid IDs/versions, malformed required flags and insufficient plan capacity. Unit tests cover keep/add/update, preservation of unrelated installed add-ons and invalid IDs.
+
+The same module models the legal transaction states (prepared, staging, verified, activated, rollback-required and rolled-back), rejects skipped transitions, enforces complete staging before verification, and allows rollback after activation. This is an in-memory state model only: it is not a durable on-disk journal and performs no file copying, signature checks, atomic rename or rollback I/O. Those remain mandatory before a public installer can be called transactional.
