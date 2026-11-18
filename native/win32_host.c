@@ -9,7 +9,7 @@ static NU_Budget budget;
 static char status_text[256]="Ready. Press O to open a Generation 1 .nup package.";
 static uint8_t package_data[NU_PACKAGE_MAX_CODE+16u];
 static void load_package(HWND hwnd){
- OPENFILENAMEA ofn;FILE *fp;long size;size_t got;NU_PackageView view;NU_VM vm;uint32_t slots;int result;char path[MAX_PATH];
+ OPENFILENAMEA ofn;FILE *fp;long size;size_t got;NU_PackageView view;NU_VM vm;uint32_t slots,batch;int result;char path[MAX_PATH];
  path[0]='\0';ZeroMemory(&ofn,sizeof(ofn));ofn.lStructSize=sizeof(ofn);ofn.hwndOwner=hwnd;
  ofn.lpstrFilter="N.U VM package (*.nup)\0*.nup\0All files (*.*)\0*.*\0\0";ofn.lpstrFile=path;ofn.nMaxFile=MAX_PATH;
  ofn.Flags=OFN_FILEMUSTEXIST|OFN_PATHMUSTEXIST|OFN_HIDEREADONLY;if(!GetOpenFileNameA(&ofn))return;
@@ -19,7 +19,7 @@ static void load_package(HWND hwnd){
  rewind(fp);got=fread(package_data,1u,(size_t)size,fp);fclose(fp);
  if(got!=(size_t)size||!NU_PackageValidate(package_data,got,&view)){lstrcpyA(status_text,"Package rejected: ABI, generation, size or CRC.");InvalidateRect(hwnd,NULL,TRUE);return;}
  NU_VMInit(&vm,view.code,view.code_size,100000u);slots=0u;result=1;
- while(result>0&&slots<200000u){++slots;if(NU_SchedulerGrantSlot(slots))result=NU_VMStep(&vm);}
+ while(result>0&&slots<200000u){++slots;if(!NU_SchedulerGrantSlot(slots)){Sleep(1);continue;}for(batch=0u;batch<64u&&result>0;++batch)result=NU_VMStep(&vm);}
  if(vm.fault||result<0)lstrcpyA(status_text,"Module stopped safely: invalid opcode or execution limit.");
  else if(vm.halted)wsprintfA(status_text,"Generation 1 module completed. Instructions: %lu",(unsigned long)vm.steps);
  else lstrcpyA(status_text,"Module paused at scheduler slice limit.");
