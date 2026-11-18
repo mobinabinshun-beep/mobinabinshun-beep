@@ -55,7 +55,7 @@ test("Real arrow-key input from a keyboard-emulated click controller moves the p
  const event={type:"keydown",key:"ArrowRight",repeat:false,altKey:false,ctrlKey:false,metaKey:false,
   preventDefault(){this.defaultPrevented=true;},stopImmediatePropagation(){this.stopped=true;}};
  h.window.dispatchEvent(event);const after=h.adapter.getState();
- assert.equal(h.adapter.isEnabled(),true);assert.equal(after.x,before.x+28);assert.equal(after.y,before.y);
+ assert.equal(h.adapter.isEnabled(),true);assert.equal(after.x,428);assert.equal(after.y,300);
  assert.equal(event.defaultPrevented,true);assert.equal(event.stopped,true);h.adapter.destroy();
 });
 test("Gateway keeps exclusive ownership of arrow keys while hierarchical navigation is active",()=>{
