@@ -91,14 +91,14 @@
     if(selected&&selected!==item){selected.classList.remove("is-selected","is-confirming");selected.setAttribute("aria-pressed","false");}
     selected=item;item.classList.add("is-selected");item.setAttribute("aria-pressed","true");
   }
-  function moveSelection(direction){
+  function moveSelection(direction,exitAtEnd=false){
     if(!items.length)return;
     const current=items.indexOf(selected);
-    if(direction>0&&current===items.length-1){closeGateway();trigger.focus({preventScroll:true});return;}
+    if(exitAtEnd&&direction>0&&current===items.length-1){closeGateway();trigger.focus({preventScroll:true});return;}
     const next=current<0?(direction>0?0:items.length-1):Math.max(0,Math.min(items.length-1,current+direction));
     select(items[next]);items[next].focus({preventScroll:true});
   }
-  function moveControllerSelection(direction){moveSelection(direction);}
+  function moveControllerSelection(direction,exitAtEnd=false){moveSelection(direction,exitAtEnd);}
   function pollController(timestamp){
     controllerFrame=0;if(!open)return;
     const pads=navigator.getGamepads?Array.from(navigator.getGamepads()||[]):[];
@@ -110,7 +110,7 @@
       const left=!!(buttons[14]&&buttons[14].pressed)||(Number(axes[0])<-.55);
       const right=!!(buttons[15]&&buttons[15].pressed)||(Number(axes[0])>.55);
       const direction=down?1:up?-1:right?1:left?-1:0;
-      if(direction&&timestamp-lastControllerMove>220){moveControllerSelection(direction);lastControllerMove=timestamp;}
+      if(direction&&timestamp-lastControllerMove>220){moveControllerSelection(direction,down&&!up);lastControllerMove=timestamp;}
       const confirm=!!(buttons[0]&&buttons[0].pressed),cancel=!!(buttons[1]&&buttons[1].pressed);
       if(confirm&&!controllerConfirmDown)activate(selected||items[0]);
       if(cancel&&!controllerCancelDown)closeGateway();
@@ -179,7 +179,7 @@
       event.preventDefault();suppressClickUntil=Date.now()+900;scheduleEntry(500,event.pointerId);
     }
   });
-  trigger.addEventListener("pointerup",event=>{if(event.pointerType==="touch"&&!open)clearEntry();});
+  trigger.addEventListener("pointerup",event=>{if(event.pointerType==="touch"&&!open){/* keep the 500ms contact timer running after a valid tap */}});
   trigger.addEventListener("pointercancel",clearEntry);
   trigger.addEventListener("click",event=>{
     event.preventDefault();
@@ -217,10 +217,10 @@
   document.addEventListener("keydown",event=>{
     if(!open)return;
     if(event.key==="Escape"){event.preventDefault();closeGateway();trigger.focus({preventScroll:true});return;}
-    if(event.key==="ArrowDown"){event.preventDefault();moveSelection(1);return;}
+    if(event.key==="ArrowDown"){event.preventDefault();moveSelection(1,true);return;}
     if(event.key==="ArrowUp"){event.preventDefault();moveSelection(-1);return;}
-    if(event.key==="ArrowRight"){event.preventDefault();moveSelection(1);return;}
-    if(event.key==="ArrowLeft"){event.preventDefault();moveSelection(-1);return;}
+    if(event.key==="ArrowRight"){event.preventDefault();moveSelection(1,false);return;}
+    if(event.key==="ArrowLeft"){event.preventDefault();moveSelection(-1,false);return;}
     if(event.key==="Enter"||event.key===" "){event.preventDefault();activate(selected||items[0]);return;}
     if(event.key==="Tab"){
       const focusable=[trigger,...items].filter(item=>item.tabIndex>=0),first=focusable[0],last=focusable[focusable.length-1];
