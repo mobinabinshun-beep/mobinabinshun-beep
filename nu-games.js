@@ -221,7 +221,12 @@ function renderArcaneShield(){
 }
 function chargeArcaneShieldInGame(){
  const result=NUWallet.chargeArcaneShield(state.save,"in_game");
- if(!result.ok){$("game-info").textContent=result.reason==="INSUFFICIENT_MANA"?"A full 10-Mana container is required.":result.reason==="WAVE_CHARGE_ALREADY_USED"?"The shield has already been charged in this Wave.":result.reason==="SHIELD_ALREADY_CHARGED"?"The shield still has charge; top-up is unavailable.":"In-game charging requires Arcane Shield level 2.";renderArcaneShield();return;}
+ if(!result.ok){
+  const message=result.reason==="INSUFFICIENT_MANA"?"A full 10-Mana container is required.":result.reason==="WAVE_CHARGE_ALREADY_USED"?"The shield has already been charged in this Wave.":result.reason==="SHIELD_ALREADY_CHARGED"?"The shield still has charge; top-up is unavailable.":"In-game charging requires Arcane Shield level 2.";
+  $("game-info").textContent=message;
+  const notice=result.reason==="INSUFFICIENT_MANA"?"ARCANE SHIELD UNAVAILABLE · NEED 10 MANA":result.reason==="WAVE_CHARGE_ALREADY_USED"?"ARCANE SHIELD ALREADY USED THIS WAVE":result.reason==="SHIELD_ALREADY_CHARGED"?"ARCANE SHIELD ALREADY CHARGED":"ARCANE SHIELD CHARGE LOCKED";
+  announceTransaction(notice,"warning");renderArcaneShield();return;
+ }
  if(!persistWalletState(result.state))return;
  animateManaContainerDrain();
  $("game-info").textContent="ARCANE SHIELD ACTIVE · 10 DEFENSE";
@@ -298,7 +303,55 @@ function animateGame(t){if(!state.active)return;const minFrame=state.quality<=3?
 function chooseGame(id){window.dispatchEvent(new Event("nu:gateway-close"));if(window.NUPixelWorld)window.NUPixelWorld.setWeatherMode("game");if(state.raf)cancelAnimationFrame(state.raf);const exitResolution=resolveRemainingChaosMasses("CHAOS_NEW_ROUND_EXIT");if(exitResolution&&exitResolution.ok===false){$("game-info").textContent="Unable to save remaining Chaos damage. Please retry.";return;}settleActiveWave("new_round");state.game=id||games[Math.floor(Math.random()*games.length)].id;const started=NUWallet.beginWave(state.save,state.game);if(started.ok)persistWalletState(started.state);state.turn=0;state.active=true;state.paused=false;state.shots=0;initTargets();$("home-view").classList.remove("active");$("article-view").classList.remove("active");$("game-view").classList.add("active");state.keyboardTargetIndex=state.targets.findIndex(target=>target.alive);state.keyboardMode=false;canvas.focus({preventScroll:true});startGamepad();$("game-title").textContent=games.find(g=>g.id===state.game).name;renderRoundProgress();$("game-info").textContent=state.game==="chaos"?"Tap a Chaos mass to mark it. N-BI fires automatically and consumes one full 10-Mana capsule per mass." :"Tap a target to interact.";renderWallet();requestAnimationFrame(()=>{resize();initTargets();drawGame();state.lastFrame=0;state.raf=requestAnimationFrame(animateGame);});}
 function closeGame(){const exitResolution=resolveRemainingChaosMasses("CHAOS_PLAYER_EXIT");if(exitResolution&&exitResolution.ok===false){$("game-info").textContent="Unable to save remaining Chaos damage. Please retry.";return;}settleActiveWave("player_exit");window.dispatchEvent(new Event("nu:gateway-close"));window.dispatchEvent(new Event("nu:game-view-exit"));stopGamepad();gatewayPause.reset();if(window.NUPixelWorld)window.NUPixelWorld.setWeatherMode("sleep");state.active=false;state.paused=false;if(state.raf)cancelAnimationFrame(state.raf);state.raf=0;$("game-view").classList.remove("active");$("home-view").classList.add("active");document.body.classList.remove("article-mode");}
 function drawGame(){const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;ctx.clearRect(0,0,w,h);ctx.save();ctx.globalAlpha=.22;for(let i=0;i<30;i++){let x=(i*97+Date.now()*.004)%w,y=(i*61)%h;ctx.fillStyle="#9cddff";ctx.fillRect(x,y,1,1);}ctx.restore();state.targets.forEach((o,i)=>{if(!o.alive)return;o.phase+=.015;const bob=Math.sin(o.phase)*2;ctx.save();if(state.game==="bubble"){const g=ctx.createRadialGradient(o.x-o.r*.3,o.y-o.r*.4,1,o.x,o.y,o.r*1.4);g.addColorStop(0,"rgba(255,255,255,.7)");g.addColorStop(.3,"rgba(255,180,210,.18)");g.addColorStop(.75,"rgba(96,185,255,.13)");g.addColorStop(1,"rgba(255,196,95,.03)");ctx.fillStyle=g;ctx.strokeStyle="rgba(255,202,111,.85)";ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(o.x,o.y+bob,o.r,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.beginPath();ctx.strokeStyle="rgba(255,255,255,.52)";ctx.lineWidth=Math.max(1,o.r*.035);ctx.arc(o.x-o.r*.22,o.y-o.r*.24+bob,o.r*.22,-Math.PI*.78,Math.PI*.18);ctx.stroke();}else if(state.game==="mana"){ctx.translate(o.x,o.y+bob);ctx.rotate(Math.PI/6);ctx.fillStyle="rgba(64,190,255,.16)";ctx.strokeStyle="#68dfff";ctx.lineWidth=1.5;ctx.shadowBlur=5;ctx.shadowColor="#43cfff";ctx.beginPath();ctx.moveTo(0,-o.r);for(let j=1;j<6;j++)ctx.lineTo(Math.cos(j*Math.PI/3)*o.r,Math.sin(j*Math.PI/3)*o.r);ctx.closePath();ctx.fill();ctx.stroke();ctx.shadowBlur=0;ctx.fillStyle="#d9faff";ctx.fillRect(-1,-2,2,4);if(window.NUMaterials)window.NUMaterials.drawMana(ctx,0,0,o.r,o.phase);}else{ctx.translate(o.x,o.y+bob);ctx.fillStyle="rgba(255,54,85,.16)";ctx.strokeStyle="#ff526c";ctx.lineWidth=1.5;ctx.shadowBlur=13;ctx.shadowColor="#ff3658";ctx.beginPath();for(let j=0;j<9;j++){const a=j*Math.PI*2/9,rr=o.r*(j%2?.78:1);if(!j)ctx.moveTo(Math.cos(a)*rr,Math.sin(a)*rr);else ctx.lineTo(Math.cos(a)*rr,Math.sin(a)*rr);}ctx.closePath();ctx.fill();ctx.stroke();ctx.shadowBlur=0;ctx.fillStyle="#ffd6df";ctx.font="10px sans-serif";ctx.textAlign="center";}ctx.restore();});if(window.NUMaterials)window.NUMaterials.drawEffects(ctx);if(state.game==="chaos"){ctx.save();ctx.strokeStyle="rgba(255,174,96,.5)";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(w-18,h-18);ctx.lineTo(w-90,h-75);ctx.stroke();ctx.fillStyle="#ffca75";ctx.shadowBlur=12;ctx.shadowColor="#ffb44e";ctx.beginPath();ctx.arc(w-18,h-18,4,0,Math.PI*2);ctx.fill();ctx.restore();}if(state.keyboardMode&&document.activeElement===canvas)drawKeyboardTarget();}
-function interact(e){if(!state.active||state.paused||state.turn>=10)return;const rect=canvas.getBoundingClientRect(),x=e.clientX-rect.left,y=e.clientY-rect.top;let target=null,best=Infinity;state.targets.forEach(o=>{if(!o.alive)return;const d=Math.hypot(o.x-x,o.y-y);if(d<o.r+(state.game==="mana"?8:state.game==="bubble"?10:15)&&d<best){best=d;target=o;}});if(!target)return;if(!e.keyboard)state.keyboardMode=false;if(state.game==="mana"&&state.save.mana>=state.save.manaCapsules*10){$("game-info").textContent="Mana storage is full. Upgrade or spend a capsule first.";return;}if(state.game==="chaos"&&state.save.mana<10){$("game-info").textContent="N-BI cannot fire: one complete Mana Capsule (10 Mana) is required.";return;}state.turn++;renderRoundProgress();showHitProgress(target.x,target.y);if(state.game==="bubble"){target.alive=false;awardXP(1,"Bubble Hunt reward");showCapsuleGain("+1","xp");$("game-info").textContent="";}else if(state.game==="mana"){target.alive=false;if(window.NUMaterials)window.NUMaterials.emit(target.x,target.y);recordGameDelta("mana",1,"GAME_REWARD",true,1);showCapsuleGain("+1","mana");$("game-info").textContent="";}else{const shot=NUWallet.fireNbiShot(state.save,target.id);if(!shot.ok){state.turn=Math.max(0,state.turn-1);renderRoundProgress();$("game-info").textContent=shot.reason==="INSUFFICIENT_MANA"?"N-BI requires one full 10-Mana container.":"N-BI shot could not be completed. Try again.";return;}if(!persistWalletState(shot.state)){state.turn=Math.max(0,state.turn-1);renderRoundProgress();$("game-info").textContent="N-BI shot could not be saved. Try again.";return;}animateManaContainerDrain();state.shots++;target.alive=false;$("game-info").textContent="";}if(state.keyboardMode)state.keyboardTargetIndex=state.targets.findIndex(o=>o.alive);drawGame();if(state.turn>=10){state.active=false;state.paused=false;cancelAnimationFrame(state.raf);if(state.save.hp<10){const healed=recordGameDelta("hp",1,"WAVE_HP_COMPLETION",false,1);if(healed&&window.NUHealth)window.NUHealth.recordHealing({gameId:state.game,amount:1,hpAfter:state.save.hp,source:"Wave completion reward"});}settleActiveWave("completed_10_successful_interactions");$("game-info").textContent="Round complete.";renderWallet();}}
+function interact(e){
+ if(!state.active||state.paused||state.turn>=10)return;
+ const rect=canvas.getBoundingClientRect(),x=e.clientX-rect.left,y=e.clientY-rect.top;
+ let target=null,best=Infinity;
+ state.targets.forEach(o=>{if(!o.alive)return;const d=Math.hypot(o.x-x,o.y-y);if(d<o.r+(state.game==="mana"?8:state.game==="bubble"?10:15)&&d<best){best=d;target=o;}});
+ if(!target)return;
+ if(!e.keyboard)state.keyboardMode=false;
+ if(state.game==="mana"&&state.save.mana>=state.save.manaCapsules*10){
+  $("game-info").textContent="Mana storage is full. Upgrade or spend a capsule first.";
+  announceTransaction("MANA STORAGE FULL · UPGRADE OR SPEND A CAPSULE","warning");return;
+ }
+ if(state.game==="chaos"&&state.save.mana<10){
+  $("game-info").textContent="N-BI cannot fire: one complete Mana Capsule (10 Mana) is required.";
+  announceTransaction("N-BI UNAVAILABLE · NEED 10 MANA","warning");return;
+ }
+ state.turn++;renderRoundProgress();showHitProgress(target.x,target.y);
+ if(state.game==="bubble"){
+  target.alive=false;
+  const awarded=awardXP(1,"Bubble Hunt reward");
+  if(awarded){showCapsuleGain("+1","xp");announceTransaction("BUBBLE HUNT · +1 XP","success");}
+  $("game-info").textContent="";
+ }else if(state.game==="mana"){
+  target.alive=false;
+  if(window.NUMaterials)window.NUMaterials.emit(target.x,target.y);
+  const collected=recordGameDelta("mana",1,"GAME_REWARD",true,1);
+  if(collected){showCapsuleGain("+1","mana");announceTransaction("MANA COLLECTED · +1","success");}
+  $("game-info").textContent="";
+ }else{
+  const shot=NUWallet.fireNbiShot(state.save,target.id);
+  if(!shot.ok){
+   state.turn=Math.max(0,state.turn-1);renderRoundProgress();
+   $("game-info").textContent=shot.reason==="INSUFFICIENT_MANA"?"N-BI requires one full 10-Mana container.":"N-BI shot could not be completed. Try again.";
+   announceTransaction(shot.reason==="INSUFFICIENT_MANA"?"N-BI UNAVAILABLE · NEED 10 MANA":"N-BI SHOT FAILED","warning");return;
+  }
+  if(!persistWalletState(shot.state)){
+   state.turn=Math.max(0,state.turn-1);renderRoundProgress();
+   $("game-info").textContent="N-BI shot could not be saved. Try again.";return;
+  }
+  animateManaContainerDrain();state.shots++;target.alive=false;$("game-info").textContent="";
+  announceTransaction("N-BI FIRED · −10 MANA","success");
+ }
+ if(state.keyboardMode)state.keyboardTargetIndex=state.targets.findIndex(o=>o.alive);
+ drawGame();
+ if(state.turn>=10){
+  state.active=false;state.paused=false;cancelAnimationFrame(state.raf);
+  if(state.save.hp<10){const healed=recordGameDelta("hp",1,"WAVE_HP_COMPLETION",false,1);if(healed&&window.NUHealth)window.NUHealth.recordHealing({gameId:state.game,amount:1,hpAfter:state.save.hp,source:"Wave completion reward"});}
+  settleActiveWave("completed_10_successful_interactions");$("game-info").textContent="Round complete.";renderWallet();
+ }
+}
 function syncWorldTime(){const hour=new Date().getHours();const phase=hour>=6&&hour<10?"dawn":hour>=10&&hour<17?"day":hour>=17&&hour<20?"dusk":"night";document.documentElement.dataset.worldTime=phase;}
 syncWorldTime();setInterval(syncWorldTime,60000);
 let mouseCameraReady=false,touchCameraReady=false,touchMoved=false,touchStart=null,touchLast=null,cameraX=0,cameraY=0,cameraQueued=false,lastCamera=0;
@@ -411,7 +464,7 @@ function renderShop(feedback=""){
  }));
  $("shop-items").querySelectorAll("[data-charge-arcane-shield]").forEach(b=>b.addEventListener("click",()=>{
   const result=NUWallet.chargeArcaneShield(state.save,"store");
-  if(!result.ok){renderShop(result.reason==="INSUFFICIENT_MANA"?"A full 10-Mana container is required.":"Shield charging is unavailable while charge remains.");return;}
+  if(!result.ok){renderShop(result.reason==="INSUFFICIENT_MANA"?"A full 10-Mana container is required.":"Shield charging is unavailable while charge remains.");announceTransaction("ARCANE SHIELD CHARGE FAILED","warning");return;}
   if(!persistWalletState(result.state))return;
   renderShop("Arcane Shield charged · −10 Mana · 10 defense ready for Chaos Attack.");
   announceTransaction("ARCANE SHIELD CHARGED · −10 MANA","success");
