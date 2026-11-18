@@ -112,6 +112,10 @@
   layoutItems();
   // Gateway releases only its own pause; the game remains frozen until real gameplay input.
   window.dispatchEvent(new Event("nu:gateway-close"));
+  if(source!=="action"&&(!document.hasFocus||document.hasFocus())){
+   if(gameView&&gameView.classList.contains("active"))document.getElementById("game-canvas")?.focus({preventScroll:true});
+   else trigger.focus({preventScroll:true});
+  }
  }
  function activate(item){
   if(!item||!item.dataset||!open)return;
@@ -121,7 +125,7 @@
   item.classList.add("is-confirming");
   activationTimer=window.setTimeout(()=>{
    activationTimer=0;
-   setOpen(false);
+   setOpen(false,"action");
    action();
   },100);
  }
@@ -209,7 +213,7 @@
  window.addEventListener("nu:gateway-cancel",()=>{if(open)setOpen(false);});
  document.addEventListener("keydown",event=>{
   if(!open)return;
-  if(event.key==="Escape"){event.preventDefault();setOpen(false);trigger.focus({preventScroll:true});return;}
+  if(event.key==="Escape"){event.preventDefault();setOpen(false,"return");return;}
   if(event.key==="ArrowDown"){event.preventDefault();moveControllerSelection(1);return;}
   if(event.key==="ArrowUp"){event.preventDefault();moveControllerSelection(-1);return;}
   if(event.key==="Enter"||event.key===" "){event.preventDefault();activate(selected||items[0]);return;}
