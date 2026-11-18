@@ -396,6 +396,8 @@ function renderShop(feedback=""){
  items.push('<article class="shop-item shop-hp-pill-item"><button class="shop-hp-pill-use" type="button" data-use-hp-pill '+(!owned||hpFull?'disabled':'')+' aria-label="Use owned HP capsule" title="'+(owned?(hpFull?'HP is full':'Use one owned HP capsule'):'No HP capsules owned')+'"><img class="hp-pill-icon '+(owned?'is-owned':'is-empty')+'" src="./assets/nu-hp-pill-golden-pixel.svg" alt=""><span class="shop-hp-pill-count" aria-live="polite">×'+state.save.hpPills+'</span></button><div class="shop-hp-pill-description"><strong>Golden HP Capsule</strong><p>Costs 10 XP · Restores up to 10 missing HP · One use per capsule</p></div><button class="btn primary shop-hp-pill-buy" data-buy-hp-pill '+(canBuy?'':'disabled')+'>'+(canBuy?'BUY · 10 XP':'NEED 10 XP')+'</button></article>');
  const shieldCanCharge=state.save.arcaneShieldCharge===0&&state.save.mana>=10;
  items.push('<article class="shop-item shop-arcane-shield-item"><div class="shop-hp-pill-description"><strong>Arcane Shield · 10 Defense</strong><p>Consumes one full Mana container · Activates immediately · No top-up</p></div><button class="btn primary" data-charge-arcane-shield '+(shieldCanCharge?'':'disabled')+'>'+(shieldCanCharge?'CHARGE · 10 MANA':state.save.arcaneShieldCharge>0?'SHIELD ALREADY CHARGED':'NEED 10 MANA')+'</button></article>');
+ const canUpgradeMana=state.save.xCredits>=1&&state.save.manaCapsules<9;
+ items.push('<article class="shop-item shop-mana-capacity-item"><div class="shop-hp-pill-description"><strong>Mana Capacity · '+state.save.manaCapsules+'/9 Containers</strong><p>Spend 1 X Credit · Add one permanent container · Receive its initial 10 Mana grant. Mana itself is never sold.</p></div><button class="btn primary" data-upgrade-mana-capacity '+(canUpgradeMana?'':'disabled')+'>'+(state.save.manaCapsules>=9?'MAX CAPACITY':canUpgradeMana?'UPGRADE · 1 X CREDIT':'NEED 1 X CREDIT')+'</button></article>');
  $("shop-items").innerHTML=items.join("");
  $("shop-status").textContent=feedback||(canBuy?"Click BUY to purchase with XP, or click the capsule icon to use one you own.": "Earn XP in Bubble Hunt or from eligible Studio exports to unlock a capsule.");
  $("shop-items").querySelectorAll("[data-buy-hp-pill]").forEach(b=>b.addEventListener("click",()=>{
@@ -412,6 +414,17 @@ function renderShop(feedback=""){
   if(!persistWalletState(result.state))return;
   renderShop("Arcane Shield charged · −10 Mana · 10 defense ready for Chaos Attack.");
   announceTransaction("ARCANE SHIELD CHARGED · −10 MANA","success");
+ }));
+ $("shop-items").querySelectorAll("[data-upgrade-mana-capacity]").forEach(b=>b.addEventListener("click",()=>{
+  const result=NUWallet.upgradeManaCapacity(state.save,{id:"mana-capacity-upgrade-"+Date.now()+"-"+Math.random().toString(36).slice(2,8)});
+  if(!result.ok){
+   const message=result.reason==="INSUFFICIENT_X_CREDITS"?"You need 1 X Credit.":result.reason==="MAX_MANA_CAPACITY"?"Mana capacity is already level 9.":"Capacity upgrade is unavailable right now.";
+   renderShop(message);announceTransaction("MANA CAPACITY UPGRADE FAILED","warning");return;
+  }
+  if(!persistWalletState(result.state))return;
+  renderShop("Capacity upgraded · +1 permanent container · +10 Mana grant · −1 X Credit.");
+  showFloatingChange("−1 X Credit","loss");showFloatingChange("+10 Mana","gain");
+  announceTransaction("CAPACITY UPGRADED · +10 MANA GRANT","success");
  }));
  $("shop-items").querySelectorAll("[data-use-hp-pill]").forEach(b=>b.addEventListener("click",e=>{
   e.preventDefault();e.stopPropagation();
