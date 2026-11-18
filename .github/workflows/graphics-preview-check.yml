@@ -43,6 +43,8 @@ jobs:
         run: node --test tests/nu-hex-gateway.test.js
       - name: Test launcher 10-level Reduced Motion controls
         run: node --test tests/nu-motion.test.js
+      - name: Test Launcher background contrast and scroll stability
+        run: node --test tests/nu-launcher-background.test.js
       - name: Test wallet, HP capsule and asset history rules
         run: node --test tests/nu-wallet.test.js
       - name: Test fictional activity-driven market simulator
