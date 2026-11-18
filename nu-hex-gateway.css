@@ -53,3 +53,6 @@ body.nu-launcher-page #nu-hex-gateway,body.nu-launcher-page .nu-gateway-scrim{di
 
 /* During Gateway navigation, keep the simulated pointer behind the Gateway layer. */
 body.nu-gateway-open .nu-simulated-mouse-cursor{z-index:105!important;opacity:.28;}
+
+/* Casino previously exposed a second Back/Home link beside Gateway. */
+body.nu-gateway-utility-active .casino-top .back-link{display:none!important;}
