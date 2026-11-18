@@ -62,7 +62,7 @@ test("Gameplay gamepad input uses the shared simulated pointer, not target auto-
 });
 
 test("Mouse, touch and simulated click all reach the existing gameplay interaction handler",()=>{
- assert.match(games,/e\.pointerType==="mouse"[^;]*interact\(e\)/);
+ assert.match(games,/window\.addEventListener\("pointerdown",e=>\{[^}]*interact\(e\)/);
  assert.match(games,/e\.pointerType!=="touch"[^;]*interact\(e\)/);
  assert.match(games,/nu:controller-direction/);
  assert.match(games,/nu:controller-confirm/);
