@@ -42,7 +42,6 @@ body.nu-gateway-open .world>#world-canvas,
 body.nu-gateway-open .world>#pixel-world,
 body.nu-gateway-open .world>.horizon,
 body.nu-gateway-open .world>.world-effects{animation-play-state:paused!important}
-body.nu-gateway-open .world,
 body.nu-gateway-open .shell,
 body.nu-gateway-open .casino-shell,
 body.nu-gateway-open .launcher{filter:blur(2px) saturate(.62);pointer-events:none}
@@ -59,7 +58,7 @@ body.nu-gateway-utility-active #profile-back{display:none!important}
 /* Standalone Gateway pages suppress duplicate Home/Back controls. */
 body.nu-casino-page .casino-top .back-link,
 body.nu-casino-page .casino-shell footer a[href="./index.html"],
-body.nu-studio-page a[href="./index.html#library-section"],
+body.nu-gateway-standalone-active a[href="./index.html#library-section"],
 body.nu-launcher-page header.top>a.brand{display:none!important}
 #nu-hex-gateway button:focus-visible{outline:2px solid var(--cyan,#65dcff);outline-offset:4px}
 @keyframes nuGatewayConfirm{0%,100%{filter:brightness(1)}50%{filter:brightness(1.8)}}
