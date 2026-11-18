@@ -18,14 +18,14 @@ Only this master index determines document precedence. Dated reports and paralle
 
 - Portable C90 core, bounded NUVM bytecode interpreter and Generation 1 IR translator subset.
 - Disk-backed FIFO cache with CRC-protected chunks (max 64 KiB) and quota enforcement.
-- Unsigned development package builder and structural manifest parser.
+- Unsigned NUPK/1 development-container builder carrying NUVM/1 bytecode; structural manifest parser.
 - Fail-closed crypto-provider boundary; no production signing keys/trust roots.
 - Bounded dependency resolver, cleanup planner, component reconciliation and in-memory journal state model.
 - Minimal Win32 smoke-test host targeting XP-era subsystem metadata.
 
 ## Important format compatibility warning
 
-Parallel candidate branches used the label `NUVM/1` for incompatible text and binary formats. Do not mix modules from the old shell samples with this portable runtime. The canonical package/container and VM naming migration is a required pre-integration gate; see the master engineering index.
+Parallel candidate branches used the label `NUVM/1` for incompatible text and binary formats. This branch now separates the NUPK/1 package container from the NUVM/1 bytecode ISA and rejects the old binary container magic. Text-based modules from the old shell branches still require an explicit translator/importer and must not be passed directly to this runtime.
 
 ## Not yet implemented
 
