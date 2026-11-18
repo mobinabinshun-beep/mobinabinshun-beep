@@ -169,3 +169,7 @@ CRC فقط خطای تصادفی را تشخیص می‌دهد، امضای نا
 ### NUPK/1 format correction applied
 
 The C90 package builder and validator now use a distinct NUPK/1 container (20-byte header) with separate container version, generation, flags and NUVM ABI fields. CRC32 protects against accidental corruption only. Unit tests cover unsupported container version, unsupported VM ABI minor, legacy NUVM container-magic rejection and payload CRC failure. The old pre-release binary format is intentionally not treated as a published compatibility target.
+
+
+### Static image host increment
+The PR #195 host now extracts and displays the canonical still image through GDI StretchBlt, with aspect-preserving scaling. No animation/decorative layers or browser engine are used. The build artifact includes the EXE and its BMP/README/checksum sidecars. This is a test payload, not a setup installer or game renderer.
