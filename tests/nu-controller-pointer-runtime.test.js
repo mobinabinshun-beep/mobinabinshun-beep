@@ -41,3 +41,11 @@ test("Gateway list navigation owns direction and blocks simulated-pointer moveme
  assert.equal(h.adapter.getState().x,before.x);assert.equal(h.adapter.getState().y,before.y);
  h.adapter.setGatewayNavigation(false);assert.equal(h.adapter.move(1,0),true);h.adapter.destroy();
 });
+
+test("Existing Gateway directional event automatically starts and moves the simulated pointer outside Gateway",()=>{
+ const h=harness();h.dispatch("nu:gateway-direction",{x:1,y:0});
+ assert.equal(h.adapter.isEnabled(),true);
+ assert.equal(h.adapter.getState().x,428);
+ assert.equal(h.adapter.getState().y,300);
+ h.adapter.destroy();
+});
