@@ -190,3 +190,8 @@ Each NUDb/1 entry carries independent schema major/minor fields, so Save, Wallet
 ## 15. Owner authorization and cross-repository audit record
 
 The explicit owner scope for native Generation-1 launcher/runtime and Pack 1, together with the cross-repository inventory and reuse-first findings, is recorded in the archive: [NU-NATIVE-LAUNCHER-REPOSITORY-AUDIT-AND-OWNER-SCOPE-fa.md](https://github.com/mobinabinshun-beep/Repository/blob/main/Operations/2026-11-18/NU-NATIVE-LAUNCHER-REPOSITORY-AUDIT-AND-OWNER-SCOPE-fa.md). This current owner directive supersedes the earlier FUTURE-2026-002 archive-only authorization only for the stated native launcher/Pack 1 scope. FUTURE-2026-004 full graphics platform remains parked; Generation 2 remains quarantined.
+
+
+## 16. NUJR/1 transaction journal serialization
+
+The install journal state model now has a fixed 24-byte NUJR/1 encoder/decoder with transaction ID, state, total/completed item counts and CRC32. Unit tests cover round-trip, insufficient output capacity and corruption rejection. It is not yet a durable journal: the Win32 host does not persist it, flush it, recover it on startup or execute rollback file operations.
