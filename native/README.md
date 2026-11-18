@@ -117,3 +117,11 @@ Build the package utility with the normal CMake build. It accepts raw NUVM/1 byt
 The output is **unsigned**. CRC32 detects accidental corruption and does not authenticate a publisher. Do not distribute third-party packages as trusted until a cryptographic signature verifier and managed trust roots are implemented.
 
 The cache API now provides `NU_CacheStageFile` and `NU_CacheLoadAll`: files are staged as CRC-protected chunks of at most 64 KiB on disk, then drained sequentially into one caller-owned module buffer. The package can then be passed to `NU_PackageValidate`. This avoids loading the entire installed library into RAM; only the selected module is assembled for execution. It remains a temporary queue, not persistent save storage. The current implementation is single-process and not crash-recoverable.
+
+## Strict Generation-1 manifest parser (development increment)
+
+The portable runtime now includes `nu_manifest.c/.h`. It parses a canonical, fixed-order ASCII manifest with exact field names, LF line endings, bounded lengths, a Generation-1/ABI-1.0 gate, a safe package basename, a decimal package size, a 64-character lowercase SHA-256 field, and a key/signature pair. Unknown fields, reordered fields, malformed encodings, path traversal, unsupported generations and ABI versions are rejected.
+
+The parser does **not** calculate SHA-256 or validate a publisher signature. `NU_ManifestVerify` delegates both operations to an explicitly supplied platform crypto provider and fails closed when the provider is absent or the manifest is marked unsigned. The test suite verifies parsing and fail-closed behavior; it does not pretend that a mock callback is cryptography.
+
+The cache drain path now preflights the complete queue before consuming it. A destination buffer that is too small returns an error without partially draining the selected module. NUVM package validation also rejects unsupported ABI minor versions rather than accepting them silently.
