@@ -7,7 +7,7 @@
 ## Implemented in this candidate
 
 - Platform-neutral resource budget model.
-- Deterministic cooperative scheduler: one N.U CPU work slot per two scheduler slots; GPU work admission alternates across N.U slots.
+- Deterministic cooperative scheduler: one N.U CPU work slot per two scheduler slots; each admitted host slice runs at most 64 VM instructions and the alternate slot yields with Sleep(1); GPU work admission alternates across N.U slots.
 - NUVM/1 bounded bytecode interpreter: eight 32-bit registers, 4 KiB private VM memory, instruction limits and fail-closed malformed-opcode handling.
 - Generation 1 package envelope: NUVM magic, ABI, generation, payload length and CRC-32.
 - Minimal native Win32 window; press O to open a .nup package and Esc to exit.
