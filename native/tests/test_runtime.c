@@ -143,7 +143,8 @@ int main(void){
   NU_InstallComponent installed[3]={{"nu-core","1.0.0",1u},
    {"bubble-hunt","0.9.0",1u},{"legacy-addon","2.0.0",0u}};
   NU_InstallPlanEntry entries[3]; NU_InstallPlan plan;
-  NU_InstallJournal journal;
+  NU_InstallJournal journal,decoded_journal;
+  uint8_t journal_bytes[NU_INSTALL_JOURNAL_DISK_SIZE];size_t journal_size;
   assert(NU_InstallPlanBuild(target,3u,0,0u,entries,3u,&plan));
   assert(plan.keep_count==0u && plan.update_count==0u && plan.add_count==3u);
   assert(NU_InstallPlanBuild(target,3u,installed,3u,entries,3u,&plan));
@@ -163,6 +164,14 @@ int main(void){
   assert(NU_InstallJournalAdvance(&journal,NU_JOURNAL_ACTIVATED,2u));
   assert(NU_InstallJournalAdvance(&journal,NU_JOURNAL_ROLLBACK_REQUIRED,2u));
   assert(NU_InstallJournalAdvance(&journal,NU_JOURNAL_ROLLED_BACK,2u));
+  journal_size=NU_InstallJournalEncode(&journal,journal_bytes,sizeof(journal_bytes));
+  assert(journal_size==NU_INSTALL_JOURNAL_DISK_SIZE);
+  assert(NU_InstallJournalDecode(journal_bytes,journal_size,&decoded_journal));
+  assert(decoded_journal.transaction_id==journal.transaction_id);
+  assert(decoded_journal.state==NU_JOURNAL_ROLLED_BACK);
+  assert(decoded_journal.completed_items==journal.completed_items);
+  assert(NU_InstallJournalEncode(&journal,journal_bytes,NU_INSTALL_JOURNAL_DISK_SIZE-1u)==0u);
+  journal_bytes[10u]^=1u;assert(!NU_InstallJournalDecode(journal_bytes,journal_size,&decoded_journal));
  }
 
  {
