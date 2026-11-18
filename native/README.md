@@ -104,3 +104,16 @@ The cache is a temporary work queue, not a persistent game-save store. The calle
 - [ ] Native ports/adapters for Bubble Hunt, Mana Collector and Chaos Attack.
 - [ ] XP toolchain/import-table audit and real Windows XP execution.
 - [ ] Per-platform resource telemetry adapters and human QA.
+
+ 
+## Package builder and cache-to-runtime path (follow-up candidate)
+
+Build the package utility with the normal CMake build. It accepts raw NUVM/1 bytecode (not source code) and writes the deterministic 16-byte NUVM envelope:
+
+```sh
+./build/nu_pack game.nubc game.nup
+```
+
+The output is **unsigned**. CRC32 detects accidental corruption and does not authenticate a publisher. Do not distribute third-party packages as trusted until a cryptographic signature verifier and managed trust roots are implemented.
+
+The cache API now provides `NU_CacheStageFile` and `NU_CacheLoadAll`: files are staged as CRC-protected chunks of at most 64 KiB on disk, then drained sequentially into one caller-owned module buffer. The package can then be passed to `NU_PackageValidate`. This avoids loading the entire installed library into RAM; only the selected module is assembled for execution. It remains a temporary queue, not persistent save storage. The current implementation is single-process and not crash-recoverable.
