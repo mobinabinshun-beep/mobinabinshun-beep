@@ -16,6 +16,7 @@ on:
       - "tests/nu-gateway-exclusive-controls.test.js"
       - "tests/nu-gateway-controller-input.test.js"
       - "tests/nu-controller-pointer.test.js"
+      - "tests/nu-controller-pointer-runtime.test.js"
       - "tests/nu-gateway-pointer-controller-mode.test.js"
       - "nu-dynamic-layers.js"
       - "tests/nu-hex-gateway.test.js"
@@ -43,4 +44,4 @@ jobs:
           node --check nu-gateway-pause.js
           node --check nu-dynamic-layers.js
       - name: Run Gateway main-game regression tests
-        run: node --test tests/nu-hex-gateway.test.js tests/nu-gateway-pause.test.js tests/nu-gateway-exclusive-controls.test.js tests/nu-gateway-controller-input.test.js tests/nu-controller-pointer.test.js tests/nu-gateway-pointer-controller-mode.test.js
+        run: node --test tests/nu-hex-gateway.test.js tests/nu-gateway-pause.test.js tests/nu-gateway-exclusive-controls.test.js tests/nu-gateway-controller-input.test.js tests/nu-controller-pointer.test.js tests/nu-controller-pointer-runtime.test.js tests/nu-gateway-pointer-controller-mode.test.js
