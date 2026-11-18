@@ -8,6 +8,7 @@ on:
       - "nu-games.js"
       - "index.html"
       - "nu-arcane-shield.css"
+      - "docs/operations/2026-11-18/NU-ARCANE-SHIELD-IMPLEMENTATION-STATUS.md"
       - "tests/nu-arcane-shield.test.js"
       - ".github/workflows/arcane-shield-regression.yml"
   pull_request:
@@ -16,6 +17,7 @@ on:
       - "nu-games.js"
       - "index.html"
       - "nu-arcane-shield.css"
+      - "docs/operations/2026-11-18/NU-ARCANE-SHIELD-IMPLEMENTATION-STATUS.md"
       - "tests/nu-arcane-shield.test.js"
       - ".github/workflows/arcane-shield-regression.yml"
   workflow_dispatch:
