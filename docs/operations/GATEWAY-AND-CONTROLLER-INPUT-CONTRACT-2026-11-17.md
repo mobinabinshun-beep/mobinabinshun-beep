@@ -187,3 +187,15 @@ Regression coverage now includes actual keydown-shaped input without a connected
 6. Keyboard focus, touch targets and responsive layouts remain usable.
 
 **Successor candidate:** `fix/gateway-pointer-bridge-successor-2026-11-18` · **Status:** `MACHINE-QA-PENDING` · Human QA and public demo deployment remain pending.
+
+
+## 2026-11-18 owner report — simulated pointer interaction remains unverified
+**Human QA status: FAILED / REOPENED.** The owner reports that the simulated-mouse arrow still does not move/interact, while Gateway options do navigate selectively. The previous machine test pass is not evidence of real-device interaction.
+
+### Forward correction
+- The shared adapter now dispatches `pointermove` and `mousemove` to the element under the virtual pointer, so canvas aiming and pointer-aware game controls receive movement rather than only a CSS target outline.
+- `setEnabled(true)` force-starts the adapter for keyboard-emulated click controllers that do not expose the Gamepad API.
+- Repeated keydown direction events are accepted, allowing held directional input to continue moving the pointer.
+- All four mounted pages use the new cache key `20261118-interaction-r7`.
+
+These code changes are a hypothesis-driven correction, not a claim of successful live interaction. The relevant runtime tests must pass and the updated demo must be exercised with the owner's actual controller before human acceptance.
