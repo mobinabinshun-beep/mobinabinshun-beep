@@ -190,6 +190,6 @@ test("page unload does not settle a Chaos Wave when remaining-mass resolution or
 test("reload recovery resolves persisted Chaos targets even before the game view is re-entered",()=>{
   const games=fs.readFileSync("nu-games.js","utf8");
   assert.match(games,/function resolveRemainingChaosMasses\(reason\)\{\s*if\(!state\.save\.activeWave\|\|state\.save\.activeWave\.gameId!=="chaos"\)return/);
-  assert.match(games,/const ids=Array\.from\(new Set\(\[\.\.\.\(state\.save\.activeWave\.pendingChaosTargetIds\|\|\[\]\),\.\.\.remaining\.map\(target=>target\.id\)\]\)\)/);
+  assert.match(games,/,ids=Array\.from\(new Set\(\[\.\.\.\(state\.save\.activeWave\.pendingChaosTargetIds\|\|\[\]\),\.\.\.remaining\.map\(target=>target\.id\)\]\)\)/);
   assert.doesNotMatch(games,/function resolveRemainingChaosMasses\(reason\)\{\s*if\(state\.game!=="chaos"/);
 });
