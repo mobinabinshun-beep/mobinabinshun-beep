@@ -145,7 +145,7 @@ A PE subsystem value of 5.01 or a successful cross-build is not proof of Windows
 This branch is a development candidate. It is not a playable launcher release and must not be merged or advertised as such until game ports, package trust, transactional installation, signed setup, actual XP testing and human acceptance pass.
 
 
-## 11. Dependency graph primitive — candidate increment
+## 13. Dependency graph primitive — candidate increment
 
 `native/nu_dependency.c/.h` provides a bounded resolver for up to 64 Generation-1 modules. A row-major adjacency matrix expresses module-to-required-module edges. The resolver validates generation 1 and ABI 1.0 for every node, rejects self-edges and malformed matrix values, and returns dependency-first order. Cycles and unsupported contracts fail closed. Tests cover a three-node chain, a cycle, and an unsupported generation.
 
