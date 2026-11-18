@@ -412,7 +412,9 @@ Package version: `0.5.2-gen1-human-image-report`. The previously working Studio 
 
 
 
-## Generation 1.32 — universal hex gateway calibration (2026-11-13)
+## Generation 1.32 — universal hex gateway calibration (2026-11-13) — historical snapshot
+
+> Historical behavior only. The current Gateway contract is the [2026-11-18 unified owner specification](https://github.com/mobinabinshun-beep/Repository/blob/docs/gateway-human-approval-lock-2026-11-18/Operations/2026-11-18/GATEWAY-MACHINE-APPROVAL-LOCK-AND-HUMAN-QA-fa.md). This snapshot's pause/resume, hover, select/confirm and dismiss semantics do not override that specification.
 
 - The compact six-sided N.U gateway is available on the main world, Casino, Launcher and Creative Studio pages, and remains available while navigating the home, library, wallet, Store, profile and article views inside the main world.
 - The gateway stays pinned near the upper-right/upper-middle frame edge. Its nine floating destinations fan out around the trigger without a full-screen menu panel; sizing and orbit radius adapt to narrow screens. It is the single menu/back entry point inside the main world, so legacy menu and back buttons are hidden there.
@@ -502,7 +504,9 @@ The classic lower-left LV / XP / Mana resource bars are protected from incidenta
 - [Product handoff and exact-SHA machine-lock record](./docs/operations/GATEWAY-MACHINE-APPROVAL-LOCK-2026-11-18.md) — points to the archive and records PR #178 evidence and verification limits.
 - Historical implementation records are retained; they do not redefine the current owner contract.
 
-## Gateway and Exchange operational contract — 2026-11-15
+## Gateway and Exchange operational contract — 2026-11-15 — historical implementation records
+
+> The linked 2026-11-15 records preserve their original implementation evidence and rationale. Current Gateway behavior is defined only by the [2026-11-18 unified owner specification](https://github.com/mobinabinshun-beep/Repository/blob/docs/gateway-human-approval-lock-2026-11-18/Operations/2026-11-18/GATEWAY-MACHINE-APPROVAL-LOCK-AND-HUMAN-QA-fa.md).
 
 - [Gateway menu and Exchange implementation record](./docs/operations/GATEWAY-MENU-EXCHANGE-IMPLEMENTATION-2026-11-15.md) — Back/Menu/Profile one-click Gateway, complete background freeze, centered keyboard-keycap module list and non-exchangeable Store purchases.
 - [Gateway purpose and rationale archive](https://github.com/mobinabinshun-beep/Repository/blob/main/Operations/2026-11-15/GATEWAY-PURPOSE-AND-RATIONALE-fa.md) — owner-corrected product purpose, menu hierarchy and future-scope boundaries.
