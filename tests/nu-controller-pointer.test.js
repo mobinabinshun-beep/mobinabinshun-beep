@@ -30,8 +30,8 @@ test("D-pad and stick directions move the virtual pointer without activating tar
  assert.match(pointer,/b\[13\]/);
  assert.match(pointer,/b\[14\]/);
  assert.match(pointer,/b\[15\]/);
- assert.match(pointer,/x\+input\.dx\*step/);
- assert.match(pointer,/y\+input\.dy\*step/);
+ assert.match(pointer,/x\+dx\*step/);
+ assert.match(pointer,/y\+dy\*step/);
  assert.match(pointer,/updateTarget\(\)/);
  assert.match(pointer,/lastMove=time/);
  assert.match(pointer,/gatewayNavigation\)emit\("nu:gateway-direction"/);
