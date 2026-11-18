@@ -70,7 +70,13 @@ A package publisher trust contract must use:
 
 No production signing key or trust root is embedded in the source tree. No unsigned package may be represented as publisher-authenticated. The current package builder emits unsigned development packages only. Signature verification, trust-root lifecycle and production Package Manager remain release blockers.
 
-## 6. Install, update, rollback and uninstall state machine
+## 6. Canonical manifest and trust-provider boundary
+
+The Generation-1 development parser accepts one canonical ASCII representation with fixed field order: format marker, module id, generation, ABI, package basename, package size, lowercase SHA-256 digest, key id and detached signature token. It rejects duplicate/reordered/unknown fields, CRLF, embedded NUL/non-ASCII bytes, path traversal, unsupported ABI/generation, oversized values and malformed digest/signature syntax.
+
+Parsing is structural validation only. SHA-256 calculation and asymmetric signature verification are deliberately delegated to a platform crypto provider through `NU_ManifestVerifyProvider`. The runtime fails closed when no provider is configured, when the package size differs, or when the manifest is unsigned. No production trust root or cryptographic implementation is shipped in this increment. A successful callback is only as trustworthy as the provider implementation and its key-management policy; the current CI only tests parser behavior and fail-closed rejection.
+
+## 7. Install, update, rollback and uninstall state machine
 
 Target state machine:
 `DISCOVERED → MANIFEST_VALIDATED → SIGNATURE_VERIFIED → DEPENDENCIES_RESOLVED → STAGED → CONTENT_VERIFIED → READY → ACTIVE`.
@@ -79,13 +85,13 @@ Failure at any pre-activation state must leave the last-known-good active versio
 
 Current implementation has package-envelope creation/validation and disk staging primitives only. Manifest parsing, cryptographic verification, dependency solving, transactional activation and recovery journal are not complete.
 
-## 7. First game-pack requirements
+## 8. First game-pack requirements
 
 First pack: Bubble Hunt, Mana Collector and Chaos Attack. Each is a separately installable module with its own Generation-1 game adapter and protocol declaration. The port must preserve gameplay rules, economy, wallet and save semantics. Each game gets independent save slots. The user may uninstall any game and later reinstall it without losing its save or wallet.
 
 Port order: Bubble Hunt first. Do not start the next game until Bubble Hunt passes deterministic behavior tests, save round-trip tests, resource budget tests and a full native-host launch cycle.
 
-## 8. Current implementation inventory
+## 9. Current implementation inventory
 
 Implemented candidate:
 - portable C90 VM, CRC-protected NUVM/1 envelope validation and cooperative scheduler;
@@ -97,7 +103,7 @@ Implemented candidate:
 - portable unit tests and Win32 cross-build workflow.
 
 Not yet implemented:
-- production Package Manager, canonical manifest parser and dependency resolver;
+- production Package Manager and dependency resolver (the structural manifest parser is now present, but it does not resolve dependencies);
 - SHA-256 publisher digest/signature verification and managed trust roots;
 - atomic install/update/rollback, uninstall UI and crash-recovery journal;
 - native game ports and game-specific translators;
@@ -105,7 +111,7 @@ Not yet implemented:
 - measured, OS-specific resource telemetry/enforcement;
 - signed installer, repair/uninstall package and real Windows XP execution QA.
 
-## 9. Automated and human acceptance gates
+## 10. Automated and human acceptance gates
 
 Automated:
 - C90 strict build with warnings as errors;
@@ -124,7 +130,7 @@ Human:
 
 A PE subsystem value of 5.01 or a successful cross-build is not proof of Windows XP execution.
 
-## 10. Engineering sequence
+## 11. Engineering sequence
 
 1. Package Manager contract and signature/trust design; implement manifest parsing and fail-closed verification.
 2. Integrate cache staging, translator and scheduler; keep one selected module in RAM at a time.
@@ -134,6 +140,6 @@ A PE subsystem value of 5.01 or a successful cross-build is not proof of Windows
 6. Native renderer and measured resource adapters.
 7. XP-compatible toolchain/import audit, signed setup, repair/uninstall, and actual XP/low-end hardware validation.
 
-## 11. Release policy
+## 12. Release policy
 
 This branch is a development candidate. It is not a playable launcher release and must not be merged or advertised as such until game ports, package trust, transactional installation, signed setup, actual XP testing and human acceptance pass.
