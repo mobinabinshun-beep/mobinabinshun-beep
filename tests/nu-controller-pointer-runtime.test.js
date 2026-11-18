@@ -118,8 +118,8 @@ test("Gamepad uses hierarchical Gateway events while the Gateway owns navigation
  h.adapter.setGatewayNavigation(true);
  h.runFrame(0); // Prime held-state detection; do not act on an already-held button.
  buttons[13].pressed=true;h.runFrame(200);
- buttons[0].pressed=true;h.runFrame(400);
- buttons[1].pressed=true;h.runFrame(600);
+ buttons[13].pressed=false;buttons[0].pressed=true;h.runFrame(400);
+ buttons[0].pressed=false;buttons[1].pressed=true;h.runFrame(600);
  assert.deepEqual(seen,[["direction",1],["confirm"],["cancel"]]);
  h.adapter.setGatewayNavigation(false);
  h.adapter.destroy();
