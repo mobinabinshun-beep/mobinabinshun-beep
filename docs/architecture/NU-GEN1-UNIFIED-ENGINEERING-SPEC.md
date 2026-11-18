@@ -238,3 +238,18 @@ The complete bundle is limited to 64 MiB and 32 entries. IDs allow lowercase ASC
 ### Integration boundary
 
 The builder/parser and portable unit tests are implemented. The host does not yet write bundle files, perform atomic export, preview imports, merge/replace profiles, or migrate the browser localStorage save. Browser key `nu-world-save-v1` requires an explicit browser export/import bridge; the Native process cannot read a browser profile's localStorage directly. Do not advertise backup/migration UI until filesystem and user-flow integration passes.
+
+
+## 21. NUJR/1 transaction journal record
+
+The install planner now encodes/decodes a fixed 24-byte NUJR/1 record:
+- bytes 0–3: ASCII `NUJR`
+- bytes 4–5: format version 1.0
+- byte 6: transaction state
+- byte 7: reserved zero
+- bytes 8–11: transaction ID
+- bytes 12–15: total item count
+- bytes 16–19: completed item count
+- bytes 20–23: CRC32 over bytes 0–19.
+
+Decode rejects unsupported version/state, nonzero reserved byte, zero transaction ID/count, completed count over total, verified/activated state before all items complete, wrong length and CRC mismatch. The serializer/parser and unit tests are implemented. This is a durable-record format primitive, not persistence: no filesystem write, fsync, atomic replacement, startup recovery or rollback I/O is connected yet.
