@@ -42,6 +42,7 @@ test("D-pad and stick directions move the virtual pointer without activating tar
 test("A held Down used to exit Gateway cannot move the virtual pointer away from the trigger",()=>{
  assert.match(pointer,/if\(gatewayBlockedUntilNeutral\)\{if\(!input\.dx&&!input\.dy\)/);
  assert.match(pointer,/gatewayBlockedUntilNeutral=!!\(current\.dx\|\|current\.dy\)/);
+ assert.match(pointer,/gatewayNavigation=true;const current=direction\(event\.gamepad\)/);
  assert.match(pointer,/setGatewayNavigation\(false\)/);
 });
 test("Confirm is a separate click; B remains Gateway cancel",()=>{
