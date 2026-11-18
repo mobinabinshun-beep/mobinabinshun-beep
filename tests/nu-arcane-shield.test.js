@@ -100,6 +100,7 @@ test("game UI keeps shield controls separate from the locked classic resource HU
   const html=fs.readFileSync("index.html","utf8");
   const games=fs.readFileSync("nu-games.js","utf8");
   const css=fs.readFileSync("nu-arcane-shield.css","utf8");
+  const shieldIcon=fs.readFileSync("assets/material/nu-arcane-shield.svg","utf8");
   assert.match(html,/<div id="arcane-shield-panel" class="nu-arcane-shield"/);
   assert.match(html,/<div class="bars"><span class="hud-chip" id="level-chip">LV 1<\/span>/);
   assert.match(html,/nu-arcane-shield\.css/);
