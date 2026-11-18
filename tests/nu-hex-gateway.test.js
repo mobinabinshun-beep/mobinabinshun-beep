@@ -140,8 +140,9 @@ test("Player views manage focus, wallet tabs support arrow navigation, and Enter
  assert.match(playerUI,/ArrowLeft/);assert.match(playerUI,/ArrowRight/);assert.match(playerUI,/event\.key==="Home"/);assert.match(playerUI,/event\.key==="End"/);
 });
 
-test("Gateway focus loop wraps in both directions and Escape restores the trigger",()=>{
- assert.match(js,/event\.key==="Escape"\)\{event\.preventDefault\(\);setOpen\(false\);trigger\.focus/);
+test("Gateway focus loop wraps and a non-navigation exit restores gameplay focus",()=>{
+ assert.match(js,/event\.key==="Escape"\)\{event\.preventDefault\(\);setOpen\(false,"return"\);return/);
+ assert.match(js,/document\.getElementById\("game-canvas"\)\?\.focus/);
  assert.match(js,/event\.shiftKey&&document\.activeElement===first/);
  assert.match(js,/!event\.shiftKey&&document\.activeElement===last/);
  assert.match(css,/#nu-hex-gateway button:focus-visible/);
