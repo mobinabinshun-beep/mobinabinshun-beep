@@ -27,24 +27,34 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install 32-bit MinGW cross compiler
-        run: sudo apt-get update && sudo apt-get install -y gcc-mingw-w64-i686
+        run: sudo apt-get update && sudo apt-get install -y gcc-mingw-w64-i686 python3-pil
+      - name: Extract canonical still background image
+        run: python3 native/build.py
       - name: Compile Win32 host with XP API target and PE subsystem 5.01
         run: >
           i686-w64-mingw32-gcc -std=c90 -Wall -Wextra -Werror -pedantic -Os
           -DWINVER=0x0501 -D_WIN32_WINNT=0x0501
           native/nu_runtime.c native/win32_host.c
-          -o nu-launcher-xp-candidate.exe -mwindows -lcomdlg32
+          -o dist/NULauncher.exe -mwindows -lcomdlg32 -lgdi32
           -Wl,--major-subsystem-version,5 -Wl,--minor-subsystem-version,1
       - name: Inspect PE subsystem
         run: |
-          i686-w64-mingw32-objdump -p nu-launcher-xp-candidate.exe > pe-report.txt
+          i686-w64-mingw32-objdump -p dist/NULauncher.exe > pe-report.txt
           grep -E "Subsystem|MajorSubsystemVersion|MinorSubsystemVersion|DLL Name" pe-report.txt
           grep -Eq "MajorSubsystemVersion[[:space:]]+5" pe-report.txt
           grep -Eq "MinorSubsystemVersion[[:space:]]+1" pe-report.txt
-      - name: Upload Windows candidate executable
+      - name: Create candidate checksums
+        run: |
+          cd dist
+          sha256sum NULauncher.exe background.bmp README.txt > SHA256SUMS.txt
+      - name: Upload Windows candidate executable and static artwork
         uses: actions/upload-artifact@v4
         with:
           name: nu-launcher-win32-xp-candidate
-          path: nu-launcher-xp-candidate.exe
+          path: |
+            dist/NULauncher.exe
+            dist/background.bmp
+            dist/README.txt
+            dist/SHA256SUMS.txt
           if-no-files-found: error
           retention-days: 14
