@@ -96,12 +96,12 @@
    frame=0;primed=false;lastDirectionX=0;lastDirectionY=0;confirmDown=false;cancelDown=false;padIndex=null;
   }
   function gamepadDirection(pad){
-   const buttons=pad.buttons||[],axes=pad.axes||[],threshold=.55;
-   const up=!!(buttons[12]&&buttons[12].pressed)||Number(axes[1])< -threshold;
-   const down=!!(buttons[13]&&buttons[13].pressed)||Number(axes[1])>threshold;
-   const left=!!(buttons[14]&&buttons[14].pressed)||Number(axes[0])< -threshold;
-   const right=!!(buttons[15]&&buttons[15].pressed)||Number(axes[0])>threshold;
-   return {dx:(right?1:0)-(left?1:0),dy:(down?1:0)-(up?1:0),confirm:!!(buttons[0]&&buttons[0].pressed),cancel:!!(buttons[1]&&buttons[1].pressed)};
+   const b=pad.buttons||[],axes=pad.axes||[],threshold=.55;
+   const up=!!(b[12]&&buttons[12].pressed)||Number(axes[1])< -threshold;
+   const down=!!(b[13]&&buttons[13].pressed)||Number(axes[1])>threshold;
+   const left=!!(b[14]&&buttons[14].pressed)||Number(axes[0])< -threshold;
+   const right=!!(b[15]&&buttons[15].pressed)||Number(axes[0])>threshold;
+   return {dx:(right?1:0)-(left?1:0),dy:(down?1:0)-(up?1:0),confirm:!!(b[0]&&buttons[0].pressed),cancel:!!(b[1]&&buttons[1].pressed)};
   }
   function pollGatewayGamepad(time){
    frame=0;
@@ -179,5 +179,5 @@
    destroy:destroy
   };
  }
- root.NUControllerPointer=Object.assign(create(),{create:create,mode:"simulated-mouse",capabilities:{directionalPointer:true,separateConfirm:true,physicalMouseDirect:true,touchDirect:true,gatewayHierarchicalNavigation:true}});
+ root.NUControllerPointer=Object.assign(create(),{create,mode:"simulated-mouse",capabilities:{directionalPointer:true,separateConfirm:true,physicalMouseDirect:true,touchDirect:true,gatewayHierarchicalNavigation:true}});
 })(typeof window!=="undefined"?window:globalThis);
