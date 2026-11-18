@@ -60,3 +60,15 @@
 - [ ] Record device, OS, browser, exact public build SHA, expected/actual behavior and evidence.
 
 **Release state:** SOURCE-CANDIDATE · AUTOMATED-QA-PASSED · BACKUP-VERIFIED · DEMO-DEPLOYMENT-UNVERIFIED · HUMAN-QA-PENDING · NOT MERGED.
+
+
+## 7. Verification refresh — 2026-11-18 (latest candidate)
+
+- Latest candidate HEAD: `ab2f9ffe448b0001e7215b2e815e5faf7dd8f2d8`.
+- Exact-HEAD workflow run [44269872127](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44269872127): **completed / success**; the run's head SHA matches the candidate above. The associated implementation report records 309/309 Generation 1 tests passing.
+- PR #185 remains open and unmerged. GitHub currently reports `mergeable=false` and `mergeable_state=dirty`; mergeability/conflict resolution is outstanding.
+- Public Pages deployment of this exact HEAD is **NOT VERIFIED**. A previous PR comment reports a successful deployment of older source SHA `e83d600937227e4ae0cc0dcf19e9691b52c6afe8`; a later comment explicitly corrects the status for the newer candidate. Do not treat the older deployment as proof that this HEAD is live.
+- The shield panel currently renders its purple meter and charge control, but no dedicated shield artwork is wired into the panel. The archive `Material/` directory currently lists five Mana SVG variants and no separately named shield SVG. The supplied pixel-art ZIP has not been inspected internally; shield-icon integration remains **NOT VERIFIED / OPEN**.
+- Human desktop/mobile/touch acceptance remains pending. Do not merge or promote until the current HEAD is deployed and its live identity is verified, the PR is mergeable, and human QA is recorded.
+
+**Refreshed state:** IMPLEMENTED IN CANDIDATE · EXACT-HEAD AUTOMATED CHECK PASS · BACKUP VERIFIED · CURRENT-HEAD DEMO DEPLOYMENT NOT VERIFIED · SHIELD ARTWORK INTEGRATION NOT VERIFIED · HUMAN QA PENDING · NOT MERGED.
