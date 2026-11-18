@@ -171,3 +171,12 @@ Still required before promising this experience: safe inventory discovery, previ
 `native/nu_install_plan.c/.h` now provides a bounded (64-component) full-pack reconciliation planner. It matches stable component IDs and versions, classifies components as keep/add/update, and deliberately leaves installed components not present in the incoming full pack untouched. It rejects duplicate IDs, invalid IDs/versions, malformed required flags and insufficient plan capacity. Unit tests cover keep/add/update, preservation of unrelated installed add-ons and invalid IDs.
 
 The same module models the legal transaction states (prepared, staging, verified, activated, rollback-required and rolled-back), rejects skipped transitions, enforces complete staging before verification, and allows rollback after activation. This is an in-memory state model only: it is not a durable on-disk journal and performs no file copying, signature checks, atomic rename or rollback I/O. Those remain mandatory before a public installer can be called transactional.
+
+
+## 16. Repository consolidation and format compatibility gate
+
+The canonical cross-repository map and document precedence are now defined in [NU-MASTER-ENGINEERING-INDEX-fa.md](NU-MASTER-ENGINEERING-INDEX-fa.md). Pack manifest, translator/resource contract and machine acceptance checklist from the parallel Generation-1 specification branch have been copied into this implementation branch so the runtime PR has one coherent documentation surface.
+
+A source audit found incompatible candidate formats all labelled `NUVM/1`: the older shell's line-oriented declarative module, the C++ host's `.numod + .nuvm` text instruction format, and this branch's binary envelope with `NUVM` magic and bytecode. They are not ABI-compatible and must not be merged as though they were one format. Before shell/game integration, split package-container, module-manifest, pack-manifest and VM-ISA version identifiers; add golden fixtures and explicit legacy rejection/migration tests. No existing released format is silently reinterpreted.
+
+The master index also records that the three approved game IDs are currently manifest-only: their native payloads are not bound to this runtime or installer. The public browser prototypes in the product default branch are not native Generation-1 ports.
