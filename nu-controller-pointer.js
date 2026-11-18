@@ -1,5 +1,6 @@
 /* N.U Controller Pointer — shared simulated-mouse adapter for launcher modules.
  * D-pad / four directions move only. Confirm performs the separate click.
+ * Gateway navigation temporarily maps vertical directions to its ordered list.
  * Physical mouse and touch remain native browser input.
  */
 (function(root){
@@ -7,9 +8,9 @@
  function create(options){
   options=options||{};
   const doc=options.document||root.document,win=options.window||root;
-  let enabled=false,frame=0,lastMove=0,confirmDown=false,cancelDown=false,primed=false,lastTarget=null,x=0,y=0,padIndex=null;
+  let enabled=false,frame=0,lastMove=0,confirmDown=false,cancelDown=false,primed=false,lastTarget=null,x=0,y=0,padIndex=null,gatewayNavigation=false,gatewayBlockedUntilNeutral=false;
   let cursor=null,style=null;
-  const step=Number(options.step)||28,repeat=Number(options.repeat)||170;
+  const step=Number(options.step)||28,repeat=Number(options.repeat)||190;
   function ensureCursor(){
    if(!doc||cursor)return;
    style=doc.createElement("style");
@@ -20,11 +21,14 @@
   }
   function targetAt(){return doc&&doc.elementFromPoint?doc.elementFromPoint(x,y):null;}
   function updateTarget(){
-   const next=targetAt();
-   if(lastTarget&&lastTarget.classList)lastTarget.classList.remove("nu-simulated-mouse-target");
+   const next=targetAt(),previous=lastTarget;
+   if(previous&&previous.classList)previous.classList.remove("nu-simulated-mouse-target");
    lastTarget=next;
    if(next&&next.classList)next.classList.add("nu-simulated-mouse-target");
    if(cursor){cursor.style.left=x+"px";cursor.style.top=y+"px";}
+   if(next!==previous&&doc&&typeof win.CustomEvent==="function"){
+    win.dispatchEvent(new win.CustomEvent("nu:simulated-pointer-target",{detail:{target:next,previousTarget:previous,x,y}}));
+   }
   }
   function direction(pad){
    const b=pad.buttons||[],a=pad.axes||[],threshold=.55;
@@ -33,6 +37,45 @@
    const left=!!(b[14]&&b[14].pressed)||Number(a[0])< -threshold;
    const right=!!(b[15]&&b[15].pressed)||Number(a[0])>threshold;
    return {dx:(right?1:0)-(left?1:0),dy:(down?1:0)-(up?1:0),confirm:!!(b[0]&&b[0].pressed),cancel:!!(b[1]&&b[1].pressed)};
+  }
+  function emit(name,detail){if(doc&&typeof win.CustomEvent==="function")win.dispatchEvent(new win.CustomEvent(name,{detail}));}
+  function movePointer(dx,dy,source){
+   if(!enabled||gatewayNavigation||gatewayBlockedUntilNeutral)return false;
+   dx=Math.sign(Number(dx)||0);dy=Math.sign(Number(dy)||0);
+   if(!dx&&!dy)return false;
+   const nextX=Math.max(1,Math.min(win.innerWidth-1,x+dx*step));
+   const nextY=Math.max(1,Math.min(win.innerHeight-1,y+dy*step));
+   if(nextX===x&&nextY===y)return false;
+   x=nextX;y=nextY;updateTarget();
+   emit("nu:simulated-pointer-move",{x,y,dx,dy,source:source||"controller"});
+   return true;
+  }
+  function onPointerDirection(event){
+   const detail=event&&event.detail||{};
+   if(!enabled)start(true);
+   movePointer(detail.dx??detail.x,detail.dy??detail.y,detail.source||"click-controller");
+  }
+  // Keyboard-emulated click controllers send ordinary arrow/confirm keys, not Gamepad API events.
+  // Capture them before game-level keyboard targeting; Gateway keeps exclusive ownership while open.
+  function onKeyboardInput(event){
+   if(!event||event.altKey||event.ctrlKey||event.metaKey||event.repeat||gatewayNavigation)return;
+   const keys={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]};
+   const delta=keys[event.key];
+   if(delta){
+    if(!enabled)start(true);
+    if(movePointer(delta[0],delta[1],"keyboard-click-controller")){
+     event.preventDefault&&event.preventDefault();
+     event.stopImmediatePropagation&&event.stopImmediatePropagation();
+    }
+    return;
+   }
+   if(event.key==="Enter"||event.key===" "||event.key==="NumpadEnter"){
+    if(enabled){
+     event.preventDefault&&event.preventDefault();
+     event.stopImmediatePropagation&&event.stopImmediatePropagation();
+     clickTarget();
+    }
+   }
   }
   function clickTarget(){
    const target=targetAt();if(!target)return false;
@@ -51,33 +94,42 @@
    if(pad){
     padIndex=pad.index;
     const input=direction(pad);
-    if((input.dx||input.dy)&&time-lastMove>=repeat){
-     x=Math.max(1,Math.min(win.innerWidth-1,x+input.dx*step));
-     y=Math.max(1,Math.min(win.innerHeight-1,y+input.dy*step));
-     updateTarget();lastMove=time;
+    if(gatewayBlockedUntilNeutral){if(!input.dx&&!input.dy){gatewayBlockedUntilNeutral=false;lastMove=time;}}
+    else if((input.dx||input.dy)&&time-lastMove>=repeat){
+     if(gatewayNavigation)emit("nu:gateway-direction",{x:input.dx,y:input.dy});
+     else movePointer(input.dx,input.dy,"gamepad");
+     lastMove=time;
     }
     if(!primed){confirmDown=input.confirm;cancelDown=input.cancel;primed=true;}
     else{
-     if(input.confirm&&!confirmDown)clickTarget();
-     if(input.cancel&&!cancelDown)doc.dispatchEvent(new win.KeyboardEvent("keydown",{key:"Escape",bubbles:true,cancelable:true}));
+     if(input.confirm&&!confirmDown){if(gatewayNavigation)emit("nu:gateway-confirm",{});else clickTarget();}
+     if(input.cancel&&!cancelDown){if(gatewayNavigation)emit("nu:gateway-cancel",{});else doc.dispatchEvent(new win.KeyboardEvent("keydown",{key:"Escape",bubbles:true,cancelable:true}));}
      confirmDown=input.confirm;cancelDown=input.cancel;
     }
    }else{padIndex=null;confirmDown=false;cancelDown=false;primed=false;}
    if(enabled)frame=win.requestAnimationFrame(tick);
   }
-  function start(){
-   if(enabled)return;ensureCursor();if(!cursor)return;
+  function hasConnectedGamepad(){return !!(win.navigator&&win.navigator.getGamepads&&Array.from(win.navigator.getGamepads()||[]).some(p=>p&&p.connected!==false));}
+  function start(force){
+   if(enabled||(!force&&!hasConnectedGamepad()))return;ensureCursor();if(!cursor)return;
    enabled=true;cursor.style.display="block";updateTarget();
    if(!frame)frame=win.requestAnimationFrame(tick);
   }
   function stop(){
-   enabled=false;if(frame)win.cancelAnimationFrame(frame);frame=0;confirmDown=false;cancelDown=false;primed=false;
+   enabled=false;if(frame)win.cancelAnimationFrame(frame);frame=0;confirmDown=false;cancelDown=false;primed=false;gatewayNavigation=false;gatewayBlockedUntilNeutral=false;
    if(lastTarget&&lastTarget.classList)lastTarget.classList.remove("nu-simulated-mouse-target");
    lastTarget=null;if(cursor)cursor.style.display="none";
   }
-  function onConnected(event){if(enabled&&event&&event.gamepad)padIndex=event.gamepad.index;}
+  function onConnected(event){if(event&&event.gamepad){padIndex=event.gamepad.index;if(doc&&doc.body&&doc.body.classList.contains("nu-gateway-open")){gatewayNavigation=true;const current=direction(event.gamepad);gatewayBlockedUntilNeutral=!!(current.dx||current.dy);}start();}}
+  function onDisconnected(){if(!hasConnectedGamepad())stop();}
   win.addEventListener&&win.addEventListener("gamepadconnected",onConnected);
-  return {start,stop,setEnabled(value){value?start():stop();},isEnabled(){return enabled;},getState(){return {enabled,x,y,padIndex,mode:"simulated-mouse"}},destroy(){stop();win.removeEventListener&&win.removeEventListener("gamepadconnected",onConnected);cursor&&cursor.remove();style&&style.remove();cursor=null;style=null;}};
+  win.addEventListener&&win.addEventListener("keydown",onKeyboardInput,true);
+  win.addEventListener&&win.addEventListener("nu:simulated-pointer-direction",onPointerDirection);
+  win.addEventListener&&win.addEventListener("nu:controller-direction",onPointerDirection);
+  win.addEventListener&&win.addEventListener("nu:gateway-direction",onPointerDirection);
+  win.addEventListener&&win.addEventListener("gamepaddisconnected",onDisconnected);
+  if(hasConnectedGamepad())start();
+  return {start,stop,startClickController(){start(true);},move(dx,dy){return movePointer(dx,dy,"click-controller");},setEnabled(value){value?start():stop();},setGatewayNavigation(value){gatewayNavigation=!!value;lastMove=0;const pads=win.navigator&&win.navigator.getGamepads?Array.from(win.navigator.getGamepads()||[]):[];const pad=pads.find(p=>p&&p.connected!==false);const current=pad?direction(pad):{dx:0,dy:0};gatewayBlockedUntilNeutral=!!(current.dx||current.dy);},isEnabled(){return enabled;},getState(){return {enabled,x,y,padIndex,mode:"simulated-mouse",gatewayNavigation};},destroy(){stop();win.removeEventListener&&win.removeEventListener("gamepadconnected",onConnected);win.removeEventListener&&win.removeEventListener("keydown",onKeyboardInput,true);win.removeEventListener&&win.removeEventListener("gamepaddisconnected",onDisconnected);win.removeEventListener&&win.removeEventListener("nu:simulated-pointer-direction",onPointerDirection);win.removeEventListener&&win.removeEventListener("nu:controller-direction",onPointerDirection);win.removeEventListener&&win.removeEventListener("nu:gateway-direction",onPointerDirection);cursor&&cursor.remove();style&&style.remove();cursor=null;style=null;}};
  }
- root.NUControllerPointer=Object.assign(create(),{create,mode:"simulated-mouse",capabilities:{directionalPointer:true,separateConfirm:true,physicalMouseDirect:true,touchDirect:true}});
+ root.NUControllerPointer=Object.assign(create(),{create,mode:"simulated-mouse",capabilities:{directionalPointer:true,separateConfirm:true,gatewayDirectionalList:true,physicalMouseDirect:true,touchDirect:true}});
 })(typeof window!=="undefined"?window:globalThis);
