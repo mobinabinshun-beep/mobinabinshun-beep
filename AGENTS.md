@@ -26,18 +26,13 @@
 5. Create and verify a recoverable checkpoint after machine checks pass.
 6. For authorized demo-eligible work, deploy to the public demo without redundant pre-approval; verify the actual live build where evidence is available.
 7. Report exact implementation, tests, checkpoint, deployment state, limitations and a concise human QA checklist.
-8. Human acceptance is separate from machine approval. Lock only after explicit owner acceptance.
+8. Human acceptance is separate from machine approval. After required automated checks pass, freeze the exact SHA as MACHINE-LOCKED / HUMAN-QA-PENDING. Only explicit owner acceptance creates a separate SCOPE-LOCKED state.
 
 ## Gateway and controller invariants
-- Gateway is the exclusive surface for actions it provides; remove redundant duplicate controls only where Gateway is mounted.
-- Gateway is the sole gameplay-pause authority; no independent/manual or player-overlay pause owner may pause or resume gameplay.
-- Opening Gateway freezes active gameplay and background rendering before its options become actionable. Closing Gateway does not resume gameplay; keep the round and ambient renderers frozen until the first real gameplay-space input (mouse/touch press, gameplay keyboard input, or controller direction/confirm with a fresh input transition after return; a controller input held through Gateway closure must not release the hold).
-- Reload is not a Gateway action and never runs automatically on page entry unless a future explicit module-specific owner directive says otherwise.
-- Gateway Exit = Back = Home = the main/home page; do not silently restore an unrelated nested-history destination.
-- Direct physical mouse and direct touch remain direct input. Stepwise cursor movement through controller buttons is simulated mouse, irrespective of cursor artwork.
-- Simulated mouse: four directions move a virtual pointer; Enter/controller-confirm performs a distinct click. Movement only highlights/selects; it must not activate.
-- Implement controller input as a shared launcher-core adapter. Gateway and future modules consume the adapter; do not fork controller-specific logic per page.
-- Keep adapters extensible for future controller types through stable interfaces and documented capability references.
+
+- The sole normative behavior and acceptance specification is the [Unified Gateway owner contract in the archive](https://github.com/mobinabinshun-beep/Repository/blob/docs/gateway-human-approval-lock-2026-11-18/Operations/2026-11-18/GATEWAY-MACHINE-APPROVAL-LOCK-AND-HUMAN-QA-fa.md). Read it before any Gateway/controller work.
+- Do not duplicate or independently reinterpret Gateway behavior in this file or other product docs. Product files are pointers or implementation/test evidence only.
+- Preserve exact-SHA machine locks. No automated agent/workflow may modify a machine-passed candidate awaiting human QA; corrections require human feedback, explicit owner instruction and a successor branch.
 
 ## Documentation
 - Keep one canonical implementation contract per subject; link secondary notes rather than creating competing rules.
