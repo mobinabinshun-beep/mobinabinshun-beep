@@ -110,7 +110,7 @@ The first public native demo may start with a new local profile if migration is 
 
 ## 11. NUDb/1 portable user-data bundle primitive
 
-The portable core now defines a bounded NUDb/1 (magic `NUDB`) container for user-owned data only. It accepts five classes: Save, Wallet, Profile, User Asset and Settings. Each entry has a stable ASCII ID, explicit class, length and CRC32. The complete bundle also carries a product tag, format version, entry count, payload length and payload CRC. Unknown classes, duplicate class/ID pairs, unsafe IDs, malformed sizes, unsupported versions and CRC mismatch are rejected before entry pointers are exposed.
+The portable core now defines a bounded NUDb/1 (magic `NUDB`) container for user-owned data only. It accepts five classes: Save, Wallet, Profile, User Asset and Settings. Each entry has a stable ASCII ID, explicit class, length and CRC32. The complete bundle also carries a product tag, format version, entry count, payload length and payload CRC. Unknown classes, duplicate stable IDs across the entire bundle, unsafe IDs, malformed sizes, unsupported versions and CRC mismatch are rejected before entry pointers are exposed.
 
 The format does not accept executable modules, installer archives or cache entries. CRC32 detects accidental corruption; it is not a cryptographic signature or tamper-proof wallet seal.
 
