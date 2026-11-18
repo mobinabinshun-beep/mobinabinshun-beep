@@ -20,3 +20,16 @@ jobs:
         run: cmake --build build --parallel
       - name: Run tests
         run: ctest --test-dir build --output-on-failure
+  win32-xp-api-cross-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install 32-bit MinGW cross compiler
+        run: sudo apt-get update && sudo apt-get install -y gcc-mingw-w64-i686
+      - name: Compile Win32 host with XP API target and PE subsystem 5.01
+        run: >
+          i686-w64-mingw32-gcc -std=c90 -Wall -Wextra -Werror -pedantic -Os
+          -DWINVER=0x0501 -D_WIN32_WINNT=0x0501
+          native/nu_runtime.c native/win32_host.c
+          -o nu-launcher-xp-candidate.exe -mwindows -lcomdlg32
+          -Wl,--major-subsystem-version,5 -Wl,--minor-subsystem-version,1
