@@ -117,3 +117,10 @@ The format does not accept executable modules, installer archives or cache entri
 The C90 build/parse primitive and unit tests are implemented. Host-level file writing, atomic sibling-file replacement, export UI, import preview, merge/replace decisions, migration from browser localStorage and post-import recovery are still not wired. Do not yet advertise a working Save/Wallet backup button.
 
 Each NUDb/1 entry now carries its own schema major/minor in addition to the class and stable ID. Save and Wallet schemas can therefore migrate independently inside the same portable identity-marked bundle.
+
+
+## 12. NUJR/1 journal serialization
+
+The install journal now has a fixed 24-byte NUJR/1 encoding with transaction ID, total/completed item counts, state, version and CRC32. The parser rejects invalid state transitions' stored representations, invalid counts, incomplete VERIFIED/ACTIVATED records and corruption. Portable round-trip/capacity/corruption tests are present.
+
+This does not yet make the journal durable: the Win32 Package Manager must write it to a temporary file, flush it, atomically replace the prior journal, recover it on startup and reconcile/rollback the staged file inventory. No install transaction is considered complete until those file operations are tested.
