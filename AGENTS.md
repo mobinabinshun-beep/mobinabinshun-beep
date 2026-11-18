@@ -21,7 +21,7 @@
 ## Fast execution path
 1. Identify the exact user intent, relevant owner decisions, locked areas, dependencies and acceptance criteria.
 2. Inspect only the directly affected code/docs/tests plus dependencies demonstrated by that inspection.
-3. Implement the smallest isolated change on a candidate branch; preserve unrelated features.
+3. Use the existing authorized working line by default; before the first write, record the baseline and create/reuse a verified PRE-CHANGE recovery ref/tag for code/data/schema/shared-contract/structural changes. Create a candidate branch only when isolation is materially required. Implement the smallest scoped change and preserve unrelated features.
 4. Run focused tests first, then relevant regression/build checks. Automate repetitive checks where practical.
 5. Create and verify a recoverable checkpoint after machine checks pass.
 6. For authorized demo-eligible work, deploy to the public demo without redundant pre-approval; verify the actual live build where evidence is available.
@@ -45,10 +45,10 @@
 ## Machine approval lock and human QA queue
 - Every scoped candidate that passes its declared automated checks is frozen at its exact commit and recorded as `MACHINE-APPROVED-LOCKED` + `HUMAN-QA-PENDING`.
 - Do not amend, rebase, regenerate, or otherwise write to that frozen candidate. Do not allow unrelated automated work to modify its locked files/scope while it is queued for human review.
-- Human QA findings or a new direct owner instruction are the only normal reasons to reopen the affected scope. A correction uses a new successor branch/commit, preserves the prior frozen candidate as evidence, reruns tests, and creates a new machine-approval lock before returning to human QA.
+- Human QA findings or a new direct owner instruction are the only normal reasons to reopen the affected scope. Preserve the prior frozen candidate as evidence. A correction uses a new successor commit on the authorized working line; create a separate branch only when isolation is materially required by a protected lock, parallel release, destructive risk or security boundary. Rerun tests and create a new exact machine-approval checkpoint before returning to human QA.
 - Machine approval is not human approval, owner acceptance, production promotion, or proof of live deployment.
 - The repository workflow lock is an agent/process rule unless GitHub branch protection is separately configured. Never claim technical branch protection unless verified.
-- Canonical workflow record: https://github.com/mobinabinshun-beep/Repository/blob/main/Operations/2026-11-18/MACHINE-APPROVAL-LOCK-AND-HUMAN-QA-QUEUE-fa.md.
+- Canonical workflow record: https://github.com/mobinabinshun-beep/Repository/blob/main/Operations/2026-11-18/NU-UNIFIED-OPERATING-PROTOCOL-fa.md (section 9: Machine approval lock and human QA queue).
 
 ## Documentation
 - Keep one canonical implementation contract per subject; link secondary notes rather than creating competing rules.
