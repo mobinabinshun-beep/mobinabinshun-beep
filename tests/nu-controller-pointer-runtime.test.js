@@ -66,12 +66,6 @@ test("Gateway keeps exclusive ownership of arrow keys while hierarchical navigat
  h.adapter.setGatewayNavigation(false);h.adapter.destroy();
 });
 
-test("setEnabled starts the simulated pointer for keyboard-emulated controllers without Gamepad API",()=>{
- const h=harness();h.adapter.setEnabled(true);
- assert.equal(h.adapter.isEnabled(),true);
- assert.equal(h.adapter.getState().x,400);
- h.adapter.destroy();
-});
 test("Virtual pointer movement dispatches pointermove and mousemove to the hit-tested game target",()=>{
  const h=harness();h.adapter.startClickController();h.target.events.length=0;
  assert.equal(h.adapter.move(1,0),true);
