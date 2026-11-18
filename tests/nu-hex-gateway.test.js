@@ -27,19 +27,19 @@ test("Gateway exposes exactly Back, Menu and Profile as one-click actions",()=>{
  assert.doesNotMatch(js,/clickArmed|hoverTimer|two-step|confirm\(item\)/);
 });
 
-test("Opening Gateway freezes the game and all ambient renderers until a decision",()=>{
+test("Opening Gateway freezes before exposing options and owns controller navigation",()=>{
  assert.match(js,/nu:gateway-open/);assert.match(js,/nu:gateway-close/);
  assert.match(games,/state\.engine\[shouldFreeze\?"pause":"resume"\]/);
  assert.match(games,/setFrozen\(shouldFreeze\)/);
- assert.match(games,/setEnabled\(!shouldFreeze/);
  assert.match(games,/NUBackgroundEngine\.setFrozen/);
  assert.match(games,/NUDynamicLayers\.setFrozen/);
  assert.match(games,/NUPixelWorld\.setEnabled/);
  assert.match(graphics,/nu-gateway-open/);
  assert.match(graphics,/NUDynamicLayers&&g\.NUDynamicLayers\.setFrozen/);
- assert.match(js,/setOpen\(false,false\)/);
- assert.match(js,/nu:menu-dismissed/);
- assert.match(js,/nu:player-overlay-close/);
+ assert.match(js,/setGatewayNavigation\(true\)/);
+ assert.match(js,/setGatewayNavigation\(false\)/);
+ assert.match(js,/setOpen\(false\)/);
+ assert.ok(js.indexOf('window.dispatchEvent(new Event("nu:gateway-open"))')<js.indexOf('root.classList.add("is-open")'));
 });
 
 test("Menu is a centered, concise module directory with player modules before games",()=>{
@@ -85,14 +85,16 @@ test("Gateway blur and animation pause stay limited to decorative background lay
  assert.doesNotMatch(css,/body\.nu-gateway-open \.world \*/);
 });
 
-test("Gateway keeps responsive geometry, touch, keyboard and reduced-motion support",()=>{
+test("Gateway supports direct mouse/touch dwell and slower simulated-pointer entry",()=>{
  assert.match(css,/position:fixed/);assert.match(css,/prefers-reduced-motion/);
  assert.match(js,/function layoutItems\(\)/);
- assert.match(js,/window\.addEventListener\("resize",layoutItems/);
- assert.match(js,/window\.addEventListener\("orientationchange",layoutItems/);
+ assert.match(js,/scheduleOpen\("mouse",500\)/);
+ assert.match(js,/scheduleOpen\("touch",500\)/);
+ assert.match(js,/scheduleOpen\("simulated",1000\)/);
+ assert.match(js,/nu:simulated-pointer-move/);
  assert.match(js,/pointerType!=="touch"/);
  assert.match(js,/event\.key==="Escape"/);
- assert.match(js,/const tolerance=10/);
+ assert.match(css,/flex-direction:column/);
 });
 
 test("Gateway replaces the duplicate gameplay pause control and hides legacy navigation in-game",()=>{
@@ -106,8 +108,12 @@ test("Gateway replaces the duplicate gameplay pause control and hides legacy nav
 
 test("No unsupported shield meter is introduced",()=>assert.doesNotMatch(html,/id="nbi-shield-bar"/));
 
-test("Gateway orbit exit bounds include the full vertical fan",()=>{
- assert.match(js,/event\.clientY>=rect\.top-orbit-tolerance&&event\.clientY<=rect\.bottom\+orbit\+tolerance/);
+test("The extra downward step after the final option exits and requires pointer leave/re-entry",()=>{
+ assert.match(js,/function moveControllerSelection\(direction\)/);
+ assert.match(js,/direction>0&&current===items\.length-1/);
+ assert.match(js,/requiresExit=wasInside/);
+ assert.match(js,/if\(requiresExit&&!insideTrigger\(/);
+ assert.match(js,/scheduleOpen\("simulated",1000\)/);
 });
 
 test("A hidden tab cannot restart frozen game or ambient renderers",()=>{
