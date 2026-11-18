@@ -18,6 +18,6 @@ test("Casino outcome and result transitions use Gateway-aware timers",()=>{
  assert.match(run,/scheduleGatewayTask\(\(\)=>\{/);
  assert.match(run,/\},170\)/);
  assert.match(run,/\},360\)/);
- assert.match(run,/\},420\)/);
+ assert.match(casino,/scheduleGatewayTask\(\(\)=>card\.classList\.remove\("is-result"\),420\)/);
  assert.doesNotMatch(run,/window\.setTimeout/);
 });
