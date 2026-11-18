@@ -4,9 +4,9 @@ const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const gateway=fs.readFileSync("nu-hex-gateway.js","utf8");
 
-test("Mouse entering the Gateway trigger opens it without requiring a click",()=>{
+test("Mouse entering the Gateway trigger schedules the 500ms entry delay",()=>{
   assert.match(gateway,/trigger\.addEventListener\("pointerenter",event=>\{/);
-  assert.match(gateway,/event\.pointerType==="mouse"&&!open\)setOpen\(true\)/);
+  assert.match(gateway,/event\.pointerType==="mouse"&&!open\)scheduleEntry\(500,event\.pointerId\)/);
 });
 
 test("Touching the Gateway trigger opens it and suppresses the synthetic click toggle",()=>{
@@ -18,13 +18,13 @@ test("Touching the Gateway trigger opens it and suppresses the synthetic click t
 test("Mouse hover activates a Gateway option directly and leaving cancels pending activation",()=>{
   assert.match(gateway,/item\.addEventListener\("pointerenter",event=>\{\s*if\(event\.pointerType==="mouse"&&open\)activate\(item\)/);
   assert.match(gateway,/item\.addEventListener\("pointerleave",event=>\{/);
-  assert.match(gateway,/pendingItem===item/);
+  assert.match(gateway,/item\.classList\.contains\("is-confirming"\)/);
   assert.doesNotMatch(gateway,/pointerenter",event=>\{if\(event\.pointerType==="mouse"&&open\)select\(item\)/);
 });
 
 test("Gamepad keeps explicit selection and confirm, then exits below the final option",()=>{
-  assert.match(gateway,/function moveControllerSelection\(direction\)/);
-  assert.match(gateway,/direction>0&&current===items\.length-1/);
+  assert.match(gateway,/function moveControllerSelection\(direction,exitAtEnd=false\)/);
+  assert.match(gateway,/exitAtEnd&&direction>0&&current===items\.length-1/);
   assert.match(gateway,/moveControllerSelection\(direction\)/);
   assert.match(gateway,/if\(confirm&&!controllerConfirmDown\)activate\(selected\|\|items\[0\]\)/);
 });
