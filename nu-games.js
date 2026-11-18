@@ -46,9 +46,11 @@ function watchFreshGamepadInput(){
    else if(gatewayResumeArmed){
     const down=!!(buttons[13]&&buttons[13].pressed)||(Number(axes[1])>.55);
     const up=!!(buttons[12]&&buttons[12].pressed)||(Number(axes[1])<-.55);
+    const left=!!(buttons[14]&&buttons[14].pressed)||(Number(axes[0])<-.55);
+    const right=!!(buttons[15]&&buttons[15].pressed)||(Number(axes[0])>.55);
     const confirm=!!(buttons[0]&&buttons[0].pressed);
     if(resumeAfterGatewayInteraction()){
-     if(confirm)activateKeyboardTarget();else if(down||up)moveKeyboardTarget(down?1:-1);
+     if(confirm)activateKeyboardTarget();else if(down||up||left||right)moveKeyboardTarget(down||right?1:-1);
      return;
     }
    }
@@ -73,9 +75,10 @@ window.addEventListener("nu:gateway-open",handleGatewayOpen);
 document.addEventListener("keydown",event=>{
  if(!gatewayAwaitingInteraction||event.repeat||event.altKey||event.ctrlKey||event.metaKey)return;
  if(!["ArrowDown","ArrowUp","ArrowLeft","ArrowRight","Enter"," "].includes(event.key))return;
- if(event.target&&event.target.closest("button,a,input,textarea,select,[role=button]"))return;
+ if(event.target&&event.target.closest("button,a,input,textarea,select,[role=button]")&&!event.target.closest(".nu-gateway-trigger"))return;
  event.preventDefault();
  if(resumeAfterGatewayInteraction()){
+  event.stopImmediatePropagation();
   if(event.key==="Enter"||event.key===" ")activateKeyboardTarget();
   else moveKeyboardTarget(event.key==="ArrowDown"||event.key==="ArrowRight"?1:-1);
   canvas.focus({preventScroll:true});
