@@ -106,7 +106,8 @@ Implemented candidate:
 Not yet implemented:
 - manifest dependency-field parsing and Package Manager integration;
 - SHA-256 publisher digest/signature verification and managed trust roots;
-- atomic install/update/rollback, three-stage uninstall UI and crash-recovery journal;\n- previous-install discovery, complete-pack upgrade reconciliation and portable identity-marked data export/import;
+- atomic install/update/rollback, three-stage uninstall UI and crash-recovery journal;
+- previous-install discovery, complete-pack upgrade reconciliation and portable identity-marked data export/import;
 - native game ports and game-specific translators;
 - GPU renderer and platform graphics adapters;
 - complete reservation-ledger integration across all N.U allocations and measured, OS-specific resource telemetry/enforcement;
@@ -133,13 +134,14 @@ A PE subsystem value of 5.01 or a successful cross-build is not proof of Windows
 
 ## 11. Engineering sequence
 
-1. Implement and test a real SHA-256 + asymmetric-signature provider, pinned trust roots and key lifecycle; then add dependency resolution and a transactional Package Manager.
-2. Integrate cache staging, translator and scheduler; keep one selected module in RAM at a time.
-3. Package builder and deterministic test fixtures.
-4. Native Bubble Hunt port and end-to-end proof.
-5. Mana Collector and Chaos Attack ports, preserving wallet/save semantics.
-6. Native renderer and measured resource adapters.
-7. XP-compatible toolchain/import audit, signed setup, repair/uninstall, and actual XP/low-end hardware validation.
+1. Build the transactional Package Manager: parse manifest dependencies, validate package inventories, discover compatible existing hosts, reconcile complete-pack component manifests, stage changes and journal atomic activation/rollback.
+2. Complete three-stage install/uninstall UI, safe inventory-constrained deletion, separate installer archive management, and portable identity-marked save/wallet/profile export/import.
+3. Integrate RAM reservations into every N.U allocation/cache path; add on-demand asset loading, release-on-exit and measured low-end resource telemetry.
+4. Complete native Runtime Host input and low-cost renderer; define the stable module presentation/input API.
+5. Port Bubble Hunt as the first complete Generation-1 module and prove install → launch → play → save → exit → uninstall → reinstall.
+6. Port Mana Collector and Chaos Attack as independent add-on modules using the same host contracts.
+7. Implement production SHA-256/signature verification and managed trust roots, then signed complete-pack installer and repair flow.
+8. Complete XP toolchain/import audit, actual XP and low-end hardware testing, resource measurements and human acceptance.
 
 ## 12. Release policy
 
