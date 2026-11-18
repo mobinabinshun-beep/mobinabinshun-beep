@@ -18,8 +18,10 @@ jobs:
         run: cmake -S native -B build -DCMAKE_C_FLAGS="-Wall -Wextra -Werror -pedantic"
       - name: Build
         run: cmake --build build --parallel
-      - name: Run tests
+      - name: Run portable C90 tests
         run: ctest --test-dir build --output-on-failure
+      - name: Validate Generation 1 pack manifest
+        run: python3 native/test_gen1_pack_manifest.py
   win32-xp-api-cross-build:
     runs-on: ubuntu-latest
     steps:
