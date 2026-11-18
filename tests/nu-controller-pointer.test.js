@@ -39,6 +39,13 @@ test("D-pad and stick directions move the virtual pointer without activating tar
  assert.doesNotMatch(pointer,/if\(\(input\.dx\|\|input\.dy\)[^}]*clickTarget/);
 });
 
+test("Keyboard-emulated click-controller arrows are captured by the shared pointer adapter outside Gateway",()=>{
+ assert.match(pointer,/function onKeyboardInput\(event\)/);
+ assert.match(pointer,/keyboard-click-controller/);
+ assert.match(pointer,/addEventListener\("keydown",onKeyboardInput,true\)/);
+ assert.match(pointer,/if\(event\.key==="Enter"\|\|event\.key===" "\|\|event\.key==="NumpadEnter"\)/);
+ assert.match(pointer,/gatewayNavigation\)return/);
+});
 test("Click-controller directions have an explicit path to move the simulated pointer",()=>{
  assert.match(pointer,/function movePointer\(dx,dy,source\)/);
  assert.match(pointer,/nu:simulated-pointer-direction/);
