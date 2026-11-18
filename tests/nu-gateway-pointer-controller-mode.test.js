@@ -25,6 +25,6 @@ test("Mouse hover activates a Gateway option directly and leaving cancels pendin
 test("Gamepad keeps explicit selection and confirm, then exits below the final option",()=>{
   assert.match(gateway,/function moveControllerSelection\(direction,exitAtEnd=false\)/);
   assert.match(gateway,/exitAtEnd&&direction>0&&current===items\.length-1/);
-  assert.match(gateway,/moveControllerSelection\(direction\)/);
+  assert.match(gateway,/moveControllerSelection\(direction,down&&!up\)/);
   assert.match(gateway,/if\(confirm&&!controllerConfirmDown\)activate\(selected\|\|items\[0\]\)/);
 });
