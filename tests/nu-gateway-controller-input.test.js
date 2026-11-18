@@ -80,23 +80,25 @@ test("Shared controller adapter maps D-pad/stick to virtual pointer and A/B to c
 
 test("Simulated mouse uses the Gateway list, one extra Down exits, and pointer must leave before re-entry",()=>{
  const pointer=fs.readFileSync("nu-controller-pointer.js","utf8");
- assert.match(pointer,/setGatewayNavigation\\(value\\)/);
+ assert.match(pointer,/setGatewayNavigation\(value\)/);
  assert.match(pointer,/nu:gateway-direction/);
  assert.match(pointer,/nu:gateway-confirm/);
  assert.match(pointer,/nu:simulated-pointer-target/);
- assert.match(gateway,/scheduleOpen\\(1000,"simulated-pointer"\\)/);
- assert.match(gateway,/scheduleOpen\\(500,"physical-mouse"\\)/);
- assert.match(gateway,/scheduleOpen\\(500,"touch"\\)/);
+ assert.match(pointer,/function hasConnectedGamepad\(\)/);
+ assert.match(pointer,/gamepaddisconnected/);
+ assert.match(gateway,/scheduleOpen\(1000,"simulated-pointer"\)/);
+ assert.match(gateway,/scheduleOpen\(500,"physical-mouse"\)/);
+ assert.match(gateway,/scheduleOpen\(500,"touch"\)/);
  assert.match(gateway,/requiresSimulatedPointerExit=true/);
  assert.match(gateway,/current>=items.length-1/);
- assert.match(gateway,/setOpen\\(false,true,"simulated-pointer"\\)/);
- assert.match(gateway,/direction\\.y>0\\)moveGatewaySelection\\(1\\)/);
- assert.match(gateway,/direction\\.y<0\\)moveGatewaySelection\\(-1\\)/);
+ assert.match(gateway,/setOpen\(false,true,"simulated-pointer"\)/);
+ assert.match(gateway,/direction\.y>0\)moveGatewaySelection\(1\)/);
+ assert.match(gateway,/direction\.y<0\)moveGatewaySelection\(-1\)/);
 });
 test("Gateway options are frozen before they become actionable and remain controller-selectable",()=>{
  assert.ok(gateway.indexOf('new Event("nu:gateway-open")')<gateway.indexOf('root.classList.toggle("is-open",open)'));
- assert.match(gateway,/setGatewayNavigation\\(true\\)/);
- assert.match(gateway,/setGatewayNavigation\\(false\\)/);
+ assert.match(gateway,/setGatewayNavigation\(true\)/);
+ assert.match(gateway,/setGatewayNavigation\(false\)/);
 });
 test("Keyboard and gamepad share game target selection and activation",()=>{
  assert.match(games,/function moveKeyboardTarget\(direction\)/);
