@@ -56,7 +56,7 @@ If the demo has a critical regression, stop further rollout, restore the verifie
 A change is not closed until the canonical archive record and relevant repository index are updated. Do not store credentials, private keys, tokens or unnecessary personal information in project records.
 
 
-## Narrow exception — Gateway pause-control clarification (2026-11-16)
+## Superseded historical exception — Gateway pause-control clarification (2026-11-16)
 The owner has explicitly confirmed that Gateway exists to serve as the game's pause/resume control. Opening Gateway pauses the active round; closing it releases only the pause owned by Gateway; any manual pause that predated Gateway must remain in force. A separate duplicate Pause/Resume control is not a required parallel path.
 
 For this specific Gateway contract clarification and a narrowly scoped correction directly required to satisfy it, **automated validation is the acceptance gate; human approval is not required to close this item**. The contributor must inspect dependencies, implement only the scoped correction if code is demonstrably needed, debug, run focused and relevant regression tests, and record exact machine evidence. If code changes, the normal verified-backup and public-demo release requirements still apply.
@@ -64,7 +64,21 @@ For this specific Gateway contract clarification and a narrowly scoped correctio
 This exception does not grant approval for unrelated work, does not unlock protected areas, and does not create HUMAN-QA-PASSED, OWNER-APPROVED or SCOPE-LOCKED status. Human QA remains distinct and may still be performed, but it is not a prerequisite for closing this narrow protocol item. See the [canonical owner decision](https://github.com/mobinabinshun-beep/Repository/blob/main/Operations/2026-11-16/GATEWAY-IS-THE-PAUSE-CONTROL-fa.md).
 
 
-## Owner clarification — Gateway-exclusive controls (2026-11-16)
+## Superseded historical clarification — Gateway-exclusive controls (2026-11-16)
 The owner confirms that Gateway is the sole control surface for any action it already provides in a space or module where Gateway is mounted. In gameplay, opening Gateway pauses the round and closing it resumes only a pause that Gateway itself created; a separate Pause/Resume button must not be shown or required. In Bag, Inventory and Wallet, Gateway owns the corresponding back-navigation action; duplicate page-level back buttons are suppressed while Gateway is active. Keep distinct navigation destinations and controls that Gateway does not provide.
 
 For this narrowly scoped Gateway-exclusive cleanup, the acceptance gate is automated debugging and regression testing. No human pre-approval is required before demo deployment. Follow code → tests/debug → verified backup → public demo → machine report. Do not mark HUMAN-QA-PASSED, OWNER-APPROVED or SCOPE-LOCKED without a separate explicit owner acceptance. Do not modify the locked LV/XP/Mana HUD or unrelated navigation/data behavior.
+
+
+## Binding owner update — Gateway unified contract and exact-SHA machine lock (2026-11-18)
+
+This section supersedes the two historical Gateway-only machine-acceptance exceptions above. Their text is retained for audit history, but they no longer permit a Gateway candidate to be closed solely by automated validation or modified after machine approval.
+
+- The sole normative behavior specification is the [Unified Gateway owner contract](https://github.com/mobinabinshun-beep/Repository/blob/docs/gateway-human-approval-lock-2026-11-18/Operations/2026-11-18/GATEWAY-MACHINE-APPROVAL-LOCK-AND-HUMAN-QA-fa.md).
+- Every candidate that passes the required automated checks on an exact SHA is recorded as `AUTOMATED-QA-PASSED · HUMAN-QA-PENDING · MACHINE-LOCKED`.
+- No automated agent, AI, workflow, bot or automated execution process may modify that candidate SHA/branch while it awaits human QA. This includes formatting, cleanup, rebase, cherry-pick and dependency updates.
+- A machine lock is process-level unless GitHub Branch Protection/Ruleset is separately enabled and verified. It is not owner acceptance or a scope lock.
+- Corrections require both human test feedback and an explicit owner instruction. Preserve the locked candidate and make the scoped correction on a successor branch from its exact SHA.
+- Re-run required machine checks and backup verification for the successor, then hand that exact SHA to human QA and lock it again.
+- The public demo remains the human-test surface where deployment is authorized; deployment does not unlock or mutate the machine-locked candidate and does not imply human acceptance.
+
