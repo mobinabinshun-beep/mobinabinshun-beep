@@ -5,7 +5,7 @@ static int nu_component_id_valid(const char *s) {
  if (!s || !s[0]) return 0;
  for (i=0u; i<NU_INSTALL_ID_SIZE; ++i) {
   char ch=s[i];
-  if (ch=='\\0') return i>0u;
+  if (ch=='\0') return i>0u;
   if (!((ch>='a'&&ch<='z')||(ch>='0'&&ch<='9')||ch=='-'||ch=='.'))
    return 0;
  }
@@ -16,7 +16,7 @@ static int nu_version_valid(const char *s) {
  if (!s || !s[0]) return 0;
  for (i=0u; i<NU_INSTALL_VERSION_SIZE; ++i) {
   char ch=s[i];
-  if (ch=='\\0') return digit;
+  if (ch=='\0') return digit;
   if (ch>='0'&&ch<='9') digit=1;
   else if (ch=='.' && digit) digit=0;
   else return 0;
