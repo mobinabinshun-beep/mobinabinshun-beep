@@ -7,7 +7,7 @@ const html=read("index.html"),casino=read("casino.html"),launcher=read("launcher
 const js=read("nu-hex-gateway.js"),css=read("nu-hex-gateway.css"),worldCss=read("nu-world.css");
 const games=read("nu-games.js"),playerUI=read("nu-player-ui.js"),graphics=read("nu-graphics-runtime.js"),exchange=read("nu-exchange.js"),dynamic=read("nu-dynamic-layers.js");
 
-test("Gateway controller mounts on the main game and launcher surfaces",()=>{
+test("Gateway and simulated pointer mount on every page containing Gateway",()=>{
  assert.match(html,/id="nu-hex-gateway"/);
  assert.match(js,/if\(!root\|\|!scrim\)return/);
  assert.match(js,/classList\.toggle\("nu-game-active",active\)/);
@@ -15,6 +15,14 @@ test("Gateway controller mounts on the main game and launcher surfaces",()=>{
  assert.match(css,/body\.nu-game-active #menu-open/);
  assert.match(css,/body\.nu-game-active #back-home/);
  for(const page of [casino,launcher,studio])assert.match(page,/id="nu-hex-gateway"/);
+ for(const page of [html,casino,launcher,studio]){
+  const pointer=page.indexOf("nu-controller-pointer.js"),gateway=page.indexOf("nu-hex-gateway.js");
+  assert.ok(pointer>=0&&gateway>pointer,"controller pointer must load before Gateway on every mounted page");
+ }
+ assert.match(js,/const standalone=!gameView&&utilityViews.length===0/);
+ assert.match(js,/const utility=standalone\|\|utilityViews\.some/);
+ assert.match(css,/body\.nu-gateway-utility-active #nu-hex-gateway/);
+ assert.match(css,/body\.nu-gateway-utility-active \.casino-top \.back-link/);
  assert.match(launcher,/<body class="nu-launcher-page">/);
  assert.match(css,/body\.nu-launcher-page #nu-hex-gateway/);
 });
