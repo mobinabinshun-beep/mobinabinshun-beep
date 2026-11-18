@@ -138,3 +138,8 @@ This ledger enforces the limit only for allocations that N.U components explicit
 The portable C90 core includes a bounded Generation-1 dependency-order resolver. It accepts at most 64 module descriptors and a caller-supplied adjacency matrix, validates every node against Generation-1 / ABI-1.0, rejects self-dependencies and malformed matrix entries, and returns a deterministic dependency-first activation order. Cycles and unsupported generations/ABIs fail closed. Unit tests cover a three-module chain, a dependency cycle, and an unsupported generation.
 
 This is the graph-validation primitive only. It does not yet parse dependency declarations from manifests, locate installed packages, download dependencies, verify publisher signatures, or perform transactional installation. It must be integrated into the Package Manager before claiming dependency-aware installation.
+
+
+## User data cleanup planning (development increment)
+
+`nu_cleanup.c/.h` adds a portable C90 inventory planner for uninstall. It separates core, game modules, disposable cache, saves, wallet/profile, user assets, settings and the downloaded installer archive. The planner calculates bytes/counts for deletion and preservation. The downloaded installer archive is always preserved by the ordinary removal mask; deleting it requires a separate explicit argument. This is a planning API only: it does not yet delete files, render the three-stage UI, discover prior installations, create portable identity-marked backups or provide a transaction journal. See `docs/architecture/NU-PACK-1-USER-LIFECYCLE.md` for the required user flow.
