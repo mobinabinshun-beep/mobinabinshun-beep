@@ -100,7 +100,7 @@ Implemented candidate:
 - file-to-cache staging and sequential drain into one selected module buffer;
 - `NU_PackageBuild` and `nu_pack input.bytecode output.nup` development package builder;
 - minimal Win32 GUI host, XP subsystem target metadata, timer-driven VM slices;
-- portable unit tests and Win32 cross-build workflow.
+- portable unit tests and Win32 cross-build workflow;\n- N.U-owned RAM reservation ledger with over-budget rejection and saturating release.
 
 Not yet implemented:
 - production Package Manager and dependency resolver (the structural manifest parser is now present, but it does not resolve dependencies);
@@ -108,7 +108,7 @@ Not yet implemented:
 - atomic install/update/rollback, uninstall UI and crash-recovery journal;
 - native game ports and game-specific translators;
 - GPU renderer and platform graphics adapters;
-- measured, OS-specific resource telemetry/enforcement;
+- complete reservation-ledger integration across all N.U allocations and measured, OS-specific resource telemetry/enforcement;
 - signed installer, repair/uninstall package and real Windows XP execution QA.
 
 ## 10. Automated and human acceptance gates
