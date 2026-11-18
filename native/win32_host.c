@@ -121,7 +121,8 @@ static LRESULT CALLBACK window_proc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp){
   wsprintfA(line,"RAM budget: %lu MiB | Disk staging: 1024 MiB",(unsigned long)(budget.ram_limit_bytes/(1024u*1024u)));TextOutA(dc,24,82,line,lstrlenA(line));
   wsprintfA(line,"CPU cooperative slots: 1 N.U slot per 2 scheduler slots | logical CPUs: %lu",(unsigned long)budget.logical_processors);TextOutA(dc,24,106,line,lstrlenA(line));
   wsprintfA(line,"Render target: %lux%lu at %lu FPS (not a GPU hard cap)",(unsigned long)budget.render_width,(unsigned long)budget.render_height,(unsigned long)budget.target_fps);TextOutA(dc,24,130,line,lstrlenA(line));
-  TextOutA(dc,24,174,status_text,lstrlenA(status_text));
+  wsprintfA(line,"RAM reserved: %lu MiB (host buffers + VM + image estimate)",(unsigned long)(budget.ram_reserved_bytes/(1024u*1024u)));TextOutA(dc,24,154,line,lstrlenA(line));
+  TextOutA(dc,24,186,status_text,lstrlenA(status_text));
   EndPaint(hwnd,&ps);return 0;
  }
  case WM_DESTROY:KillTimer(hwnd,1u);vm_active=0;if(background_bitmap)DeleteObject(background_bitmap);if(background_reserved_bytes)NU_BudgetRelease(&budget,background_reserved_bytes);if(package_data)free(package_data);if(package_reserved_bytes)NU_BudgetRelease(&budget,package_reserved_bytes);if(vm_reserved_bytes)NU_BudgetRelease(&budget,vm_reserved_bytes);PostQuitMessage(0);return 0;
