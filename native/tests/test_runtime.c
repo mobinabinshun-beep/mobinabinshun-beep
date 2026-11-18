@@ -9,6 +9,7 @@
 #include "../nu_dependency.h"
 #include "../nu_cleanup.h"
 #include "../nu_install_plan.h"
+#include "../nu_data_bundle.h"
 int main(void){
  NU_Budget b;uint8_t code[]={1,0,42,0,0,0,1,1,8,0,0,0,3,0,1,0};
  uint8_t pkg[NU_PACKAGE_HEADER_SIZE+sizeof(code)];
@@ -162,6 +163,41 @@ int main(void){
   assert(NU_InstallJournalAdvance(&journal,NU_JOURNAL_ACTIVATED,2u));
   assert(NU_InstallJournalAdvance(&journal,NU_JOURNAL_ROLLBACK_REQUIRED,2u));
   assert(NU_InstallJournalAdvance(&journal,NU_JOURNAL_ROLLED_BACK,2u));
+ }
+
+ {
+  static const uint8_t save_data[]={1u,2u,3u,4u,5u};
+  static const uint8_t wallet_data[]={9u,8u,7u};
+  NU_BundleEntry entries[2];NU_BundleView view;
+  uint8_t bundle[256];size_t bundle_size;
+  memset(entries,0,sizeof(entries));
+  entries[0].data_class=NU_BUNDLE_SAVE;
+  strcpy(entries[0].id,"game.bubble-hunt.save");
+  entries[0].data=save_data;entries[0].size=(uint32_t)sizeof(save_data);
+  entries[1].data_class=NU_BUNDLE_WALLET;
+  strcpy(entries[1].id,"wallet.shared");
+  entries[1].data=wallet_data;entries[1].size=(uint32_t)sizeof(wallet_data);
+  bundle_size=NU_BundleBuild(entries,2u,bundle,sizeof(bundle));
+  assert(bundle_size>NU_BUNDLE_HEADER_SIZE);
+  assert(memcmp(bundle,"NUDB",4u)==0);
+  assert(NU_BundleParse(bundle,bundle_size,&view));
+  assert(view.count==2u);
+  assert(view.entries[0].data_class==NU_BUNDLE_SAVE);
+  assert(strcmp(view.entries[0].id,"game.bubble-hunt.save")==0);
+  assert(view.entries[0].size==sizeof(save_data));
+  assert(memcmp(view.entries[0].data,save_data,sizeof(save_data))==0);
+  assert(view.entries[1].data_class==NU_BUNDLE_WALLET);
+  assert(memcmp(view.entries[1].data,wallet_data,sizeof(wallet_data))==0);
+  bundle[bundle_size-1u]^=1u;
+  assert(!NU_BundleParse(bundle,bundle_size,&view));
+  bundle[bundle_size-1u]^=1u;
+  strcpy(entries[1].id,entries[0].id);
+  assert(NU_BundleBuild(entries,2u,bundle,sizeof(bundle))==0u);
+  strcpy(entries[1].id,"../outside");
+  assert(NU_BundleBuild(entries,2u,bundle,sizeof(bundle))==0u);
+  entries[1].data_class=99u;
+  strcpy(entries[1].id,"wallet.shared");
+  assert(NU_BundleBuild(entries,2u,bundle,sizeof(bundle))==0u);
  }
  puts("N.U native runtime tests passed");return 0;
 }
