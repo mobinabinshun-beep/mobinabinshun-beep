@@ -100,7 +100,8 @@ Implemented candidate:
 - file-to-cache staging and sequential drain into one selected module buffer;
 - `NU_PackageBuild` and `nu_pack input.bytecode output.nup` development package builder;
 - minimal Win32 GUI host, XP subsystem target metadata, timer-driven VM slices;
-- portable unit tests and Win32 cross-build workflow;\n- N.U-owned RAM reservation ledger with over-budget rejection and saturating release.
+- portable unit tests and Win32 cross-build workflow;
+- N.U-owned RAM reservation ledger with over-budget rejection and saturating release.
 
 Not yet implemented:
 - manifest dependency-field parsing and Package Manager integration;
