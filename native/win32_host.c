@@ -4,10 +4,14 @@
 #include <windows.h>
 #include <commdlg.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "nu_runtime.h"
 static NU_Budget budget;
 static HBITMAP background_bitmap=NULL;
+static uint8_t *package_data=NULL;
+static uint64_t package_reserved_bytes=0u,vm_reserved_bytes=0u,background_reserved_bytes=0u;
+static int runtime_memory_ready=0;
 static BITMAP background_info;
 #define ID_OPEN_PACKAGE 1001
 #define ID_EXIT_HOST 1002
@@ -15,10 +19,10 @@ static NU_VM active_vm;
 static int vm_active=0;
 static uint32_t scheduler_slot=0u;
 static char status_text[256]="Ready. Press O to open a Generation 1 .nup package.";
-static uint8_t package_data[NU_PACKAGE_MAX_CODE+NU_PACKAGE_HEADER_SIZE];
 
 static void load_background(void){
- char path[MAX_PATH];char *slash;DWORD length;
+ char path[MAX_PATH];char *slash;DWORD length;WIN32_FILE_ATTRIBUTE_DATA file_data;
+ uint64_t image_bytes;
  length=GetModuleFileNameA(NULL,path,MAX_PATH);
  if(!length||length>=MAX_PATH)return;
  slash=strrchr(path,'\\');
@@ -27,20 +31,28 @@ static void load_background(void){
  slash[1]='\0';
  if(lstrlenA(path)+lstrlenA("background.bmp")>=MAX_PATH)return;
  lstrcatA(path,"background.bmp");
+ if(!GetFileAttributesExA(path,GetFileExInfoStandard,&file_data))return;
+ image_bytes=((uint64_t)file_data.nFileSizeHigh<<32)|(uint64_t)file_data.nFileSizeLow;
+ if(!NU_BudgetReserve(&budget,image_bytes))return;
+ background_reserved_bytes=image_bytes;
  background_bitmap=(HBITMAP)LoadImageA(NULL,path,IMAGE_BITMAP,0,0,
      LR_LOADFROMFILE|LR_CREATEDIBSECTION);
- if(background_bitmap)ZeroMemory(&background_info,sizeof(background_info));
- if(background_bitmap)GetObjectA(background_bitmap,sizeof(background_info),&background_info);
+ if(!background_bitmap){
+  NU_BudgetRelease(&budget,background_reserved_bytes);
+  background_reserved_bytes=0u;return;
+ }
+ ZeroMemory(&background_info,sizeof(background_info));
+ GetObjectA(background_bitmap,sizeof(background_info),&background_info);
 }
 
 static void load_package(HWND hwnd){
  OPENFILENAMEA ofn;FILE *fp;long size;size_t got;NU_PackageView view;char path[MAX_PATH];
- path[0]='\0';ZeroMemory(&ofn,sizeof(ofn));ofn.lStructSize=sizeof(ofn);ofn.hwndOwner=hwnd;
+ path[0]='\0';if(!runtime_memory_ready||!package_data){lstrcpyA(status_text,"Insufficient N.U memory budget for module loading.");InvalidateRect(hwnd,NULL,TRUE);return;}ZeroMemory(&ofn,sizeof(ofn));ofn.lStructSize=sizeof(ofn);ofn.hwndOwner=hwnd;
  ofn.lpstrFilter="N.U VM package (*.nup)\0*.nup\0All files (*.*)\0*.*\0\0";ofn.lpstrFile=path;ofn.nMaxFile=MAX_PATH;
  ofn.Flags=OFN_FILEMUSTEXIST|OFN_PATHMUSTEXIST|OFN_HIDEREADONLY;if(!GetOpenFileNameA(&ofn))return;
  fp=fopen(path,"rb");if(!fp){lstrcpyA(status_text,"Cannot open package.");InvalidateRect(hwnd,NULL,TRUE);return;}
  if(fseek(fp,0L,SEEK_END)!=0){fclose(fp);return;}size=ftell(fp);
- if(size<(long)NU_PACKAGE_HEADER_SIZE||size>(long)sizeof(package_data)){fclose(fp);lstrcpyA(status_text,"Package size rejected.");InvalidateRect(hwnd,NULL,TRUE);return;}
+ if(size<(long)NU_PACKAGE_HEADER_SIZE||size>(long)(NU_PACKAGE_MAX_CODE+NU_PACKAGE_HEADER_SIZE)){fclose(fp);lstrcpyA(status_text,"Package size rejected.");InvalidateRect(hwnd,NULL,TRUE);return;}
  rewind(fp);got=fread(package_data,1u,(size_t)size,fp);fclose(fp);
  if(got!=(size_t)size||!NU_PackageValidate(package_data,got,&view)){lstrcpyA(status_text,"Package rejected: ABI, generation, size or CRC.");InvalidateRect(hwnd,NULL,TRUE);return;}
  NU_VMInit(&active_vm,view.code,view.code_size,100000u);
@@ -112,7 +124,7 @@ static LRESULT CALLBACK window_proc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp){
   TextOutA(dc,24,174,status_text,lstrlenA(status_text));
   EndPaint(hwnd,&ps);return 0;
  }
- case WM_DESTROY:KillTimer(hwnd,1u);vm_active=0;if(background_bitmap)DeleteObject(background_bitmap);PostQuitMessage(0);return 0;
+ case WM_DESTROY:KillTimer(hwnd,1u);vm_active=0;if(background_bitmap)DeleteObject(background_bitmap);if(background_reserved_bytes)NU_BudgetRelease(&budget,background_reserved_bytes);if(package_data)free(package_data);if(package_reserved_bytes)NU_BudgetRelease(&budget,package_reserved_bytes);if(vm_reserved_bytes)NU_BudgetRelease(&budget,vm_reserved_bytes);PostQuitMessage(0);return 0;
  }
  return DefWindowProcA(hwnd,msg,wp,lp);
 }
@@ -120,6 +132,16 @@ int WINAPI WinMain(HINSTANCE inst,HINSTANCE prev,LPSTR cmd,int show){
  WNDCLASSA wc;HWND hwnd;MSG msg;MEMORYSTATUS mem;SYSTEM_INFO si;(void)prev;(void)cmd;
  ZeroMemory(&mem,sizeof(mem));mem.dwLength=sizeof(mem);GlobalMemoryStatus(&mem);GetSystemInfo(&si);
  NU_BudgetInit(&budget,(uint64_t)mem.dwTotalPhys,(uint64_t)mem.dwAvailPhys,(uint32_t)si.dwNumberOfProcessors);
+ if(NU_BudgetReserve(&budget,(uint64_t)sizeof(active_vm))){
+  vm_reserved_bytes=(uint64_t)sizeof(active_vm);
+  if(NU_BudgetReserve(&budget,(uint64_t)(NU_PACKAGE_MAX_CODE+NU_PACKAGE_HEADER_SIZE))){
+   package_reserved_bytes=(uint64_t)(NU_PACKAGE_MAX_CODE+NU_PACKAGE_HEADER_SIZE);
+   package_data=(uint8_t*)malloc((size_t)package_reserved_bytes);
+   if(!package_data){NU_BudgetRelease(&budget,package_reserved_bytes);package_reserved_bytes=0u;}
+  }
+ }
+ runtime_memory_ready=(package_data!=NULL&&vm_reserved_bytes!=0u);
+ if(!runtime_memory_ready)lstrcpyA(status_text,"N.U memory budget too small; module loading disabled.");
  ZeroMemory(&wc,sizeof(wc));wc.style=CS_HREDRAW|CS_VREDRAW;wc.lpfnWndProc=window_proc;wc.hInstance=inst;wc.hCursor=LoadCursor(NULL,IDC_ARROW);wc.hbrBackground=(HBRUSH)(COLOR_WINDOW+1);wc.lpszClassName="NU_NATIVE_RUNTIME_HOST";
  if(!RegisterClassA(&wc))return 1;
  hwnd=CreateWindowA(wc.lpszClassName,"N.U Native Runtime",WS_OVERLAPPEDWINDOW,CW_USEDEFAULT,CW_USEDEFAULT,720,360,NULL,NULL,inst,NULL);if(!hwnd)return 1;
