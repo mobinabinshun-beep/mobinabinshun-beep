@@ -21,7 +21,7 @@ static void load_background(void){
  char path[MAX_PATH];char *slash;DWORD length;
  length=GetModuleFileNameA(NULL,path,MAX_PATH);
  if(!length||length>=MAX_PATH)return;
- slash=strrchr(path,'\\\\');
+ slash=strrchr(path,'\\');
  if(!slash)slash=strrchr(path,'/');
  if(!slash)return;
  slash[1]='\\0';
