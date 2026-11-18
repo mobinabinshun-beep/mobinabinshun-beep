@@ -7,6 +7,7 @@
 #include "../nu_package.h"
 #include "../nu_manifest.h"
 #include "../nu_dependency.h"
+#include "../nu_cleanup.h"
 int main(void){
  NU_Budget b;uint8_t code[]={1,0,42,0,0,0,1,1,8,0,0,0,3,0,1,0};
  uint8_t pkg[16+sizeof(code)];NU_PackageView view;NU_VM vm;int result;unsigned int i;
@@ -102,6 +103,25 @@ int main(void){
   assert(!NU_DependencyResolve(nodes,3u,graph,sizeof(graph),order,3u));
   graph[6]=0u;nodes[1].generation=2u;
   assert(!NU_DependencyResolve(nodes,3u,graph,sizeof(graph),order,3u));
+ }
+
+ {
+  NU_CleanupItem items[8]={{NU_DATA_CORE,100u},{NU_DATA_MODULE,200u},
+   {NU_DATA_CACHE,300u},{NU_DATA_SAVE,400u},{NU_DATA_WALLET,500u},
+   {NU_DATA_ASSET,600u},{NU_DATA_PROFILE,700u},{NU_DATA_INSTALLER,800u}};
+  NU_CleanupPlan plan;
+  uint32_t remove_mask=(1u<<NU_DATA_CORE)|(1u<<NU_DATA_MODULE)|
+   (1u<<NU_DATA_CACHE)|(1u<<NU_DATA_PROFILE);
+  assert(NU_CleanupPlanBuild(items,8u,remove_mask,0,&plan));
+  assert(plan.delete_count==4u && plan.delete_bytes==1300u);
+  assert(plan.preserve_count==4u && plan.preserve_bytes==2300u);
+  assert(plan.installer_preserved==1u && plan.installer_bytes==800u);
+  assert(NU_CleanupPlanBuild(items,8u,remove_mask,1,&plan));
+  assert(plan.installer_preserved==0u && plan.installer_bytes==800u);
+  assert(plan.delete_count==5u && plan.delete_bytes==2100u);
+  assert(!NU_CleanupPlanBuild(items,8u,0x80000000u,0,&plan));
+  items[0].data_class=99u;
+  assert(!NU_CleanupPlanBuild(items,8u,remove_mask,0,&plan));
  }
  puts("N.U native runtime tests passed");return 0;
 }
