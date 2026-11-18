@@ -86,3 +86,21 @@ Windows host requires a 32-bit XP-compatible toolchain/SDK, WINVER=0x0501 and _W
 4. Disk-backed bounded FIFO/pattern cache; never load the whole package set into RAM.
 5. Platform resource adapters and measured enforcement evidence per OS/GPU.
 6. Signed package manifests and transactional install/rollback before third-party distribution.
+
+## Added candidate modules (2026-11-18 follow-up)
+
+- `nu_translator.c/.h`: a Generation-1 neutral instruction-record to NUVM/1 bytecode translator. It validates register and memory operands and fails closed when output capacity is insufficient. This is a small compiler backend, not yet a translator for the three existing browser games or arbitrary historical console binaries.
+- `nu_cache.c/.h`: a disk-backed FIFO spool for bounded binary chunks. It writes length + CRC32 + payload records, reads one chunk into a caller-owned buffer, validates integrity, and removes the temporary cache file when the queue drains. Chunk size is capped at 64 KiB; disk limit is supplied by the caller and defaults at integration time to the 1 GiB project policy.
+- Tests cover translator output executed by the VM, insufficient output capacity, cache FIFO order, checksum validation path, disk-capacity rejection and deletion when drained.
+
+The cache is a temporary work queue, not a persistent game-save store. The caller must not place user saves or wallet state in it. The queue currently uses standard C file I/O; crash recovery, multi-process locking, secure path creation and platform-specific durable flush semantics remain open work.
+
+## Current implementation boundary after follow-up
+
+- [x] Bounded Gen-1 IR translator backend to NUVM/1.
+- [x] Disk-backed FIFO cache primitive with one-chunk-at-a-time reads and drain deletion.
+- [ ] Full package manifest parser, dependency resolver and atomic install/rollback.
+- [ ] Publisher authentication / digital signatures. CRC32 is corruption detection only.
+- [ ] Native ports/adapters for Bubble Hunt, Mana Collector and Chaos Attack.
+- [ ] XP toolchain/import-table audit and real Windows XP execution.
+- [ ] Per-platform resource telemetry adapters and human QA.
