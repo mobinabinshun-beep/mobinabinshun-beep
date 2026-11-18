@@ -1,5 +1,6 @@
 #include "nu_install_plan.h"
 #include <string.h>
+#include "nu_runtime.h"
 static int nu_component_id_valid(const char *s) {
  size_t i;
  if (!s || !s[0]) return 0;
@@ -86,4 +87,50 @@ int NU_InstallJournalAdvance(NU_InstallJournal *j,NU_InstallJournalState next,
  if(next==NU_JOURNAL_VERIFIED && completed!=j->total_items) return 0;
  if(next==NU_JOURNAL_ACTIVATED && j->state!=NU_JOURNAL_VERIFIED) return 0;
  j->completed_items=completed; j->state=(uint8_t)next; return 1;
+}
+
+static void nu_journal_put32(uint8_t *p,uint32_t v){
+ p[0]=(uint8_t)v;p[1]=(uint8_t)(v>>8);
+ p[2]=(uint8_t)(v>>16);p[3]=(uint8_t)(v>>24);
+}
+static uint32_t nu_journal_read32(const uint8_t *p){
+ return (uint32_t)p[0]|((uint32_t)p[1]<<8)|
+        ((uint32_t)p[2]<<16)|((uint32_t)p[3]<<24);
+}
+size_t NU_InstallJournalEncode(const NU_InstallJournal *j,uint8_t *out,
+                               size_t capacity){
+ if(!j||!out||capacity<NU_INSTALL_JOURNAL_DISK_SIZE||
+    j->transaction_id==0u||j->total_items==0u||
+    j->completed_items>j->total_items||
+    j->state<NU_JOURNAL_PREPARED||j->state>NU_JOURNAL_ROLLED_BACK)
+  return 0u;
+ if((j->state==NU_JOURNAL_VERIFIED||j->state==NU_JOURNAL_ACTIVATED)&&
+    j->completed_items!=j->total_items)return 0u;
+ out[0]='N';out[1]='U';out[2]='J';out[3]='R';
+ out[4]=1u;out[5]=0u;out[6]=j->state;out[7]=0u;
+ nu_journal_put32(out+8u,j->transaction_id);
+ nu_journal_put32(out+12u,j->total_items);
+ nu_journal_put32(out+16u,j->completed_items);
+ nu_journal_put32(out+20u,NU_CRC32(out,20u));
+ return NU_INSTALL_JOURNAL_DISK_SIZE;
+}
+int NU_InstallJournalDecode(const uint8_t *data,size_t length,
+                            NU_InstallJournal *j){
+ NU_InstallJournal parsed;
+ if(!data||!j||length!=NU_INSTALL_JOURNAL_DISK_SIZE||
+    data[0]!='N'||data[1]!='U'||data[2]!='J'||data[3]!='R'||
+    data[4]!=1u||data[5]!=0u||data[7]!=0u||
+    NU_CRC32(data,20u)!=nu_journal_read32(data+20u))return 0;
+ parsed.state=data[6];
+ parsed.transaction_id=nu_journal_read32(data+8u);
+ parsed.total_items=nu_journal_read32(data+12u);
+ parsed.completed_items=nu_journal_read32(data+16u);
+ if(parsed.state<NU_JOURNAL_PREPARED||
+    parsed.state>NU_JOURNAL_ROLLED_BACK||
+    parsed.transaction_id==0u||parsed.total_items==0u||
+    parsed.completed_items>parsed.total_items)return 0;
+ if((parsed.state==NU_JOURNAL_VERIFIED||
+     parsed.state==NU_JOURNAL_ACTIVATED)&&
+    parsed.completed_items!=parsed.total_items)return 0;
+ *j=parsed;return 1;
 }
