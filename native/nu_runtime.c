@@ -9,7 +9,8 @@ void NU_BudgetInit(NU_Budget *b,uint64_t physical,uint64_t available,uint32_t pr
  if(b->ram_limit_bytes>(uint64_t)NU_DEFAULT_RAM_CAP)b->ram_limit_bytes=(uint64_t)NU_DEFAULT_RAM_CAP;
  b->shared_cache_bytes=b->ram_limit_bytes;
  b->short_cache_bytes=b->shared_cache_bytes/2u;
- b->pattern_cache_bytes=b->shared_cache_bytes-b->short_cache_bytes;\n b->ram_reserved_bytes=0u;
+ b->pattern_cache_bytes=b->shared_cache_bytes-b->short_cache_bytes;
+ b->ram_reserved_bytes=0u;
  b->disk_cache_limit_bytes=(uint64_t)NU_DEFAULT_DISK_CACHE;
  b->cpu_slot_numerator=1u;b->cpu_slot_denominator=2u;
  b->render_width=640u;b->render_height=480u;b->target_fps=30u;
