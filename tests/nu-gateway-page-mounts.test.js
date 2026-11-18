@@ -30,3 +30,11 @@ test("Non-game pages initialize Gateway without requiring a game-view element",(
 test("Simulated pointer selection cannot recursively reposition itself",()=>{
  assert.match(gateway,/Math\.abs\(pos\.x-x\)>.5\|\|Math\.abs\(pos\.y-y\)>.5/);
 });
+
+
+test("Physical and simulated pointers must leave Gateway bounds before re-entry after close",()=>{
+ assert.match(gateway,/requirePhysicalLeave=true/);
+ assert.match(gateway,/if\(requirePhysicalLeave&&!isInsideGatewayBounds/);
+ assert.match(gateway,/requireVirtualLeave=true/);
+ assert.match(gateway,/if\(requireVirtualLeave\)/);
+});
