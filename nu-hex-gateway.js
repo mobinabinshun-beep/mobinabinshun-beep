@@ -75,7 +75,7 @@
     if(next)window.dispatchEvent(new Event("nu:gateway-open"));
     if(!next&&lastPhysicalPointer&&isInsideGatewayBounds(lastPhysicalPointer.x,lastPhysicalPointer.y))requirePhysicalLeave=true;
     open=next;outsideSince=0;
-    if(!open&&core&&core.getState().mode==="simulated-mouse")requireVirtualLeave=true;
+    if(!open&&core)requireVirtualLeave=true;
     root.classList.toggle("is-open",open);
     document.body.classList.toggle("nu-gateway-open",open);
     trigger.setAttribute("aria-expanded",String(open));
