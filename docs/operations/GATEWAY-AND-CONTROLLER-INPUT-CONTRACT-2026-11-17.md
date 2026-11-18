@@ -1,5 +1,8 @@
 # N.U Gateway & simulated-mouse controller contract — 2026-11-17
 
+> **HISTORICAL IMPLEMENTATION RECORD — NORMATIVE BEHAVIOR SUPERSEDED (2026-11-18).** This file preserves the implementation and CI evidence for its recorded commits only. Its behavior rules are no longer the current Gateway contract. The sole current normative specification is the [Unified Gateway owner contract](https://github.com/mobinabinshun-beep/Repository/blob/docs/gateway-human-approval-lock-2026-11-18/Operations/2026-11-18/GATEWAY-MACHINE-APPROVAL-LOCK-AND-HUMAN-QA-fa.md). In particular, old Back-history, immediate-resume, hover-activation and controller-exit descriptions must not override that newer owner decision. Historical PASS results do not prove acceptance of the 2026-11-18 additions.
+
+
 **Status:** IMPLEMENTED · AUTOMATED-QA-PASSED · BACKUP-VERIFIED · SOURCE-MERGED · SCOPE-LOCKED · PUBLIC-DEPLOYMENT-UNVERIFIED · HUMAN-QA-PENDING  
 **Scope:** Gateway behavior and the shared launcher-core controller pointer adapter  
 **Supersedes:** conflicting earlier descriptions of nested Back history or direct Gamepad option execution  
