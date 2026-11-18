@@ -6,7 +6,7 @@ const gateway=fs.readFileSync("nu-hex-gateway.js","utf8");
 
 test("Mouse entering the Gateway trigger schedules the 500ms entry delay",()=>{
   assert.match(gateway,/trigger\.addEventListener\("pointerenter",event=>\{/);
-  assert.match(gateway,/event\.pointerType==="mouse"&&!open\)scheduleEntry\(500,event\.pointerId\)/);
+  assert.match(gateway,/event\.pointerType==="mouse"&&!open&&!requirePhysicalLeave\)scheduleEntry\(500,event\.pointerId\)/);
 });
 
 test("Touching the Gateway trigger opens it and suppresses the synthetic click toggle",()=>{
