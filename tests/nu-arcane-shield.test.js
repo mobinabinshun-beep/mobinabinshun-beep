@@ -104,6 +104,9 @@ test("game UI keeps shield controls separate from the locked classic resource HU
   assert.match(html,/<div id="arcane-shield-panel" class="nu-arcane-shield"/);
   assert.match(html,/<div class="bars"><span class="hud-chip" id="level-chip">LV 1<\/span>/);
   assert.match(html,/nu-arcane-shield\.css/);
+  assert.match(html,/assets\\/material\\/nu-arcane-shield\\.svg/);
+  assert.match(css,/nu-arcane-shield-title img/);
+  assert.match(shieldIcon,/<svg[^>]+viewBox="0 0 32 32"/);
   assert.match(games,/function renderArcaneShield\(/);
   assert.match(games,/function resolveRemainingChaosMasses\(/);
   assert.match(games,/resolveRemainingChaosMasses\("CHAOS_PLAYER_EXIT"\)/);
