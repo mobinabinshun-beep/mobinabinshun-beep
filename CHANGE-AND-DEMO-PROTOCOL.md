@@ -12,10 +12,10 @@
 
 ## Required sequence for authorized, unlocked demo-eligible work
 1. **Read and scope:** read AGENTS.md, docs/operations/LOCKED-AREAS.md, relevant architecture/feature specs and the canonical owner directive. Identify locks, dependencies, exclusions and acceptance criteria.
-2. **Record:** create a dated change record with request, authority, scope, affected files, expected behavior and regression boundaries.
-3. **Implement in isolation:** use a dedicated candidate branch; keep unrelated changes out.
+2. **Record:** create a dated change record with request, authority, scope, affected files, expected behavior and regression boundaries. Before the first write, record the exact baseline SHA and create or reuse a verified PRE-CHANGE recovery ref/tag for code, data, schema, shared-contract or structural changes. For DOC-ONLY changes, PR/history plus fetch-back is sufficient unless the operation is destructive.
+3. **Implement in isolation:** use the existing authorized working line by default and avoid a new branch for every defect. Create a dedicated candidate branch only when a protected lock, parallel release, destructive risk, security boundary or explicit owner direction materially requires isolation. A direct owner instruction may authorize the existing default/development line for that exact scope only.
 4. **Machine test and debug:** run focused tests, syntax/build checks and relevant regression workflows. Fix failures before continuing. Record exact test names, environment and outcomes.
-5. **Machine backup:** after the candidate passes required checks, create a recoverable checkpoint/backup of the pre-release state and verify its commit/file identity and restoration path. Record the candidate commit too.
+5. **PRE-RELEASE backup:** after the candidate passes required checks and before deploy, create or reuse a recoverable checkpoint for the exact candidate SHA and verify its ref and restoration path. This is separate from the PRE-CHANGE BASELINE created before editing; never report one as the other.
 6. **Publish to the public demo:** once machine checks and backup are verified, deploy the candidate to the designated public demo. **No additional human pre-approval is required** for changes already authorized and within an unlocked scope.
 7. **Verify and report:** check the public URL and actual build/commit identity. If the platform does not provide sufficient evidence, mark deployment UNVERIFIED; source merge alone is not proof of live deployment.
 8. **Human QA:** give the owner and invited testers the demo link, exact scope/build, test steps, expected outcomes, known limitations and rollback reference. Record device, OS, browser, orientation/input method and observed result.
@@ -68,3 +68,14 @@ This exception does not grant approval for unrelated work, does not unlock prote
 The owner confirms that Gateway is the sole control surface for any action it already provides in a space or module where Gateway is mounted. In gameplay, opening Gateway pauses the round and closing it resumes only a pause that Gateway itself created; a separate Pause/Resume button must not be shown or required. In Bag, Inventory and Wallet, Gateway owns the corresponding back-navigation action; duplicate page-level back buttons are suppressed while Gateway is active. Keep distinct navigation destinations and controls that Gateway does not provide.
 
 For this narrowly scoped Gateway-exclusive cleanup, the acceptance gate is automated debugging and regression testing. No human pre-approval is required before demo deployment. Follow code → tests/debug → verified backup → public demo → machine report. Do not mark HUMAN-QA-PASSED, OWNER-APPROVED or SCOPE-LOCKED without a separate explicit owner acceptance. Do not modify the locked LV/XP/Mana HUD or unrelated navigation/data behavior.
+
+
+## Branch and two-stage backup discipline
+
+- PRE-CHANGE BASELINE protects the exact state before the first write.
+- PRE-RELEASE CANDIDATE protects the exact tested candidate before deployment.
+- Reuse a verified ref/tag when it points to the exact required SHA; otherwise create one. A branch is not required when a tag or existing recovery ref provides the needed isolation.
+- Preserve the previous machine-approved candidate unchanged. If human QA fails, fix on the authorized working line with a successor commit unless a protected lock or parallel release requires a separate branch.
+- A direct default-branch write is allowed only when the current owner instruction explicitly names that line/scope. It does not relax tests, backup, deployment verification or human QA.
+- If an automatic deployment starts before the prescribed backup, record the sequence deviation; create and verify the missing recovery ref immediately and do not claim that the required order was followed.
+- DOC-ONLY changes do not trigger a runtime deployment. Fetch-back and PR review are the verification path.
