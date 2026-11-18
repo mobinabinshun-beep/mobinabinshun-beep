@@ -5,6 +5,7 @@
 #include "../nu_cache.h"
 #include "../nu_translator.h"
 #include "../nu_package.h"
+#include "../nu_manifest.h"
 int main(void){
  NU_Budget b;uint8_t code[]={1,0,42,0,0,0,1,1,8,0,0,0,3,0,1,0};
  uint8_t pkg[16+sizeof(code)];NU_PackageView view;NU_VM vm;int result;unsigned int i;
@@ -50,6 +51,34 @@ int main(void){
   assert(NU_CacheLoadAll(&cache,staged,(uint32_t)sizeof(staged),&staged_size)==1);
   assert(staged_size==sizeof(pkg)&&NU_PackageValidate(staged,staged_size,&view));
   remove("nu-stage-test.nup");
+ }
+ {
+  static const uint8_t manifest_text[] =
+   "NU-MANIFEST/1\\n"
+   "id=bubble-hunt\\n"
+   "generation=1\\n"
+   "abi=1.0\\n"
+   "package=bubble-hunt.nup\\n"
+   "package_size=32\\n"
+   "sha256=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\\n"
+   "key_id=none\\n"
+   "signature=unsigned\\n";
+  static const uint8_t bad_manifest[] =
+   "NU-MANIFEST/1\\n"
+   "id=bubble-hunt\\n"
+   "generation=2\\n"
+   "abi=1.0\\n"
+   "package=bubble-hunt.nup\\n"
+   "package_size=32\\n"
+   "sha256=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\\n"
+   "key_id=none\\n"
+   "signature=unsigned\\n";
+  NU_Manifest manifest;
+  assert(NU_ManifestParse(manifest_text,sizeof(manifest_text)-1u,&manifest));
+  assert(strcmp(manifest.id,"bubble-hunt")==0);
+  assert(manifest.generation==1u && manifest.package_size==32u);
+  assert(!NU_ManifestVerify(&manifest,pkg,32u,(NU_ManifestVerifyProvider)0,0));
+  assert(!NU_ManifestParse(bad_manifest,sizeof(bad_manifest)-1u,&manifest));
  }
  puts("N.U native runtime tests passed");return 0;
 }
