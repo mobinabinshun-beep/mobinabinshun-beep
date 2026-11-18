@@ -86,6 +86,7 @@ test("Simulated mouse uses the Gateway list, one extra Down exits, and pointer m
  assert.match(pointer,/nu:simulated-pointer-target/);
  assert.match(pointer,/function hasConnectedGamepad\(\)/);
  assert.match(pointer,/gamepaddisconnected/);
+ assert.match(pointer,/gamepadconnected/);
  assert.match(gateway,/scheduleOpen\(1000,"simulated-pointer"\)/);
  assert.match(gateway,/scheduleOpen\(500,"physical-mouse"\)/);
  assert.match(gateway,/scheduleOpen\(500,"touch"\)/);
