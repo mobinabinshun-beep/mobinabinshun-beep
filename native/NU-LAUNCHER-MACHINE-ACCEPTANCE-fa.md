@@ -37,3 +37,12 @@
 - Resume پس از کالیبراسیون
 - Windows XP SP3 واقعی/VM و سیستم‌های جدید
 - گزارش موارد crash، افت فریم، خطای تصویر، از دست‌رفتن داده و مصرف منابع
+
+## انتقال Save از نسخهٔ وب به Native
+
+- export از localStorage کلید nu-world-save-v1 بدون تغییر دادهٔ مبدأ؛
+- حفظ transaction IDs، reward IDs، settled Wave IDs و casino round IDs؛
+- import در پروفایل خالی و رد replace ناخواستهٔ دادهٔ موجود؛
+- تست duplicate import برای جلوگیری از دوباره‌اعمال شدن reward/wallet transaction؛
+- رد schema ناشناخته، digest نادرست، مسیر ناامن و bundle ناقص؛
+- تأیید انسانی مقدار XP/Mana/HP/Wallet قبل و بعد از انتقال.
