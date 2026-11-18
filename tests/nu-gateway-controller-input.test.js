@@ -59,7 +59,7 @@ test("Gateway keyboard controls move through options, extra-down exits, and conf
  assert.match(gateway,/event\.key==="ArrowUp"\)\{event\.preventDefault\(\);moveSelection\(-1,false\)/);
  assert.match(gateway,/event\.key==="ArrowLeft"\)\{event\.preventDefault\(\);moveSelection\(-1,false\)/);
  assert.match(gateway,/event\.key==="Enter"\|\|event\.key===" "/);
- assert.match(gateway,/function moveSelection\(direction\)/);
+ assert.match(gateway,/function moveSelection\(direction,exitAtEnd=false\)/);
  assert.match(gateway,/exitAtEnd&&direction>0&&current===items.length-1\)\{closeGateway\(\)/);
  assert.doesNotMatch(gateway,/\(current\+direction\+items\.length\)%items\.length/);
 });
