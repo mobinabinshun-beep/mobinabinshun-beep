@@ -31,3 +31,13 @@ test("Player ID keeps the original stable local identifier behavior",()=>{
   for(const id of ["demo-name","demo-call","demo-family","demo-age"])assert.ok(html.includes('id="'+id+'"'));
   assert.doesNotMatch(html,/class="glass player-id-card classic-player-card"/);
 });
+
+
+test("Profile exposes Wallet section tabs and returns to the selected Wallet page",()=>{
+  assert.match(html,/class="wallet-card-tabs profile-wallet-tabs"/);
+  for(const tab of ["profile","balances","transactions","health","mana"])assert.ok(html.includes('data-profile-wallet-tab="'+tab+'"'));
+  assert.match(ui,/function open\(view,replaceCurrent=false\)/);
+  assert.match(ui,/open\(walletView,true\)/);
+  assert.match(ui,/if\(previous&&previous\.view===view\)viewStack\.pop\(\)/);
+  assert.doesNotMatch(html,/id="profile-back"/);
+});
