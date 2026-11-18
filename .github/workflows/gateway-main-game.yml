@@ -1,16 +1,39 @@
 name: N.U Gateway main-game regression
 
 on:
+  push:
+    branches:
+      - "fix/gateway-pointer-bridge-successor-2026-11-18"
+    paths:
+      - "index.html"
+      - "nu-controller-pointer.js"
+      - "nu-player-ui.js"
+      - "nu-world.css"
+      - "nu-hex-gateway.js"
+      - "tests/nu-controller-pointer.test.js"
+      - "tests/nu-controller-pointer-runtime.test.js"
+      - "tests/nu-wallet-tabs.test.js"
+      - ".github/workflows/gateway-main-game.yml"
   pull_request:
     paths:
       - "index.html"
+      - "casino.html"
+      - "launcher.html"
+      - "pixel-art-studio.html"
       - "nu-hex-gateway.js"
+      - "nu-controller-pointer.js"
+      - "nu-player-ui.js"
+      - "nu-world.css"
       - "nu-hex-gateway.css"
       - "nu-games.js"
       - "nu-gateway-pause.js"
       - "tests/nu-gateway-pause.test.js"
       - "tests/nu-gateway-exclusive-controls.test.js"
       - "tests/nu-gateway-controller-input.test.js"
+      - "tests/nu-controller-pointer.test.js"
+      - "tests/nu-controller-pointer-runtime.test.js"
+      - "tests/nu-wallet-tabs.test.js"
+      - "tests/nu-gateway-pointer-controller-mode.test.js"
       - "nu-dynamic-layers.js"
       - "tests/nu-hex-gateway.test.js"
       - ".github/workflows/gateway-main-game.yml"
@@ -32,8 +55,10 @@ jobs:
       - name: Check Gateway and renderer lifecycle syntax
         run: |
           node --check nu-hex-gateway.js
+          node --check nu-controller-pointer.js
+          node --check nu-player-ui.js
           node --check nu-games.js
           node --check nu-gateway-pause.js
           node --check nu-dynamic-layers.js
       - name: Run Gateway main-game regression tests
-        run: node --test tests/nu-hex-gateway.test.js tests/nu-gateway-pause.test.js tests/nu-gateway-exclusive-controls.test.js tests/nu-gateway-controller-input.test.js
+        run: node --test tests/nu-hex-gateway.test.js tests/nu-gateway-pause.test.js tests/nu-gateway-exclusive-controls.test.js tests/nu-gateway-controller-input.test.js tests/nu-controller-pointer.test.js tests/nu-controller-pointer-runtime.test.js tests/nu-wallet-tabs.test.js tests/nu-gateway-pointer-controller-mode.test.js

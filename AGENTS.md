@@ -26,7 +26,7 @@
 5. Create and verify a recoverable checkpoint after machine checks pass.
 6. For authorized demo-eligible work, deploy to the public demo without redundant pre-approval; verify the actual live build where evidence is available.
 7. Report exact implementation, tests, checkpoint, deployment state, limitations and a concise human QA checklist.
-8. Human acceptance is separate from machine approval. Lock only after explicit owner acceptance.
+8. Human acceptance is separate from machine approval. A machine-passed candidate is immediately recorded as MACHINE-APPROVED-LOCKED / HUMAN-QA-PENDING; final product acceptance and permanent scope lock still require the owner.
 
 ## Gateway and controller invariants
 - Gateway is the exclusive surface for actions it provides; remove redundant duplicate controls only where Gateway is mounted.
@@ -35,9 +35,20 @@
 - Reload is not a Gateway action and never runs automatically on page entry unless a future explicit module-specific owner directive says otherwise.
 - Gateway Exit = Back = Home = the main/home page; do not silently restore an unrelated nested-history destination.
 - Direct physical mouse and direct touch remain direct input. Stepwise cursor movement through controller buttons is simulated mouse, irrespective of cursor artwork.
-- Simulated mouse: four directions move a virtual pointer; Enter/controller-confirm performs a distinct click. Movement only highlights/selects; it must not activate.
+- Simulated mouse outside Gateway: four directions move the virtual pointer and only highlight targets; separate confirm clicks. The shared adapter starts when a gamepad is connected.
+- Simulated mouse inside Gateway: vertical directions navigate the ordered Gateway options; a further Down after the final option closes Gateway without selecting anything. A/Enter confirms the highlighted option; B/Escape remains a cancel path.
+- Direct physical mouse and touch enter Gateway after a 500 ms dwell; simulated-pointer entry uses 1000 ms. Opening dispatches the pause event before options become visible/actionable.
+- After directional exit, the virtual pointer remains at the Gateway trigger. It must leave the trigger hit-zone and re-enter before Gateway can open again.
 - Implement controller input as a shared launcher-core adapter. Gateway and future modules consume the adapter; do not fork controller-specific logic per page.
 - Keep adapters extensible for future controller types through stable interfaces and documented capability references.
+
+## Machine approval lock and human QA queue
+- Every scoped candidate that passes its declared automated checks is frozen at its exact commit and recorded as `MACHINE-APPROVED-LOCKED` + `HUMAN-QA-PENDING`.
+- Do not amend, rebase, regenerate, or otherwise write to that frozen candidate. Do not allow unrelated automated work to modify its locked files/scope while it is queued for human review.
+- Human QA findings or a new direct owner instruction are the only normal reasons to reopen the affected scope. A correction uses a new successor branch/commit, preserves the prior frozen candidate as evidence, reruns tests, and creates a new machine-approval lock before returning to human QA.
+- Machine approval is not human approval, owner acceptance, production promotion, or proof of live deployment.
+- The repository workflow lock is an agent/process rule unless GitHub branch protection is separately configured. Never claim technical branch protection unless verified.
+- Canonical workflow record: https://github.com/mobinabinshun-beep/Repository/blob/main/Operations/2026-11-18/MACHINE-APPROVAL-LOCK-AND-HUMAN-QA-QUEUE-fa.md.
 
 ## Documentation
 - Keep one canonical implementation contract per subject; link secondary notes rather than creating competing rules.

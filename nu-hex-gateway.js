@@ -9,11 +9,13 @@
 
   const trigger=root.querySelector(".nu-gateway-trigger");
   const items=[...root.querySelectorAll(".nu-gateway-item")];
-  let open=false,selected=null,activationTimer=0,outsideSince=0,suppressClickUntil=0;
+  let open=false,selected=null,activationTimer=0,openTimer=0,outsideSince=0,suppressClickUntil=0;
+  let pendingItem=null,requiresSimulatedPointerExit=false,simulatedPointerOutside=false;
 
   function syncGatewayScope(){
     const active=!!(gameView&&gameView.classList.contains("active"));
-    const utility=utilityViews.some(view=>view.classList.contains("active"));
+    const standalone=!gameView&&utilityViews.length===0;
+    const utility=standalone||utilityViews.some(view=>view.classList.contains("active"));
     document.body.classList.toggle("nu-gateway-enabled",active||utility);
     document.body.classList.toggle("nu-main-game-page",active);
     document.body.classList.toggle("nu-game-active",active);
@@ -59,8 +61,12 @@
     if(open)return;
     window.dispatchEvent(new Event("nu:gateway-close"));
   }
-  function setOpen(next,shouldResume=true){
+  function setOpen(next,shouldResume=true,source="direct"){
     if(open===next)return;
+    if(next){
+      // Pause the round and renderers before making Gateway options visible/actionable.
+      window.dispatchEvent(new Event("nu:gateway-open"));
+    }
     open=next;outsideSince=0;
     root.classList.toggle("is-open",open);
     document.body.classList.toggle("nu-gateway-open",open);
@@ -68,12 +74,16 @@
     trigger.setAttribute("aria-label",open?"Close N.U navigation gateway":"Open N.U navigation gateway");
     items.forEach(item=>{item.tabIndex=open?0:-1;});
     if(open){
-      window.dispatchEvent(new Event("nu:gateway-open"));
-      trigger.focus({preventScroll:true});
+      clearTimeout(openTimer);openTimer=0;
+      selected=null;
+      items.forEach(item=>{item.classList.remove("is-selected","is-confirming");item.setAttribute("aria-pressed","false");});
       window.NUControllerPointer?.setEnabled(true);
+      window.NUControllerPointer?.setGatewayNavigation(true);
+      if(source!=="simulated-pointer")trigger.focus({preventScroll:true});
     }else{
-      window.NUControllerPointer?.setEnabled(false);
-      clearTimeout(activationTimer);activationTimer=0;selected=null;
+      window.NUControllerPointer?.setGatewayNavigation(false);
+      // Keep the virtual pointer alive after Gateway closes so it can leave and re-enter the trigger zone.
+      clearTimeout(activationTimer);activationTimer=0;pendingItem=null;
       items.forEach(item=>{item.classList.remove("is-selected","is-confirming");item.setAttribute("aria-pressed","false");});
       if(shouldResume)releaseHeldState();
     }
@@ -93,7 +103,24 @@
     select(items[next]);
     items[next].focus({preventScroll:true});
   }
-  let pendingItem=null;
+  function moveGatewaySelection(direction){
+    if(!items.length||!open)return;
+    const current=items.indexOf(selected);
+    if(direction>0){
+      if(current>=items.length-1){
+        // One additional downward step exits the list. Keep the pointer over Gateway;
+        // a simulated pointer must leave and re-enter the hit zone before reopening.
+        requiresSimulatedPointerExit=true;
+        simulatedPointerOutside=false;
+        setOpen(false,true,"simulated-pointer");
+        return;
+      }
+      select(items[current+1]);
+      return;
+    }
+    if(current<0){select(items[0]);return;}
+    if(current>0)select(items[current-1]);
+  }
   function activate(item){
     if(!item||!item.dataset)return;
     const key=item.dataset.action,action=routes[key];
@@ -109,25 +136,45 @@
     },120);
   }
 
+  function scheduleOpen(delay,source){
+    if(open||openTimer)return;
+    openTimer=window.setTimeout(()=>{
+      openTimer=0;
+      if(!open)setOpen(true,true,source);
+    },delay);
+  }
+  function cancelScheduledOpen(){
+    if(openTimer){clearTimeout(openTimer);openTimer=0;}
+  }
+
   trigger.addEventListener("pointerenter",event=>{
-    if(event.pointerType==="mouse"&&!open)setOpen(true);
+    if(event.pointerType==="mouse"&&!open)scheduleOpen(500,"physical-mouse");
+  });
+  trigger.addEventListener("pointerleave",event=>{
+    if(event.pointerType==="mouse"&&!open)cancelScheduledOpen();
   });
   trigger.addEventListener("pointerdown",event=>{
     if(event.pointerType==="touch"){
       event.preventDefault();
-      suppressClickUntil=Date.now()+900;
-      setOpen(true);
+      suppressClickUntil=Date.now()+1000;
+      scheduleOpen(500,"touch");
     }
+  });
+  trigger.addEventListener("pointerup",event=>{
+    if(event.pointerType==="touch"&&!open)cancelScheduledOpen();
+  });
+  trigger.addEventListener("pointercancel",event=>{
+    if(event.pointerType==="touch")cancelScheduledOpen();
   });
   trigger.addEventListener("click",event=>{
     event.preventDefault();
     if(Date.now()<suppressClickUntil)return;
+    // Keyboard activation remains available; physical mouse/touch use the dwell threshold.
     if(event.detail===0)setOpen(!open);
-    else if(!open)setOpen(true);
   });
   items.forEach(item=>{
     item.addEventListener("pointerenter",event=>{
-      if(event.pointerType==="mouse"&&open)activate(item);
+      if(event.pointerType==="mouse"&&open)select(item);
     });
     item.addEventListener("pointerleave",event=>{
       if(event.pointerType==="mouse"&&pendingItem===item){
@@ -148,6 +195,31 @@
     });
   });
 
+  window.addEventListener("nu:simulated-pointer-target",event=>{
+    const detail=event.detail||{};
+    const target=detail.target&&detail.target.closest?detail.target.closest(".nu-gateway-trigger"):null;
+    const previous=detail.previousTarget&&detail.previousTarget.closest?detail.previousTarget.closest(".nu-gateway-trigger"):null;
+    if(requiresSimulatedPointerExit&&!target){
+      simulatedPointerOutside=true;
+      return;
+    }
+    if(requiresSimulatedPointerExit&&target&&simulatedPointerOutside){
+      requiresSimulatedPointerExit=false;
+      simulatedPointerOutside=false;
+    }
+    if(!open&&target&&!previous&&!requiresSimulatedPointerExit)scheduleOpen(1000,"simulated-pointer");
+    if(!open&&target&&previous!==target&&!requiresSimulatedPointerExit)scheduleOpen(1000,"simulated-pointer");
+    if(!target&&!open)cancelScheduledOpen();
+  });
+  window.addEventListener("nu:gateway-direction",event=>{
+    if(!open)return;
+    const direction=event.detail||{};
+    if(direction.y>0)moveGatewaySelection(1);
+    else if(direction.y<0)moveGatewaySelection(-1);
+  });
+  window.addEventListener("nu:gateway-confirm",()=>{if(open)activate(selected||items[0]);});
+  window.addEventListener("nu:gateway-cancel",()=>{if(open)setOpen(false);});
+
   scrim.addEventListener("click",()=>setOpen(false));
   document.addEventListener("pointermove",event=>{
     if(!open||!["mouse","touch","pen"].includes(event.pointerType))return;
@@ -163,8 +235,8 @@
   document.addEventListener("keydown",event=>{
     if(!open)return;
     if(event.key==="Escape"){event.preventDefault();setOpen(false);trigger.focus({preventScroll:true});return;}
-    if(event.key==="ArrowDown"||event.key==="ArrowRight"){event.preventDefault();moveSelection(1);return;}
-    if(event.key==="ArrowUp"||event.key==="ArrowLeft"){event.preventDefault();moveSelection(-1);return;}
+    if(event.key==="ArrowDown"||event.key==="ArrowRight"){event.preventDefault();moveGatewaySelection(1);return;}
+    if(event.key==="ArrowUp"||event.key==="ArrowLeft"){event.preventDefault();moveGatewaySelection(-1);return;}
     if(event.key==="Enter"||event.key===" "){event.preventDefault();activate(selected||items[0]);return;}
     if(event.key==="Tab"){
       const focusable=[trigger,...items].filter(item=>item.tabIndex>=0);
@@ -178,7 +250,6 @@
 
   window.addEventListener("nu:menu-dismissed",releaseHeldState);
   window.addEventListener("nu:player-overlay-close",releaseHeldState);
-
 
   const initialView=new URLSearchParams(window.location.search).get("view");
   if(["store","profile"].includes(initialView))document.getElementById("menu-"+initialView)?.click();

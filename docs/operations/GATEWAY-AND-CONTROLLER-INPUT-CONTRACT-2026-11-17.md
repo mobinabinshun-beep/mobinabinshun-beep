@@ -1,6 +1,6 @@
 # N.U Gateway & simulated-mouse controller contract — 2026-11-17
 
-**Status:** IMPLEMENTED · AUTOMATED-QA-PASSED · BACKUP-VERIFIED · SOURCE-MERGED · SCOPE-LOCKED · PUBLIC-DEPLOYMENT-UNVERIFIED · HUMAN-QA-PENDING  
+**Status:** PRIOR BASELINE IMPLEMENTED · OWNER-REOPENED FOR SCOPED 2026-11-18 CANDIDATE · NEW CANDIDATE MACHINE-QA-PENDING · HUMAN-QA-PENDING  
 **Scope:** Gateway behavior and the shared launcher-core controller pointer adapter  
 **Supersedes:** conflicting earlier descriptions of nested Back history or direct Gamepad option execution  
 **Protected boundary:** Classic LV / XP / Mana HUD is untouched and remains locked.
@@ -101,3 +101,89 @@ This file is the normative owner-directed contract. The following implementation
 - Human desktop/mobile QA: pending. The owner directly updated and reaffirmed this Gateway/controller scope; the resulting behavior is locked again in [LOCKED-AREAS.md](./LOCKED-AREAS.md).
 
 The exact prior version is not to be restored unilaterally; future corrections must preserve this contract unless the owner explicitly changes it.
+
+
+## 8. Owner amendment — directional simulated-mouse Gateway and two-stage approval (2026-11-18)
+
+This section is the newer owner instruction and supersedes conflicting input/exit behavior above only for the 2026-11-18 candidate. Historical PR #180–#182 evidence remains unchanged.
+
+### Gateway entry and pause ordering
+- Direct physical mouse and touch enter after a 500 ms dwell/tolerance.
+- Simulated mouse entry uses a 1000 ms dwell.
+- The Gateway-open event is dispatched before the Gateway becomes visible/actionable, so active gameplay and designated background renderers freeze first.
+- Pause remains Gateway-exclusive. Reload is absent and never automatic on page entry unless a future explicit module-specific owner instruction changes that rule.
+- Closing Gateway does not resume gameplay. The round and renderers remain frozen until the first real gameplay-space interaction, using the existing fresh-input safeguards.
+
+### Simulated mouse while Gateway is open
+- A connected controller activates the shared virtual pointer adapter. The virtual pointer moves normally outside Gateway.
+- When the virtual pointer enters the Gateway trigger zone, the 1000 ms dwell opens Gateway.
+- While Gateway is open, the virtual pointer is visually behind the Gateway and remains at its trigger location. Up/Down input navigates the ordered options; movement does not activate an option.
+- One additional Down after the final option exits Gateway without selecting an option. Holding Down repeats the same progression and can exit without a separate confirmation.
+- A/Enter confirms the highlighted option. B/Escape remains a cancel/close route.
+- On directional exit, the virtual pointer remains enabled at the trigger. It must first leave the trigger hit-zone and then re-enter before the next Gateway opening can occur.
+- The physical pointer and touch remain native direct inputs. Physical mouse and touch do not become simulated-mouse input.
+
+### Approval lifecycle
+- The prior Gateway/controller scope is explicitly reopened only for this owner-directed amendment.
+- Candidate branch: `feat/gateway-directional-exit-human-qa-lock-2026-11-18`.
+- Candidate files: `nu-hex-gateway.js`, `nu-controller-pointer.js`, `nu-hex-gateway.css`, `tests/nu-gateway-controller-input.test.js`, `.github/workflows/gateway-main-game.yml`, and this contract.
+- Current status at document authoring: implementation exists on candidate branch; automated workflow has not yet reported; backup, deployment, and live build verification are not yet claimed.
+- After automated checks pass, freeze the exact candidate commit as `MACHINE-APPROVED-LOCKED` and place it in `HUMAN-QA-PENDING`. No automated edits may alter that frozen commit or its locked scope.
+- Only a human test report or explicit owner reopening may generate a successor candidate. Every correction repeats machine tests and creates a new exact machine-approval lock.
+- Machine approval never implies human acceptance or production promotion.
+
+### Acceptance checks for this amendment
+1. Direct mouse and touch dwell thresholds are 500 ms; simulated-pointer threshold is 1000 ms.
+2. Gateway-open pause event runs before Gateway options are exposed.
+3. Connected gamepad activates the shared simulated pointer without per-page polling forks.
+4. Simulated pointer enters Gateway and opens it after the 1000 ms threshold.
+5. In Gateway, Up/Down navigates options and A/Enter confirms the selected option.
+6. One additional Down after the final option closes Gateway without activation; held Down can perform the repeated traversal.
+7. After directional exit, the pointer remains active at the trigger; leaving and re-entering is required to reopen.
+8. Gameplay remains frozen after Gateway closes until the first real gameplay-space interaction.
+9. Existing duplicate-control removal, Home/Back equivalence, Reload exclusion, and classic HUD lock remain intact.
+10. No unrelated game, wallet, economy, or protected HUD behavior changes.
+
+### Machine and human status
+- Automated QA: `PENDING` — workflow is configured to include `nu-controller-pointer.js` syntax and Gateway regression tests.
+- Backup: `PENDING`.
+- Public demo deployment / exact live build: `PENDING`.
+- Human QA: `PENDING`.
+- Owner acceptance / final scope lock: `PENDING`.
+
+
+
+## 9. Human finding — keyboard-emulated click-controller pointer bridge (2026-11-18)
+
+The 2026-11-18 human report states that the hierarchical Gateway options respond to directional input but the simulated pointer does not move. Inspection of the previous candidate showed that its runtime test dispatched synthetic custom events directly; it did not exercise a real keydown path. The shared adapter listened for custom directional events and Gamepad API polling, but ordinary arrow-key events were still consumed by the Generation 1 game-target keyboard handler.
+
+The successor candidate adds a capture-phase keyboard bridge in `nu-controller-pointer.js`:
+- Outside Gateway, ArrowUp/Down/Left/Right start the simulated pointer if needed and move it one discrete step.
+- Enter, Space, and NumpadEnter perform the separate click at the virtual pointer.
+- The bridge ignores modified/repeated key events.
+- While Gateway navigation is active, the bridge yields all direction and confirmation keys to Gateway. The Gateway's hierarchical selection, extra-Down exit, and pause behavior are not rewritten.
+- The bridge runs in the shared adapter, not as per-page controller code.
+
+Regression coverage now includes actual keydown-shaped input without a connected Gamepad API device and verifies that Gateway retains exclusive ownership while open. This corrects the earlier test gap: synthetic custom-event coverage alone was insufficient evidence for keyboard-emulated click-controller behavior.
+
+**Successor branch:** `fix/gateway-real-keyboard-pointer-bridge-2026-11-18`  
+**Approval state at authoring:** implementation candidate; CI and exact-SHA machine approval pending. The previous frozen candidate `96b549d0f53fc0f69cc1ea2494250196cef6f87d` remains unchanged. Live-device human QA is still required after CI.
+
+
+## 10. Owner amendment — utility-page exclusivity and Profile/Wallet navigation (2026-11-18)
+
+- Wherever Gateway is mounted on a game or utility page, the independent Menu opener and duplicate Profile entry are suppressed; redundant Home/Back controls are removed when Gateway or the existing Bag destination shortcuts provide the route.
+- Bag remains the parent of Wallet and Inventory. Wallet keeps its Bag/Inventory destination shortcuts and its own section tabs.
+- Player Profile is reached through Wallet and remains a Wallet subview. The Profile view exposes persistent Wallet section tabs: Profile, Wallet/Balances, Transactions, Health and MHL. Choosing a Wallet section returns to Wallet without creating a duplicate history entry; closing Profile returns to the exact prior Wallet view.
+- Do not create a parallel Profile page, wallet store, or identity record. The existing player identity and shared Wallet remain the single source of truth.
+- The Profile page has no independent Home/Back button beside Gateway. Bag/Inventory/Wallet navigation uses explicit destination tabs, not duplicate Back controls.
+
+### Acceptance checks
+1. On every Gateway-mounted utility page, independent Menu/Profile/Home controls that duplicate Gateway are absent.
+2. Bag → Wallet → Profile works; Profile exposes Wallet/Balances, Transactions, Health and MHL destinations.
+3. Returning from Profile to Wallet preserves the selected Wallet section and the parent Bag return path.
+4. Profile opened from Gateway can navigate to Wallet and close back to the originating game view without a broken history stack.
+5. Wallet, Profile and Inventory continue to read the existing shared save; no parallel identity or balance store is created.
+6. Keyboard focus, touch targets and responsive layouts remain usable.
+
+**Successor candidate:** `fix/gateway-pointer-bridge-successor-2026-11-18` · **Status:** `MACHINE-QA-PENDING` · Human QA and public demo deployment remain pending.

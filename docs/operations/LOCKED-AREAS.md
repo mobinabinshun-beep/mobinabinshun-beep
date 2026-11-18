@@ -67,3 +67,31 @@ The archived CSS snapshot is a point-in-time copy of the full stylesheet at the 
 This lock does not prohibit additive, backward-compatible support for future controller types or modules. Such extensions must preserve the locked base behavior, pass focused and relevant regression tests, and be documented against the canonical contract.
 
 Do not modify, weaken, bypass, or revert this locked contract unless the owner gives a new, direct instruction explicitly naming the Gateway/controller scope to be changed. If another approved feature appears to require a conflict, propose a forward-compatible extension; do not independently restore an older implementation.
+
+
+---
+
+# Owner reopening — Gateway directional simulated-mouse amendment (2026-11-18)
+
+**Status:** PRIOR 2026-11-17 BASELINE RETAINED AS HISTORY; SCOPED REOPENING AUTHORIZED FOR CANDIDATE `feat/gateway-directional-exit-human-qa-lock-2026-11-18`.
+
+The owner explicitly reopens only Gateway/controller behavior for the 2026-11-18 amendment. The prior accepted baseline and its recovery points remain preserved; no unrelated locked area is reopened.
+
+The candidate implements 500 ms direct mouse/touch entry, 1000 ms simulated-pointer entry, pause-before-options ordering, directional option navigation, one-extra-Down exit, virtual-pointer persistence after exit, and leave/re-enter gating. The classic LV/XP/Mana HUD remains locked and untouched.
+
+After the exact candidate passes automated QA and a verified backup is created:
+1. Record its exact commit as `MACHINE-APPROVED-LOCKED`.
+2. Move it to `HUMAN-QA-PENDING` with exact public-demo URL/build identity if deployment is verified.
+3. Do not permit further automated writes to the frozen commit or locked scope.
+4. Reopen only the affected scope after a human QA finding or explicit new owner instruction.
+5. Corrections use a successor branch and repeat machine validation, backup, deployment verification and human QA.
+
+**Enforcement boundary:** the current GitHub connector exposes repository content, branches, commits, pull requests and Actions evidence, but no branch-protection/ruleset mutation capability. This lock is therefore enforced by the documented agent workflow and exact immutable commit reference; it is not represented as a GitHub server-side branch protection rule. Existing GitHub protections must not be weakened.
+
+
+## Owner amendment — Profile/Wallet navigation and Gateway utility controls (2026-11-18)
+
+- Gateway remains the only top-level Menu/Home/Profile control on mounted game and utility pages. Hide duplicate utility-page Menu and Profile entry points and redundant Home/Back buttons.
+- Keep the Bag → Wallet → Profile hierarchy. Profile exposes Wallet section tabs and returns to the selected Wallet page; Wallet destination shortcuts preserve Bag/Inventory navigation.
+- This is a forward-compatible amendment to the existing Gateway lock, not a rollback. The classic LV/XP/Mana HUD remains untouched.
+- Successor candidate: `fix/gateway-pointer-bridge-successor-2026-11-18`. Machine QA, backup of the final candidate, public demo deployment and human QA are pending until the exact candidate checks complete.

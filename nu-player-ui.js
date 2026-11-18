@@ -189,9 +189,12 @@
     if(name==="health")renderHealth();
     if(name==="mana")renderManaHistory();
   }
-  function open(view){
+  function open(view,replaceCurrent=false){
     const activeView=document.querySelector(".view.active");
-    if(activeView&&activeView!==view)viewStack.push({view:activeView,focus:document.activeElement});
+    if(activeView&&activeView!==view){
+      if(replaceCurrent){const previous=viewStack[viewStack.length-1];if(previous&&previous.view===view)viewStack.pop();}
+      else viewStack.push({view:activeView,focus:document.activeElement});
+    }
     window.dispatchEvent(new Event("nu:player-overlay-open"));
     document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));
     view.classList.add("active");
@@ -216,7 +219,6 @@
   $("bag-back").addEventListener("click",close);
   $("inventory-back").addEventListener("click",close);
   $("wallet-back").addEventListener("click",close);
-  $("profile-back").addEventListener("click",close);
   const demoFields=["demo-name","demo-call","demo-family","demo-age","demo-age-band","demo-bio","demo-interests"];
   demoFields.forEach(id=>{const field=$(id);if(field){["input","change"].forEach(type=>field.addEventListener(type,()=>{$("demo-profile-warning").hidden=false;}));}});
   const appearanceDefaults={hue:205,tone:0,lightness:48,saturation:72};
@@ -410,6 +412,13 @@
       setWalletTab(tab);target.focus({preventScroll:true});
     });
   });
+  const profileWalletTabButtons=[...document.querySelectorAll("[data-profile-wallet-tab]")];
+  profileWalletTabButtons.forEach(button=>button.addEventListener("click",()=>{
+    const tab=button.dataset.profileWalletTab;
+    if(tab==="profile")return;
+    open(walletView,true);
+    setWalletTab(tab);
+  }));
   const identitySave=$("player-identity-save");
   if(identitySave)identitySave.addEventListener("click",()=>{
     const s=ensureIdentity();
