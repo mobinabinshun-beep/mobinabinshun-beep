@@ -12,6 +12,9 @@ typedef unsigned __int64 uint64_t;
 #define NU_ABI_MAJOR 1u
 #define NU_ABI_MINOR 0u
 #define NU_GENERATION 1u
+#define NU_PACKAGE_CONTAINER_MAJOR 1u
+#define NU_PACKAGE_CONTAINER_MINOR 0u
+#define NU_PACKAGE_HEADER_SIZE 20u
 #define NU_PACKAGE_MAX_CODE (1024u * 1024u)
 #define NU_VM_MEMORY_SIZE 4096u
 #define NU_VM_REGISTER_COUNT 8u
