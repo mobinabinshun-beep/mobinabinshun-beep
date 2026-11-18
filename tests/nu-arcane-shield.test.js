@@ -5,6 +5,8 @@ const fs=require("node:fs");
 const Wallet=require("../nu-wallet.js");
 
 test("Mana container capacity is one to nine fixed 10-Mana containers",()=>{
+  const games=fs.readFileSync("nu-games.js","utf8");
+  assert.match(games,/state\.save\.manaCapsules=Math\.max\(1,Math\.min\(9,state\.save\.manaCapsules\)\)/);
   assert.equal(Wallet.normalizeSave({manaCapsules:1,mana:10}).mana,10);
   assert.equal(Wallet.normalizeSave({manaCapsules:9,mana:90}).mana,90);
   assert.equal(Wallet.normalizeSave({manaCapsules:10,mana:120}).manaCapsules,9);
