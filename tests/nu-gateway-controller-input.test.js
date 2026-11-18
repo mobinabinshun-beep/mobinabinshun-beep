@@ -28,7 +28,7 @@ test("Gateway is the only visible Back/Pause control in mounted views",()=>{
 
 test("Gateway pause ownership captures only an active round and close leaves it frozen for fresh input",()=>{
  assert.match(games,/gatewayPause\.open\(state\)/);
- assert.match(games,/gatewayPause\.close\(state\)/);
+ assert.match(games,/gatewayPause\.close\(\)/);
  assert.match(games,/gatewayPause\.ownsPause\(\)/);
  assert.match(pause,/if\(!state\|\|!state\.active\|\|state\.paused\)return false/);
  assert.match(pause,/close\(\)[\s\S]*?ownsPause=false;[\s\S]*?return true/);
@@ -53,11 +53,12 @@ test("Gateway freezes gameplay and ambient renderers while keeping foreground co
 });
 
 test("Gateway keyboard controls move through options, extra-down exits, and confirm is separate",()=>{
- assert.match(gateway,/event\.key==="ArrowDown"\|\|event\.key==="ArrowRight"/);
+ assert.match(gateway,/event\.key==="ArrowDown"\)\{event\.preventDefault\(\);moveSelection\(1,true\)/);
+ assert.match(gateway,/event\.key==="ArrowRight"\)\{event\.preventDefault\(\);moveSelection\(1,false\)/);
  assert.match(gateway,/event\.key==="ArrowUp"\|\|event\.key==="ArrowLeft"/);
  assert.match(gateway,/event\.key==="Enter"\|\|event\.key===" "/);
  assert.match(gateway,/function moveSelection\(direction\)/);
- assert.match(gateway,/direction>0&&current===items.length-1\)\{closeGateway\(\)/);
+ assert.match(gateway,/exitAtEnd&&direction>0&&current===items.length-1\)\{closeGateway\(\)/);
  assert.doesNotMatch(gateway,/\(current\+direction\+items\.length\)%items\.length/);
 });
 
