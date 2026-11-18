@@ -1,6 +1,16 @@
 name: N.U Gateway main-game regression
 
 on:
+  push:
+    branches:
+      - "fix/gateway-real-keyboard-pointer-bridge-2026-11-18"
+    paths:
+      - "index.html"
+      - "nu-controller-pointer.js"
+      - "nu-hex-gateway.js"
+      - "tests/nu-controller-pointer.test.js"
+      - "tests/nu-controller-pointer-runtime.test.js"
+      - ".github/workflows/gateway-main-game.yml"
   pull_request:
     paths:
       - "index.html"
