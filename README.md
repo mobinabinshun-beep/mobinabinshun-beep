@@ -574,3 +574,8 @@ Before any implementation or new module, re-enumerate and inspect all accessible
 
 ## Public demo = human test laboratory
 The public Generation 1 demo is the mandatory shared surface for real human testing, observation, feedback and reporting—not an optional preview. For every explicitly authorized, unlocked and demo-eligible candidate, follow machine tests → verified backup → public-demo deployment → live URL/build verification → post-deploy smoke checks → human QA on that exact public build. Do not ask for redundant pre-deployment confirmation for this standing authorized demo step. A deployed candidate may remain HUMAN-QA-PENDING; deployment is not human acceptance or production promotion. See [NU-OPS-IMPLEMENT-01](./docs/operations/NU-OPS-IMPLEMENT-01.md), Section 11.
+
+
+## Documentation
+
+- [Project documentation hub](docs/README.md) — canonical guides, operations, audits, tests and feature records.
