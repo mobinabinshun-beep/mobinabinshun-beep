@@ -2,6 +2,7 @@
 #include "nu_runtime.h"
 #include <string.h>
 #include <limits.h>
+#include <stdlib.h>
 static void nu_cache_put32(uint8_t *p, uint32_t v) {
  p[0]=(uint8_t)v; p[1]=(uint8_t)(v>>8); p[2]=(uint8_t)(v>>16); p[3]=(uint8_t)(v>>24);
 }
@@ -68,4 +69,29 @@ void NU_CacheClear(NU_DiskCache *c) {
  if(c->file){fclose(c->file);c->file=NULL;}
  if(c->path[0])remove(c->path);
  c->read_offset=0u;c->write_offset=0u;c->queued_items=0u;
+}
+
+uint64_t NU_CacheStageFile(NU_DiskCache *c,const char *source_path) {
+ FILE *source;uint8_t chunk[NU_CACHE_MAX_CHUNK];size_t n;uint64_t total=0u;
+ if(!c||!source_path)return 0u;
+ source=fopen(source_path,"rb");if(!source)return 0u;
+ while((n=fread(chunk,1u,sizeof(chunk),source))>0u){
+  if(!NU_CachePush(c,chunk,(uint32_t)n)){fclose(source);NU_CacheClear(c);return 0u;}
+  total+=(uint64_t)n;
+ }
+ if(ferror(source)||fclose(source)!=0||!total){NU_CacheClear(c);return 0u;}
+ return total;
+}
+int NU_CacheLoadAll(NU_DiskCache *c,uint8_t *output,uint32_t capacity,uint32_t *length) {
+ uint32_t used=0u,n=0u;int result;
+ if(length)*length=0u;
+ if(!c||!output||!length)return -1;
+ while(c->queued_items){
+  if(used>=capacity)return -2;
+  result=NU_CachePop(c,output+used,capacity-used,&n);
+  if(result!=1)return result;
+  if(n>capacity-used)return -2;
+  used+=n;
+ }
+ *length=used;return used?1:0;
 }
