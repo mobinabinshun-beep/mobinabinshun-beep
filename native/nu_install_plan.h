@@ -45,4 +45,7 @@ typedef struct NU_InstallJournal {
 int NU_InstallJournalInit(NU_InstallJournal *, uint32_t, uint32_t);
 int NU_InstallJournalAdvance(NU_InstallJournal *, NU_InstallJournalState,
                              uint32_t);
+#define NU_INSTALL_JOURNAL_DISK_SIZE 24u
+size_t NU_InstallJournalEncode(const NU_InstallJournal *, uint8_t *, size_t);
+int NU_InstallJournalDecode(const uint8_t *, size_t, NU_InstallJournal *);
 #endif
