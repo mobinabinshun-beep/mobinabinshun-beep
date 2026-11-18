@@ -3,6 +3,7 @@
 #include <string.h>
 #include "../nu_runtime.h"
 #include "../nu_cache.h"
+#include "../nu_translator.h"
 static void put32(uint8_t *p,uint32_t v){p[0]=(uint8_t)v;p[1]=(uint8_t)(v>>8);p[2]=(uint8_t)(v>>16);p[3]=(uint8_t)(v>>24);}
 int main(void){
  NU_Budget b;uint8_t code[]={1,0,42,0,0,0,1,1,8,0,0,0,3,0,1,0};
@@ -22,7 +23,15 @@ int main(void){
  pkg[16u]^=1u;assert(!NU_PackageValidate(pkg,sizeof(pkg),&view));
  {uint8_t bad[]={255u};NU_VMInit(&vm,bad,1u,10u);assert(NU_VMStep(&vm)==-1&&vm.fault);}
  {
-  NU_DiskCache cache;uint8_t first[]={1u,2u,3u,4u};uint8_t second[]={9u,8u,7u};uint8_t output[16];uint32_t output_size;FILE *probe;
+  NU_DiskCache cache;NU_IRInstruction ir[4];uint8_t translated[64];size_t translated_size;uint8_t first[]={1u,2u,3u,4u};uint8_t second[]={9u,8u,7u};uint8_t output[16];uint32_t output_size;FILE *probe;
+  ir[0].operation=NU_IR_LOAD_IMM;ir[0].a=0u;ir[0].immediate=42u;
+  ir[1].operation=NU_IR_LOAD_IMM;ir[1].a=1u;ir[1].immediate=8u;
+  ir[2].operation=NU_IR_ADD;ir[2].a=0u;ir[2].b=1u;
+  ir[3].operation=NU_IR_HALT;ir[3].a=0u;ir[3].b=0u;
+  translated_size=NU_TranslateGen1(ir,4u,translated,sizeof(translated));
+  assert(translated_size>0u);NU_VMInit(&vm,translated,(uint32_t)translated_size,100u);
+  result=1;while(result>0)result=NU_VMStep(&vm);assert(vm.halted&&vm.registers[0]==50u);
+  assert(NU_TranslateGen1(ir,4u,translated,1u)==0u);
   NU_CacheInit(&cache,"nu-cache-test.bin",64u);
   assert(NU_CachePush(&cache,first,4u));assert(NU_CachePush(&cache,second,3u));
   assert(cache.queued_items==2u);
