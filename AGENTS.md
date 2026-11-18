@@ -55,3 +55,8 @@
 - The current Gateway/controller contract is [GATEWAY-AND-CONTROLLER-INPUT-CONTRACT-2026-11-17.md](./docs/operations/GATEWAY-AND-CONTROLLER-INPUT-CONTRACT-2026-11-17.md). The older Gateway navigation report is historical only.
 - Record decisions, affected files, focused tests, backup/recovery, demo status and remaining risks in the relevant change record.
 - Do not claim tests, backup, deployment, human acceptance or locks that were not actually verified.
+
+## Unified operating protocol
+- Canonical execution lifecycle and checklists: [NU-UNIFIED-OPERATING-PROTOCOL-fa.md](https://github.com/mobinabinshun-beep/Repository/blob/main/Operations/2026-11-18/NU-UNIFIED-OPERATING-PROTOCOL-fa.md).
+- Apply its scope-aware discovery, reuse-first, change-record, test, verified backup/restore, deployment, human-QA and handoff requirements to every task.
+- This guide supplements these repository-specific rules; protected areas, owner decisions and exact candidate locks remain in force. For scoped work, inspect the directly affected files and demonstrated dependencies; use full cross-repository discovery for architecture, shared contracts, data, security or multi-repository changes.
