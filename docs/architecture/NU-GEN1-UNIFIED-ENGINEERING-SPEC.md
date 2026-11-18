@@ -132,7 +132,7 @@ A PE subsystem value of 5.01 or a successful cross-build is not proof of Windows
 
 ## 11. Engineering sequence
 
-1. Package Manager contract and signature/trust design; implement manifest parsing and fail-closed verification.
+1. Implement and test a real SHA-256 + asymmetric-signature provider, pinned trust roots and key lifecycle; then add dependency resolution and a transactional Package Manager.
 2. Integrate cache staging, translator and scheduler; keep one selected module in RAM at a time.
 3. Package builder and deterministic test fixtures.
 4. Native Bubble Hunt port and end-to-end proof.
