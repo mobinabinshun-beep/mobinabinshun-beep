@@ -42,7 +42,7 @@ These mechanisms bound N.U-owned work; they do not guarantee the OS, drivers or 
 
 ## 4. Execution and translation
 
-NUVM/1 currently uses a 16-byte little-endian package header followed by at most 1 MiB of bytecode. The VM has eight 32-bit registers, 4 KiB private memory, and a bounded instruction budget. Unknown opcodes, invalid operands, invalid package CRC, unsupported ABI major and unsupported generation fail closed.
+NUPK/1 uses a 20-byte little-endian package-container header and carries at most 1 MiB of NUVM/1 bytecode. Container version and VM ABI are separate fields. The VM has eight 32-bit registers, 4 KiB private memory, and a bounded instruction budget. Unknown opcodes, invalid operands, invalid package CRC, unsupported ABI major and unsupported generation fail closed.
 
 The Generation-1 translator currently supports a small neutral IR subset: immediate load, move, add/subtract/XOR, byte load/store, jump, conditional jump and halt. This is not a translator for arbitrary console binaries and is not yet a port of any of the three games.
 
@@ -59,7 +59,7 @@ The disk queue is disposable staging only. Save data, wallet state, user assets 
 
 ## 5. Package format and trust contract
 
-The current `.nup` envelope has: magic `NUVM`, ABI major/minor, generation, flags, bytecode length and CRC32, then bytecode. CRC32 is corruption detection, not authentication.
+The current `.nup` envelope uses the NUPK/1 container: magic `NUPK`, container major/minor, generation, flags, 16-bit NUVM ABI major/minor, bytecode length and CRC32, then bytecode. The VM instruction-set identifier remains NUVM/1. CRC32 is corruption detection, not authentication. CRC32 is corruption detection, not authentication.
 
 A package publisher trust contract must use:
 - canonical manifest encoding and SHA-256 content digests;
@@ -68,7 +68,7 @@ A package publisher trust contract must use:
 - explicit signature algorithm/version identifiers;
 - fail-closed behavior for missing/unknown keys, invalid signatures, digest mismatch, unsupported generation, dependency cycles, undeclared capabilities and ABI-major mismatch.
 
-No production signing key or trust root is embedded in the source tree. No unsigned package may be represented as publisher-authenticated. The current package builder emits unsigned development packages only. Signature verification, trust-root lifecycle and production Package Manager remain release blockers.
+No production signing key or trust root is embedded in the source tree. No unsigned package may be represented as publisher-authenticated. The current package builder emits unsigned NUPK/1 development packages only. Signature verification, trust-root lifecycle and production Package Manager remain release blockers.
 
 ## 6. Canonical manifest and trust-provider boundary
 
@@ -94,7 +94,7 @@ Port order: Bubble Hunt first. Do not start the next game until Bubble Hunt pass
 ## 9. Current implementation inventory
 
 Implemented candidate:
-- portable C90 VM, CRC-protected NUVM/1 envelope validation and cooperative scheduler;
+- portable C90 VM, CRC-protected NUPK/1 container validation carrying NUVM/1 bytecode, and cooperative scheduler;
 - Generation-1 neutral IR translator subset;
 - disk-backed FIFO queue with per-chunk CRC, 64 KiB maximum chunk and caller-owned RAM buffer;
 - file-to-cache staging and sequential drain into one selected module buffer;
@@ -180,3 +180,12 @@ The canonical cross-repository map and document precedence are now defined in [N
 A source audit found incompatible candidate formats all labelled `NUVM/1`: the older shell's line-oriented declarative module, the C++ host's `.numod + .nuvm` text instruction format, and this branch's binary envelope with `NUVM` magic and bytecode. They are not ABI-compatible and must not be merged as though they were one format. Before shell/game integration, split package-container, module-manifest, pack-manifest and VM-ISA version identifiers; add golden fixtures and explicit legacy rejection/migration tests. No existing released format is silently reinterpreted.
 
 The master index also records that the three approved game IDs are currently manifest-only: their native payloads are not bound to this runtime or installer. The public browser prototypes in the product default branch are not native Generation-1 ports.
+
+
+## 17. NUPK/1 container separation — candidate implementation
+
+The package-container/VM-ISA naming collision in the binary runtime path has been corrected in this pre-release branch. The binary envelope now uses NUPK magic and a 20-byte versioned header. Container major/minor, generation, flags and 16-bit NUVM ABI major/minor are independently validated; payload length and CRC32 follow. The payload begins at offset 20 and remains NUVM/1 bytecode.
+
+The validator rejects the previous pre-release binary envelope with NUVM container magic, unsupported container version, unsupported ABI minor, nonzero flags, bad length and payload CRC mismatch. The legacy text-based NUVM samples in the older shell branches remain separate incompatible formats and are not silently imported.
+
+This is a breaking pre-release format correction; no public user data or published package compatibility is claimed. Golden fixtures and cross-host interoperability tests are still required before release.
