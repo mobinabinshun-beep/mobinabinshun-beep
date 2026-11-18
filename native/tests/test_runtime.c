@@ -32,7 +32,7 @@ int main(void){
  assert(NU_PackageValidate(pkg,sizeof(pkg),&view));NU_VMInit(&vm,view.code,view.code_size,100u);
  result=1;for(i=0u;i<20u&&result>0;++i)result=NU_VMStep(&vm);
  assert(vm.halted&&vm.registers[0]==50u);
- pkg[NU_PACKAGE_HEADER_SIZE]^=1u;assert(!NU_PackageValidate(pkg,sizeof(pkg),&view));pkg[16u]^=1u;
+ pkg[NU_PACKAGE_HEADER_SIZE]^=1u;assert(!NU_PackageValidate(pkg,sizeof(pkg),&view));pkg[NU_PACKAGE_HEADER_SIZE]^=1u;
  pkg[4u]=2u;assert(!NU_PackageValidate(pkg,sizeof(pkg),&view));pkg[4u]=1u;
  pkg[11u]=1u;assert(!NU_PackageValidate(pkg,sizeof(pkg),&view));pkg[11u]=0u;
  pkg[0]='N';pkg[1]='U';pkg[2]='V';pkg[3]='M';assert(!NU_PackageValidate(pkg,sizeof(pkg),&view));
