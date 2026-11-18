@@ -95,3 +95,19 @@ After the exact candidate passes automated QA and a verified backup is created:
 - Keep the Bag → Wallet → Profile hierarchy. Profile exposes Wallet section tabs and returns to the selected Wallet page; Wallet destination shortcuts preserve Bag/Inventory navigation.
 - This is a forward-compatible amendment to the existing Gateway lock, not a rollback. The classic LV/XP/Mana HUD remains untouched.
 - Successor candidate: `fix/gateway-pointer-bridge-successor-2026-11-18`. Machine QA, backup of the final candidate, public demo deployment and human QA are pending until the exact candidate checks complete.
+
+
+---
+
+## Owner-authorized scoped restoration — XP rail and icon feedback (2026-11-17; implementation candidate 2026-11-18)
+
+The owner explicitly authorized Issue #179 to extract and restore only the historical Generation 1 full-width XP rail and to verify/reuse the existing accessible transaction toast for interactive game icons/actions.
+
+- Authorized visual exception: the XP rail spans the bottom edge; the Mana rail remains compact at the lower-left; LV remains above the rails; the current XP/Mana state and calculation logic are unchanged.
+- Icon feedback uses the existing `#transaction-toast`, `announceTransaction`, and `showFloatingChange` mechanisms. The current HP Capsule icon, Store purchase and Arcane Shield interaction paths already call the shared feedback functions; this candidate adds focused regression coverage rather than a parallel notification system.
+- No change is authorized to XP/Mana arithmetic, persistence, Wallet, game rules, HP, Arcane Shield/N-BI mechanics, Gateway, or unrelated HUD elements.
+- Candidate branch: `fix/gen1-xp-rail-icon-feedback-2026-11-18`.
+- Pre-change recovery ref: `backup/pre-gen1-xp-rail-icon-feedback-2026-11-18` at `705b5f99a7bf2b32c4156c5d647a5e678985d76a`.
+- After the authorized correction is reviewed and accepted, the classic HUD lock is reinstated for the exact restored layout. No further styling/layout edits are permitted without another direct owner instruction.
+
+This record documents a one-time narrow exception; it does not permanently unlock the protected HUD.
