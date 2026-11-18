@@ -3,7 +3,7 @@ name: N.U Gateway main-game regression
 on:
   push:
     branches:
-      - "fix/gateway-pointer-bridge-successor-2026-11-18"
+      - "**"
     paths:
       - "index.html"
       - "nu-controller-pointer.js"
