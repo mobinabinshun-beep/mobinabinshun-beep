@@ -171,10 +171,10 @@ int main(void){
   NU_BundleEntry entries[2];NU_BundleView view;
   uint8_t bundle[256];size_t bundle_size;
   memset(entries,0,sizeof(entries));
-  entries[0].data_class=NU_BUNDLE_SAVE;
+  entries[0].data_class=NU_BUNDLE_SAVE;entries[0].schema_major=1u;entries[0].schema_minor=0u;
   strcpy(entries[0].id,"game.bubble-hunt.save");
   entries[0].data=save_data;entries[0].size=(uint32_t)sizeof(save_data);
-  entries[1].data_class=NU_BUNDLE_WALLET;
+  entries[1].data_class=NU_BUNDLE_WALLET;entries[1].schema_major=1u;entries[1].schema_minor=0u;
   strcpy(entries[1].id,"wallet.shared");
   entries[1].data=wallet_data;entries[1].size=(uint32_t)sizeof(wallet_data);
   bundle_size=NU_BundleBuild(entries,2u,bundle,sizeof(bundle));
@@ -183,10 +183,12 @@ int main(void){
   assert(NU_BundleParse(bundle,bundle_size,&view));
   assert(view.count==2u);
   assert(view.entries[0].data_class==NU_BUNDLE_SAVE);
+  assert(view.entries[0].schema_major==1u&&view.entries[0].schema_minor==0u);
   assert(strcmp(view.entries[0].id,"game.bubble-hunt.save")==0);
   assert(view.entries[0].size==sizeof(save_data));
   assert(memcmp(view.entries[0].data,save_data,sizeof(save_data))==0);
   assert(view.entries[1].data_class==NU_BUNDLE_WALLET);
+  assert(view.entries[1].schema_major==1u&&view.entries[1].schema_minor==0u);
   assert(memcmp(view.entries[1].data,wallet_data,sizeof(wallet_data))==0);
   bundle[bundle_size-1u]^=1u;
   assert(!NU_BundleParse(bundle,bundle_size,&view));
