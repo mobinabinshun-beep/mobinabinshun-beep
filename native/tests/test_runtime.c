@@ -42,6 +42,7 @@ int main(void){
   probe=fopen("nu-cache-test.bin","rb");assert(probe==NULL);
   assert(NU_CachePush(&cache,first,4u));assert(!NU_CachePush(&cache,first,60u));
   NU_CacheClear(&cache);
+  assert(NU_PackageBuild(code,sizeof(code),pkg,sizeof(pkg))==sizeof(pkg));
   source=fopen("nu-stage-test.nup","wb");assert(source!=NULL);
   assert(fwrite(pkg,1u,sizeof(pkg),source)==sizeof(pkg));assert(fclose(source)==0);
   assert(NU_CacheInit(&cache,"nu-stage-cache.bin",1024u));
