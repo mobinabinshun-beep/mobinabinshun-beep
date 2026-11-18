@@ -12,8 +12,8 @@ Each physical or logical input translator owns only its source-specific interpre
 
 | Translator | Input ownership | Normalized actions |
 |---|---|---|
-| Direct touch | Native touch/pointer events | press, activate |
-| Direct physical mouse | Native mouse/pointer events | press, release; native click is observed once by the selective-action translator |
+| Direct touch | Native touch/pointer events | press, move, activate, cancel |
+| Direct physical mouse | Native mouse/pointer events | hover, press, release; native click is observed once by the selective-action translator |
 | Selective/action translator | Clicks, form changes, keyboard confirm/cancel, controller/Gateway navigation | hover, navigate, select, confirm, activate, cancel, execute |
 | Virtual mouse / simulator | Gamepad or keyboard-emulated direction and confirm; consumes shared simulated-pointer events | move, hover, confirm, activate |
 | Future controller translators | Source-specific mappings only | Must publish the same semantic event contract |
@@ -22,7 +22,7 @@ Each physical or logical input translator owns only its source-specific interpre
 - Direct mouse and touch are never reclassified as simulated mouse.
 - A direction/move event never implies selection, click, confirmation or execution.
 - Select/highlight, confirm, activate and execute are distinct semantic stages.
-- Touch-generated compatibility clicks are guarded against duplicate activation in the observation stream.
+- Touch-generated compatibility clicks are guarded against duplicate activation in the observation stream. Synthetic virtual-pointer events carry a source marker so they are never misclassified as physical mouse input; virtual activation is recorded as simulated-mouse.
 - The core is non-intrusive: a diagnostic observer exception cannot break a game action.
 - Do not add per-page polling loops or duplicate controller adapters. Reuse the shared core and existing simulated pointer adapter.
 
