@@ -190,6 +190,8 @@ int main(void){
   assert(view.entries[1].data_class==NU_BUNDLE_WALLET);
   assert(view.entries[1].schema_major==1u&&view.entries[1].schema_minor==0u);
   assert(memcmp(view.entries[1].data,wallet_data,sizeof(wallet_data))==0);
+  bundle[4u]=2u;assert(!NU_BundleParse(bundle,bundle_size,&view));bundle[4u]=1u;
+  bundle[16u]^=1u;assert(!NU_BundleParse(bundle,bundle_size,&view));bundle[16u]^=1u;
   bundle[bundle_size-1u]^=1u;
   assert(!NU_BundleParse(bundle,bundle_size,&view));
   bundle[bundle_size-1u]^=1u;
@@ -199,6 +201,8 @@ int main(void){
   assert(NU_BundleBuild(entries,2u,bundle,sizeof(bundle))==0u);
   entries[1].data_class=99u;
   strcpy(entries[1].id,"wallet.shared");
+  assert(NU_BundleBuild(entries,2u,bundle,sizeof(bundle))==0u);
+  entries[1].data_class=NU_BUNDLE_WALLET;entries[1].schema_major=0u;
   assert(NU_BundleBuild(entries,2u,bundle,sizeof(bundle))==0u);
  }
  puts("N.U native runtime tests passed");return 0;
