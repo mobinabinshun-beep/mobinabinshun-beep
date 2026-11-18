@@ -15,23 +15,24 @@
 5. **N.U Package Manager** validates metadata, ABI, generation, hashes/signatures, dependencies, permissions and rollback before activation.
 6. **Disk Cache** stages bounded data chunks; only one chunk is admitted to the caller's RAM buffer at a time. Cache data is disposable and never replaces save data.
 
-## 2. NUVM/1 binary envelope
+## 2. NUPK/1 package container and NUVM/1 bytecode
 
-The current 16-byte header is little-endian:
+The package file uses the NUPK/1 container (20-byte little-endian header) and carries a separate NUVM/1 bytecode payload. The container version is not the VM ISA version.
 
 | Offset | Size | Meaning |
 |---:|---:|---|
-| 0 | 4 | ASCII NUVM |
-| 4 | 1 | ABI major = 1 |
-| 5 | 1 | ABI minor = 0 |
+| 0 | 4 | ASCII NUPK |
+| 4 | 1 | container major = 1 |
+| 5 | 1 | container minor = 0 |
 | 6 | 1 | generation = 1 |
 | 7 | 1 | flags = 0 |
-| 8 | 4 | bytecode payload length |
-| 12 | 4 | CRC-32 of payload |
-| 16 | N | bytecode |
+| 8 | 2 | NUVM ABI major = 1, little-endian |
+| 10 | 2 | NUVM ABI minor = 0, little-endian |
+| 12 | 4 | bytecode payload length |
+| 16 | 4 | CRC-32 of payload |
+| 20 | N | NUVM/1 bytecode |
 
-The current envelope limits bytecode to 1 MiB. CRC-32 detects accidental corruption only. It is not publisher authentication, a signature, or a trust decision.
-
+The current container limits bytecode to 1 MiB. CRC-32 detects accidental corruption only. It is not publisher authentication, a signature, or a trust decision. The old pre-release binary envelope using NUVM as the container magic is not the NUPK/1 format and is rejected by the new validator.
 ## 3. Generation-1 neutral IR
 
 The C90 translator currently supports these operations:
