@@ -5,7 +5,7 @@
   const scrim=document.querySelector(".nu-gateway-scrim");
   const gameView=document.getElementById("game-view");
   const utilityViews=["bag-view","wallet-view","inventory-view","profile-view"].map(id=>document.getElementById(id)).filter(Boolean);
-  if(!root||!scrim||!gameView)return;
+  if(!root||!scrim)return;
 
   const trigger=root.querySelector(".nu-gateway-trigger");
   const items=[...root.querySelectorAll(".nu-gateway-item")];
@@ -25,16 +25,18 @@
   document.body.appendChild(virtualPointer);
 
   function syncGatewayScope(){
-    const active=gameView.classList.contains("active");
+    const active=!!(gameView&&gameView.classList.contains("active"));
+    const pageActive=!gameView;
     const utility=utilityViews.some(view=>view.classList.contains("active"));
-    document.body.classList.toggle("nu-gateway-enabled",active||utility);
+    document.body.classList.toggle("nu-gateway-enabled",active||utility||pageActive);
+    document.body.classList.toggle("nu-gateway-page-active",pageActive);
     document.body.classList.toggle("nu-main-game-page",active);
     document.body.classList.toggle("nu-game-active",active);
     document.body.classList.toggle("nu-gateway-utility-active",utility);
   }
   syncGatewayScope();
   const scopeObserver=new MutationObserver(syncGatewayScope);
-  [gameView,...utilityViews].forEach(view=>scopeObserver.observe(view,{attributes:true,attributeFilter:["class"]}));
+  [...(gameView?[gameView]:[]),...utilityViews].forEach(view=>scopeObserver.observe(view,{attributes:true,attributeFilter:["class"]}));
 
   function layoutItems(){
     const compact=window.matchMedia("(max-width: 600px)").matches;
@@ -56,7 +58,11 @@
     if(home){home.click();return;}
     window.location.href="./index.html";
   }
-  const routes={back:goHome,menu:()=>document.getElementById("menu-open")?.click(),profile:()=>document.getElementById("menu-profile")?.click()};
+  const routes={
+    back:goHome,
+    menu:()=>{const button=document.getElementById("menu-open");if(button){button.click();return;}window.location.href="./index.html?view=menu";},
+    profile:()=>{const button=document.getElementById("menu-profile");if(button){button.click();return;}window.location.href="./index.html?view=profile";}
+  };
   function clearEntry(){if(entryTimer){clearTimeout(entryTimer);entryTimer=0;}entryPointerId=null;}
   function scheduleEntry(delay,pointerId=null){
     clearEntry();
@@ -93,8 +99,8 @@
     if(selected&&selected!==item){selected.classList.remove("is-selected","is-confirming");selected.setAttribute("aria-pressed","false");}
     selected=item;item.classList.add("is-selected");item.setAttribute("aria-pressed","true");
     if(core&&core.getState().mode==="simulated-mouse"){
-      const rect=item.getBoundingClientRect();
-      core.setPosition(rect.left+rect.width/2,rect.top+rect.height/2);
+      const rect=item.getBoundingClientRect(),x=rect.left+rect.width/2,y=rect.top+rect.height/2,pos=core.getState();
+      if(Math.abs(pos.x-x)>.5||Math.abs(pos.y-y)>.5)core.setPosition(x,y);
     }
   }
   function moveSelection(direction,exitAtEnd=false){
@@ -172,8 +178,8 @@
       return core.move(dx,dy);
     },
     setPosition:(x,y)=>!!(core&&core.setPosition(Number(x),Number(y))),
-    confirm:()=>{if(core)core.keyDown({key:"Enter"});},
-    cancel:()=>{if(core)core.keyDown({key:"Escape"});},
+    confirm:()=>{if(open)activate(selected||items[0]);},
+    cancel:()=>{if(open)closeGateway();},
     getState:()=>core?core.getState():null
   };
   window.addEventListener("nu:simulated-mouse-input",event=>{
@@ -261,4 +267,5 @@
   if(["store","profile"].includes(initialView))document.getElementById("menu-"+initialView)?.click();
   if(initialView==="bag")document.getElementById("menu-bag")?.click();
   if(initialView==="wallet"){document.getElementById("menu-bag")?.click();document.querySelector('[data-bag-destination="wallet"]')?.click();}
+  if(initialView==="menu")document.getElementById("menu-open")?.click();
 })();
