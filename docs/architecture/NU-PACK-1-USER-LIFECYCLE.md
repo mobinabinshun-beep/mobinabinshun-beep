@@ -87,3 +87,22 @@ The bundle must be written atomically: create a temporary sibling, write and ver
 native/nu_cleanup.c and native/nu_cleanup.h currently implement a portable C90 cleanup planning primitive. It classifies inventory entries, calculates delete/preserve counts and byte totals, and preserves the installer archive unless a separate explicit argument is supplied. Unit tests cover keep/delete planning and explicit installer deletion.
 
 This primitive does not perform filesystem deletion, discover installations, build the identity bundle, display the three-stage UI or guarantee zero leftovers. A bounded full-pack component reconciler now compares stable component IDs and versions (keep/add/update) and leaves installed components absent from the incoming pack untouched. An in-memory journal state model validates prepared → staging → verified → activated and rollback transitions, but it is not yet persisted to disk and cannot recover from power loss. These primitives do not constitute a transactional installer. Safe filesystem operations, durable journal persistence, installation identity discovery, portable data-bundle export/import, the three-stage UI and human QA remain required. The public demo must not be advertised as supporting complete install/uninstall until those paths are implemented and tested.
+
+
+## 10. Migration from the existing browser demo
+
+The current public Generation 1 web demo stores its shared local save under the browser localStorage key `nu-world-save-v1`. The current wallet normalizer recognizes XP, level, Mana, X/N Credits, upgrade, HP, HP capsules, Mana capsule capacity, Arcane Shield charge/level/prepared state, Shield-used Wave IDs, casino credits, transaction history, reward IDs, non-exchangeable assets, active Wave, settled Wave IDs and casino round IDs.
+
+A native Win32 process cannot directly read another browser profile's localStorage. Therefore “preserve existing progress” requires an explicit, user-initiated browser export followed by N.U import; it cannot be assumed to happen automatically. The import/export implementation is not yet present.
+
+Migration requirements:
+- export only after the browser save is successfully parsed and normalized;
+- include product ID, source schema/key, schema version, component IDs, lengths and per-file digests in a portable identity-marked bundle;
+- preserve transaction IDs, reward IDs, settled Wave IDs and idempotency history to prevent duplicate rewards or wallet movements;
+- keep Save, Wallet/Profile and User Assets as separate logical data classes even if they are stored in one physical bundle;
+- import into a new native profile without overwriting a non-empty profile unless the user explicitly chooses replace/merge and sees a preview;
+- reject unknown schema versions, path traversal, size overflows and digest mismatch;
+- keep the original browser data unchanged until the native import is verified and the user confirms the migration;
+- never put browser data, wallet data or save files in disposable cache or inside a versioned executable directory.
+
+The first public native demo may start with a new local profile if migration is not ready, but it must clearly disclose that the old browser save has not been imported. It must not claim automatic continuity.
