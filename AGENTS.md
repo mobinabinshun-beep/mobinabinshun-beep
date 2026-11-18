@@ -53,6 +53,7 @@
 ## Documentation
 - Keep one canonical implementation contract per subject; link secondary notes rather than creating competing rules.
 - The current Gateway/controller contract is [GATEWAY-AND-CONTROLLER-INPUT-CONTRACT-2026-11-17.md](./docs/operations/GATEWAY-AND-CONTROLLER-INPUT-CONTRACT-2026-11-17.md). The older Gateway navigation report is historical only.
+- The shared input-translator architecture and durable debug evidence protocol is [INTERACTION-CORE-AND-DEBUG-PROTOCOL-2026-11-19.md](./docs/operations/INTERACTION-CORE-AND-DEBUG-PROTOCOL-2026-11-19.md). `nu-interaction-core.js` is loaded before the controller/Gateway adapters on the main game, launcher, casino and studio pages.
 - Record decisions, affected files, focused tests, backup/recovery, demo status and remaining risks in the relevant change record.
 - Do not claim tests, backup, deployment, human acceptance or locks that were not actually verified.
 
@@ -69,3 +70,10 @@
 - Machine approval means automated checks passed and the exact build was deployed to the demo for human testing. It is not final acceptance.
 - The exact machine-approved candidate is immutable to unrelated automation. A correction to a failed candidate must be made as a scoped forward fix on the existing working line; after re-testing, record a new exact machine-approved checkpoint and keep the human QA state open until the owner reports acceptance.
 - Simulated pointer movement must deliver pointermove and mousemove to the hit-tested target in addition to updating the visible cursor and highlight. Keyboard-emulated direction repeats must continue moving; Gateway exclusively owns directional input while open.
+
+
+## Shared interaction core and debug retention
+- Keep direct touch, direct physical mouse, selective/action translation and simulated mouse as independent translators feeding the shared `NUInteractionCore` semantic event stream.
+- Never conflate pointer movement/highlight with select, confirm, activate or execute. Gateway owns its hierarchy while open.
+- Instrument system/platform controls and game objects (Bubble Hunt bubbles, Mana particles/orbs, Chaos masses/clusters) with stable object/game/action/source/outcome identifiers. Diagnostic failures must never block gameplay.
+- Preserve original human findings and debug exports as linked issue/change-record evidence. A failed human report reopens the affected behavior; do not overwrite it with a later pass.
