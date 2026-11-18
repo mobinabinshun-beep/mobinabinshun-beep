@@ -196,3 +196,15 @@ This is a breaking pre-release format correction; no public user data or publish
 The Win32 host now loads the one canonical still image from `background.bmp` beside the executable and draws it with GDI StretchBlt while preserving its aspect ratio. The build extracts the embedded PNG payload from the canonical SVG into a 24-bit BMP and validates the expected 1536×1024 dimensions. No dynamic background layer, particle system, Canvas, WebGL, shader, browser or animation is loaded by the native host. Foreground OS-native buttons remain separate controls. This is a low-cost image presentation path, not a native game renderer or GPU quota.
 
 The CI artifact is a loose test payload (EXE + BMP + README + SHA-256 manifest), not an installer. XP API cross-build and PE subsystem inspection do not replace an actual XP SP3 execution test.
+
+
+## 19. Host allocation accounting increment
+
+The Win32 host now routes its known large allocations through the N.U RAM reservation ledger:
+- reserves the bounded 1 MiB + NUPK header package buffer;
+- reserves the active VM state;
+- checks and reserves the BMP file-size estimate before GDI bitmap loading, releasing it if loading fails;
+- releases reservations and frees the package buffer at host shutdown;
+- displays the current N.U reservation total in the host window.
+
+This is real host-path accounting, not a complete memory sandbox. GDI/driver internal allocations are only approximated by the file-size reservation; C runtime, cache, future renderer and all module allocations still need to use a central allocator/budget broker. No claim of system-wide RAM enforcement is made.
