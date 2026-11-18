@@ -86,7 +86,7 @@
    if(lastTarget&&lastTarget.classList)lastTarget.classList.remove("nu-simulated-mouse-target");
    lastTarget=null;if(cursor)cursor.style.display="none";
   }
-  function onConnected(event){if(event&&event.gamepad){padIndex=event.gamepad.index;if(doc&&doc.body&&doc.body.classList.contains("nu-gateway-open"))gatewayNavigation=true;start();}}
+  function onConnected(event){if(event&&event.gamepad){padIndex=event.gamepad.index;if(doc&&doc.body&&doc.body.classList.contains("nu-gateway-open")){gatewayNavigation=true;const current=direction(event.gamepad);gatewayBlockedUntilNeutral=!!(current.dx||current.dy);}start();}}
   function onDisconnected(){if(!hasConnectedGamepad())stop();}
   win.addEventListener&&win.addEventListener("gamepadconnected",onConnected);
   win.addEventListener&&win.addEventListener("gamepaddisconnected",onDisconnected);
