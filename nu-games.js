@@ -42,12 +42,10 @@ function handleGatewayClose(){
 }
 window.addEventListener("nu:gateway-open",handleGatewayOpen);
 window.addEventListener("nu:gateway-close",handleGatewayClose);
-window.addEventListener("nu:controller-direction",event=>{
- const detail=event&&event.detail||{};
- if(gatewayPause.isAwaitingInteraction()&&(Number(detail.dx)||Number(detail.dy)))resumeAfterGatewayReturn();
-});
-window.addEventListener("nu:controller-confirm",()=>{
- if(gatewayPause.isAwaitingInteraction())resumeAfterGatewayReturn();
+window.addEventListener("nu:simulated-pointer-move",event=>{
+ if(!gatewayPause.isAwaitingInteraction())return;
+ const target=event&&event.detail&&event.detail.target;
+ if(target&&typeof target.closest==="function"&&target.closest("#game-canvas"))resumeAfterGatewayReturn();
 });
 const games=[
  {id:"bubble",name:"Bubble Hunt",desc:"Find the rain-glass droplets and collect XP.",status:"PLAYABLE"},
@@ -310,9 +308,9 @@ function syncWorldTime(){const hour=new Date().getHours();const phase=hour>=6&&h
 syncWorldTime();setInterval(syncWorldTime,60000);
 let mouseCameraReady=false,touchCameraReady=false,touchMoved=false,touchStart=null,touchLast=null,cameraX=0,cameraY=0,cameraQueued=false,lastCamera=0;
 function applyCamera(){if(cameraQueued)return;cameraQueued=true;requestAnimationFrame(t=>{cameraQueued=false;if(t-lastCamera<24)return;lastCamera=t;document.documentElement.style.setProperty("--camera-x",cameraX.toFixed(1)+"px");document.documentElement.style.setProperty("--camera-y",cameraY.toFixed(1)+"px");if(window.NUPixelWorld)window.NUPixelWorld.setCamera(cameraX,cameraY);});}
-function mouseMove(e){if(e.pointerType!=="mouse"||NU.clamp(state.quality,1,10)<=1||document.body.classList.contains("nu-gateway-open"))return;cameraX=((e.clientX/(innerWidth||1)-.5)*22);cameraY=((e.clientY/(innerHeight||1)-.5)*16);applyCamera();}
+function mouseMove(e){if(e.pointerType!=="mouse"||NU.clamp(state.quality,1,10)<=1||state.paused||gatewayPause.isAwaitingInteraction()||document.body.classList.contains("nu-gateway-open"))return;cameraX=((e.clientX/(innerWidth||1)-.5)*22);cameraY=((e.clientY/(innerHeight||1)-.5)*16);applyCamera();}
 function touchDown(e){if(e.pointerType!=="touch"||NU.clamp(state.quality,1,10)<=1||document.body.classList.contains("nu-gateway-open")||e.target.closest("button,a,input,textarea,select,[role=button]"))return;touchStart={x:e.clientX,y:e.clientY,id:e.pointerId};touchLast={x:e.clientX,y:e.clientY};touchMoved=false;if(window.NUPixelWorld)window.NUPixelWorld.lastTouchWasDrag=false;if(!touchCameraReady){touchCameraReady=true;window.addEventListener("pointermove",touchMove,{passive:true});window.addEventListener("pointerup",touchUp,{passive:true});window.addEventListener("pointercancel",touchUp,{passive:true});}}
-function touchMove(e){if(document.body.classList.contains("nu-gateway-open")||!touchStart||e.pointerId!==touchStart.id)return;const dx=e.clientX-touchLast.x,dy=e.clientY-touchLast.y;if(Math.hypot(e.clientX-touchStart.x,e.clientY-touchStart.y)>7)touchMoved=true;if(touchMoved){cameraX=NU.clamp(cameraX-dx*.75,-28,28);cameraY=NU.clamp(cameraY-dy*.75,-20,20);applyCamera();}touchLast={x:e.clientX,y:e.clientY};}
+function touchMove(e){if(state.paused||gatewayPause.isAwaitingInteraction()||document.body.classList.contains("nu-gateway-open")||!touchStart||e.pointerId!==touchStart.id)return;const dx=e.clientX-touchLast.x,dy=e.clientY-touchLast.y;if(Math.hypot(e.clientX-touchStart.x,e.clientY-touchStart.y)>7)touchMoved=true;if(touchMoved){cameraX=NU.clamp(cameraX-dx*.75,-28,28);cameraY=NU.clamp(cameraY-dy*.75,-20,20);applyCamera();}touchLast={x:e.clientX,y:e.clientY};}
 function touchUp(e){if(!touchStart||e.pointerId!==touchStart.id)return;const wasDrag=touchMoved;touchStart=null;touchLast=null;touchMoved=false;if(window.NUPixelWorld)window.NUPixelWorld.lastTouchWasDrag=wasDrag;}
 function mouseCameraBootstrap(e){if(e.pointerType!=="mouse")return;mouseCameraReady=true;window.removeEventListener("pointermove",mouseCameraBootstrap);window.addEventListener("pointermove",mouseMove,{passive:true});mouseMove(e);}
 window.addEventListener("pointermove",mouseCameraBootstrap,{passive:true});window.addEventListener("pointerdown",e=>{if(e.pointerType==="touch")touchDown(e);},{passive:true});
@@ -363,11 +361,10 @@ function pollGamepad(timestamp){
     const freshDirection=hasDirection&&directionKey!==gamepadReturnDirection;
     const freshConfirm=confirm&&!gamepadReturnConfirm;
     if(freshDirection||freshConfirm){
-     const resumed=resumeAfterGatewayReturn(true);
-     if(resumed){
-      if(freshDirection&&window.NUControllerPointer)window.NUControllerPointer.move(dx,dy,"gamepad");
-      else if(freshConfirm&&window.NUControllerPointer)window.NUControllerPointer.click("gamepad");
-     }
+     if(window.NUControllerPointer){
+      if(freshDirection)window.NUControllerPointer.move(dx,dy,"gamepad");
+      else if(freshConfirm)window.NUControllerPointer.click("gamepad");
+     }else resumeAfterGatewayReturn(true);
     }
     gamepadReturnDirection=directionKey;gamepadReturnConfirm=confirm;
    }
@@ -402,7 +399,7 @@ function handleGameKeydown(event){
  if(event.key==="Enter"||event.key===" "){event.preventDefault();activateKeyboardTarget();}
 }
 document.addEventListener("keydown",event=>{
- if(!gatewayPause.isAwaitingInteraction()||!$("game-view").classList.contains("active")||event.altKey||event.ctrlKey||event.metaKey)return;
+ if(!gatewayPause.isAwaitingInteraction()||!$("game-view").classList.contains("active")||(event.target!==canvas&&!(event.target&&event.target.closest&&event.target.closest("#game-canvas")))||event.altKey||event.ctrlKey||event.metaKey)return;
  const key=event.key;
  if(!["ArrowRight","ArrowDown","ArrowLeft","ArrowUp","Enter"," "].includes(key))return;
  event.preventDefault();event.stopImmediatePropagation();
