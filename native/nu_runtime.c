@@ -35,14 +35,21 @@ uint32_t NU_CRC32(const uint8_t *data,size_t length) {
  return crc^0xFFFFFFFFu;
 }
 int NU_PackageValidate(const uint8_t *data,size_t length,NU_PackageView *view) {
- uint32_t n,crc;
- if(!data||!view||length<16u)return 0;
- if(data[0]!='N'||data[1]!='U'||data[2]!='V'||data[3]!='M')return 0;
- if(data[4]!=NU_ABI_MAJOR||data[5]!=NU_ABI_MINOR||data[6]!=NU_GENERATION||data[7]!=0u)return 0;
- n=nu_read_u32(data+8u);crc=nu_read_u32(data+12u);
- if(!n||n>NU_PACKAGE_MAX_CODE||length!=(size_t)16u+(size_t)n)return 0;
- if(NU_CRC32(data+16u,(size_t)n)!=crc)return 0;
- view->code=data+16u;view->code_size=n;view->abi_major=data[4];view->abi_minor=data[5];view->generation=data[6];
+ uint32_t n,crc;uint16_t abi_major,abi_minor;
+ if(!data||!view||length<(size_t)NU_PACKAGE_HEADER_SIZE)return 0;
+ if(data[0]!='N'||data[1]!='U'||data[2]!='P'||data[3]!='K')return 0;
+ if(data[4]!=NU_PACKAGE_CONTAINER_MAJOR||
+    data[5]!=NU_PACKAGE_CONTAINER_MINOR||
+    data[6]!=NU_GENERATION||data[7]!=0u)return 0;
+ abi_major=nu_read_u16(data+8u);abi_minor=nu_read_u16(data+10u);
+ if(abi_major!=NU_ABI_MAJOR||abi_minor!=NU_ABI_MINOR)return 0;
+ n=nu_read_u32(data+12u);crc=nu_read_u32(data+16u);
+ if(!n||n>NU_PACKAGE_MAX_CODE||
+    length!=(size_t)NU_PACKAGE_HEADER_SIZE+(size_t)n)return 0;
+ if(NU_CRC32(data+NU_PACKAGE_HEADER_SIZE,(size_t)n)!=crc)return 0;
+ view->code=data+NU_PACKAGE_HEADER_SIZE;view->code_size=n;
+ view->abi_major=(uint8_t)abi_major;view->abi_minor=(uint8_t)abi_minor;
+ view->generation=data[6];
  return 1;
 }
 void NU_VMInit(NU_VM *vm,const uint8_t *code,uint32_t size,uint32_t limit) {
