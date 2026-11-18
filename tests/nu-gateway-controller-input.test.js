@@ -105,7 +105,7 @@ test("One shared adapter owns gamepad pointer movement and activation",()=>{
  const pointer=fs.readFileSync("nu-controller-pointer.js","utf8");
  assert.match(pointer,/navigator&&win\.navigator\.getGamepads/);
  assert.match(pointer,/function tick\(time\)/);
- assert.match(pointer,/buttons\[0\]/);
+ assert.match(pointer,/b\[0\]/);
  assert.match(pointer,/target\.dispatchEvent\(down\)/);
  assert.match(games,/window\.addEventListener\("nu:simulated-pointer-move"/);
  assert.doesNotMatch(games,/navigator\.getGamepads|function pollGamepad|gamepadconnected|startGamepad|stopGamepad/);
