@@ -1,5 +1,6 @@
 /* N.U Controller Pointer — shared simulated-mouse adapter for launcher modules.
  * D-pad / four directions move only. Confirm performs the separate click.
+ * Gateway navigation temporarily maps vertical directions to its ordered list.
  * Physical mouse and touch remain native browser input.
  */
 (function(root){
@@ -7,9 +8,9 @@
  function create(options){
   options=options||{};
   const doc=options.document||root.document,win=options.window||root;
-  let enabled=false,frame=0,lastMove=0,confirmDown=false,cancelDown=false,primed=false,lastTarget=null,x=0,y=0,padIndex=null;
+  let enabled=false,frame=0,lastMove=0,confirmDown=false,cancelDown=false,primed=false,lastTarget=null,x=0,y=0,padIndex=null,gatewayNavigation=false;
   let cursor=null,style=null;
-  const step=Number(options.step)||28,repeat=Number(options.repeat)||170;
+  const step=Number(options.step)||28,repeat=Number(options.repeat)||190;
   function ensureCursor(){
    if(!doc||cursor)return;
    style=doc.createElement("style");
@@ -20,11 +21,14 @@
   }
   function targetAt(){return doc&&doc.elementFromPoint?doc.elementFromPoint(x,y):null;}
   function updateTarget(){
-   const next=targetAt();
-   if(lastTarget&&lastTarget.classList)lastTarget.classList.remove("nu-simulated-mouse-target");
+   const next=targetAt(),previous=lastTarget;
+   if(previous&&previous.classList)previous.classList.remove("nu-simulated-mouse-target");
    lastTarget=next;
    if(next&&next.classList)next.classList.add("nu-simulated-mouse-target");
    if(cursor){cursor.style.left=x+"px";cursor.style.top=y+"px";}
+   if(next!==previous&&doc&&typeof win.CustomEvent==="function"){
+    win.dispatchEvent(new win.CustomEvent("nu:simulated-pointer-target",{detail:{target:next,previousTarget:previous,x,y}}));
+   }
   }
   function direction(pad){
    const b=pad.buttons||[],a=pad.axes||[],threshold=.55;
@@ -34,6 +38,7 @@
    const right=!!(b[15]&&b[15].pressed)||Number(a[0])>threshold;
    return {dx:(right?1:0)-(left?1:0),dy:(down?1:0)-(up?1:0),confirm:!!(b[0]&&b[0].pressed),cancel:!!(b[1]&&b[1].pressed)};
   }
+  function emit(name,detail){if(doc&&typeof win.CustomEvent==="function")win.dispatchEvent(new win.CustomEvent(name,{detail}));}
   function clickTarget(){
    const target=targetAt();if(!target)return false;
    const common={bubbles:true,cancelable:true,view:win,clientX:x,clientY:y,button:0,buttons:1};
@@ -52,14 +57,18 @@
     padIndex=pad.index;
     const input=direction(pad);
     if((input.dx||input.dy)&&time-lastMove>=repeat){
-     x=Math.max(1,Math.min(win.innerWidth-1,x+input.dx*step));
-     y=Math.max(1,Math.min(win.innerHeight-1,y+input.dy*step));
-     updateTarget();lastMove=time;
+     if(gatewayNavigation)emit("nu:gateway-direction",{x:input.dx,y:input.dy});
+     else{
+      x=Math.max(1,Math.min(win.innerWidth-1,x+input.dx*step));
+      y=Math.max(1,Math.min(win.innerHeight-1,y+input.dy*step));
+      updateTarget();
+     }
+     lastMove=time;
     }
     if(!primed){confirmDown=input.confirm;cancelDown=input.cancel;primed=true;}
     else{
-     if(input.confirm&&!confirmDown)clickTarget();
-     if(input.cancel&&!cancelDown)doc.dispatchEvent(new win.KeyboardEvent("keydown",{key:"Escape",bubbles:true,cancelable:true}));
+     if(input.confirm&&!confirmDown){if(gatewayNavigation)emit("nu:gateway-confirm",{});else clickTarget();}
+     if(input.cancel&&!cancelDown){if(gatewayNavigation)emit("nu:gateway-cancel",{});else doc.dispatchEvent(new win.KeyboardEvent("keydown",{key:"Escape",bubbles:true,cancelable:true}));}
      confirmDown=input.confirm;cancelDown=input.cancel;
     }
    }else{padIndex=null;confirmDown=false;cancelDown=false;primed=false;}
@@ -71,13 +80,13 @@
    if(!frame)frame=win.requestAnimationFrame(tick);
   }
   function stop(){
-   enabled=false;if(frame)win.cancelAnimationFrame(frame);frame=0;confirmDown=false;cancelDown=false;primed=false;
+   enabled=false;if(frame)win.cancelAnimationFrame(frame);frame=0;confirmDown=false;cancelDown=false;primed=false;gatewayNavigation=false;
    if(lastTarget&&lastTarget.classList)lastTarget.classList.remove("nu-simulated-mouse-target");
    lastTarget=null;if(cursor)cursor.style.display="none";
   }
   function onConnected(event){if(enabled&&event&&event.gamepad)padIndex=event.gamepad.index;}
   win.addEventListener&&win.addEventListener("gamepadconnected",onConnected);
-  return {start,stop,setEnabled(value){value?start():stop();},isEnabled(){return enabled;},getState(){return {enabled,x,y,padIndex,mode:"simulated-mouse"}},destroy(){stop();win.removeEventListener&&win.removeEventListener("gamepadconnected",onConnected);cursor&&cursor.remove();style&&style.remove();cursor=null;style=null;}};
+  return {start,stop,setEnabled(value){value?start():stop();},setGatewayNavigation(value){gatewayNavigation=!!value;lastMove=0;},isEnabled(){return enabled;},getState(){return {enabled,x,y,padIndex,mode:"simulated-mouse",gatewayNavigation};},destroy(){stop();win.removeEventListener&&win.removeEventListener("gamepadconnected",onConnected);cursor&&cursor.remove();style&&style.remove();cursor=null;style=null;}};
  }
- root.NUControllerPointer=Object.assign(create(),{create,mode:"simulated-mouse",capabilities:{directionalPointer:true,separateConfirm:true,physicalMouseDirect:true,touchDirect:true}});
+ root.NUControllerPointer=Object.assign(create(),{create,mode:"simulated-mouse",capabilities:{directionalPointer:true,separateConfirm:true,gatewayDirectionalList:true,physicalMouseDirect:true,touchDirect:true}});
 })(typeof window!=="undefined"?window:globalThis);
