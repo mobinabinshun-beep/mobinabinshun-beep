@@ -33,3 +33,16 @@ jobs:
           native/nu_runtime.c native/win32_host.c
           -o nu-launcher-xp-candidate.exe -mwindows -lcomdlg32
           -Wl,--major-subsystem-version,5 -Wl,--minor-subsystem-version,1
+      - name: Inspect PE subsystem
+        run: |
+          i686-w64-mingw32-objdump -p nu-launcher-xp-candidate.exe > pe-report.txt
+          grep -E "Subsystem|MajorSubsystemVersion|MinorSubsystemVersion|DLL Name" pe-report.txt
+          grep -q "MajorSubsystemVersion 5" pe-report.txt
+          grep -q "MinorSubsystemVersion 1" pe-report.txt
+      - name: Upload Windows candidate executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: nu-launcher-win32-xp-candidate
+          path: nu-launcher-xp-candidate.exe
+          if-no-files-found: error
+          retention-days: 14
