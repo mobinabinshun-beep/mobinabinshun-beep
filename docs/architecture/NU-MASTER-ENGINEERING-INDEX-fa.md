@@ -185,3 +185,8 @@ The PR #195 host now extracts and displays the canonical still image through GDI
 A portable C90 serializer/parser now defines a bounded NUDb/1 user-data container for Save, Wallet, Profile, User Assets and Settings. It rejects executable/cache/installer classes, unsafe or duplicate stable IDs, unknown classes/versions, invalid lengths and CRC mismatch. This is a serialization/validation primitive only; host filesystem export/import, atomic write, migration from browser localStorage and UI remain pending. CRC32 is not authenticity protection.
 
 Each NUDb/1 entry carries independent schema major/minor fields, so Save, Wallet, Profile and Settings can migrate independently while retaining a common product-tagged bundle container.
+
+
+## 15. Owner authorization and cross-repository audit record
+
+The explicit owner scope for native Generation-1 launcher/runtime and Pack 1, together with the cross-repository inventory and reuse-first findings, is recorded in the archive: [NU-NATIVE-LAUNCHER-REPOSITORY-AUDIT-AND-OWNER-SCOPE-fa.md](https://github.com/mobinabinshun-beep/Repository/blob/main/Operations/2026-11-18/NU-NATIVE-LAUNCHER-REPOSITORY-AUDIT-AND-OWNER-SCOPE-fa.md). This current owner directive supersedes the earlier FUTURE-2026-002 archive-only authorization only for the stated native launcher/Pack 1 scope. FUTURE-2026-004 full graphics platform remains parked; Generation 2 remains quarantined.
