@@ -23,8 +23,8 @@
   function dispatchPointerMove(target){
    if(!target||typeof target.dispatchEvent!=="function")return;
    const common={bubbles:true,cancelable:true,view:win,clientX:x,clientY:y,button:0,buttons:0};
-   if(typeof win.PointerEvent==="function")target.dispatchEvent(new win.PointerEvent("pointermove",{...common,pointerId:1,pointerType:"mouse",isPrimary:true}));
-   if(typeof win.MouseEvent==="function")target.dispatchEvent(new win.MouseEvent("mousemove",common));
+   if(typeof win.PointerEvent==="function"){const event=new win.PointerEvent("pointermove",{...common,pointerId:1,pointerType:"mouse",isPrimary:true});event.nuSimulated=true;target.dispatchEvent(event);}
+   if(typeof win.MouseEvent==="function"){const event=new win.MouseEvent("mousemove",common);event.nuSimulated=true;target.dispatchEvent(event);}
   }
   function updateTarget(){
    const next=targetAt(),previous=lastTarget;
@@ -90,10 +90,10 @@
    const target=targetAt();if(!target)return false;
    const common={bubbles:true,cancelable:true,view:win,clientX:x,clientY:y,button:0,buttons:1};
    if(typeof win.PointerEvent==="function"){
-    target.dispatchEvent(new win.PointerEvent("pointerdown",{...common,pointerId:1,pointerType:"mouse",isPrimary:true}));
-    target.dispatchEvent(new win.PointerEvent("pointerup",{...common,pointerId:1,pointerType:"mouse",isPrimary:true,buttons:0}));
+    const down=new win.PointerEvent("pointerdown",{...common,pointerId:1,pointerType:"mouse",isPrimary:true});down.nuSimulated=true;target.dispatchEvent(down);
+    const up=new win.PointerEvent("pointerup",{...common,pointerId:1,pointerType:"mouse",isPrimary:true,buttons:0});up.nuSimulated=true;target.dispatchEvent(up);
    }
-   target.dispatchEvent(new win.MouseEvent("click",{...common,detail:1,buttons:0}));
+   const click=new win.MouseEvent("click",{...common,detail:1,buttons:0});click.nuSimulated=true;target.dispatchEvent(click);
    return true;
   }
   function tick(time){
