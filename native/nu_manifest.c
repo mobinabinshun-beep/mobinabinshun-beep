@@ -45,7 +45,7 @@ int NU_ManifestParse(const uint8_t *text, size_t length, NU_Manifest *m) {
      text[length - 1u] != (uint8_t)'\n') return 0;
  memset(m, 0, sizeof(*m));
  if (!nu_line(text, length, &pos, "", &v, &vn) ||
-     vn != 14u || memcmp(v, "NU-MANIFEST/1", 13u) != 0) return 0;
+     vn != 13u || memcmp(v, "NU-MANIFEST/1", 13u) != 0) return 0;
  if (!nu_line(text, length, &pos, "id=", &v, &vn) ||
      !nu_copy_value(m->id, sizeof(m->id), v, vn)) return 0;
  if (!nu_lower(m->id[0]) && !nu_digit(m->id[0])) return 0;
