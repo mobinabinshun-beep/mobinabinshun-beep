@@ -136,3 +136,28 @@
 - `BAG-01`: زبانه‌های Wallet داخل Profile افزوده شده‌اند تا مسیر Bag → Wallet → Profile و بازگشت به Wallet بدون شکستن تاریخچه حفظ شود؛ تا تست انسانی باز می‌ماند.
 - کنترل‌های تکراری Menu/Profile/Home در صفحات دارای Gateway حذف/مخفی شده‌اند؛ صحت مسیرهای Bag و Inventory باید در Human QA بررسی شود.
 - شاخه جانشین: `fix/gateway-pointer-bridge-successor-2026-11-18`؛ وضعیت فعلی `MACHINE-QA-PENDING` است. هیچ موردی صرفاً به دلیل وجود کد یا تست ایستا بسته نشده است.
+
+
+---
+
+## الحاقیهٔ پیشرفت واقعی backlog و مرزهای اجرا — 2026-11-18
+
+### موارد machine-passed و در صف Human QA
+- **Arcane Shield / Mana / N-BI:** منطق ظرفیت 1–9، grant ارتقای X Credit، شارژ 10 Mana، جذب Chaos، carry-over، محدودیت یک فعال‌سازی در هر Gameplay Wave، مصرف 10 Mana توپ و +3 XP، و recovery idempotent خروج/reload در منبع فعلی ادغام شده‌اند. CI کامل روی candidate `a0ea6d39eaea1adb5fcd7d6314a95157a1f71285` برابر 323/323 PASS؛ Pages source commit `3610c4159a2a6f582117166549ad25e75c2e377d` با run 44374258659 منتشرسازی موفق دارد. **HUMAN-QA-PENDING** در Issue #204.
+- **GATE-01..04 و BAG-01/02/04:** candidate `a0ea6d39eaea1adb5fcd7d6314a95157a1f71285` هشت workflow مرتبط را PASS کرده و merge/deploy source commit `3610c4159a2a6f582117166549ad25e75c2e377d` ثبت شده است. گزارش انسانی در Issue #210 لازم است؛ scope قفل‌شده تا دریافت گزارش دست‌نخورده بماند.
+
+### مواردی که عمداً نباید با حدس فعال شوند
+- **Shield Level 2 purchase:** قیمت و قرارداد خرید UNKNOWN؛ runtime gate وجود دارد، اما Store purchase action پنهان می‌ماند.
+- **N-BI upgrade curve / N Credit price:** منحنی تاریخی صرفاً proposal است.
+- **X/N Credit issuance/conversion:** نرخ‌ها و منبع صدور فعال/تأیید نشده‌اند.
+- **EX-01 Swap settlement:** جفت‌های مجاز، نرخ، fee، rounding، expiry و atomic settlement هنوز قرارداد نهایی ندارند؛ Bridge read-only می‌ماند.
+- **CAS-02/03 Casino:** backlog مالک 50/50 و پرداخت ناخالص 2× و ادامه با دوبرابرشدن شرط را ثبت کرده است، اما CAS-04 رفتار ladder پس از باخت و CAS-13 ماهیت Casino Credits هنوز unresolved است. runtime فعلی هنوز Lucky Dice شش‌وجهی و Mini Slots با پرداخت 8×/2× دارد؛ بنابراین Casino تا رفع این دو تصمیم **NOT-MACHINE-APPROVED FOR NEW ECONOMY** است و نباید به‌عنوان مدل 50/50 معرفی شود.
+- **HUD-01 / LV-XP-Mana classic bars:** قفل صریح حفظ می‌شود؛ درخواست کلی برای اجرای backlog مجوز تغییر این نوارهای محافظت‌شده نیست.
+- **Gateway/controller:** scope قفل‌شده و exact candidate در صف human QA است؛ هیچ اصلاح خودکار دیگری در آن انجام نشود مگر گزارش انسانی یا دستور مستقیم مالک.
+- **Generation 2 / Native Runtime:** parked/quarantined باقی می‌مانند.
+
+### وضعیت موارد نیازمند تست انسانی، نه ادعای بسته‌شدن
+GAME-01..04، HUD-01..04، BAG-03، HP dock/notifications، و تمام رفتارهای responsive/accessibility فقط پس از گزارش دقیق روی دمو عمومی قابل بستن‌اند. PASS شدن CI یا وجود کد، اثبات تجربهٔ واقعی دستگاه نیست.
+
+### انضباط شاخه و انتشار
+در ادامهٔ این ممیزی هیچ شاخهٔ جدیدی ساخته نشد. تغییرات کد بعدی فقط پس از رعایت lockهای موجود، backup قابل‌بازیابی، تست روی SHA دقیق و gate انتشار انجام شوند؛ تا آن زمان build عمومی فعلی برای Human QA ثابت نگه داشته شود.

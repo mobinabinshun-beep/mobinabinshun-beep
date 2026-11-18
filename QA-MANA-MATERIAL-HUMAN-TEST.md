@@ -226,3 +226,40 @@ Validate the five archived N.U Mana SVG materials when used on interactive Mana 
 - Expected vs actual:
 - Severity: cosmetic / usability / functional / blocking
 - Notes:
+
+
+---
+
+# Arcane Shield + Mana — Public Demo Human QA (2026-11-18)
+
+**Demo:** https://mobinabinshun-beep.github.io/mobinabinshun-beep/  
+**Machine-approved candidate:** `a0ea6d39eaea1adb5fcd7d6314a95157a1f71285`  
+**Pages source commit:** `3610c4159a2a6f582117166549ad25e75c2e377d`  
+**Pages deploy:** [44374258659](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44374258659)  
+**CI:** [Arcane Shield / full Generation 1 323/323 PASS](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44373938870)  
+**Human report:** https://github.com/mobinabinshun-beep/mobinabinshun-beep/issues/204
+
+## Test protocol
+- [ ] Confirm the public page shows `PUBLIC HUMAN-TEST CANDIDATE — NOT OWNER-APPROVED`.
+- [ ] Confirm Mana capacity levels 1, 2 and 9 are 10, 20 and 90 respectively.
+- [ ] Collect Mana one unit at a time; at capacity, verify no successful interaction/reward is counted.
+- [ ] Spend one X Credit on a capacity upgrade; verify +1 permanent container and +10 Mana grant, with no direct Mana-sale transaction.
+- [ ] In Chaos Attack, charge Shield from Store; verify exactly −10 Mana and immediate 10-defense activation.
+- [ ] Verify shield absorbs each hit until depleted; later hits reduce HP by one each.
+- [ ] Verify partial charge carries to the next gameplay Wave without auto-refill or top-up.
+- [ ] Verify only one successful shield activation per gameplay Wave; Level 1 has no in-game recharge.
+- [ ] Verify Level-1 N-BI shot costs exactly 10 Mana, neutralizes one mass and awards +3 XP.
+- [ ] Exit/reload with live Chaos masses; verify remaining damage resolves exactly once.
+- [ ] Verify Wallet Transactions distinguishes `ARCANE_SHIELD_CHARGE`, N-BI spend, Mana collection and capacity-upgrade grant.
+- [ ] Test desktop mouse/keyboard, mobile touch, portrait/landscape and reduced-motion.
+
+## Explicitly unavailable until owner pricing decision
+Shield Level 2 Store purchase is not exposed because its price/eligibility contract is unknown. Do not edit local save or manually grant level 2 to simulate purchase. N-BI upgrade pricing and X/N issuance/conversion are also out of scope.
+
+## Human result
+Device / OS / Browser / Version / Viewport / Input type:  
+PASS / PASS WITH ISSUES / FAIL:  
+Expected vs actual / reproduction steps:  
+Evidence / date / tester:  
+
+CI success is not human acceptance. Keep this checklist and Issue #204 open until the exact public build is tested.

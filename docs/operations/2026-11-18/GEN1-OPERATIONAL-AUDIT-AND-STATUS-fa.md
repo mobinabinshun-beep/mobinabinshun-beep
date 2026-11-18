@@ -76,3 +76,31 @@ https://github.com/mobinabinshun-beep/mobinabinshun-beep/issues/204
 - backup کاندید تست‌شده: `backup/post-chaos-exit-persistence-candidate-2026-11-18` → `fb8b80cb1cfa44f4ce6f34ce076307dc7f0df889`.
 - Pages build/deploy برای merge commit موفق شد: https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44367521993
 - HTTP/live HTML verification از این محیط همچنان قابل انجام نبود؛ Human QA روی دمو عمومی همچنان PENDING است.
+
+
+---
+
+## الحاقیهٔ وضعیت جاری دمو عمومی و تست ماشینی — 2026-11-18، 22:xx +03:30
+
+این الحاقیه وضعیت قدیمی‌تر همین سند را حفظ می‌کند و نقطهٔ انتشار فعلی را ثبت می‌کند.
+
+- **Public Pages source merge commit:** `3610c4159a2a6f582117166549ad25e75c2e377d`.
+- **Machine-approved candidate SHA:** `a0ea6d39eaea1adb5fcd7d6314a95157a1f71285`.
+- **Demo / آزمایشگاه:** https://mobinabinshun-beep.github.io/mobinabinshun-beep/
+- **Pages build + deploy:** [Run 44374258659](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44374258659)؛ jobهای build، deploy و report-build-status همگی PASS.
+- **Arcane Shield/Mana + full Generation 1:** [Run 44373938870](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44373938870)؛ 323/323 تست PASS و 0 failure روی candidate SHA بالا.
+- تست‌های بین‌ماژولی همان candidate: Gateway #422 (44373938704)، Wallet/Profile #441 (44373938861)، Graphics integrity #726 (44373938906)، HUD #437 (44373938820)، Exchange #297 (44373938851)، Studio export #1214 (44373939056) و Graphics preview #1276 (44373938740) همگی PASS.
+- نشان `PUBLIC HUMAN-TEST CANDIDATE — NOT OWNER-APPROVED` و اتصال آیکون `assets/material/nu-arcane-shield.svg` در منبع فعلی `index.html` تأیید شد. HTTP fetch مستقل HTML زنده از محیط ممیزی ممکن نشد؛ tester باید نمایش نشان و نسخهٔ واقعی را در مرورگر کنترل کند.
+- گزارش انسانی سپر/مانا: [Issue #204](https://github.com/mobinabinshun-beep/mobinabinshun-beep/issues/204)؛ Gateway و Bag/Wallet/Profile: [Issue #210](https://github.com/mobinabinshun-beep/mobinabinshun-beep/issues/210).
+
+### وضعیت مرزهای تصمیم
+- Shield Level 2 runtime gate دارد، اما قیمت/مسیر خرید تأیید نشده؛ Store upgrade پنهان می‌ماند و قیمت حدسی اضافه نمی‌شود.
+- N-BI upgrade curve تاریخی 10→1 و قیمت N Credit هنوز قرارداد فعال نیست.
+- X/N Credit issuance/conversion و قیمت/نرخ آن فعال نیست؛ X Credit فقط طبق تصمیم ثبت‌شده برای ارتقای ظرفیت مصرف می‌شود: یک X Credit → یک ظرف دائمی +10 Mana grant، تا سقف 9 ظرف.
+- Casino در runtime هنوز قرارداد قدیمی Lucky Dice (حدس 1 از 6، پرداخت 5×) و Mini Slots (8×/2×) را دارد؛ backlog جدید 50/50 و 2× را ثبت کرده، اما CAS-04 (reset پس از باخت) و CAS-13 (نقش Casino Credits) باز و تعیین‌نشده‌اند. تا رفع این تناقض‌ها، این بخش را مطابق قرارداد جدید اعلام نکنید.
+- Exchange واقعی read-only است؛ نرخ، کارمزد، rounding و settlement تأیید نشده‌اند.
+- Gateway/controller در scope قفل‌شده و candidate دقیق آن machine-approved است؛ تا گزارش انسانی یا دستور مستقیم جدید، فایل‌های آن scope دست‌نخورده بمانند.
+- HUD کلاسیک LV/XP/Mana، Generation 2 و Native Runtime خارج از این اجرای مجاز باقی می‌مانند.
+
+**وضعیت جاری:** CORE-CODE-MERGED · MACHINE-TEST-PASSED · PAGES-DEPLOY-SUCCEEDED · LIVE-HTTP-BUILD-IDENTITY-UNVERIFIED · HUMAN-QA-PENDING · OWNER-ACCEPTANCE-PENDING.
+**روش ادامه:** این نوبت روی default branchهای موجود مستند شد؛ branch جدیدی ایجاد نشد. هیچ تست ماشینی یا Pages deployment به‌جای تأیید انسانی محسوب نمی‌شود.
