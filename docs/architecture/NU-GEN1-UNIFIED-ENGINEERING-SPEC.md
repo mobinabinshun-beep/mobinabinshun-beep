@@ -105,7 +105,7 @@ Implemented candidate:
 Not yet implemented:
 - manifest dependency-field parsing and Package Manager integration;
 - SHA-256 publisher digest/signature verification and managed trust roots;
-- atomic install/update/rollback, uninstall UI and crash-recovery journal;
+- atomic install/update/rollback, three-stage uninstall UI and crash-recovery journal;\n- previous-install discovery, complete-pack upgrade reconciliation and portable identity-marked data export/import;
 - native game ports and game-specific translators;
 - GPU renderer and platform graphics adapters;
 - complete reservation-ledger integration across all N.U allocations and measured, OS-specific resource telemetry/enforcement;
@@ -150,3 +150,14 @@ This branch is a development candidate. It is not a playable launcher release an
 `native/nu_dependency.c/.h` provides a bounded resolver for up to 64 Generation-1 modules. A row-major adjacency matrix expresses module-to-required-module edges. The resolver validates generation 1 and ABI 1.0 for every node, rejects self-edges and malformed matrix values, and returns dependency-first order. Cycles and unsupported contracts fail closed. Tests cover a three-node chain, a cycle, and an unsupported generation.
 
 This is not yet a complete dependency manager: manifest dependency declarations, installed-package lookup, download, signature verification and transactional activation remain unimplemented.
+
+
+## 14. Pack installation, upgrades and user-controlled cleanup — candidate increment
+
+The initial public demo is planned as a complete offline pack. Future releases remain complete packs for clean installation, but a compatible existing host must be discovered through a verified N.U installation identity. Setup then reconciles component IDs and versions and stages only missing/changed modules while retaining the complete downloaded pack as the user's independent installer archive.
+
+The user-facing lifecycle is defined in docs/architecture/NU-PACK-1-USER-LIFECYCLE.md. Install and uninstall both use three understandable stages: choose destination/action, choose components or data classes, then review and confirm. Uninstall defaults to preserving saves, wallet/profile, user assets and settings. Temporary cache and program-owned files are removable. The original downloaded installer archive is stored outside the managed install root and is never included in ordinary uninstall or “select all”; deleting it requires a separate explicit user action.
+
+The native C90 cleanup planner classifies inventory entries as core, module, cache, save, wallet, user asset, profile/settings or installer. It calculates delete/preserve counts and bytes. Unit tests verify that ordinary cleanup preserves the installer and that a separate explicit flag is required to include it in a deletion plan. This planner does not yet perform filesystem operations.
+
+Still required before promising this experience: safe inventory discovery, previous-host detection, full-pack component reconciliation, staged atomic activation, durable recovery journal, filesystem deletion constrained to verified N.U roots, portable identity-marked data bundle export/import, a simple three-stage Win32 UI, and real uninstall/reinstall QA. The installer archive must remain outside the uninstall root. Unknown files must never be treated as cache.
