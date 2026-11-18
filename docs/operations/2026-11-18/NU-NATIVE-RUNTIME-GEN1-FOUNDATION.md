@@ -69,3 +69,24 @@ Draft PR: [#195 — N.U native runtime Generation 1 foundation](https://github.c
 - [ ] Confirm no module can exceed VM memory or instruction limits.
 - [ ] Verify real CPU/RAM use with OS tools; do not infer a strict percentage from scheduler counters.
 - [ ] Confirm existing Generation 1 browser games and public demo are unchanged.
+
+
+## Follow-up implementation — 2026-11-18
+
+- Added the Generation-1 neutral IR translator backend (IR instruction records → bounded NUVM/1 bytecode).
+- Added a disk-backed FIFO cache spool with per-record CRC32, 64 KiB maximum chunk, caller-owned read buffer, disk quota and deletion after the queue drains.
+- Added translator execution and cache FIFO/capacity/deletion regression tests.
+- Reworked the Win32 host to execute at most 64 VM instructions per admitted timer slice; the message loop remains responsive between slices.
+- Added the Generation-1 module/translator contract at native/NUVM-1-GENERATION-1-MODULE-CONTRACT.md.
+- Successful machine checks for the Win32 host + translator/cache candidate: [workflow run 44250986834](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44250986834). Portable C90 tests, static validation and XP-target cross-build passed. The PE artifact was uploaded as nu-launcher-win32-xp-candidate (43,667 bytes; 14-day retention at upload).
+- This artifact is a host/VM smoke-test candidate only. It is not a setup installer, contains no native ports of the three games and has not been executed on Windows XP.
+
+### Remaining release blockers
+
+- Digital publisher signature and trust-root/key rotation.
+- Manifest parser, dependency resolver, package staging/atomic activation/rollback.
+- Streaming cache integration into module loading and crash-recovery semantics.
+- Generation-specific game translators and native ports of Bubble Hunt, Mana Collector and Chaos Attack.
+- GPU renderer/adapter and actual resource allocation enforcement.
+- XP-compatible toolchain/import audit, actual XP boot/run test and old-hardware QA.
+- Signed installer, uninstall/repair and release packaging.
