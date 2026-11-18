@@ -11,7 +11,7 @@
   const items=[...root.querySelectorAll(".nu-gateway-item")];
   let open=false,selected=null,activationTimer=0,entryTimer=0,outsideSince=0,suppressClickUntil=0;
   let controllerFrame=0,lastControllerMove=0,controllerConfirmDown=false,controllerCancelDown=false;
-  let entryPointerId=null,virtualInside=false;
+  let entryPointerId=null,virtualInside=false,requireVirtualLeave=false;
   const core=window.NUControllerInputCore?window.NUControllerInputCore.create({
     mode:"physical-mouse",bounds:{left:0,top:0,right:Math.max(1,innerWidth),bottom:Math.max(1,innerHeight)},
     x:trigger.getBoundingClientRect().left+trigger.getBoundingClientRect().width/2,
@@ -66,6 +66,7 @@
     if(open===next)return;
     if(next)window.dispatchEvent(new Event("nu:gateway-open"));
     open=next;outsideSince=0;
+    if(!open&&core&&core.getState().mode==="simulated-mouse")requireVirtualLeave=true;
     root.classList.toggle("is-open",open);
     document.body.classList.toggle("nu-gateway-open",open);
     trigger.setAttribute("aria-expanded",String(open));
@@ -136,6 +137,9 @@
     virtualPointer.style.left=x+"px";virtualPointer.style.top=y+"px";
     const target=document.elementFromPoint(x,y);
     const onTrigger=!!(target&&(target===trigger||trigger.contains(target)));
+    const bounds=root.getBoundingClientRect(),orbit=window.matchMedia("(max-width: 600px)").matches?112:126;
+    const inGatewayBounds=x>=bounds.left-orbit&&x<=bounds.right+orbit&&y>=bounds.top-orbit&&y<=bounds.bottom+orbit;
+    if(requireVirtualLeave){if(!inGatewayBounds)requireVirtualLeave=false;virtualInside=onTrigger;clearEntry();return;}
     if(onTrigger&&!open&&!virtualInside)scheduleEntry(1000);
     if(!onTrigger&&!open)clearEntry();
     virtualInside=onTrigger;
