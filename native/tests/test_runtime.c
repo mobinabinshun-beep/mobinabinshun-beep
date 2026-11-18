@@ -133,6 +133,8 @@ int main(void){
    {"bubble-hunt","0.9.0",1u},{"legacy-addon","2.0.0",0u}};
   NU_InstallPlanEntry entries[3]; NU_InstallPlan plan;
   NU_InstallJournal journal;
+  assert(NU_InstallPlanBuild(target,3u,0,0u,entries,3u,&plan));
+  assert(plan.keep_count==0u && plan.update_count==0u && plan.add_count==3u);
   assert(NU_InstallPlanBuild(target,3u,installed,3u,entries,3u,&plan));
   assert(plan.keep_count==1u && plan.update_count==1u && plan.add_count==1u);
   assert(plan.untouched_installed_count==1u);
