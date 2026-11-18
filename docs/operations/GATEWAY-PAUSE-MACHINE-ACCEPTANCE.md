@@ -1,4 +1,7 @@
 # Gateway pause/resume — owner decision and machine-acceptance addendum
+
+> **HISTORICAL IMPLEMENTATION RECORD — behavior superseded (2026-11-18).** Preserve this record as evidence for its original scope and commits only. The current normative behavior is defined exclusively by the [Unified Gateway owner contract](https://github.com/mobinabinshun-beep/Repository/blob/docs/gateway-human-approval-lock-2026-11-18/Operations/2026-11-18/GATEWAY-MACHINE-APPROVAL-LOCK-AND-HUMAN-QA-fa.md). Historical machine checks do not prove the new timing, list-exit, pointer re-entry or training requirements.
+
 - Date: 2026-11-16
 - Status: CONFIRMED owner direction; documentation-only change
 - Canonical archive decision: https://github.com/mobinabinshun-beep/Repository/blob/main/Operations/2026-11-16/GATEWAY-IS-THE-PAUSE-CONTROL-fa.md

@@ -1,5 +1,8 @@
 # N.U Generation 1 — Main-game Gateway implementation record
 
+> **HISTORICAL IMPLEMENTATION RECORD — behavior superseded (2026-11-18).** Preserve this record as evidence for its original scope and commits only. The current normative behavior is defined exclusively by the [Unified Gateway owner contract](https://github.com/mobinabinshun-beep/Repository/blob/docs/gateway-human-approval-lock-2026-11-18/Operations/2026-11-18/GATEWAY-MACHINE-APPROVAL-LOCK-AND-HUMAN-QA-fa.md). Historical machine checks do not prove the new timing, list-exit, pointer re-entry or training requirements.
+
+
 **Record:** NU-G1-GATEWAY-2026-11-15  
 **Status:** CANDIDATE — PR #113 OPEN; CI AND HUMAN DEVICE QA PENDING
 **Pull request:** https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/113  
