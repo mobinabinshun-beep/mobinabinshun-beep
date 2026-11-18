@@ -4,6 +4,7 @@
 #include "../nu_runtime.h"
 #include "../nu_cache.h"
 #include "../nu_translator.h"
+#include "../nu_package.h"
 static void put32(uint8_t *p,uint32_t v){p[0]=(uint8_t)v;p[1]=(uint8_t)(v>>8);p[2]=(uint8_t)(v>>16);p[3]=(uint8_t)(v>>24);}
 int main(void){
  NU_Budget b;uint8_t code[]={1,0,42,0,0,0,1,1,8,0,0,0,3,0,1,0};
@@ -15,15 +16,15 @@ int main(void){
  assert(b.cpu_slot_numerator==1u&&b.cpu_slot_denominator==2u);
  assert(!NU_SchedulerGrantSlot(0u)&&NU_SchedulerGrantSlot(1u));
  assert(!NU_SchedulerGrantGpuSlot(0u)&&NU_SchedulerGrantGpuSlot(1u));
- memcpy(pkg,"NUVM",4u);pkg[4]=1u;pkg[5]=0u;pkg[6]=1u;pkg[7]=0u;
- put32(pkg+8u,(uint32_t)sizeof(code));memcpy(pkg+16u,code,sizeof(code));put32(pkg+12u,NU_CRC32(code,sizeof(code)));
+ assert(NU_PackageBuild(code,sizeof(code),pkg,sizeof(pkg))==sizeof(pkg));
+
  assert(NU_PackageValidate(pkg,sizeof(pkg),&view));NU_VMInit(&vm,view.code,view.code_size,100u);
  result=1;for(i=0u;i<20u&&result>0;++i)result=NU_VMStep(&vm);
  assert(vm.halted&&vm.registers[0]==50u);
  pkg[16u]^=1u;assert(!NU_PackageValidate(pkg,sizeof(pkg),&view));
  {uint8_t bad[]={255u};NU_VMInit(&vm,bad,1u,10u);assert(NU_VMStep(&vm)==-1&&vm.fault);}
  {
-  NU_DiskCache cache;NU_IRInstruction ir[4];uint8_t translated[64];size_t translated_size;uint8_t first[]={1u,2u,3u,4u};uint8_t second[]={9u,8u,7u};uint8_t output[16];uint32_t output_size;FILE *probe;
+  NU_DiskCache cache;NU_IRInstruction ir[4];uint8_t translated[64];size_t translated_size;uint8_t first[]={1u,2u,3u,4u};uint8_t second[]={9u,8u,7u};uint8_t output[16];uint32_t output_size;FILE *probe;uint8_t staged[sizeof(pkg)];uint32_t staged_size;FILE *source;
   ir[0].operation=NU_IR_LOAD_IMM;ir[0].a=0u;ir[0].immediate=42u;
   ir[1].operation=NU_IR_LOAD_IMM;ir[1].a=1u;ir[1].immediate=8u;
   ir[2].operation=NU_IR_ADD;ir[2].a=0u;ir[2].b=1u;
@@ -42,6 +43,13 @@ int main(void){
   probe=fopen("nu-cache-test.bin","rb");assert(probe==NULL);
   assert(NU_CachePush(&cache,first,4u));assert(!NU_CachePush(&cache,first,60u));
   NU_CacheClear(&cache);
+  source=fopen("nu-stage-test.nup","wb");assert(source!=NULL);
+  assert(fwrite(pkg,1u,sizeof(pkg),source)==sizeof(pkg));assert(fclose(source)==0);
+  assert(NU_CacheInit(&cache,"nu-stage-cache.bin",1024u));
+  assert(NU_CacheStageFile(&cache,"nu-stage-test.nup")==sizeof(pkg));
+  assert(NU_CacheLoadAll(&cache,staged,(uint32_t)sizeof(staged),&staged_size)==1);
+  assert(staged_size==sizeof(pkg)&&NU_PackageValidate(staged,staged_size,&view));
+  remove("nu-stage-test.nup");
  }
  puts("N.U native runtime tests passed");return 0;
 }
