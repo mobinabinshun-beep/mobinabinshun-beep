@@ -8,6 +8,7 @@ on:
       - "nu-arcane-shield.css"
       - "tests/nu-arcane-shield.test.js"
       - ".github/workflows/arcane-shield-regression.yml"
+      - "tests/*.test.js"
   workflow_dispatch:
 permissions:
   contents: read
@@ -28,3 +29,5 @@ jobs:
       - name: Run focused and adjacent Generation 1 regression tests
         run: |
           node --test tests/nu-arcane-shield.test.js tests/nu-wallet.test.js tests/nu-keyboard-gameplay.test.js tests/nu-health.test.js tests/nu-hp-pill-interaction.test.js tests/nu-wallet-history-presentation.test.js tests/nu-hud-layout.test.js
+      - name: Run complete Generation 1 test suite
+        run: node --test tests/*.test.js
