@@ -18,28 +18,35 @@ test("Launcher core exposes one reusable simulated-mouse controller adapter",()=
  assert.doesNotMatch(gateway,/if\(!root\|\|!scrim\|\|!gameView\)return/);
 });
 
-test("D-pad and stick directions move the virtual pointer without activating targets",()=>{
- assert.match(pointer,/b\[12\]/);
- assert.match(pointer,/b\[13\]/);
- assert.match(pointer,/b\[14\]/);
- assert.match(pointer,/b\[15\]/);
- assert.match(pointer,/x\+input\.dx\*step/);
- assert.match(pointer,/y\+input\.dy\*step/);
- assert.match(pointer,/updateTarget\(\);lastMove=time/);
- assert.match(pointer,/if\(\(input\.dx\|\|input\.dy\)&&time-lastMove>=repeat\)/);
- assert.doesNotMatch(pointer,/if\(\(input\.dx\|\|input\.dy\)[^}]*clickTarget/);
+test("Directional click-controller input moves the virtual pointer without auto-selecting a game target",()=>{
+ assert.match(pointer,/function move\(dx,dy,source\)/);
+ assert.match(pointer,/win\.addEventListener&&win\.addEventListener\("nu:controller-direction"/);
+ assert.match(pointer,/else move\(dx,dy,detail\.source/);
+ assert.match(pointer,/x\+sx\*step/);
+ assert.match(pointer,/y\+sy\*step/);
+ assert.doesNotMatch(pointer,/aimBot|autoAim|autoTarget/i);
 });
 
-test("Confirm is a separate click; B remains Gateway cancel",()=>{
- assert.match(pointer,/if\(!primed\)/);
- assert.match(pointer,/if\(input\.confirm&&!confirmDown\)clickTarget\(\)/);
- assert.match(pointer,/if\(input\.cancel&&!cancelDown\).*key:"Escape"/);
+test("Gamepad D-pad and stick are translated into Gateway up/down navigation",()=>{
+ for(const index of [12,13,14,15])assert.match(pointer,new RegExp("b\\\\["+index+"\\\\]"));
+ assert.match(pointer,/emit\("nu:gateway-direction",\{dx:input\.dx,dy:input\.dy,source:"gamepad"\}\)/);
+ assert.match(pointer,/if\(input\.confirm&&!confirmDown\)emit\("nu:gateway-confirm"/);
+ assert.match(pointer,/if\(input\.cancel&&!cancelDown\)emit\("nu:gateway-cancel"/);
+});
+
+test("Confirmation is a separate click and Gateway cancel is not treated as a gameplay click",()=>{
+ assert.match(pointer,/function clickTarget\(source\)/);
+ assert.match(pointer,/target\.dispatchEvent\(new win\.PointerEvent\("pointerdown"/);
+ assert.match(pointer,/target\.dispatchEvent\(new win\.PointerEvent\("pointerup"/);
  assert.match(pointer,/new win\.MouseEvent\("click"/);
+ assert.match(pointer,/if\(gatewayNavigation\)\{emit\("nu:gateway-confirm"/);
+ assert.match(pointer,/if\(gatewayNavigation\)emit\("nu:gateway-cancel"/);
 });
 
-test("Gateway delegates simulated pointer ownership to the shared adapter",()=>{
- assert.match(gateway,/NUControllerPointer\?\.setEnabled\(true\)/);
- assert.match(gateway,/NUControllerPointer\?\.setEnabled\(false\)/);
+test("Gateway delegates pointer ownership to the shared adapter without disabling it on return",()=>{
+ assert.match(gateway,/NUControllerPointer\?\.setGatewayNavigation\(true\)/);
+ assert.match(gateway,/NUControllerPointer\?\.setGatewayNavigation\(false\)/);
+ assert.doesNotMatch(gateway,/NUControllerPointer\?\.setEnabled/);
  assert.doesNotMatch(gateway,/window\.addEventListener\("gamepadconnected",startController\)/);
 });
 
