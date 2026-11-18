@@ -7,7 +7,7 @@
 ## Implemented in this candidate
 
 - Platform-neutral resource budget model.
-- Deterministic cooperative scheduler: one N.U work slot per two slots.
+- Deterministic cooperative scheduler: one N.U CPU work slot per two scheduler slots; GPU work admission alternates across N.U slots.
 - NUVM/1 bounded bytecode interpreter: eight 32-bit registers, 4 KiB private VM memory, instruction limits and fail-closed malformed-opcode handling.
 - Generation 1 package envelope: NUVM magic, ABI, generation, payload length and CRC-32.
 - Minimal native Win32 window; press O to open a .nup package and Esc to exit.
@@ -21,13 +21,14 @@ This is a native execution foundation, **not yet a playable port** of Bubble Hun
 |---|---|
 | Physical RAM | Query total and currently available RAM at startup |
 | N.U RAM budget | min(50% physical, 50% currently available, 250 MiB) |
+| Shared working/cache budget | Same bounded RAM budget; maximum 250 MiB |
+| Short-term cache | 50% of shared budget (125 MiB at full profile) |
+| Repeated-pattern cache | Remaining 50% (125 MiB at full profile) |
 | Disk package/cache ceiling | 1 GiB |
-| Short-term disk cache | 125 MiB |
-| Repeated-pattern cache | 125 MiB |
 | CPU | One N.U cooperative slot per two scheduler slots; process priority below normal |
-| Graphics | App-side ceiling 640×480 at 30 FPS; no GPU stress benchmark |
+| GPU | Alternating N.U render admission; app-side ceiling 640×480 at 30 FPS |
 
-The two 125 MiB cache partitions are disk-cache targets, not RAM preallocations. The 1 GiB disk ceiling is a policy, not a claim that the drive has that much free space.
+The 125 MiB partitions are subdivisions of the shared working/cache budget, not extra memory allocations. The 1 GiB disk ceiling is a storage policy, not a claim that the drive has that much free space.
 
 ## Engineering limits that must remain explicit
 
