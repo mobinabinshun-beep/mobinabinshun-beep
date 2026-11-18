@@ -52,11 +52,13 @@ test("Gateway freezes gameplay and ambient renderers while keeping foreground co
  assert.match(games,/document\.body\.classList\.contains\("nu-gateway-open"\)/);
 });
 
-test("Gateway keyboard controls move through options and confirm the selected destination",()=>{
- assert.match(gateway,/event\.key==="ArrowDown"\|\|event\.key==="ArrowRight"/);
- assert.match(gateway,/event\.key==="ArrowUp"\|\|event\.key==="ArrowLeft"/);
+test("Gateway keyboard controls move vertically through options and confirm the selected destination",()=>{
+ assert.match(gateway,/event\.key==="ArrowDown"/);
+ assert.match(gateway,/event\.key==="ArrowUp"/);
  assert.match(gateway,/event\.key==="Enter"\|\|event\.key===" "/);
  assert.match(gateway,/function moveSelection\(direction\)/);
+ assert.match(gateway,/function moveControllerSelection\(direction\)/);
+ assert.doesNotMatch(gateway,/event\.key==="ArrowRight"\|\|event\.key==="ArrowLeft"/);
 });
 
 test("Gateway mouse hover visibly selects and a click activates one destination",()=>{
@@ -67,18 +69,19 @@ test("Gateway mouse hover visibly selects and a click activates one destination"
  assert.match(gateway,/function activate\(item\)/);
 });
 
-test("Shared controller adapter maps D-pad/stick to virtual pointer and A/B to confirm/cancel",()=>{
+test("Shared controller adapter maps D-pad/stick to Gateway hierarchy and A/B to confirm/cancel",()=>{
  const pointer=fs.readFileSync("nu-controller-pointer.js","utf8");
- assert.match(gateway,/NUControllerPointer\?\.setEnabled\(true\)/);
- assert.match(pointer,/navigator&&win\.navigator\.getGamepads/);
+ assert.match(gateway,/NUControllerPointer\?\.setGatewayNavigation\(true\)/);
+ assert.match(pointer,/win\.navigator&&typeof win\.navigator\.getGamepads/);
  assert.match(pointer,/b\[12\]/);
  assert.match(pointer,/b\[15\]/);
  assert.match(pointer,/b\[0\]/);
  assert.match(pointer,/b\[1\]/);
- assert.match(pointer,/key:"Escape"/);
+ assert.match(pointer,/emit\("nu:gateway-confirm"/);
+ assert.match(pointer,/emit\("nu:gateway-cancel"/);
 });
 
-test("Keyboard and gamepad share game target selection and activation",()=>{
+test("Keyboard retains its own selection while gamepad gameplay uses the shared simulated pointer",()=>{
  assert.match(games,/function moveKeyboardTarget\(direction\)/);
  assert.match(games,/function activateKeyboardTarget\(\)/);
  assert.match(games,/event\.key==="ArrowRight"\|\|event\.key==="ArrowDown"/);
@@ -86,8 +89,9 @@ test("Keyboard and gamepad share game target selection and activation",()=>{
  assert.match(games,/buttons\[0\]/);
  assert.match(games,/function startGamepad\(\)/);
  assert.match(games,/document\.addEventListener\("keydown",event=>\{/);
- assert.match(games,/gamepadReturnPrimed=false/);
- assert.match(games,/freshDirection=direction!==0&&direction!==gamepadReturnDirection/);
+ assert.match(games,/NUControllerPointer\.move\(dx,dy,"gamepad"\)/);
+ assert.match(games,/NUControllerPointer\.click\("gamepad"\)/);
+ assert.match(games,/freshDirection=hasDirection&&directionKey!==gamepadReturnDirection/);
  assert.match(games,/freshConfirm=confirm&&!gamepadReturnConfirm/);
 });
 
@@ -105,5 +109,5 @@ test("Hidden tabs do not restart a Gateway-paused round or gamepad polling",()=>
  assert.match(games,/const shouldFreeze=!!frozen\|\|document\.hidden/);
  assert.match(games,/if\(state\.active&&!state\.paused\)/);
  assert.match(gateway,/window\.addEventListener\("blur"/);
- assert.match(gateway,/NUControllerPointer\?\.setEnabled\(false\)/);
+ assert.match(gateway,/NUControllerPointer\?\.setGatewayNavigation\(false\)/);
 });
