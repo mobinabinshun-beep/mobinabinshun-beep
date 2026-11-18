@@ -1,43 +1,36 @@
-# Gateway machine-approval lock and human-QA handoff
+# Gateway — product repository pointer and candidate handoff
 
-**Effective date:** 2026-11-18  
-**Status:** OWNER-DIRECTED PROCESS — EFFECTIVE  
-**Canonical specification:** [Archive decision](https://github.com/mobinabinshun-beep/Repository/blob/main/Operations/2026-11-18/GATEWAY-MACHINE-APPROVAL-LOCK-AND-HUMAN-QA-fa.md)
+**Date:** 2026-11-18  
+**Status:** DOCUMENTATION POINTER · CANONICAL ARCHIVE CONTRACT IS AUTHORITATIVE
 
-This product-repository record points to the canonical owner directive. The archive document is authoritative; do not maintain a divergent copy of the full specification here.
+## Single source of truth
 
-## Required candidate status
+The only normative Gateway/controller behavior specification is the [Unified Gateway owner contract in the archive](https://github.com/mobinabinshun-beep/Repository/blob/docs/gateway-human-approval-lock-2026-11-18/Operations/2026-11-18/GATEWAY-MACHINE-APPROVAL-LOCK-AND-HUMAN-QA-fa.md).
 
-Every candidate that passes its recorded automated checks must be handed off as:
+It defines the selective commands (Menu/List, Back=Home=Exit, Profile), Gateway-only Pause/Freeze, no automatic Reload, freeze-until-first-real-gameplay-interaction after closing, simulated-mouse definition, controller list traversal, extra-down and held-down exit, pointer leave/re-enter reopening, 0.50s/1.00s entry targets, future eight-direction training, acceptance tests and machine-lock/human-QA rules.
 
-`AUTOMATED-QA-PASSED · HUMAN-QA-PENDING · MACHINE-LOCKED`
+Do not copy or independently redefine those rules in this repository. This file is only a pointer and a status handoff. Product code and tests remain authoritative evidence of what is actually implemented; the archive is authoritative for what is required.
 
-The lock applies to the exact candidate SHA and branch. No automated agent, bot, workflow or contributor acting as an automated execution agent may make further content changes to that candidate until human QA feedback and an explicit scope reopening are recorded. Preserve the candidate SHA and its test evidence. Any requested correction must be implemented on a successor branch, not by mutating the frozen candidate.
-
-Automated approval is not human acceptance, owner approval, scope lock, merge authorization or production release.
-
-## Existing Gateway candidate reviewed on 2026-11-18
+## Locked runtime candidate — PR #178
 
 - PR: https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/178
-- Candidate branch: `owner/gateway-speed-and-simulated-mouse-2026-11-17`
-- Candidate SHA: `78d25edbc6e2fed31a8925c7e33f5949af50bef5`
-- Seven associated CI workflows were observed completed successfully; exact run IDs and coverage limits are in the canonical archive decision.
-- Human QA remains pending. The newly specified 0.50s/1.00s activation delays and the extra-down / held-down list-exit behavior are not proven by those seven workflows and remain open acceptance items.
+- Branch: `owner/gateway-speed-and-simulated-mouse-2026-11-17`
+- Exact SHA: `78d25edbc6e2fed31a8925c7e33f5949af50bef5`
+- Seven associated workflows previously observed successful; exact run IDs are recorded in the canonical archive contract.
+- Status for that recorded coverage only: `AUTOMATED-QA-PASSED · HUMAN-QA-PENDING · MACHINE-LOCKED`.
+- The new 0.50s/1.00s timing, extra-down/held-down exit, pointer leave/re-enter behavior and eight-direction training are not proven by those seven workflows.
+- Do not modify PR #178 or its SHA. Any owner-authorized correction belongs on a successor branch after human feedback and explicit reopening.
 
-No runtime source file is changed by this documentation-only record. Do not interpret this record as implementation or test evidence for the newly specified timing/list-exit behavior.
+## Documentation PRs
 
+- Archive PR #30: https://github.com/mobinabinshun-beep/Repository/pull/30
+- Product PR #186: https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/186
+- Documentation commits require their own CI/readback. Until those checks are observed successful on exact final SHAs, their status remains `PENDING-AUTOMATED-QA`, not Machine Passed or Machine Locked.
 
-## Owner clarification — unified Gateway/controller contract (2026-11-18)
+## Historical product records
 
-The canonical archive now includes the owner's detailed, overriding acceptance addendum:
-- Remove duplicate controls only where Gateway provides the same function.
-- Selective actions: Menu/List, Back = Home = Exit (main page), Profile.
-- Pause exists only through Gateway; freeze before Gateway options appear. No automatic Reload on page/Gateway entry.
-- After Gateway closes, gameplay remains frozen until the first deliberate real interaction with the game. Preserve pre-existing pause.
-- Directional/click-step cursor movement is simulated mouse input. While Gateway is open, controller navigation takes over.
-- Down traverses options; one extra Down after the last option exits. Holding Down may pass through and exit without activating skipped options. Users may pause between options indefinitely.
-- On exit, the virtual pointer remains over Gateway; reopening requires leaving its bounds and re-entering.
-- Target activation delay: physical mouse/touch 0.50s; simulated mouse 1.00s. These remain unverified until dedicated timing tests pass.
-- Eight-direction first-use training remains FUTURE / NOT IMPLEMENTED until separately built and tested.
+- `GATEWAY-AND-CONTROLLER-INPUT-CONTRACT-2026-11-17.md` is retained as historical implementation/CI evidence; its behavior clauses are superseded.
+- `GATEWAY-CONTROLLER-NAVIGATION-2026-11-17.md` is historical.
+- Other dated Gateway implementation and pause notes preserve their original scope/evidence and must not be treated as the current behavior contract.
 
-**Implementation boundary:** PR #178 remains frozen at its recorded SHA. Follow-up implementation belongs on successor branch `owner/gateway-contract-successor-2026-11-18`, created from that exact SHA; it must not mutate PR #178. The addendum is a specification, not evidence that every behavior is implemented.
+No runtime source is changed by this pointer. A documentation link, a merged source commit, a green workflow, a live demo and human acceptance are distinct evidence states.
