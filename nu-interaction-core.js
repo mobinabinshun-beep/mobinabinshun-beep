@@ -27,7 +27,7 @@
  }
  function on(type,fn){if(typeof fn!=="function")return()=>{};if(!listeners.has(type))listeners.set(type,[]);listeners.get(type).push(fn);return()=>listeners.set(type,(listeners.get(type)||[]).filter(x=>x!==fn));}
  function targetOf(event){return event&&event.target&&event.target.closest?event.target.closest(INTERACTIVE):event&&event.target;}
- function mouse(event){if(!event||event.pointerType==="touch")return;if(event.type==="pointermove"||event.type==="mousemove")return;publish(event.type==="click"?"activate":event.type==="pointerdown"?"press":"release","physical-mouse",targetOf(event),{button:event.button,detail:event.detail||0});}
+ function mouse(event){if(!event||event.pointerType==="touch"||event.type==="click")return;if(event.type==="pointermove"||event.type==="mousemove")return;publish(event.type==="pointerdown"?"press":"release","physical-mouse",targetOf(event),{button:event.button,detail:event.detail||0});}
  function touch(event){
   if(!event||event.pointerType!=="touch")return;
   if(event.type==="pointerdown"){lastTouchAt=now();publish("press","direct-touch",targetOf(event),{pointerId:event.pointerId});}
