@@ -19,7 +19,7 @@ test("Launcher core exposes one reusable simulated-mouse controller adapter",()=
  assert.ok(studio.includes("nu-controller-pointer.js"));
  assert.ok(casino.indexOf("nu-controller-pointer.js")<casino.indexOf("nu-hex-gateway.js"));
  assert.ok(studio.indexOf("nu-controller-pointer.js")<studio.indexOf("nu-hex-gateway.js"));
- for(const page of [index,casino,launcher,studio])assert.ok(page.includes("nu-controller-pointer.js?v=20261118-directional-r3"));
+ for(const page of [index,casino,launcher,studio])assert.ok(page.includes("nu-controller-pointer.js?v=20261118-directional-r4"));
  assert.match(launcher,/<body class="nu-launcher-page">/);
  assert.match(gatewayCss,/body\.nu-launcher-page #nu-hex-gateway/);
  assert.doesNotMatch(gateway,/if\(!root\|\|!scrim\|\|!gameView\)return/);
@@ -39,6 +39,14 @@ test("D-pad and stick directions move the virtual pointer without activating tar
  assert.doesNotMatch(pointer,/if\(\(input\.dx\|\|input\.dy\)[^}]*clickTarget/);
 });
 
+test("Click-controller directions have an explicit path to move the simulated pointer",()=>{
+ assert.match(pointer,/function movePointer\(dx,dy,source\)/);
+ assert.match(pointer,/nu:simulated-pointer-direction/);
+ assert.match(pointer,/nu:controller-direction/);
+ assert.match(pointer,/startClickController\(\)/);
+ assert.match(pointer,/move\(dx,dy\)\{return movePointer/);
+ assert.match(pointer,/emit\("nu:simulated-pointer-move"/);
+});
 test("A held Down used to exit Gateway cannot move the virtual pointer away from the trigger",()=>{
  assert.match(pointer,/if\(gatewayBlockedUntilNeutral\)\{if\(!input\.dx&&!input\.dy\)/);
  assert.match(pointer,/gatewayBlockedUntilNeutral=!!\(current\.dx\|\|current\.dy\)/);
