@@ -49,3 +49,19 @@ test("Existing Gateway directional event automatically starts and moves the simu
  assert.equal(h.adapter.getState().y,300);
  h.adapter.destroy();
 });
+
+test("Real arrow-key input from a keyboard-emulated click controller moves the pointer without Gamepad API",()=>{
+ const h=harness();const before=h.adapter.getState();
+ const event={type:"keydown",key:"ArrowRight",repeat:false,altKey:false,ctrlKey:false,metaKey:false,
+  preventDefault(){this.defaultPrevented=true;},stopImmediatePropagation(){this.stopped=true;}};
+ h.window.dispatchEvent(event);const after=h.adapter.getState();
+ assert.equal(h.adapter.isEnabled(),true);assert.equal(after.x,before.x+28);assert.equal(after.y,before.y);
+ assert.equal(event.defaultPrevented,true);assert.equal(event.stopped,true);h.adapter.destroy();
+});
+test("Gateway keeps exclusive ownership of arrow keys while hierarchical navigation is active",()=>{
+ const h=harness();h.adapter.startClickController();h.adapter.setGatewayNavigation(true);const before=h.adapter.getState();
+ const event={type:"keydown",key:"ArrowDown",repeat:false,preventDefault(){this.defaultPrevented=true;},stopImmediatePropagation(){this.stopped=true;}};
+ h.window.dispatchEvent(event);const after=h.adapter.getState();
+ assert.equal(after.x,before.x);assert.equal(after.y,before.y);assert.equal(event.defaultPrevented,undefined);
+ h.adapter.setGatewayNavigation(false);h.adapter.destroy();
+});
