@@ -7,11 +7,13 @@ const html=read("index.html"),casino=read("casino.html"),launcher=read("launcher
 const js=read("nu-hex-gateway.js"),css=read("nu-hex-gateway.css"),worldCss=read("nu-world.css");
 const games=read("nu-games.js"),playerUI=read("nu-player-ui.js"),graphics=read("nu-graphics-runtime.js"),exchange=read("nu-exchange.js"),dynamic=read("nu-dynamic-layers.js");
 
-test("Gateway controller is scoped only to active main-game view",()=>{
+test("Gateway runs on every mounted page and scopes game-only state when a game view exists",()=>{
  assert.match(html,/id="nu-hex-gateway"/);
- assert.match(js,/if\(!root\|\|!scrim\|\|!gameView\)return/);
+ assert.match(js,/if\(!root\|\|!scrim\)return/);
+ assert.match(js,/const pageActive=!gameView/);
  assert.match(js,/classList\.toggle\("nu-game-active",active\)/);
  assert.match(css,/body\.nu-game-active #nu-hex-gateway/);
+ assert.match(css,/body\.nu-gateway-page-active #nu-hex-gateway/);
  assert.match(css,/body\.nu-game-active #menu-open/);
  assert.match(css,/body\.nu-game-active #back-home/);
  for(const page of [casino,launcher,studio])assert.match(page,/id="nu-hex-gateway"/);
@@ -35,9 +37,11 @@ test("Opening Gateway freezes the game and all ambient renderers until a decisio
  assert.match(games,/NUPixelWorld\.setEnabled/);
  assert.match(graphics,/nu-gateway-open/);
  assert.match(graphics,/NUDynamicLayers&&g\.NUDynamicLayers\.setFrozen/);
- assert.match(js,/setOpen\(false,false\)/);
- assert.match(js,/nu:menu-dismissed/);
- assert.match(js,/nu:player-overlay-close/);
+ assert.match(js,/window\.dispatchEvent\(new Event\("nu:gateway-close"\)\)/);
+ assert.match(games,/gatewayAwaitingInteraction=true/);
+ assert.match(games,/function resumeAfterGatewayInteraction\(\)/);
+ assert.doesNotMatch(js,/nu:menu-dismissed/);
+ assert.doesNotMatch(js,/nu:player-overlay-close/);
 });
 
 test("Menu is a centered, concise module directory with player modules before games",()=>{
@@ -132,8 +136,10 @@ test("Player views manage focus, wallet tabs support arrow navigation, and Enter
  assert.match(playerUI,/ArrowLeft/);assert.match(playerUI,/ArrowRight/);assert.match(playerUI,/event\.key==="Home"/);assert.match(playerUI,/event\.key==="End"/);
 });
 
-test("Gateway focus loop wraps in both directions and Escape restores the trigger",()=>{
- assert.match(js,/event\.key==="Escape"\)\{event\.preventDefault\(\);setOpen\(false\);trigger\.focus/);
+test("Gateway focus loop stays trapped, arrow navigation is bounded, and Escape closes",()=>{
+ assert.match(js,/event\.key==="Escape"\)\{event\.preventDefault\(\);closeGateway\(\);trigger\.focus/);
+ assert.match(js,/exitAtEnd&&direction>0&&current===items.length-1/);
+ assert.doesNotMatch(js,/\(current\+direction\+items\.length\)%items\.length/);
  assert.match(js,/event\.shiftKey&&document\.activeElement===first/);
  assert.match(js,/!event\.shiftKey&&document\.activeElement===last/);
  assert.match(css,/#nu-hex-gateway button:focus-visible/);

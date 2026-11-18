@@ -15,9 +15,9 @@ test("Gateway is the only visible gameplay pause control",()=>{
  assert.match(games,/window\.addEventListener\("nu:gateway-open"/);
  assert.match(games,/window\.addEventListener\("nu:gateway-close"/);
 });
-test("Gateway closing resumes only a pause it created",()=>{
+test("Gateway close releases ownership but leaves the game frozen",()=>{
  assert.match(games,/gatewayPause\.open\(state\)/);
- assert.match(games,/gatewayPause\.close\(state\)/);
+ assert.match(games,/gatewayPause\.close\(\)/);
  assert.match(games,/playerOverlayPaused&&!gatewayPause\.ownsPause\(\)&&state\.paused/);
  assert.match(pause,/ownsPause=true/);
  assert.match(pause,/if\(!ownsPause\)return false/);

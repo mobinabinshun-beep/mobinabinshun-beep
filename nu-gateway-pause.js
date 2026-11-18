@@ -1,4 +1,4 @@
-/* N.U Gateway pause ownership — only releases a pause created by Gateway. */
+/* N.U Gateway pause ownership — close never resumes gameplay. */
 (function(root,factory){
   const api=factory();
   if(typeof module==="object"&&module.exports)module.exports=api;
@@ -15,16 +15,13 @@
         state.paused=true;
         return true;
       },
-      close(state){
+      close(){
         if(!ownsPause)return false;
         ownsPause=false;
-        if(!state||!state.paused||state.turn>=10)return false;
-        state.paused=false;
-        state.active=true;
         return true;
       },
-      reset(){ownsPause=false;},
-      ownsPause(){return ownsPause;}
+      ownsPause(){return ownsPause;},
+      reset(){ownsPause=false;}
     };
   }
   return {create};
