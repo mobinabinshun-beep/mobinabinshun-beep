@@ -138,3 +138,34 @@ test("pending Chaos targets survive save normalization and are resolved exactly 
   assert.equal(duplicate.resolvedCount,0);
   assert.equal(duplicate.hpDamage,0);
 });
+
+
+test("one X Credit capacity upgrade adds a permanent full container and a separate Mana grant",()=>{
+  const result=Wallet.upgradeManaCapacity({xCredits:1,manaCapsules:1,mana:4},{id:"capacity-upgrade-1"});
+  assert.equal(result.ok,true);
+  assert.equal(result.xCreditsSpent,1);
+  assert.equal(result.capacity,2);
+  assert.equal(result.maxMana,20);
+  assert.equal(result.manaGranted,10);
+  assert.equal(result.state.xCredits,0);
+  assert.equal(result.state.manaCapsules,2);
+  assert.equal(result.state.mana,14);
+  assert.equal(result.transactions.length,3);
+  assert.equal(result.transactions[0].category,"MANA_CAPACITY_UPGRADE_COST");
+  assert.equal(result.transactions[1].category,"MANA_CAPACITY_UPGRADE");
+  assert.equal(result.transactions[2].category,"MANA_CAPACITY_UPGRADE_GRANT");
+  assert.equal(result.transactions[2].signedAmount,10);
+  const duplicate=Wallet.upgradeManaCapacity(result.state,{id:"capacity-upgrade-1"});
+  assert.equal(duplicate.ok,false);
+  assert.equal(duplicate.reason,"DUPLICATE_TRANSACTION");
+});
+
+test("capacity upgrade rejects missing X Credit, active Wave and level-nine capacity without side effects",()=>{
+  assert.equal(Wallet.upgradeManaCapacity({xCredits:0,manaCapsules:1,mana:0},{id:"no-x"}).reason,"INSUFFICIENT_X_CREDITS");
+  const active=Wallet.beginWave({xCredits:1,manaCapsules:1,mana:0},"chaos");
+  assert.equal(Wallet.upgradeManaCapacity(active.state,{id:"active-wave"}).reason,"UPGRADE_REQUIRES_NO_ACTIVE_WAVE");
+  assert.equal(Wallet.upgradeManaCapacity({xCredits:1,manaCapsules:9,mana:90},{id:"cap-nine"}).reason,"MAX_MANA_CAPACITY");
+  const unchanged=Wallet.normalizeSave({xCredits:0,manaCapsules:1,mana:0});
+  assert.equal(unchanged.mana,0);
+  assert.equal(unchanged.manaCapsules,1);
+});
