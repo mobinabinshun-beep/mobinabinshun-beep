@@ -125,3 +125,9 @@ The portable runtime now includes `nu_manifest.c/.h`. It parses a canonical, fix
 The parser does **not** calculate SHA-256 or validate a publisher signature. `NU_ManifestVerify` delegates both operations to an explicitly supplied platform crypto provider and fails closed when the provider is absent or the manifest is marked unsigned. The test suite verifies parsing and fail-closed behavior; it does not pretend that a mock callback is cryptography.
 
 The cache drain path now preflights the complete queue before consuming it. A destination buffer that is too small returns an error without partially draining the selected module. NUVM package validation also rejects unsupported ABI minor versions rather than accepting them silently.
+
+## N.U-owned RAM reservation ledger
+
+`NU_BudgetReserve` and `NU_BudgetRelease` now provide a C90-safe reservation ledger against the calibrated N.U RAM ceiling. A request that would exceed the remaining N.U budget is rejected; release is saturating and cannot underflow. Tests cover exact-capacity admission, over-budget rejection and release.
+
+This ledger enforces the limit only for allocations that N.U components explicitly reserve through it. It does not intercept arbitrary process allocations, account for third-party libraries automatically, or impose a global OS memory quota. Integration into every module/cache/renderer allocation path is still required before claiming complete RAM enforcement.
