@@ -7,6 +7,11 @@ on:
     paths:
       - "index.html"
       - "nu-controller-pointer.js"
+      - "nu-interaction-core.js"
+      - "tests/nu-interaction-core.test.js"
+      - "launcher.html"
+      - "casino.html"
+      - "pixel-art-studio.html"
       - "nu-player-ui.js"
       - "nu-world.css"
       - "nu-hex-gateway.js"
@@ -22,7 +27,9 @@ on:
       - "pixel-art-studio.html"
       - "nu-hex-gateway.js"
       - "nu-controller-pointer.js"
+      - "nu-interaction-core.js"
       - "nu-player-ui.js"
+      - "tests/nu-interaction-core.test.js"
       - "nu-world.css"
       - "nu-hex-gateway.css"
       - "nu-games.js"
@@ -56,9 +63,10 @@ jobs:
         run: |
           node --check nu-hex-gateway.js
           node --check nu-controller-pointer.js
+          node --check nu-interaction-core.js
           node --check nu-player-ui.js
           node --check nu-games.js
           node --check nu-gateway-pause.js
           node --check nu-dynamic-layers.js
       - name: Run Gateway main-game regression tests
-        run: node --test tests/nu-hex-gateway.test.js tests/nu-gateway-pause.test.js tests/nu-gateway-exclusive-controls.test.js tests/nu-gateway-controller-input.test.js tests/nu-controller-pointer.test.js tests/nu-controller-pointer-runtime.test.js tests/nu-wallet-tabs.test.js tests/nu-gateway-pointer-controller-mode.test.js
+        run: node --test tests/nu-hex-gateway.test.js tests/nu-gateway-pause.test.js tests/nu-gateway-exclusive-controls.test.js tests/nu-gateway-controller-input.test.js tests/nu-controller-pointer.test.js tests/nu-controller-pointer-runtime.test.js tests/nu-interaction-core.test.js tests/nu-wallet-tabs.test.js tests/nu-gateway-pointer-controller-mode.test.js
