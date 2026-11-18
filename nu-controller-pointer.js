@@ -39,6 +39,21 @@
    return {dx:(right?1:0)-(left?1:0),dy:(down?1:0)-(up?1:0),confirm:!!(b[0]&&b[0].pressed),cancel:!!(b[1]&&b[1].pressed)};
   }
   function emit(name,detail){if(doc&&typeof win.CustomEvent==="function")win.dispatchEvent(new win.CustomEvent(name,{detail}));}
+  function movePointer(dx,dy,source){
+   if(!enabled||gatewayNavigation||gatewayBlockedUntilNeutral)return false;
+   dx=Math.sign(Number(dx)||0);dy=Math.sign(Number(dy)||0);
+   if(!dx&&!dy)return false;
+   const nextX=Math.max(1,Math.min(win.innerWidth-1,x+dx*step));
+   const nextY=Math.max(1,Math.min(win.innerHeight-1,y+dy*step));
+   if(nextX===x&&nextY===y)return false;
+   x=nextX;y=nextY;updateTarget();
+   emit("nu:simulated-pointer-move",{x,y,dx,dy,source:source||"controller"});
+   return true;
+  }
+  function onPointerDirection(event){
+   const detail=event&&event.detail||{};
+   movePointer(detail.dx??detail.x,detail.dy??detail.y,detail.source||"click-controller");
+  }
   function clickTarget(){
    const target=targetAt();if(!target)return false;
    const common={bubbles:true,cancelable:true,view:win,clientX:x,clientY:y,button:0,buttons:1};
@@ -59,11 +74,7 @@
     if(gatewayBlockedUntilNeutral){if(!input.dx&&!input.dy){gatewayBlockedUntilNeutral=false;lastMove=time;}}
     else if((input.dx||input.dy)&&time-lastMove>=repeat){
      if(gatewayNavigation)emit("nu:gateway-direction",{x:input.dx,y:input.dy});
-     else{
-      x=Math.max(1,Math.min(win.innerWidth-1,x+input.dx*step));
-      y=Math.max(1,Math.min(win.innerHeight-1,y+input.dy*step));
-      updateTarget();
-     }
+     else movePointer(input.dx,input.dy,"gamepad");
      lastMove=time;
     }
     if(!primed){confirmDown=input.confirm;cancelDown=input.cancel;primed=true;}
@@ -76,8 +87,8 @@
    if(enabled)frame=win.requestAnimationFrame(tick);
   }
   function hasConnectedGamepad(){return !!(win.navigator&&win.navigator.getGamepads&&Array.from(win.navigator.getGamepads()||[]).some(p=>p&&p.connected!==false));}
-  function start(){
-   if(enabled||!hasConnectedGamepad())return;ensureCursor();if(!cursor)return;
+  function start(force){
+   if(enabled||(!force&&!hasConnectedGamepad()))return;ensureCursor();if(!cursor)return;
    enabled=true;cursor.style.display="block";updateTarget();
    if(!frame)frame=win.requestAnimationFrame(tick);
   }
@@ -89,9 +100,11 @@
   function onConnected(event){if(event&&event.gamepad){padIndex=event.gamepad.index;if(doc&&doc.body&&doc.body.classList.contains("nu-gateway-open")){gatewayNavigation=true;const current=direction(event.gamepad);gatewayBlockedUntilNeutral=!!(current.dx||current.dy);}start();}}
   function onDisconnected(){if(!hasConnectedGamepad())stop();}
   win.addEventListener&&win.addEventListener("gamepadconnected",onConnected);
+  win.addEventListener&&win.addEventListener("nu:simulated-pointer-direction",onPointerDirection);
+  win.addEventListener&&win.addEventListener("nu:controller-direction",onPointerDirection);
   win.addEventListener&&win.addEventListener("gamepaddisconnected",onDisconnected);
   if(hasConnectedGamepad())start();
-  return {start,stop,setEnabled(value){value?start():stop();},setGatewayNavigation(value){gatewayNavigation=!!value;lastMove=0;const pads=win.navigator&&win.navigator.getGamepads?Array.from(win.navigator.getGamepads()||[]):[];const pad=pads.find(p=>p&&p.connected!==false);const current=pad?direction(pad):{dx:0,dy:0};gatewayBlockedUntilNeutral=!!(current.dx||current.dy);},isEnabled(){return enabled;},getState(){return {enabled,x,y,padIndex,mode:"simulated-mouse",gatewayNavigation};},destroy(){stop();win.removeEventListener&&win.removeEventListener("gamepadconnected",onConnected);win.removeEventListener&&win.removeEventListener("gamepaddisconnected",onDisconnected);cursor&&cursor.remove();style&&style.remove();cursor=null;style=null;}};
+  return {start,stop,startClickController(){start(true);},move(dx,dy){return movePointer(dx,dy,"click-controller");},setEnabled(value){value?start():stop();},setGatewayNavigation(value){gatewayNavigation=!!value;lastMove=0;const pads=win.navigator&&win.navigator.getGamepads?Array.from(win.navigator.getGamepads()||[]):[];const pad=pads.find(p=>p&&p.connected!==false);const current=pad?direction(pad):{dx:0,dy:0};gatewayBlockedUntilNeutral=!!(current.dx||current.dy);},isEnabled(){return enabled;},getState(){return {enabled,x,y,padIndex,mode:"simulated-mouse",gatewayNavigation};},destroy(){stop();win.removeEventListener&&win.removeEventListener("gamepadconnected",onConnected);win.removeEventListener&&win.removeEventListener("gamepaddisconnected",onDisconnected);win.removeEventListener&&win.removeEventListener("nu:simulated-pointer-direction",onPointerDirection);win.removeEventListener&&win.removeEventListener("nu:controller-direction",onPointerDirection);cursor&&cursor.remove();style&&style.remove();cursor=null;style=null;}};
  }
  root.NUControllerPointer=Object.assign(create(),{create,mode:"simulated-mouse",capabilities:{directionalPointer:true,separateConfirm:true,gatewayDirectionalList:true,physicalMouseDirect:true,touchDirect:true}});
 })(typeof window!=="undefined"?window:globalThis);
