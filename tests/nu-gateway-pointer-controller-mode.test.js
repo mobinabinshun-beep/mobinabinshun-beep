@@ -6,20 +6,21 @@ const gateway=fs.readFileSync("nu-hex-gateway.js","utf8");
 
 test("Mouse entering the Gateway trigger opens it without requiring a click",()=>{
   assert.match(gateway,/trigger\.addEventListener\("pointerenter",event=>\{/);
-  assert.match(gateway,/event\.pointerType==="mouse"&&!open\)setOpen\(true\)/);
+  assert.match(gateway,/event\.pointerType==="mouse"&&!open\)scheduleOpen\(500,"physical-mouse"\)/);
 });
 
 test("Touching the Gateway trigger opens it and suppresses the synthetic click toggle",()=>{
   assert.match(gateway,/trigger\.addEventListener\("pointerdown",event=>\{/);
   assert.match(gateway,/event\.pointerType==="touch"/);
-  assert.match(gateway,/suppressClickUntil=Date\.now\(\)\+900/);
+  assert.match(gateway,/suppressClickUntil=Date\.now\(\)\+1000/);
+  assert.match(gateway,/scheduleOpen\(500,"touch"\)/);
 });
 
 test("Mouse hover activates a Gateway option directly and leaving cancels pending activation",()=>{
-  assert.match(gateway,/item\.addEventListener\("pointerenter",event=>\{\s*if\(event\.pointerType==="mouse"&&open\)activate\(item\)/);
+  assert.match(gateway,/item\.addEventListener\("pointerenter",event=>\{\s*if\(event\.pointerType==="mouse"&&open\)select\(item\)/);
   assert.match(gateway,/item\.addEventListener\("pointerleave",event=>\{/);
   assert.match(gateway,/pendingItem===item/);
-  assert.doesNotMatch(gateway,/pointerenter",event=>\{if\(event\.pointerType==="mouse"&&open\)select\(item\)/);
+  assert.doesNotMatch(gateway,/pointerenter",event=>\{if\(event\.pointerType==="mouse"&&open\)activate\(item\)/);
 });
 
 test("Gamepad simulated mouse is delegated to the shared launcher-core adapter",()=>{
@@ -27,6 +28,6 @@ test("Gamepad simulated mouse is delegated to the shared launcher-core adapter",
   assert.match(gateway,/NUControllerPointer\?\.setEnabled\(true\)/);
   assert.match(pointer,/b\[12\]/);
   assert.match(pointer,/b\[15\]/);
-  assert.match(pointer,/if\(input\.confirm&&!confirmDown\)clickTarget\(\)/);
+  assert.match(pointer,/if\(input\.confirm&&!confirmDown\)\{if\(gatewayNavigation\)emit\("nu:gateway-confirm",\{\}\);else clickTarget\(\);\}/);
   assert.doesNotMatch(gateway,/function pollController\(/);
 });
