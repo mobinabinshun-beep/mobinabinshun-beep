@@ -27,7 +27,7 @@
  }
  function on(type,fn){if(typeof fn!=="function")return()=>{};if(!listeners.has(type))listeners.set(type,[]);listeners.get(type).push(fn);return()=>listeners.set(type,(listeners.get(type)||[]).filter(x=>x!==fn));}
  function targetOf(event){return event&&event.target&&event.target.closest?event.target.closest(INTERACTIVE):event&&event.target;}
- function mouse(event){if(!event||event.pointerType==="touch"||event.type==="click")return;if(event.type==="pointermove"){if(now()-lastMouseMoveAt>=80){lastMouseMoveAt=now();publish("hover","physical-mouse",targetOf(event),{x:event.clientX,y:event.clientY});}return;}if(event.type==="mousemove")return;publish(event.type==="pointerdown"?"press":"release","physical-mouse",targetOf(event),{button:event.button,detail:event.detail||0});}
+ function mouse(event){if(!event||event.nuSimulated||event.pointerType==="touch"||event.type==="click")return;if(event.type==="pointermove"){if(now()-lastMouseMoveAt>=80){lastMouseMoveAt=now();publish("hover","physical-mouse",targetOf(event),{x:event.clientX,y:event.clientY});}return;}if(event.type==="mousemove")return;publish(event.type==="pointerdown"?"press":"release","physical-mouse",targetOf(event),{button:event.button,detail:event.detail||0});}
  function touch(event){
   if(!event||event.pointerType!=="touch")return;
   if(event.type==="pointerdown"){lastTouchAt=now();publish("press","direct-touch",targetOf(event),{pointerId:event.pointerId});}
@@ -39,6 +39,7 @@
   if(!event)return;
   const target=targetOf(event);if(!target)return;
   if(event.type==="click"){
+   if(event.nuSimulated){publish("activate","simulated-mouse",target,{detail:event.detail||0});return;}
    if(now()-lastTouchAt<850&&event.detail>0)return;
    publish("activate","selective-click",target,{detail:event.detail||0});
   }else if(event.type==="change")publish("select","selective-control",target,{value:target.value??null});
