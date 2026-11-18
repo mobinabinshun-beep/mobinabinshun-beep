@@ -131,3 +131,10 @@ The cache drain path now preflights the complete queue before consuming it. A de
 `NU_BudgetReserve` and `NU_BudgetRelease` now provide a C90-safe reservation ledger against the calibrated N.U RAM ceiling. A request that would exceed the remaining N.U budget is rejected; release is saturating and cannot underflow. Tests cover exact-capacity admission, over-budget rejection and release.
 
 This ledger enforces the limit only for allocations that N.U components explicitly reserve through it. It does not intercept arbitrary process allocations, account for third-party libraries automatically, or impose a global OS memory quota. Integration into every module/cache/renderer allocation path is still required before claiming complete RAM enforcement.
+
+
+## Dependency graph resolver — 2026-11-18
+
+The portable C90 core includes a bounded Generation-1 dependency-order resolver. It accepts at most 64 module descriptors and a caller-supplied adjacency matrix, validates every node against Generation-1 / ABI-1.0, rejects self-dependencies and malformed matrix entries, and returns a deterministic dependency-first activation order. Cycles and unsupported generations/ABIs fail closed. Unit tests cover a three-module chain, a dependency cycle, and an unsupported generation.
+
+This is the graph-validation primitive only. It does not yet parse dependency declarations from manifests, locate installed packages, download dependencies, verify publisher signatures, or perform transactional installation. It must be integrated into the Package Manager before claiming dependency-aware installation.
