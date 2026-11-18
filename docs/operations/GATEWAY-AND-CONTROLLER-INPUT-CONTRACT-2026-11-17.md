@@ -199,3 +199,21 @@ Regression coverage now includes actual keydown-shaped input without a connected
 - All four mounted pages use the new cache key `20261118-interaction-r7`.
 
 These code changes are a hypothesis-driven correction, not a claim of successful live interaction. The relevant runtime tests must pass and the updated demo must be exercised with the owner's actual controller before human acceptance.
+
+
+## 11. Owner amendment — shared interaction core and independent translators (2026-11-19)
+
+The shared translator architecture and debug retention rules are normative in [INTERACTION-CORE-AND-DEBUG-PROTOCOL-2026-11-19.md](./INTERACTION-CORE-AND-DEBUG-PROTOCOL-2026-11-19.md).
+
+- Direct touch, direct physical mouse, selective/action translation and simulated mouse are independent source translators.
+- All translators publish normalized semantic events through `NUInteractionCore`; existing page/game handlers remain action owners until separately migrated.
+- Movement/highlight, hierarchy navigation, selection, confirmation, activation and execution are distinct stages.
+- Gateway retains exclusive ownership of its option hierarchy and pause/return lifecycle.
+- Debug scope includes all platform controls and game objects: bubbles, Mana particles/orbs, Chaos masses/clusters, their lifecycle, targeting, collision/effect and outcome.
+- Human findings and exported debug reports must be retained as linked issue/change-record evidence; never overwrite a failed original report.
+
+### Implementation record
+- Core module: `nu-interaction-core.js`; loaded before the pointer and Gateway adapters on `index.html`, `launcher.html`, `casino.html` and `pixel-art-studio.html`.
+- Focused regression test: `tests/nu-interaction-core.test.js`.
+- Gateway workflow now includes core syntax and focused test execution.
+- The first implementation provides independent translator declarations, normalized event observation and a bounded JSON debug export. Full object-level producer instrumentation and runtime/CI execution remain pending; this amendment does not claim machine approval or human acceptance.
