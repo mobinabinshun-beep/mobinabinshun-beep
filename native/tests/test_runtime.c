@@ -6,6 +6,7 @@
 #include "../nu_translator.h"
 #include "../nu_package.h"
 #include "../nu_manifest.h"
+#include "../nu_dependency.h"
 int main(void){
  NU_Budget b;uint8_t code[]={1,0,42,0,0,0,1,1,8,0,0,0,3,0,1,0};
  uint8_t pkg[16+sizeof(code)];NU_PackageView view;NU_VM vm;int result;unsigned int i;
@@ -90,6 +91,17 @@ int main(void){
   assert(manifest.generation==1u && manifest.package_size==32u);
   assert(!NU_ManifestVerify(&manifest,pkg,32u,(NU_ManifestVerifyProvider)0,0));
   assert(!NU_ManifestParse(bad_manifest,sizeof(bad_manifest)-1u,&manifest));
+ }
+ {
+  NU_DependencyNode nodes[3]={{1u,1u,0u},{1u,1u,0u},{1u,1u,0u}};
+  uint8_t graph[9]={0u,1u,0u, 0u,0u,1u, 0u,0u,0u};
+  uint8_t order[3];
+  assert(NU_DependencyResolve(nodes,3u,graph,sizeof(graph),order,3u));
+  assert(order[0]==2u && order[1]==1u && order[2]==0u);
+  graph[2]=1u;
+  assert(!NU_DependencyResolve(nodes,3u,graph,sizeof(graph),order,3u));
+  graph[2]=0u;nodes[1].generation=2u;
+  assert(!NU_DependencyResolve(nodes,3u,graph,sizeof(graph),order,3u));
  }
  puts("N.U native runtime tests passed");return 0;
 }
