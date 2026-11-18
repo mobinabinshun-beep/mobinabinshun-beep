@@ -5,6 +5,29 @@ const $=id=>document.getElementById(id);
 const symbols=["🍒","⭐","🔔","💎","7️⃣"];
 const ladder=[1,2,4,8];
 let save=NUWallet.normalizeSave(NU.load()),coinCall="heads",busy=false,selectedAsset=null,baseStake=1,ladderStep=0;
+let gatewayOpen=false,gatewayAwaitingInteraction=false;
+const gatewayTimers=new Set();
+function scheduleGatewayTask(callback,delay){
+ let remaining=delay,startedAt=0,timer=0,done=false;
+ const task={
+  pause(){if(!timer)return;clearTimeout(timer);timer=0;remaining=Math.max(0,remaining-(performance.now()-startedAt));},
+  resume(){if(done||timer||gatewayOpen||gatewayAwaitingInteraction)return;startedAt=performance.now();timer=window.setTimeout(()=>{timer=0;done=true;gatewayTimers.delete(task);callback();},remaining);}
+ };
+ gatewayTimers.add(task);task.resume();return task;
+}
+function pauseGatewayTasks(){gatewayTimers.forEach(task=>task.pause());}
+function resumeGatewayTasks(){gatewayTimers.forEach(task=>task.resume());}
+function resumeCasinoAfterFreshInput(event){
+ if(!gatewayAwaitingInteraction||gatewayOpen||event.target.closest("#nu-hex-gateway"))return;
+ gatewayAwaitingInteraction=false;resumeGatewayTasks();
+}
+window.addEventListener("nu:gateway-open",()=>{gatewayOpen=true;pauseGatewayTasks();});
+window.addEventListener("nu:gateway-close",()=>{gatewayOpen=false;gatewayAwaitingInteraction=true;});
+document.addEventListener("pointerdown",resumeCasinoAfterFreshInput,true);
+document.addEventListener("keydown",event=>{
+ if(event.repeat||!["ArrowDown","ArrowUp","ArrowLeft","ArrowRight","Enter"," "].includes(event.key))return;
+ resumeCasinoAfterFreshInput(event);
+},true);
 function spendable(){return NUWallet.casinoSpendableAssets(save);}
 function selected(){return spendable().find(row=>row.key===selectedAsset)||null;}
 function multiplier(){return ladder[ladderStep]||1;}
@@ -64,13 +87,13 @@ function runRound(button,resultNode,game,resolve){
  if(busy)return;
  if(!selected()||wager()<1||wager()>balance()){$("casino-status").textContent="Choose a valid base wager within the selected wallet balance.";render();return;}
  busy=true;const roundAsset=selectedAsset,roundStake=wager(),card=button.closest(".game-card");card.classList.remove("is-result","is-running");card.classList.add("is-starting");resultNode.textContent="ROUND STARTING…";render();
- window.setTimeout(()=>{
+ scheduleGatewayTask(()=>{
   card.classList.remove("is-starting");card.classList.add("is-running");resultNode.textContent="BET IN PLAY…";
-  window.setTimeout(()=>{
+  scheduleGatewayTask(()=>{
    const outcome=resolve(roundStake);resultNode.textContent=outcome.message;
    settle(game,outcome.payout,outcome.detail,roundAsset,roundStake);
    card.classList.remove("is-running");card.classList.add("is-result");
-   window.setTimeout(()=>card.classList.remove("is-result"),420);
+   scheduleGatewayTask(()=>card.classList.remove("is-result"),420);
    busy=false;render();
   },360);
  },170);
