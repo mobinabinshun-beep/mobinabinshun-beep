@@ -1,6 +1,6 @@
 # N.U Generation 1 — Unified Engineering Specification
 
-- Revision: 1.1-candidate
+- Revision: 1.2-candidate
 - Date: 2026-11-18
 - Status: engineering baseline; not a release specification
 - Canonical implementation branch: `feat/nu-native-runtime-gen1-foundation`
@@ -103,7 +103,7 @@ Implemented candidate:
 - portable unit tests and Win32 cross-build workflow;\n- N.U-owned RAM reservation ledger with over-budget rejection and saturating release.
 
 Not yet implemented:
-- production Package Manager and dependency resolver (the structural manifest parser is now present, but it does not resolve dependencies);
+- manifest dependency-field parsing and Package Manager integration;
 - SHA-256 publisher digest/signature verification and managed trust roots;
 - atomic install/update/rollback, uninstall UI and crash-recovery journal;
 - native game ports and game-specific translators;
@@ -143,3 +143,10 @@ A PE subsystem value of 5.01 or a successful cross-build is not proof of Windows
 ## 12. Release policy
 
 This branch is a development candidate. It is not a playable launcher release and must not be merged or advertised as such until game ports, package trust, transactional installation, signed setup, actual XP testing and human acceptance pass.
+
+
+## 11. Dependency graph primitive — candidate increment
+
+`native/nu_dependency.c/.h` provides a bounded resolver for up to 64 Generation-1 modules. A row-major adjacency matrix expresses module-to-required-module edges. The resolver validates generation 1 and ABI 1.0 for every node, rejects self-edges and malformed matrix values, and returns dependency-first order. Cycles and unsupported contracts fail closed. Tests cover a three-node chain, a cycle, and an unsupported generation.
+
+This is not yet a complete dependency manager: manifest dependency declarations, installed-package lookup, download, signature verification and transactional activation remain unimplemented.
