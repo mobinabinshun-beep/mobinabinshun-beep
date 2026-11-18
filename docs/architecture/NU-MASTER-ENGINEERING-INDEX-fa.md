@@ -178,3 +178,8 @@ The PR #195 host now extracts and displays the canonical still image through GDI
 ## 13. انتقال ذخیرهٔ نسخهٔ وب به Native
 
 نسخهٔ وب فعلی از localStorage با کلید `nu-world-save-v1` استفاده می‌کند و Wallet/transaction ledger، XP/Mana/HP، وضعیت Shield، شناسه‌های reward و Wave را نگه می‌دارد. پردازش Native به localStorage مرورگر دسترسی مستقیم ندارد. برای حفظ پیشرفت، export کاربرمحور از مرورگر و import اعتبارسنجی‌شده به بستهٔ داده لازم است؛ تا آن زمان نباید ادعای انتقال خودکار Save یا Wallet شود. جزئیات در قرارداد Pack 1 آمده است.
+
+
+## 14. NUDb/1 data bundle primitive
+
+A portable C90 serializer/parser now defines a bounded NUDb/1 user-data container for Save, Wallet, Profile, User Assets and Settings. It rejects executable/cache/installer classes, unsafe or duplicate IDs, unknown classes/versions, invalid lengths and CRC mismatch. This is a serialization/validation primitive only; host filesystem export/import, atomic write, migration from browser localStorage and UI remain pending. CRC32 is not authenticity protection.
