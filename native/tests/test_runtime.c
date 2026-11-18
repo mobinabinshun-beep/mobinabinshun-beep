@@ -8,6 +8,7 @@
 #include "../nu_manifest.h"
 #include "../nu_dependency.h"
 #include "../nu_cleanup.h"
+#include "../nu_install_plan.h"
 int main(void){
  NU_Budget b;uint8_t code[]={1,0,42,0,0,0,1,1,8,0,0,0,3,0,1,0};
  uint8_t pkg[16+sizeof(code)];NU_PackageView view;NU_VM vm;int result;unsigned int i;
@@ -123,6 +124,32 @@ int main(void){
   assert(!NU_CleanupPlanBuild(items,8u,remove_mask,2,&plan));
   items[0].data_class=99u;
   assert(!NU_CleanupPlanBuild(items,8u,remove_mask,0,&plan));
+ }
+
+ {
+  NU_InstallComponent target[3]={{"nu-core","1.0.0",1u},
+   {"bubble-hunt","1.0.0",1u},{"mana-collector","1.0.0",0u}};
+  NU_InstallComponent installed[3]={{"nu-core","1.0.0",1u},
+   {"bubble-hunt","0.9.0",1u},{"legacy-addon","2.0.0",0u}};
+  NU_InstallPlanEntry entries[3]; NU_InstallPlan plan;
+  NU_InstallJournal journal;
+  assert(NU_InstallPlanBuild(target,3u,installed,3u,entries,3u,&plan));
+  assert(plan.keep_count==1u && plan.update_count==1u && plan.add_count==1u);
+  assert(plan.untouched_installed_count==1u);
+  assert(entries[0].action==NU_INSTALL_KEEP);
+  assert(entries[1].action==NU_INSTALL_UPDATE);
+  assert(entries[2].action==NU_INSTALL_ADD);
+  target[1].id[0]='N';
+  assert(!NU_InstallPlanBuild(target,3u,installed,3u,entries,3u,&plan));
+  target[1].id[0]='b';
+  assert(NU_InstallJournalInit(&journal,7u,2u));
+  assert(!NU_InstallJournalAdvance(&journal,NU_JOURNAL_VERIFIED,0u));
+  assert(NU_InstallJournalAdvance(&journal,NU_JOURNAL_STAGING,1u));
+  assert(!NU_InstallJournalAdvance(&journal,NU_JOURNAL_VERIFIED,1u));
+  assert(NU_InstallJournalAdvance(&journal,NU_JOURNAL_VERIFIED,2u));
+  assert(NU_InstallJournalAdvance(&journal,NU_JOURNAL_ACTIVATED,2u));
+  assert(NU_InstallJournalAdvance(&journal,NU_JOURNAL_ROLLBACK_REQUIRED,2u));
+  assert(NU_InstallJournalAdvance(&journal,NU_JOURNAL_ROLLED_BACK,2u));
  }
  puts("N.U native runtime tests passed");return 0;
 }
