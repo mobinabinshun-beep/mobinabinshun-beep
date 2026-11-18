@@ -10,6 +10,7 @@ const graphics=fs.readFileSync("nu-graphics-runtime.js","utf8");
 const player=fs.readFileSync("nu-player-ui.js","utf8");
 const pause=fs.readFileSync("nu-gateway-pause.js","utf8");
 const manifest=fs.readFileSync("NU-GENERATION-1-MANIFEST.json","utf8");
+const {create: createGatewayPause}=require("../nu-gateway-pause.js");
 
 test("Gateway is mounted and remains available across Bag, Inventory, Wallet and Profile",()=>{
  assert.match(html,/id="nu-hex-gateway"/);
@@ -121,4 +122,23 @@ test("Gateway close does not resume gameplay until fresh play-space input",()=>{
  assert.match(games,/function resumeAfterGatewayInteraction\(\)/);
  assert.match(games,/syncGatewayBackgrounds\(!!state\.paused\|\|!!gatewayAwaitingInteraction\)/);
  assert.doesNotMatch(games,/let gatewayOwnsPause=false/);
+});
+
+
+test("Closing Gateway keeps the owned pause frozen until a separate fresh interaction",()=>{
+ const pause=createGatewayPause();
+ const state={active:true,paused:false,turn:2};
+ assert.equal(pause.open(state),true);
+ assert.deepEqual({active:state.active,paused:state.paused},{active:false,paused:true});
+ assert.equal(pause.close(),true);
+ assert.deepEqual({active:state.active,paused:state.paused},{active:false,paused:true});
+ assert.equal(pause.close(),false);
+});
+
+test("Gateway does not claim ownership of a pause that already exists",()=>{
+ const pause=createGatewayPause();
+ const state={active:false,paused:true,turn:2};
+ assert.equal(pause.open(state),false);
+ assert.equal(pause.close(),false);
+ assert.equal(state.paused,true);
 });
