@@ -10,7 +10,7 @@ static NU_VM active_vm;
 static int vm_active=0;
 static uint32_t scheduler_slot=0u;
 static char status_text[256]="Ready. Press O to open a Generation 1 .nup package.";
-static uint8_t package_data[NU_PACKAGE_MAX_CODE+16u];
+static uint8_t package_data[NU_PACKAGE_MAX_CODE+NU_PACKAGE_HEADER_SIZE];
 static void load_package(HWND hwnd){
  OPENFILENAMEA ofn;FILE *fp;long size;size_t got;NU_PackageView view;char path[MAX_PATH];
  path[0]='\0';ZeroMemory(&ofn,sizeof(ofn));ofn.lStructSize=sizeof(ofn);ofn.hwndOwner=hwnd;
@@ -18,7 +18,7 @@ static void load_package(HWND hwnd){
  ofn.Flags=OFN_FILEMUSTEXIST|OFN_PATHMUSTEXIST|OFN_HIDEREADONLY;if(!GetOpenFileNameA(&ofn))return;
  fp=fopen(path,"rb");if(!fp){lstrcpyA(status_text,"Cannot open package.");InvalidateRect(hwnd,NULL,TRUE);return;}
  if(fseek(fp,0L,SEEK_END)!=0){fclose(fp);return;}size=ftell(fp);
- if(size<16L||size>(long)sizeof(package_data)){fclose(fp);lstrcpyA(status_text,"Package size rejected.");InvalidateRect(hwnd,NULL,TRUE);return;}
+ if(size<(long)NU_PACKAGE_HEADER_SIZE||size>(long)sizeof(package_data)){fclose(fp);lstrcpyA(status_text,"Package size rejected.");InvalidateRect(hwnd,NULL,TRUE);return;}
  rewind(fp);got=fread(package_data,1u,(size_t)size,fp);fclose(fp);
  if(got!=(size_t)size||!NU_PackageValidate(package_data,got,&view)){lstrcpyA(status_text,"Package rejected: ABI, generation, size or CRC.");InvalidateRect(hwnd,NULL,TRUE);return;}
  NU_VMInit(&active_vm,view.code,view.code_size,100000u);
