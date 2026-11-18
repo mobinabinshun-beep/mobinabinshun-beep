@@ -42,6 +42,7 @@ size_t NU_BundleBuild(const NU_BundleEntry *entries,size_t count,
  for(i=0u;i<count;++i){
   if(!nu_bundle_class_valid(entries[i].data_class)||
      !nu_bundle_id_length(entries[i].id,&id_length)||
+     entries[i].schema_major==0u||
      (!entries[i].data&&entries[i].size!=0u)||
      entries[i].size>NU_BUNDLE_MAX_ENTRY_SIZE||
      nu_bundle_duplicate(entries,i))return 0u;
@@ -60,7 +61,7 @@ size_t NU_BundleBuild(const NU_BundleEntry *entries,size_t count,
  for(i=0u;i<count;++i){
   nu_bundle_id_length(entries[i].id,&id_length);
   out[pos]=entries[i].data_class;out[pos+1u]=(uint8_t)id_length;
-  out[pos+2u]=0u;out[pos+3u]=0u;
+  out[pos+2u]=entries[i].schema_major;out[pos+3u]=entries[i].schema_minor;
   nu_bundle_put32(out+pos+4u,entries[i].size);
   nu_bundle_put32(out+pos+8u,
       NU_CRC32(entries[i].data,(size_t)entries[i].size));
@@ -96,8 +97,8 @@ int NU_BundleParse(const uint8_t *data,size_t length,NU_BundleView *view){
   if(pos>length||length-pos<NU_BUNDLE_ENTRY_HEADER_SIZE)return 0;
   entry->data_class=data[pos];id_length=(size_t)data[pos+1u];
   if(!nu_bundle_class_valid(entry->data_class)||id_length==0u||
-     id_length>=NU_BUNDLE_ID_SIZE||data[pos+2u]!=0u||data[pos+3u]!=0u)
-   return 0;
+     id_length>=NU_BUNDLE_ID_SIZE||data[pos+2u]==0u)return 0;
+  entry->schema_major=data[pos+2u];entry->schema_minor=data[pos+3u];
   entry_size=nu_bundle_read32(data+pos+4u);
   entry_crc=nu_bundle_read32(data+pos+8u);
   pos+=NU_BUNDLE_ENTRY_HEADER_SIZE;
