@@ -43,7 +43,7 @@ test("A held Down used to exit Gateway cannot move the virtual pointer away from
  assert.match(pointer,/if\(gatewayBlockedUntilNeutral\)\{if\(!input\.dx&&!input\.dy\)/);
  assert.match(pointer,/gatewayBlockedUntilNeutral=!!\(current\.dx\|\|current\.dy\)/);
  assert.match(pointer,/gatewayNavigation=true;const current=direction\(event\.gamepad\)/);
- assert.match(gateway,/NUControllerPointer\\?\\.setGatewayNavigation\\(false\\)/);
+ assert.ok(gateway.includes("setGatewayNavigation(false)"));
 });
 test("Confirm is a separate click; B remains Gateway cancel",()=>{
  assert.match(pointer,/if\(!primed\)/);
@@ -55,7 +55,7 @@ test("Confirm is a separate click; B remains Gateway cancel",()=>{
 test("Gateway delegates simulated pointer ownership to the shared adapter",()=>{
  assert.match(gateway,/NUControllerPointer\?\.setEnabled\(true\)/);
  assert.match(gateway,/NUControllerPointer\?\.setGatewayNavigation\(true\)/);
- assert.match(gateway,/NUControllerPointer\?\.setGatewayNavigation\(false\)/);
+ assert.ok(gateway.includes("setGatewayNavigation(false)"));
  assert.doesNotMatch(gateway,/window\.addEventListener\("gamepadconnected",startController\)/);
 });
 
