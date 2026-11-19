@@ -9,11 +9,14 @@ test("Mouse entering the Gateway trigger opens it without requiring a click",()=
   assert.match(gateway,/event\.pointerType==="mouse"&&!open\)scheduleOpen\(500,"physical-mouse"\)/);
 });
 
-test("Touching the Gateway trigger opens it and suppresses the synthetic click toggle",()=>{
-  assert.match(gateway,/trigger\.addEventListener\("pointerdown",event=>\{/);
-  assert.match(gateway,/event\.pointerType==="touch"/);
-  assert.match(gateway,/suppressClickUntil=Date\.now\(\)\+1000/);
-  assert.match(gateway,/scheduleOpen\(500,"touch"\)/);
+test("Touch must dwell for 500 ms and release/cancel before the threshold must not open Gateway",()=>{
+  assert.ok(gateway.includes('trigger.addEventListener("pointerdown",event=>{'));
+  assert.ok(gateway.includes('scheduleOpen(500,"touch")'));
+  assert.ok(gateway.includes('trigger.addEventListener("pointerup",event=>{'));
+  assert.ok(gateway.includes("if(!open)cancelScheduledOpen()"));
+  assert.ok(gateway.includes('trigger.addEventListener("pointercancel",event=>{'));
+  assert.ok(gateway.includes("suppressClickUntil=Date.now()+1000"));
+  assert.ok(!gateway.includes('setOpen(!open,true,"touch")'));
 });
 
 test("Mouse hover activates a Gateway option directly and leaving cancels pending activation",()=>{
