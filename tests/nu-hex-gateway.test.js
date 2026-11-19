@@ -366,3 +366,14 @@ test("Touch pointer cancellation clears an option dwell without executing it",()
  h.advance(200);
  assert.equal(h.menuClicks(),0);assert.equal(h.root.classList.contains("is-open"),true);
 });
+
+
+test("A long-held touch option gesture still suppresses the compatibility click after execution",()=>{
+ const h=gatewayRuntimeHarness();h.openByClick();h.setHit(h.items[0]);
+ h.items[0].dispatch("pointerdown",{pointerType:"touch",pointerId:9});
+ h.advance(200);assert.equal(h.menuClicks(),1);
+ h.advance(1800);
+ h.dispatchDocument("pointerup",{pointerType:"touch",pointerId:9,clientX:10,clientY:10});
+ h.items[0].dispatch("click",{detail:1});
+ assert.equal(h.menuClicks(),1);
+});
