@@ -23,9 +23,10 @@
 - The focused Gateway pointer/controller test and the broader Gateway controller-input regression both assert dwell scheduling and early-release cancellation; neither permits immediate pointerup activation.
 
 ## Verification state
-- Machine QA: PENDING exact-head CI.
-- Candidate backup: PENDING until machine checks pass.
-- Public demo deployment/live-build verification: NOT PERFORMED.
+- Machine QA: PASS on exact candidate `e074ea51cc5482f30b459c1914a26c0425aa71cc`; all five checks passed: Gateway regression, Arcane Shield/Mana regression, Studio export regression, Wallet regression and static validation (including the focused Gateway pointer/controller test).
+- Candidate backup: verified branch `backup/gateway-touch-dwell-machine-pass-2026-11-20`, created from the exact machine-passed SHA above.
+- Public demo deployment/live-build verification: NOT PERFORMED; this candidate remains in the PR/human-QA queue.
+- Candidate state: `MACHINE-APPROVED-LOCKED / HUMAN-QA-PENDING` at the exact SHA above.
 - Human device QA: PENDING.
 - Final acceptance: NOT GRANTED; machine approval and owner human QA are separate gates.
 
