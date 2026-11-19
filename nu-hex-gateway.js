@@ -9,8 +9,11 @@
 
   const trigger=root.querySelector(".nu-gateway-trigger");
   const items=[...root.querySelectorAll(".nu-gateway-item")];
-  let open=false,selected=null,activationTimer=0,openTimer=0,outsideSince=0,suppressClickUntil=0;
+  let open=false,selected=null,activationTimer=0,openTimer=0,physicalOpenTimer=0,outsideSince=0,suppressClickUntil=0;
   let pendingItem=null,requiresSimulatedPointerExit=false,simulatedPointerOutside=false;
+  let touchTriggerPointerId=null,touchTriggerDwellFired=false,touchTriggerCancelledPointerId=null;
+  let touchOptionPointerId=null,touchOptionItem=null,touchOptionTimer=0,touchOptionDwellFired=false,touchOptionCompletedPointerId=null,touchOptionCancelledPointerId=null;
+  let optionHoverTimer=0,hoveredItem=null;
 
   function syncGatewayScope(){
     const active=!!(gameView&&gameView.classList.contains("active"));
@@ -74,7 +77,7 @@
     trigger.setAttribute("aria-label",open?"Close N.U navigation gateway":"Open N.U navigation gateway");
     items.forEach(item=>{item.tabIndex=open?0:-1;});
     if(open){
-      clearTimeout(openTimer);openTimer=0;
+      clearTimeout(openTimer);openTimer=0;clearTimeout(physicalOpenTimer);physicalOpenTimer=0;
       selected=null;
       items.forEach(item=>{item.classList.remove("is-selected","is-confirming");item.setAttribute("aria-pressed","false");});
       window.NUControllerPointer?.setEnabled(true);
@@ -84,6 +87,8 @@
       window.NUControllerPointer?.setGatewayNavigation(false);
       // Keep the virtual pointer alive after Gateway closes so it can leave and re-enter the trigger zone.
       clearTimeout(activationTimer);activationTimer=0;pendingItem=null;
+      clearOptionHover();
+      clearTouchOption();
       items.forEach(item=>{item.classList.remove("is-selected","is-confirming");item.setAttribute("aria-pressed","false");});
       if(shouldResume)releaseHeldState();
     }
@@ -121,83 +126,185 @@
     if(current<0){select(items[0]);return;}
     if(current>0)select(items[current-1]);
   }
-  function activate(item){
+  function activate(item,immediate=false){
     if(!item||!item.dataset)return;
     const key=item.dataset.action,action=routes[key];
     if(!action||!open)return;
     clearTimeout(activationTimer);
     pendingItem=item;
     item.classList.add("is-confirming");
-    activationTimer=window.setTimeout(()=>{
+    const commit=()=>{
       pendingItem=null;
       item.classList.remove("is-confirming");
       setOpen(false,false);
       action();
-    },120);
+    };
+    if(immediate){commit();return;}
+    activationTimer=window.setTimeout(commit,120);
+  }
+
+  function clearOptionHover(){
+    if(optionHoverTimer){clearTimeout(optionHoverTimer);optionHoverTimer=0;}
+    hoveredItem=null;
+  }
+  function clearTouchOption(){
+    if(touchOptionTimer){clearTimeout(touchOptionTimer);touchOptionTimer=0;}
+    touchOptionPointerId=null;touchOptionItem=null;touchOptionDwellFired=false;
+  }
+  function startTouchOption(item,pointerId){
+    if(!open||!item)return;
+    if(touchOptionItem===item&&touchOptionPointerId===pointerId)return;
+    clearTouchOption();
+    touchOptionItem=item;touchOptionPointerId=pointerId;touchOptionDwellFired=false;touchOptionCompletedPointerId=null;touchOptionCancelledPointerId=null;
+    select(item);
+    touchOptionTimer=window.setTimeout(()=>{
+      touchOptionTimer=0;
+      if(open&&touchOptionItem===item){
+        touchOptionDwellFired=true;
+        touchOptionCompletedPointerId=touchOptionPointerId;
+        suppressClickUntil=Date.now()+1200;
+        activate(item,true);
+      }
+    },200);
   }
 
   function scheduleOpen(delay,source){
-    if(open||openTimer)return;
-    openTimer=window.setTimeout(()=>{
-      openTimer=0;
-      if(!open)setOpen(true,true,source);
+    if(open)return;
+    const simulated=source==="simulated-pointer";
+    if(simulated?openTimer:physicalOpenTimer)return;
+    const timer=window.setTimeout(()=>{
+      if(simulated)openTimer=0;else physicalOpenTimer=0;
+      if(!open){
+        if(source==="touch")touchTriggerDwellFired=true;
+        setOpen(true,true,source);
+      }
     },delay);
+    if(simulated)openTimer=timer;else physicalOpenTimer=timer;
   }
-  function cancelScheduledOpen(){
-    if(openTimer){clearTimeout(openTimer);openTimer=0;}
+  function cancelScheduledOpen(source="physical"){
+    if(source==="simulated-pointer"){
+      if(openTimer){clearTimeout(openTimer);openTimer=0;}
+      return;
+    }
+    if(physicalOpenTimer){clearTimeout(physicalOpenTimer);physicalOpenTimer=0;}
   }
 
   trigger.addEventListener("pointerenter",event=>{
-    if(event.pointerType==="mouse"&&!open)scheduleOpen(500,"physical-mouse");
+    if(event.pointerType==="mouse"&&!event.nuSimulated&&!open)scheduleOpen(200,"physical-mouse");
   });
   trigger.addEventListener("pointerleave",event=>{
-    if(event.pointerType==="mouse"&&!open)cancelScheduledOpen();
+    if(event.pointerType==="mouse"&&!event.nuSimulated&&!open)cancelScheduledOpen();
   });
-  // Android browsers dispatch a short pointerdown/pointerup pair for a normal tap.
-  // Opening was previously scheduled on pointerdown and cancelled on pointerup, so
-  // an ordinary touch could never open Gateway. Treat a completed touch as the
-  // direct activation; keep the 500 ms dwell exclusively for physical mouse hover.
   trigger.addEventListener("pointerdown",event=>{
-    if(event.pointerType==="touch"){
-      event.preventDefault();
-      suppressClickUntil=Date.now()+1000;
-    }
-  });
-  trigger.addEventListener("pointerup",event=>{
     if(event.pointerType!=="touch"||event.isPrimary===false)return;
     event.preventDefault();
-    event.stopPropagation();
-    suppressClickUntil=Date.now()+1000;
-    setOpen(!open,true,"touch");
+    touchTriggerPointerId=event.pointerId;
+    touchTriggerDwellFired=false;
+    touchOptionCompletedPointerId=null;touchTriggerCancelledPointerId=null;touchOptionCancelledPointerId=null;
+    suppressClickUntil=Date.now()+1200;
+    scheduleOpen(200,"touch");
+  });
+  trigger.addEventListener("pointerup",event=>{
+    if(event.pointerType!=="touch"||event.isPrimary===false||touchTriggerPointerId!==event.pointerId)return;
+    event.preventDefault();event.stopPropagation();
+    const dwellOpened=touchTriggerDwellFired;
+    cancelScheduledOpen();
+    suppressClickUntil=Date.now()+1200;
+    if(!dwellOpened)setOpen(!open,true,"touch");
+    touchTriggerPointerId=null;touchTriggerDwellFired=false;
   });
   trigger.addEventListener("pointercancel",event=>{
-    if(event.pointerType==="touch")cancelScheduledOpen();
+    if(event.pointerType==="touch"&&touchTriggerPointerId===event.pointerId){
+      cancelScheduledOpen();touchTriggerPointerId=null;touchTriggerDwellFired=false;touchTriggerCancelledPointerId=null;
+    }
   });
   trigger.addEventListener("click",event=>{
+    if(event.nuSimulated)return;
     event.preventDefault();
     if(Date.now()<suppressClickUntil)return;
-    // Keyboard activation remains available; physical mouse/touch use the dwell threshold.
-    if(event.detail===0)setOpen(!open);
+    if(event.detail===0||event.detail>0){
+      cancelScheduledOpen();
+      setOpen(!open,true,event.detail===0?"keyboard":"physical-mouse-click");
+    }
   });
+  document.addEventListener("pointermove",event=>{
+    if(event.pointerType!=="touch")return;
+    const hit=document.elementFromPoint?document.elementFromPoint(event.clientX,event.clientY):event.target;
+    const triggerHit=hit&&hit.closest?hit.closest(".nu-gateway-trigger"):null;
+    if(touchTriggerPointerId===event.pointerId&&triggerHit!==trigger){
+      cancelScheduledOpen();touchTriggerCancelledPointerId=event.pointerId;touchTriggerPointerId=null;touchTriggerDwellFired=false;
+    }
+    if(touchOptionPointerId===event.pointerId){
+      const nextItem=hit&&hit.closest?hit.closest(".nu-gateway-item"):null;
+      if(nextItem!==touchOptionItem){
+        if(nextItem&&open)startTouchOption(nextItem,event.pointerId);
+        else{touchOptionCancelledPointerId=event.pointerId;clearTouchOption();}
+      }
+    }
+  },true);
+  document.addEventListener("pointerup",event=>{
+    if(event.pointerType!=="touch"||event.isPrimary===false)return;
+    if(touchOptionCompletedPointerId===event.pointerId){
+      event.preventDefault();event.stopPropagation();
+      suppressClickUntil=Date.now()+1200;
+      touchOptionCompletedPointerId=null;
+      return;
+    }
+    if(touchTriggerCancelledPointerId===event.pointerId||touchOptionCancelledPointerId===event.pointerId){
+      event.preventDefault();event.stopPropagation();
+      suppressClickUntil=Date.now()+1200;
+      touchTriggerCancelledPointerId=null;touchOptionCancelledPointerId=null;
+      return;
+    }
+    if(touchOptionPointerId!==event.pointerId||!touchOptionItem)return;
+    const item=touchOptionItem,fired=touchOptionDwellFired;
+    const hit=document.elementFromPoint?document.elementFromPoint(event.clientX,event.clientY):event.target;
+    const releasedOnItem=!!(hit&&hit.closest&&hit.closest(".nu-gateway-item")===item);
+    event.preventDefault();event.stopPropagation();
+    suppressClickUntil=Date.now()+1200;
+    clearTouchOption();
+    if(open&&!fired&&releasedOnItem)activate(item);
+  },true);
+  document.addEventListener("pointercancel",event=>{
+    if(event.pointerType==="touch"&&touchOptionCompletedPointerId===event.pointerId)touchOptionCompletedPointerId=null;
+    if(event.pointerType==="touch"&&touchOptionCancelledPointerId===event.pointerId)touchOptionCancelledPointerId=null;
+    if(event.pointerType==="touch"&&touchTriggerCancelledPointerId===event.pointerId)touchTriggerCancelledPointerId=null;
+    if(event.pointerType==="touch"&&touchOptionPointerId===event.pointerId)clearTouchOption();
+    if(event.pointerType==="touch"&&touchTriggerPointerId===event.pointerId){
+      cancelScheduledOpen();touchTriggerPointerId=null;touchTriggerDwellFired=false;
+    }
+  },true);
   items.forEach(item=>{
     item.addEventListener("pointerenter",event=>{
-      if(event.pointerType==="mouse"&&open)select(item);
+      if(event.pointerType==="mouse"&&!event.nuSimulated&&open){
+        select(item);clearOptionHover();hoveredItem=item;
+        optionHoverTimer=window.setTimeout(()=>{
+          optionHoverTimer=0;
+          if(open&&hoveredItem===item)activate(item,true);
+        },200);
+      }
     });
     item.addEventListener("pointerleave",event=>{
-      if(event.pointerType==="mouse"&&pendingItem===item){
+      if(event.pointerType==="mouse"&&!event.nuSimulated&&hoveredItem===item)clearOptionHover();
+      if(event.pointerType==="mouse"&&!event.nuSimulated&&pendingItem===item){
         clearTimeout(activationTimer);activationTimer=0;pendingItem=null;
         item.classList.remove("is-confirming");
       }
     });
-    item.addEventListener("focus",()=>select(item));
-    item.addEventListener("pointerup",event=>{
-      if(event.pointerType!=="touch"||!open)return;
-      event.preventDefault();event.stopPropagation();
-      suppressClickUntil=Date.now()+900;activate(item);
+    item.addEventListener("pointerdown",event=>{
+      if(event.pointerType==="touch"&&event.isPrimary!==false&&open){
+        event.preventDefault();
+        suppressClickUntil=Date.now()+1200;
+        touchTriggerCancelledPointerId=null;touchOptionCancelledPointerId=null;
+        startTouchOption(item,event.pointerId);
+      }
     });
+    item.addEventListener("focus",()=>select(item));
     item.addEventListener("click",event=>{
+      if(event.nuSimulated)return;
       event.preventDefault();event.stopPropagation();
       if(Date.now()<suppressClickUntil)return;
+      clearOptionHover();
       activate(item);
     });
   });
@@ -216,7 +323,7 @@
     }
     if(!open&&target&&!previous&&!requiresSimulatedPointerExit)scheduleOpen(1000,"simulated-pointer");
     if(!open&&target&&previous!==target&&!requiresSimulatedPointerExit)scheduleOpen(1000,"simulated-pointer");
-    if(!target&&!open)cancelScheduledOpen();
+    if(!target&&!open)cancelScheduledOpen("simulated-pointer");
   });
   window.addEventListener("nu:gateway-direction",event=>{
     if(!open)return;

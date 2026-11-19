@@ -6,18 +6,18 @@ const gateway=fs.readFileSync("nu-hex-gateway.js","utf8");
 
 test("Mouse entering the Gateway trigger opens it without requiring a click",()=>{
   assert.match(gateway,/trigger\.addEventListener\("pointerenter",event=>\{/);
-  assert.match(gateway,/event\.pointerType==="mouse"&&!open\)scheduleOpen\(500,"physical-mouse"\)/);
+  assert.match(gateway,/event\.pointerType==="mouse"&&!event\.nuSimulated&&!open\)scheduleOpen\(200,"physical-mouse"\)/);
 });
 
 test("Touching the Gateway trigger opens it and suppresses the synthetic click toggle",()=>{
   assert.match(gateway,/trigger\.addEventListener\("pointerdown",event=>\{/);
   assert.match(gateway,/event\.pointerType==="touch"/);
-  assert.match(gateway,/suppressClickUntil=Date\.now\(\)\+1000/);
-  assert.match(gateway,/scheduleOpen\(500,"touch"\)/);
+  assert.match(gateway,/suppressClickUntil=Date\.now\(\)\+1200/);
+  assert.match(gateway,/scheduleOpen\(200,"touch"\)/);
 });
 
 test("Mouse hover activates a Gateway option directly and leaving cancels pending activation",()=>{
-  assert.match(gateway,/item\.addEventListener\("pointerenter",event=>\{\s*if\(event\.pointerType==="mouse"&&open\)select\(item\)/);
+  assert.match(gateway,/item\.addEventListener\("pointerenter",event=>\{\s*if\(event\.pointerType==="mouse"&&!event\.nuSimulated&&open\)\{\s*select\(item\)/);
   assert.match(gateway,/item\.addEventListener\("pointerleave",event=>\{/);
   assert.match(gateway,/pendingItem===item/);
   assert.doesNotMatch(gateway,/pointerenter",event=>\{if\(event\.pointerType==="mouse"&&open\)activate\(item\)/);
