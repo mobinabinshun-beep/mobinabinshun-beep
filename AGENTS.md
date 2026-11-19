@@ -1,5 +1,14 @@
 # N.U contributor operating rules — fast, safe, owner-directed
 
+## Mandatory protocol-first execution order
+- Start every task by reading this repository's AGENTS.md and the canonical N.U operating/change protocols in the Repository archive. Read the protocol instructions before inspecting implementation data or issuing write/deploy commands.
+- Next read the relevant product specifications, owner decisions, protected-area locks, recent change records, QA reports and related Issue/PR history.
+- Only then inspect repository state: actual default branch and SHA, relevant source/tests/assets, refs/backups, workflow evidence, build/deploy configuration and the identity/content of the currently running public demo.
+- Execute only the explicit owner request and actions required by the applicable protocol/acceptance criteria. No speculative cleanup, refactor, redesign, migration or adjacent change.
+- Before the first runtime write, preserve the currently running public demo as a versioned, decomposed Runtime Baseline Snapshot using the baskets in canonical protocol sections 18–19. Do not assume live demo == current source head. If live identity or access is unavailable, record the exact unverified/missing basket and do not claim backup completion.
+- After machine checks pass, create and verify the exact candidate backup, deploy the authorized candidate to the public demo, verify the actual live build, and hand it to the owner/testers as HUMAN-QA-PENDING. Human acceptance requires the owner's explicit result.
+- Canonical protocol: https://github.com/mobinabinshun-beep/Repository/blob/main/Operations/2026-11-18/NU-UNIFIED-OPERATING-PROTOCOL-fa.md (sections 18–19).
+
 ## Authority and delivery
 - The project owner defines intent, scope and final human acceptance. Contributors/agents execute implementation, debugging, machine tests, backup, demo deployment, verification and documentation.
 - **Speed is a binding engineering requirement.** No avoidable ceremony, duplicate approval, repeated inventory, speculative research, or process-only gate may stall an authorized task. Replace friction with the smallest useful check or automation.
