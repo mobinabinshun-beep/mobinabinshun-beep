@@ -883,3 +883,9 @@ body.nu-gateway-utility-active #menu-profile{display:none!important}
  #game-view.active .bars .bar-fill{transition:none}
  .transaction-toast{transition:none;transform:translate(-50%,0)}
 }
+
+
+/* Gameplay input recovery: the active full-screen game layer must receive real pointer events.
+   HUD remains non-interactive; only the game surface accepts direct mouse/touch input. */
+#game-view.active .game-stage{pointer-events:auto}
+#game-view.active .game-stage canvas{pointer-events:auto;touch-action:none}
