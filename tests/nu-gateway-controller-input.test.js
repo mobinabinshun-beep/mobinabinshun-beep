@@ -88,7 +88,10 @@ test("Simulated mouse uses the Gateway list, one extra Down exits, and pointer m
  assert.match(pointer,/gamepaddisconnected/);
  assert.match(pointer,/gamepadconnected/);
  assert.match(gateway,/scheduleOpen\(1000,"simulated-pointer"\)/);
- assert.match(gateway,/scheduleOpen\(500,"physical-mouse"\)/);
+ assert.match(gateway,/scheduleOpen\(200,"physical-mouse"\)/);
+ assert.match(gateway,/scheduleOpen\(200,"touch"\)/);
+ assert.match(gateway,/},200\);/);
+ assert.match(gateway,/scheduleOpen\(200,"physical-mouse"\)/);
  assert.match(gateway,/setOpen\(!open,true,"touch"\)/);
  assert.match(gateway,/event.pointerType!=="touch"\|\|event.isPrimary===false/);
  assert.match(gateway,/suppressClickUntil=Date.now\(\)\+1000/);
