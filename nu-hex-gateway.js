@@ -12,7 +12,7 @@
   let open=false,selected=null,activationTimer=0,openTimer=0,outsideSince=0,suppressClickUntil=0;
   let pendingItem=null,requiresSimulatedPointerExit=false,simulatedPointerOutside=false;
   let touchTriggerPointerId=null,touchTriggerDwellFired=false;
-  let touchOptionPointerId=null,touchOptionItem=null,touchOptionTimer=0,touchOptionDwellFired=false;
+  let touchOptionPointerId=null,touchOptionItem=null,touchOptionTimer=0,touchOptionDwellFired=false,touchOptionCompletedPointerId=null;
   let optionHoverTimer=0,hoveredItem=null;
 
   function syncGatewayScope(){
@@ -155,12 +155,13 @@
     if(!open||!item)return;
     if(touchOptionItem===item&&touchOptionPointerId===pointerId)return;
     clearTouchOption();
-    touchOptionItem=item;touchOptionPointerId=pointerId;touchOptionDwellFired=false;
+    touchOptionItem=item;touchOptionPointerId=pointerId;touchOptionDwellFired=false;touchOptionCompletedPointerId=null;
     select(item);
     touchOptionTimer=window.setTimeout(()=>{
       touchOptionTimer=0;
       if(open&&touchOptionItem===item){
         touchOptionDwellFired=true;
+        touchOptionCompletedPointerId=touchOptionPointerId;
         suppressClickUntil=Date.now()+1200;
         activate(item,true);
       }
@@ -233,7 +234,14 @@
     }
   },true);
   document.addEventListener("pointerup",event=>{
-    if(event.pointerType!=="touch"||event.isPrimary===false||touchOptionPointerId!==event.pointerId||!touchOptionItem)return;
+    if(event.pointerType!=="touch"||event.isPrimary===false)return;
+    if(touchOptionCompletedPointerId===event.pointerId){
+      event.preventDefault();event.stopPropagation();
+      suppressClickUntil=Date.now()+1200;
+      touchOptionCompletedPointerId=null;
+      return;
+    }
+    if(touchOptionPointerId!==event.pointerId||!touchOptionItem)return;
     const item=touchOptionItem,fired=touchOptionDwellFired;
     const hit=document.elementFromPoint?document.elementFromPoint(event.clientX,event.clientY):event.target;
     const releasedOnItem=!!(hit&&hit.closest&&hit.closest(".nu-gateway-item")===item);
@@ -243,6 +251,7 @@
     if(open&&!fired&&releasedOnItem)activate(item);
   },true);
   document.addEventListener("pointercancel",event=>{
+    if(event.pointerType==="touch"&&touchOptionCompletedPointerId===event.pointerId)touchOptionCompletedPointerId=null;
     if(event.pointerType==="touch"&&touchOptionPointerId===event.pointerId)clearTouchOption();
     if(event.pointerType==="touch"&&touchTriggerPointerId===event.pointerId){
       cancelScheduledOpen();touchTriggerPointerId=null;touchTriggerDwellFired=false;
