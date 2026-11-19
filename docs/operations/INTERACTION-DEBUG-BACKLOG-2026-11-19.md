@@ -151,3 +151,33 @@ The original human report in Issue #210 remains preserved and authoritative unti
 - Owner acceptance: **NOT GRANTED**.
 
 The checked object-level items mean source/test evidence exists; they do not establish that the public demo works on the owner's physical devices.
+
+
+## 2026-11-19 — Object hit-test, preview and touch-target correction
+
+### Source-level defects corrected
+- Public online rounds previously excluded the central 56% of the canvas even when no article/reading column was active, forcing targets into narrow side lanes.
+- Mana's effective hit radius was only 12–14 CSS pixels, too small for reliable touch selection.
+- Pointer hover and activation duplicated the distance check, and the pointer path did not draw an object-level preview ring.
+- Raw viewport-rectangle offsets were used as canvas-local coordinates without scaling for a CSS-scaled canvas.
+
+### Applied on the existing default line
+- Target generation now uses the full playable canvas and excludes only the actual visible reading-column rectangle, converted into canvas-local coordinates.
+- Added one shared CSS-pixel coordinate mapper and one hit-test resolver for both pointer preview and activation.
+- Added a 22 CSS-pixel minimum hit radius while preserving the existing game-specific padding.
+- Pointer hover now selects and visibly outlines the actual Bubble/Mana/Chaos object; keyboard preview remains separate.
+- Updated the game script cache key to `nu-games.js?v=20261119-object-hit-test-r1`.
+
+### Machine evidence
+- Final source/test commit: `316682f021c05e40cbba1cd21d6f85916838e941`.
+- Gateway/main-game: **73/73 PASS** — [run 44431199376](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44431199376).
+- Focused Mana: **83/83 PASS**; full Generation 1: **343/343 PASS** — [run 44431199348](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44431199348).
+- Studio export: **343/343 PASS** — [run 44431199378](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44431199378).
+- Graphics preview: PASS — [run 44431199365](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44431199365).
+- Pages deployment: SUCCESS — [run 44431198875](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44431198875); deploy payload records `pages_build_version=316682f021c05e40cbba1cd21d6f85916838e941`.
+
+### Recovery and acceptance boundary
+- PRE-CHANGE backup: `backup/pre-object-hit-test-touch-targets-2026-11-19` → `3558144e8aacaa7348d9944af04bb224030b1150`.
+- Initial CI attempts exposed stale contract assertions for the old cache key and old hit-radius expression; those tests were updated to the new contract. Final exact-SHA runs above are green.
+- Independent live-page HTTP/browser read-back was unavailable in this session: **NOT TESTED**.
+- Physical-device QA: **PENDING**. Issue #210 remains open; owner acceptance is **NOT GRANTED**.
