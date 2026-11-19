@@ -15,6 +15,7 @@ This page is the navigation index for the Generation 1 implementation repository
 4. [Protected areas and mandatory edit restrictions](operations/LOCKED-AREAS.md)
 5. [Technical audit and verified baseline (2026-11-12)](GEN1-TECHNICAL-AUDIT-2026-11-12.md)
 6. [Change and demo protocol](../CHANGE-AND-DEMO-PROTOCOL.md)
+7. [Four execution-governance protocols](https://github.com/mobinabinshun-beep/Repository/blob/main/Operations/2026-11-19/NU-FOUR-EXECUTION-GOVERNANCE-PROTOCOLS-fa.md) — intake, fail-closed assessment, continuous change documentation and versioned backup/archive.
 
 ## Canonical architecture and product rules
 
