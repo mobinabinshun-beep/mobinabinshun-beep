@@ -174,3 +174,23 @@ The original Issue #210 report remains authoritative: «هنوز اینترکش�
 - The owner performed the real-world retest and confirmed interaction works. This is human acceptance for the reported input defect, not merely a machine-test claim.
 - The focused regression guard is in tests/nu-interaction-core.test.js.
 - This acceptance record does not claim separate Gamepad QA or acceptance of unrelated interaction subsystems.
+
+## 11. 2026-11-19 — Owner requirement: 200 ms direct mouse/touch Gateway dwell
+
+### Request and decision
+- Owner clarified that physical mouse and direct touch must support both immediate direct Select/action and a dwell-based path.
+- A 200 ms continuous dwell on the Gateway trigger opens Gateway; a 200 ms continuous dwell on an actionable Gateway option executes it without requiring prior Select.
+- Direct mouse click and direct touch tap/select remain immediate. Dwell is additive, not a replacement.
+- Simulated mouse is explicitly unchanged: retain 1000 ms trigger dwell, directional option navigation/highlight, A/Enter confirmation, and existing cancel/exit/re-entry behavior.
+
+### Scope and exclusions
+- Documentation only: AGENTS.md, Gateway contract, interaction-core/debug protocol, interaction debug backlog and this change record.
+- No runtime JavaScript, CSS, tests, game assets, build configuration, deployment, data or protected HUD files changed.
+- No change to Gateway pause ownership/order, fresh-input return guard, game-canvas pointer routing, touch-action, controller adapter timing or virtual-pointer semantics.
+
+### Verification / status
+- Base commit: 7b9874fe8ef9bad47c6c236ae79f4bb7b659f326.
+- Candidate branch: docs/gateway-direct-dwell-200ms-owner-amendment-2026-11-19.
+- Requirement state: DOCUMENTED; implementation and machine tests NOT RUN; live deployment NOT REQUESTED; physical-device human QA PENDING; owner acceptance of implementation NOT GRANTED.
+- Acceptance checklist is in the canonical Gateway contract and mirrored in the live debug backlog.
+- Keep Issue #210 open until the exact implementation candidate is tested on physical mouse and touch and the owner explicitly accepts it.
