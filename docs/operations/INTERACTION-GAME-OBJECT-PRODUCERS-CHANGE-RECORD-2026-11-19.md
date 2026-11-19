@@ -142,3 +142,14 @@ The original Issue #210 report remains authoritative: «هنوز اینترکش�
 ### Acceptance boundary
 - This correction addresses the confirmed input-routing blocker; it is not evidence of a physical-device play test.
 - Direct public-page browser read-back and physical mouse/touch/gamepad QA remain **PENDING**. Issue #210 remains open and owner acceptance is not granted.
+
+
+## 2026-11-19 — Owner-directed rollback and gameplay input recovery
+
+- Owner reported that physical touch, physical mouse/click and simulated mouse still did not interact with game objects, and explicitly instructed rollback of the previous hit-test attempt.
+- Restored nu-games.js, the game script cache reference, and the three directly related test files to their exact blobs on backup/pre-object-hit-test-touch-targets-2026-11-19 (3558144e8aacaa7348d9944af04bb224030b1150). The pointer-target preview, shared 22px hit-test and full-canvas target-generation attempt are no longer present in nu-games.js.
+- Compared the default line against the pre-change checkpoint. The only remaining functional code delta is the six-line nu-world.css input-surface correction: the active game stage and canvas receive pointer events. This is retained because it fixes the actual event-routing failure: with pointer-events:none, browser pointer/touch events never reach the canvas handlers. The CSS cache key is explicitly bumped to 20261119-gameplay-input-r3.
+- Added a focused regression assertion for the active canvas pointer-event rules and cache key.
+- Added mandatory repository-wide explicit-scope rules to AGENTS.md and the detailed anti-destruction protocol at docs/operations/ANTI-DESTRUCTION-EXPLICIT-SCOPE-PROTOCOL-2026-11-19.md.
+- Verified by reading back the restored file blobs and comparing the default line with the checkpoint. Automated workflow status for the final rollback/protocol commit is not yet available in this record; physical-device QA remains pending.
+- Scope boundary: no other games, wallet, HUD, controller adapter, launcher, studio, account, storage or unrelated features were changed by this rollback.
