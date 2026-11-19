@@ -55,7 +55,7 @@ The shared `nu-controller-pointer.js` adapter is unchanged. Its contract remains
 
 ## 5. Implementation and verification
 
-Candidate head SHA at this assessment: `7be547379085abf2e40d3c435856d5825653330d`.
+Candidate code/test SHA validated by the workflow runs below: `7be547379085abf2e40d3c435856d5825653330d`.
 
 ### Machine evidence for this candidate SHA
 
