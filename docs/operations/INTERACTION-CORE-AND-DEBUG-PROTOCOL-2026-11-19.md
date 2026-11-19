@@ -97,3 +97,17 @@ Focused tests must verify:
 - The ledger remains bounded and local; export is manual. No cloud telemetry, persistent event storage or automatic upload is claimed.
 - Contract tests validate producer wiring. They do not simulate every physical input source or prove a real user's interaction succeeds.
 - Do not close Issue #210 until the owner retests the exact deployed build and records an explicit acceptance decision.
+
+
+## 8. Owner amendment — direct physical Gateway dwell (2026-11-19)
+
+The 2026-11-19 owner amendment in [GATEWAY-AND-CONTROLLER-INPUT-CONTRACT-2026-11-17.md](./GATEWAY-AND-CONTROLLER-INPUT-CONTRACT-2026-11-17.md) is normative for direct physical mouse and touch:
+
+- Physical mouse hover on the Gateway trigger and continuous direct touch on that trigger open Gateway after 200 ms.
+- Physical mouse hover or continuous direct touch on an actionable Gateway option for 200 ms executes that option directly, without requiring prior Select.
+- Direct mouse click and direct touch tap/select remain immediate independent activation paths.
+- Dwell cancellation, source separation and one-gesture/one-execution deduplication are required. Movement/highlight alone is not activation.
+- Simulated mouse is explicitly excluded from this 200 ms change: retain its existing 1000 ms Gateway-entry dwell, directional highlight/navigation and A/Enter confirmation exactly as currently contracted.
+- Gateway pause-before-options ordering and the fresh-gameplay-input return guard remain unchanged.
+
+This protocol entry records requirements only. It is not implementation or QA evidence. Pointer Events distinguish physical pointer types and can generate compatibility mouse events after pointer activity; implementations/tests must preserve source identity and deduplicate rather than interpreting a touch as a second mouse action. Reference: [W3C Pointer Events](https://www.w3.org/TR/pointerevents/), [MDN Pointer Events](https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events).

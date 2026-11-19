@@ -192,3 +192,20 @@ The checked object-level items mean source/test evidence exists; they do not est
 - [ ] Other unrelated interaction routes remain governed by their own test/acceptance records.
 
 **Protected contract:** see the owner-confirmed acceptance and protected input contract in INTERACTION-GAME-OBJECT-PRODUCERS-CHANGE-RECORD-2026-11-19.md. Do not remove or override the gameplay input CSS rules without an explicit focused change request, a regression test and verification of direct touch, physical mouse/click and simulated mouse.
+
+## 2026-11-19 — Owner-directed direct Gateway dwell requirement
+
+**Status:** REQUIREMENT-DOCUMENTED · IMPLEMENTATION-PENDING · HUMAN-QA-PENDING. Normative details: [Gateway contract, owner amendment](./GATEWAY-AND-CONTROLLER-INPUT-CONTRACT-2026-11-17.md).
+
+- [ ] Direct physical mouse hover on Gateway trigger opens after 200 ms.
+- [ ] Direct touch held continuously on Gateway trigger opens after 200 ms.
+- [ ] Direct physical mouse hover on an actionable Gateway option for 200 ms executes it without prior Select.
+- [ ] Direct touch held continuously on an actionable Gateway option for 200 ms executes it without prior Select.
+- [ ] Immediate direct mouse click and touch tap/select remain supported alongside dwell.
+- [ ] Dwell cancels on target leave/change/cancel; stale timers cannot activate a later target.
+- [ ] One gesture produces at most one action; touch compatibility mouse/click events are deduplicated.
+- [ ] Simulated pointer remains unchanged: 1000 ms Gateway-entry dwell; directional option navigation/highlight; A/Enter confirmation; existing cancel/exit/re-entry behavior.
+- [ ] Verify pause-before-options ordering and the close/resume guard.
+- [ ] Physical mouse and real touch-device QA on the exact deployed SHA; preserve Issue #210 until owner reports acceptance.
+
+Do not mark any item complete based only on this documentation PR or static tests. No runtime code or CSS is changed by this record.
