@@ -84,3 +84,13 @@ test("active game canvas receives physical pointer and touch input",()=>{
  assert.match(worldCss,/#game-view\\.active \\.game-stage canvas\\{pointer-events:auto;touch-action:none\\}/);
  assert.match(indexHtml,/nu-world\\.css\\?v=20261119-gameplay-input-r3/);
 });
+
+
+test("Mana Collector targets cover the playable canvas and use Android-safe touch hit testing",()=>{
+ assert.doesNotMatch(gameSource,/if\(!download&&x>w\*\.22&&x<w\*\.78\)continue/);
+ assert.match(gameSource,/const x=rnd\(margin,w-margin\)/);
+ assert.match(gameSource,/const hitRadius=state\.game==="mana"\?Math\.max\(22,o\.r\+8\)/);
+ assert.match(gameSource,/const scaleX=rect\.width>0\?canvas\.clientWidth\/rect\.width:1/);
+ assert.match(gameSource,/const scaleY=rect\.height>0\?canvas\.clientHeight\/rect\.height:1/);
+ assert.match(gameSource,/canvas\.setPointerCapture\(e\.pointerId\)/);
+});
