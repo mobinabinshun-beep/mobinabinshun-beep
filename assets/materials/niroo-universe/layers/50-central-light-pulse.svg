@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1536" height="1024" viewBox="0 0 1536 1024"><title>Central light pulse</title><desc>Subtle pulse aligned to central celestial light.</desc><defs></defs><g transform="translate(770 198)"><circle r="30" fill="#ffc06e" opacity=".12"><animate attributeName="r" values="18;55;18" dur="8s" repeatCount="indefinite"/><animate attributeName="opacity" values=".06;.28;.06" dur="8s" repeatCount="indefinite"/></circle></g></svg>
