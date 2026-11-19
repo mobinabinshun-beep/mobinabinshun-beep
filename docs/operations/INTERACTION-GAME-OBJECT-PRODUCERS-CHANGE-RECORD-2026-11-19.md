@@ -116,3 +116,29 @@ The original Issue #210 report remains authoritative: «هنوز اینترکش�
 - Initial test runs failed only on outdated assertions for the previous hit-radius expression/cache key; test contracts were updated and final runs passed.
 - Direct live-page read-back: **NOT TESTED** in this session.
 - Human QA: **PENDING**; Issue #210 remains open; owner acceptance: **NOT GRANTED**.
+
+
+## 10. 2026-11-19 — Gameplay input surface restored after owner report
+
+### Confirmed root cause
+- The active full-screen game layer and its canvas were both assigned `pointer-events:none` by later CSS overrides. The game runtime listens for pointer events whose target is inside `#game-canvas`; with pointer events disabled, the events targeted elements behind the game and the runtime's `closest("#game-canvas")` / `canvas.contains(event.target)` guards rejected them. This explains why the previous hit-radius and hit-test changes did not restore actual play.
+
+### Forward correction
+- `nu-world.css`: explicitly restore `pointer-events:auto` on the active game stage and canvas; set `touch-action:none` on the canvas so touch taps are not converted into page scrolling.
+- `index.html`: cache-bust stylesheet to `nu-world.css?v=20261119-gameplay-input-r2`.
+- `tests/nu-interaction-core.test.js`: add a regression contract that verifies the active game surface receives pointer/touch input and the new stylesheet cache key is loaded.
+- Protected HUD layout and markup were not changed.
+
+### Exact commits and machine checks
+- CSS fix: `11ee406faceb10206a1e40d6def98baabc98c9c2`.
+- Cache reference: `40d076ff2b7da9901682f6423c054ebdeaef2e2d`.
+- Regression test and final candidate: `912034e18fb5137baa6b25c755eb30696e68e16f`.
+- Gateway/main-game: **74/74 PASS** — [run 44432348286](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44432348286).
+- Focused Mana: **83/83 PASS**; full Generation 1: **344/344 PASS** — [run 44432348258](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44432348258).
+- Studio export: **344/344 PASS** — [run 44432348256](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44432348256).
+- Graphics preview: PASS — [run 44432348101](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44432348101).
+- Pages deployment: SUCCESS — [run 44432347903](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44432347903).
+
+### Acceptance boundary
+- This correction addresses the confirmed input-routing blocker; it is not evidence of a physical-device play test.
+- Direct public-page browser read-back and physical mouse/touch/gamepad QA remain **PENDING**. Issue #210 remains open and owner acceptance is not granted.
