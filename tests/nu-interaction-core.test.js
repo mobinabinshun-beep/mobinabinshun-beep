@@ -76,3 +76,11 @@ test("game-object diagnostics are non-intrusive when the shared core is unavaila
  assert.match(gameSource,/if\(!core\|\|typeof core\.record!=="function"\)return null/);
  assert.match(gameSource,/catch\(_\)\{return null;\}/);
 });
+
+const worldCss=fs.readFileSync("nu-world.css","utf8");
+const indexHtml=fs.readFileSync("index.html","utf8");
+test("active game canvas receives physical pointer and touch input",()=>{
+ assert.match(worldCss,/#game-view\\.active \\.game-stage\\{pointer-events:auto\\}/);
+ assert.match(worldCss,/#game-view\\.active \\.game-stage canvas\\{pointer-events:auto;touch-action:none\\}/);
+ assert.match(indexHtml,/nu-world\\.css\\?v=20261119-gameplay-input-r3/);
+});
