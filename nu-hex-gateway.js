@@ -11,8 +11,8 @@
   const items=[...root.querySelectorAll(".nu-gateway-item")];
   let open=false,selected=null,activationTimer=0,openTimer=0,outsideSince=0,suppressClickUntil=0;
   let pendingItem=null,requiresSimulatedPointerExit=false,simulatedPointerOutside=false;
-  let touchTriggerPointerId=null,touchTriggerDwellFired=false;
-  let touchOptionPointerId=null,touchOptionItem=null,touchOptionTimer=0,touchOptionDwellFired=false,touchOptionCompletedPointerId=null;
+  let touchTriggerPointerId=null,touchTriggerDwellFired=false,touchTriggerCancelledPointerId=null;
+  let touchOptionPointerId=null,touchOptionItem=null,touchOptionTimer=0,touchOptionDwellFired=false,touchOptionCompletedPointerId=null,touchOptionCancelledPointerId=null;
   let optionHoverTimer=0,hoveredItem=null;
 
   function syncGatewayScope(){
@@ -155,7 +155,7 @@
     if(!open||!item)return;
     if(touchOptionItem===item&&touchOptionPointerId===pointerId)return;
     clearTouchOption();
-    touchOptionItem=item;touchOptionPointerId=pointerId;touchOptionDwellFired=false;touchOptionCompletedPointerId=null;
+    touchOptionItem=item;touchOptionPointerId=pointerId;touchOptionDwellFired=false;touchOptionCompletedPointerId=null;touchOptionCancelledPointerId=null;
     select(item);
     touchOptionTimer=window.setTimeout(()=>{
       touchOptionTimer=0;
@@ -193,7 +193,7 @@
     event.preventDefault();
     touchTriggerPointerId=event.pointerId;
     touchTriggerDwellFired=false;
-    touchOptionCompletedPointerId=null;
+    touchOptionCompletedPointerId=null;touchTriggerCancelledPointerId=null;touchOptionCancelledPointerId=null;
     suppressClickUntil=Date.now()+1200;
     scheduleOpen(200,"touch");
   });
@@ -208,7 +208,7 @@
   });
   trigger.addEventListener("pointercancel",event=>{
     if(event.pointerType==="touch"&&touchTriggerPointerId===event.pointerId){
-      cancelScheduledOpen();touchTriggerPointerId=null;touchTriggerDwellFired=false;
+      cancelScheduledOpen();touchTriggerPointerId=null;touchTriggerDwellFired=false;touchTriggerCancelledPointerId=null;
     }
   });
   trigger.addEventListener("click",event=>{
@@ -225,13 +225,13 @@
     const hit=document.elementFromPoint?document.elementFromPoint(event.clientX,event.clientY):event.target;
     const triggerHit=hit&&hit.closest?hit.closest(".nu-gateway-trigger"):null;
     if(touchTriggerPointerId===event.pointerId&&triggerHit!==trigger){
-      cancelScheduledOpen();touchTriggerPointerId=null;touchTriggerDwellFired=false;
+      cancelScheduledOpen();touchTriggerCancelledPointerId=event.pointerId;touchTriggerPointerId=null;touchTriggerDwellFired=false;
     }
     if(touchOptionPointerId===event.pointerId){
       const nextItem=hit&&hit.closest?hit.closest(".nu-gateway-item"):null;
       if(nextItem!==touchOptionItem){
         if(nextItem&&open)startTouchOption(nextItem,event.pointerId);
-        else clearTouchOption();
+        else{touchOptionCancelledPointerId=event.pointerId;clearTouchOption();}
       }
     }
   },true);
@@ -241,6 +241,12 @@
       event.preventDefault();event.stopPropagation();
       suppressClickUntil=Date.now()+1200;
       touchOptionCompletedPointerId=null;
+      return;
+    }
+    if(touchTriggerCancelledPointerId===event.pointerId||touchOptionCancelledPointerId===event.pointerId){
+      event.preventDefault();event.stopPropagation();
+      suppressClickUntil=Date.now()+1200;
+      touchTriggerCancelledPointerId=null;touchOptionCancelledPointerId=null;
       return;
     }
     if(touchOptionPointerId!==event.pointerId||!touchOptionItem)return;
@@ -254,6 +260,8 @@
   },true);
   document.addEventListener("pointercancel",event=>{
     if(event.pointerType==="touch"&&touchOptionCompletedPointerId===event.pointerId)touchOptionCompletedPointerId=null;
+    if(event.pointerType==="touch"&&touchOptionCancelledPointerId===event.pointerId)touchOptionCancelledPointerId=null;
+    if(event.pointerType==="touch"&&touchTriggerCancelledPointerId===event.pointerId)touchTriggerCancelledPointerId=null;
     if(event.pointerType==="touch"&&touchOptionPointerId===event.pointerId)clearTouchOption();
     if(event.pointerType==="touch"&&touchTriggerPointerId===event.pointerId){
       cancelScheduledOpen();touchTriggerPointerId=null;touchTriggerDwellFired=false;
@@ -280,6 +288,7 @@
       if(event.pointerType==="touch"&&event.isPrimary!==false&&open){
         event.preventDefault();
         suppressClickUntil=Date.now()+1200;
+        touchTriggerCancelledPointerId=null;touchOptionCancelledPointerId=null;
         startTouchOption(item,event.pointerId);
       }
     });
