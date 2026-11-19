@@ -181,3 +181,14 @@ The checked object-level items mean source/test evidence exists; they do not est
 - Initial CI attempts exposed stale contract assertions for the old cache key and old hit-radius expression; those tests were updated to the new contract. Final exact-SHA runs above are green.
 - Independent live-page HTTP/browser read-back was unavailable in this session: **NOT TESTED**.
 - Physical-device QA: **PENDING**. Issue #210 remains open; owner acceptance is **NOT GRANTED**.
+
+## 2026-11-19 — Owner confirmation: gameplay input restored
+
+- [x] Owner-confirmed interaction recovery for the reported direct touch, physical mouse/click and simulated-mouse paths.
+- [x] Preserve the active game-stage and canvas pointer-event rules in nu-world.css.
+- [x] Preserve touch-action:none on the active game canvas so touch is handled by the game rather than page scrolling.
+- [x] Preserve the CSS cache-bust reference in index.html and the focused regression assertion.
+- [ ] Gamepad and keyboard-emulated controller remain separate QA items; owner confirmation above does not imply they were tested.
+- [ ] Other unrelated interaction routes remain governed by their own test/acceptance records.
+
+**Protected contract:** see the owner-confirmed acceptance and protected input contract in INTERACTION-GAME-OBJECT-PRODUCERS-CHANGE-RECORD-2026-11-19.md. Do not remove or override the gameplay input CSS rules without an explicit focused change request, a regression test and verification of direct touch, physical mouse/click and simulated mouse.
