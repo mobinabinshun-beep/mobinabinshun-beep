@@ -38,13 +38,23 @@ jobs:
           node-version: 20
       - name: Check JavaScript syntax
         run: |
-          for file in nu-engine.js nu-pixel-world.js nu-graphics-core.js nu-background-engine.js nu-dynamic-layers.js nu-game-render-adapter.js nu-graphics-runtime.js nu-games.js nu-svg-vectorizer.js nu-graphics-analysis.js nu-studio-layout.js nu-raster-import.js nu-pixel-art-studio.js nu-wallet.js nu-market-sim.js nu-exchange.js nu-materials.js nu-player-ui.js nu-casino.js nu-hex-gateway.js nu-launcher.js nu-motion.js; do
+          for file in nu-engine.js nu-pixel-world.js nu-graphics-core.js nu-background-engine.js nu-dynamic-layers.js nu-game-render-adapter.js nu-graphics-runtime.js nu-games.js nu-svg-vectorizer.js nu-graphics-analysis.js nu-studio-layout.js nu-raster-import.js nu-pixel-art-studio.js nu-wallet.js nu-market-sim.js nu-exchange.js nu-materials.js nu-player-ui.js nu-casino.js nu-hex-gateway.js nu-launcher.js nu-motion.js nu-controller-pointer.js nu-interaction-core.js; do
             node --check "$file"
           done
       - name: Test hex gateway navigation and interaction contract
         run: node --test tests/nu-hex-gateway.test.js
       - name: Test launcher 10-level Reduced Motion controls
         run: node --test tests/nu-motion.test.js
+      - name: Test normalized interaction translators and debug ledger
+        run: node --test tests/nu-interaction-core.test.js
+      - name: Test Gateway pointer/controller mode contract
+        run: node --test tests/nu-gateway-pointer-controller-mode.test.js
+      - name: Verify canonical software-governance routing
+        run: |
+          set -euo pipefail
+          grep -Fq 'NU-FOUR-EXECUTION-GOVERNANCE-PROTOCOLS-fa.md' AGENTS.md
+          grep -Fq 'NU-FOUR-EXECUTION-GOVERNANCE-PROTOCOLS-fa.md' docs/README.md
+
       - name: Test wallet, HP capsule and asset history rules
         run: node --test tests/nu-wallet.test.js
       - name: Test fictional activity-driven market simulator
