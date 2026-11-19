@@ -46,7 +46,7 @@
 - Direct physical mouse and direct touch remain direct input. Stepwise cursor movement through controller buttons is simulated mouse, irrespective of cursor artwork.
 - Simulated mouse outside Gateway: four directions move the virtual pointer and only highlight targets; separate confirm clicks. The shared adapter starts when a gamepad is connected.
 - Simulated mouse inside Gateway: vertical directions navigate the ordered Gateway options; a further Down after the final option closes Gateway without selecting anything. A/Enter confirms the highlighted option; B/Escape remains a cancel path.
-- Direct physical mouse and touch enter Gateway after a 500 ms dwell; simulated-pointer entry uses 1000 ms. Opening dispatches the pause event before options become visible/actionable.
+- Direct physical mouse hover and direct touch enter Gateway after a continuous 200 ms dwell. Direct physical mouse hover or direct touch held on an actionable Gateway option for 200 ms executes it without prior Select; immediate mouse click and touch tap/select remain supported. The simulated pointer is unchanged: Gateway entry uses 1000 ms, directions navigate/highlight, and A/Enter confirms. Opening dispatches the pause event before options become visible/actionable.
 - After directional exit, the virtual pointer remains at the Gateway trigger. It must leave the trigger hit-zone and re-enter before Gateway can open again.
 - Implement controller input as a shared launcher-core adapter. Gateway and future modules consume the adapter; do not fork controller-specific logic per page.
 - Keep adapters extensible for future controller types through stable interfaces and documented capability references.
@@ -108,3 +108,9 @@
 - Any modification to these selectors, canvas touch-action, game-stage pointer routing or the CSS cache key requires a new explicit user instruction focused on gameplay input, a focused regression test, and verification of direct touch, physical mouse/click and simulated mouse. Do not bundle it with unrelated CSS/layout/controller/game work.
 - Preserve HUD non-interactivity and all unrelated game/UI behavior. Never enable pointer events globally as a shortcut.
 - Evidence/acceptance record: docs/operations/INTERACTION-GAME-OBJECT-PRODUCERS-CHANGE-RECORD-2026-11-19.md.
+
+## Owner-directed direct-input dwell amendment — 2026-11-19
+- The 200 ms Gateway trigger and option dwell rule applies only to direct physical mouse and direct touch.
+- Preserve immediate direct click/tap/select as an alternative activation path.
+- Do not change simulated mouse: 1000 ms trigger dwell, directional navigation/highlight and A/Enter confirmation remain unchanged.
+- See the normative acceptance checklist in docs/operations/GATEWAY-AND-CONTROLLER-INPUT-CONTRACT-2026-11-17.md and the live debug backlog in docs/operations/INTERACTION-DEBUG-BACKLOG-2026-11-19.md.
