@@ -88,3 +88,14 @@
 - These rules apply to every model, agent, bot, script and contributor operating in this repository. Further development outside the current lock requires a new explicit, focused user instruction.
 - Full mandatory protocol: [ANTI-DESTRUCTION-EXPLICIT-SCOPE-PROTOCOL-2026-11-19.md](./docs/operations/ANTI-DESTRUCTION-EXPLICIT-SCOPE-PROTOCOL-2026-11-19.md).
 - This is a repository instruction, not a claim of platform-enforced branch protection. Do not claim GitHub ruleset/branch protection unless independently verified in repository settings.
+
+## Protected gameplay input contract — owner accepted 2026-11-19
+- Owner-confirmed working behavior: direct touch, physical mouse/click and simulated mouse. Treat this as an accepted protected behavior, not an invitation to refactor the input stack.
+- Do not remove, weaken, override or globally replace these exact rules in nu-world.css:
+  - #game-view.active .game-stage{pointer-events:auto}
+  - #game-view.active .game-stage canvas{pointer-events:auto;touch-action:none}
+- Keep index.html loading nu-world.css?v=20261119-gameplay-input-r3; if the CSS is intentionally changed, bump the key and prove the new behavior instead of reverting to a stale cached stylesheet.
+- These rules route real pointer/touch events to the game canvas. The game runtime filters events by canvas target; removing pointer delivery breaks interaction. This is functional input routing, not decorative CSS.
+- Any modification to these selectors, canvas touch-action, game-stage pointer routing or the CSS cache key requires a new explicit user instruction focused on gameplay input, a focused regression test, and verification of direct touch, physical mouse/click and simulated mouse. Do not bundle it with unrelated CSS/layout/controller/game work.
+- Preserve HUD non-interactivity and all unrelated game/UI behavior. Never enable pointer events globally as a shortcut.
+- Evidence/acceptance record: docs/operations/INTERACTION-GAME-OBJECT-PRODUCERS-CHANGE-RECORD-2026-11-19.md.
