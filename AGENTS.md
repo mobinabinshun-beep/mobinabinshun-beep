@@ -108,3 +108,9 @@
 - Any modification to these selectors, canvas touch-action, game-stage pointer routing or the CSS cache key requires a new explicit user instruction focused on gameplay input, a focused regression test, and verification of direct touch, physical mouse/click and simulated mouse. Do not bundle it with unrelated CSS/layout/controller/game work.
 - Preserve HUD non-interactivity and all unrelated game/UI behavior. Never enable pointer events globally as a shortcut.
 - Evidence/acceptance record: docs/operations/INTERACTION-GAME-OBJECT-PRODUCERS-CHANGE-RECORD-2026-11-19.md.
+
+## Owner-mandated repository/data coverage principle
+- For explicit owner requests to inspect all repositories or all data, follow the canonical coverage rule: https://github.com/mobinabinshun-beep/Repository/blob/main/Governance/NU-REPOSITORY-AND-DATA-COVERAGE-PRINCIPLE-fa.md
+- Exhaust repository discovery and pagination, enumerate trees/paths, fetch requested and relevant files directly, inspect related branches/history/issues/PRs, and record per-repository/per-path coverage. Do not stop at code-search indexing or a failed search; use direct file/tree retrieval alternatives.
+- Never respond to a global coverage request with a blanket “cannot read / did not read”. Exhaust available routes, state exact remaining path/ref/error only after alternatives, continue all independent work, and never claim full coverage without a verifiable manifest.
+- This explicit owner rule overrides the ordinary scoped-task shortcut only when the owner explicitly asks for all repositories/all data; it does not authorize unrelated runtime changes.
