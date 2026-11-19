@@ -3,6 +3,7 @@
 **Owner:** N.U project owner  
 **Canonical protocol:** [Interaction Core & Debug Data Protocol](./INTERACTION-CORE-AND-DEBUG-PROTOCOL-2026-11-19.md)  
 **Active human-QA record:** [Issue #210](https://github.com/mobinabinshun-beep/mobinabinshun-beep/issues/210)  
+**Latest change record:** [Game-object producers and cache-safe deployment](./INTERACTION-GAME-OBJECT-PRODUCERS-CHANGE-RECORD-2026-11-19.md)  
 **Rule:** A checked item means code/test evidence exists, not human acceptance. Preserve original failed reports and append resolutions; never overwrite findings.
 
 ## Shared core and translators
@@ -34,21 +35,21 @@
 
 ## Game-object instrumentation
 ### Bubble Hunt
-- [ ] Bubble spawn / stable object ID / position.
-- [ ] Pointer hover or touch target / hit test.
-- [ ] Click/pop / miss / despawn.
+- [x] Bubble spawn / stable object ID / position.
+- [x] Pointer hover or touch target / hit test.
+- [x] Click/pop / miss / despawn.
 - [ ] Score, XP and wallet outcome correlation.
 
 ### Mana Collector
-- [ ] Mana particle/orb spawn / stable object ID / position.
-- [ ] Pointer or touch targeting / collection attempt.
-- [ ] Collection success / miss / despawn.
+- [x] Mana particle/orb spawn / stable object ID / position.
+- [x] Pointer or touch targeting / collection attempt.
+- [x] Collection success / miss / despawn.
 - [ ] Mana delta, capsule/charge and round outcome correlation.
 
 ### Chaos Attack
-- [ ] Chaos mass/cluster spawn / stable object ID / position.
-- [ ] Targeting / overlap / collision / split or merge where supported.
-- [ ] Damage/effect / hit or miss / despawn.
+- [x] Chaos mass/cluster spawn / stable object ID / position.
+- [x] Targeting / overlap / collision / split or merge where supported.
+- [x] Damage/effect / hit or miss / despawn.
 - [ ] Health, Mana/Arcane Shield and round outcome correlation.
 
 ## Debug record and human evidence
@@ -113,3 +114,40 @@
 - Gateway hierarchy, held-input and fresh-input return verification on actual devices.
 
 The original human report in Issue #210 remains preserved and authoritative until the owner retests this exact deployed build. Machine approval is not human acceptance.
+
+## 2026-11-19 — Game-object instrumentation and cache-safe deployment
+
+**Change record:** [INTERACTION-GAME-OBJECT-PRODUCERS-CHANGE-RECORD-2026-11-19.md](./INTERACTION-GAME-OBJECT-PRODUCERS-CHANGE-RECORD-2026-11-19.md)
+
+### Code/test coverage now present
+- [x] Bubble Hunt spawn identity/position, target/hit-test, activation/pop, miss and despawn producers.
+- [x] Mana Collector spawn identity/position, target/collection attempt, success/failure, miss and despawn producers.
+- [x] Chaos Attack spawn identity/position, target/hit-test, N-BI fire, collision/resolution, damage/absorption and despawn producers.
+- [x] Stable `gameId`, `waveId`, `objectType`, `objectId`, source, action and outcome fields are attached to object events.
+- [x] Focused producer contract tests and full Generation 1 regression run on the deployed merge SHA.
+- [ ] Full XP/score/wallet transaction, Mana capsule/charge and round-outcome correlation for every game path.
+- [ ] Browser/device proof that every producer fires correctly for physical touch, physical mouse, keyboard-emulated controller and Gamepad.
+- [ ] Full simulated-pointer dispatch chain and Gateway correlated pause/re-entry trace.
+- [ ] Human export attachment and exact-build retest.
+
+### Latest machine/deployment evidence
+- PR #219 merged at `4665e11f2a3a34eaef0a9fba2b252b1689f43ad1`; producer candidate `e8d207edd73083be578d7d301e07cbc1e474671a`.
+- PR #220 merged at `a814cf20e28e0a1f4455c4e9fd094a9948f74f86`; final cache key: `nu-games.js?v=20261119-game-object-events-r1`.
+- Final Gateway/main-game regression: **71/71 PASS** — [run 44427652450](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44427652450).
+- Full Generation 1 regression: **341/341 PASS** — [run 44427652536](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44427652536).
+- Studio export: PASS — [run 44427652401](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44427652401).
+- Graphics preview/static validation: PASS — [run 44427652390](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44427652390).
+- Graphics integrity: PASS — [run 44427652309](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44427652309).
+- Pages deployment: SUCCESS — [run 44427652015](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44427652015); its deploy log records `pages_build_version=a814cf20e28e0a1f4455c4e9fd094a9948f74f86`.
+- Pre-change backup `backup/pre-game-object-instrumentation-2026-11-19` → `9440dc05676e81516466c13b49f3d43a1e5f4a1b`; second pre-change backup `backup/pre-game-object-cache-bust-2026-11-19` → `4665e11f2a3a34eaef0a9fba2b252b1689f43ad1`.
+- Post-test checkpoint `checkpoint/post-test-game-object-cache-bust-2026-11-19` → `d1da424e707b44a370b6e42567766ddfac414f2b`; pre-release checkpoint `checkpoint/pre-release-game-object-cache-bust-2026-11-19` → final merge SHA `a814cf20e28e0a1f4455c4e9fd094a9948f74f86`.
+
+### Separate acceptance states
+- Implementation: **MERGED**.
+- Automated machine tests: **PASS** on the exact final merge SHA.
+- Pages deployment identity: **CONFIRMED** by `pages_build_version` matching the final merge SHA.
+- Direct HTTP/browser read-back: **NOT_TESTED** in this session.
+- Human QA: **PENDING**; Issue #210 remains open and the original failed report remains authoritative.
+- Owner acceptance: **NOT GRANTED**.
+
+The checked object-level items mean source/test evidence exists; they do not establish that the public demo works on the owner's physical devices.

@@ -1,6 +1,6 @@
 # N.U Interaction Core & Debug Data Protocol — 2026-11-19
 
-**Status:** IMPLEMENTED ON DEFAULT LINE · AUTOMATED VALIDATION PENDING · HUMAN QA REQUIRED  
+**Status:** OBJECT-LEVEL PRODUCERS MERGED · AUTOMATED VALIDATION PASS · PAGES BUILD ID CONFIRMED · HUMAN QA REQUIRED  
 **Scope:** Shared launcher/game interaction pipeline, independent input translators, Gateway, game objects and durable debugging evidence.  
 **Protected boundary:** Classic LV / XP / Mana HUD remains locked. Do not alter its markup, style, layout or semantics.
 
@@ -51,7 +51,7 @@ The debug inventory must cover every interactive surface, not just DOM buttons:
 - **Rendering/physics bridges:** canvas hit-test, pointer coordinates, object identity, collision/overlap, frame/update ownership and render pause/resume.
 - **Economy and health effects:** only the event/result identifiers and deltas needed to explain the interaction; do not log secrets or unnecessary player-identifying data.
 
-Every object-specific producer should use stable `objectType`, `objectId`, `gameId`, `action`, `source`, `outcome` and optional coordinate/result fields. Object lifecycle and game-specific semantics are not yet claimed as fully instrumented by the first core commit; add producers incrementally and test each game adapter.
+Every object-specific producer should use stable `objectType`, `objectId`, `gameId`, `action`, `source`, `outcome` and optional coordinate/result fields. Code-level producers for Bubble Hunt, Mana Collector and Chaos Attack were added in PR #219 and are covered by focused contract tests. Their exact deployed successor is PR #220 / merge SHA `a814cf20e28e0a1f4455c4e9fd094a9948f74f86`. This establishes source/test coverage, not proof of physical-device event delivery or complete wallet/capsule/round correlation.
 
 ## 4. Core API and debug ledger
 
@@ -87,4 +87,13 @@ Focused tests must verify:
 - debug export schema, bounded retention and report attachment workflow;
 - no change to protected HUD or unrelated game/economy behavior.
 
-**Release state:** source and focused unit tests are committed to the default line. Test execution, full game-object producer coverage, exact demo deployment/live-build identity and owner human acceptance must be reported separately; none is implied by the presence of this document or core module.
+**Release state (2026-11-19):** object-level producers for all three Generation 1 games are merged. Gateway/main-game regression is 71/71 and the full Generation 1 suite is 341/341 on the final deployed merge SHA `a814cf20e28e0a1f4455c4e9fd094a9948f74f86`. Pages run `44427652015` records the same SHA as `pages_build_version`. The runtime cache key is `nu-games.js?v=20261119-game-object-events-r1`. Direct HTTP/browser read-back is NOT_TESTED; physical-device human QA is PENDING; owner acceptance is NOT_GRANTED. Remaining work is tracked in the living backlog and Issue #210.
+
+## 7. Verified producer extension — 2026-11-19
+
+- Implementation PRs: [#219](https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/219) and [#220](https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/220).
+- Final deployed SHA: `a814cf20e28e0a1f4455c4e9fd094a9948f74f86`; Pages run [44427652015](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44427652015).
+- The game adapter records object identity, source, action and outcome for spawn, target/hit-test, activation, reward/collection/fire, Chaos resolution/collision and despawn.
+- The ledger remains bounded and local; export is manual. No cloud telemetry, persistent event storage or automatic upload is claimed.
+- Contract tests validate producer wiring. They do not simulate every physical input source or prove a real user's interaction succeeds.
+- Do not close Issue #210 until the owner retests the exact deployed build and records an explicit acceptance decision.
