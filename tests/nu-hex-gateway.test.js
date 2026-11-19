@@ -332,3 +332,37 @@ test("Direct dwell never edits or reclassifies the shared simulated-pointer adap
  assert.match(js,/scheduleOpen\(1000,"simulated-pointer"\)/);
  assert.match(js,/event\.nuSimulated/);
 });
+
+
+test("Direct mouse clicks remain immediate on the Gateway trigger and options",()=>{
+ const trigger=gatewayRuntimeHarness();
+ trigger.trigger.dispatch("click",{detail:1});
+ assert.equal(trigger.root.classList.contains("is-open"),true);
+ const option=gatewayRuntimeHarness();option.openByClick();
+ option.items[0].dispatch("click",{detail:1});
+ option.advance(120);assert.equal(option.menuClicks(),1);
+});
+
+test("Touch leaving the Gateway trigger or cancelling before 200ms cannot open it later",()=>{
+ const moved=gatewayRuntimeHarness();
+ moved.trigger.dispatch("pointerdown",{pointerType:"touch",pointerId:6});
+ moved.advance(100);moved.setHit(null);
+ moved.dispatchDocument("pointermove",{pointerType:"touch",pointerId:6,clientX:300,clientY:300});
+ moved.trigger.dispatch("pointerup",{pointerType:"touch",pointerId:6});
+ moved.advance(200);assert.equal(moved.root.classList.contains("is-open"),false);
+
+ const cancelled=gatewayRuntimeHarness();
+ cancelled.trigger.dispatch("pointerdown",{pointerType:"touch",pointerId:7});
+ cancelled.advance(100);
+ cancelled.trigger.dispatch("pointercancel",{pointerType:"touch",pointerId:7});
+ cancelled.advance(200);assert.equal(cancelled.root.classList.contains("is-open"),false);
+});
+
+test("Touch pointer cancellation clears an option dwell without executing it",()=>{
+ const h=gatewayRuntimeHarness();h.openByClick();h.setHit(h.items[0]);
+ h.items[0].dispatch("pointerdown",{pointerType:"touch",pointerId:8});
+ h.advance(100);
+ h.dispatchDocument("pointercancel",{pointerType:"touch",pointerId:8});
+ h.advance(200);
+ assert.equal(h.menuClicks(),0);assert.equal(h.root.classList.contains("is-open"),true);
+});
