@@ -153,3 +153,24 @@ The original Issue #210 report remains authoritative: «هنوز اینترکش�
 - Added mandatory repository-wide explicit-scope rules to AGENTS.md and the detailed anti-destruction protocol at docs/operations/ANTI-DESTRUCTION-EXPLICIT-SCOPE-PROTOCOL-2026-11-19.md.
 - Verified by reading back the restored file blobs and comparing the default line with the checkpoint. Automated workflow status for the final rollback/protocol commit is not yet available in this record; physical-device QA remains pending.
 - Scope boundary: no other games, wallet, HUD, controller adapter, launcher, studio, account, storage or unrelated features were changed by this rollback.
+
+## 2026-11-19 — Owner-confirmed gameplay interaction acceptance and protected input contract
+
+### Human acceptance
+- The owner explicitly confirmed in chat: "عمل کرد تعاملی و اینترکشن درست شد" (it worked; interaction/gameplay is fixed).
+- This supersedes the earlier PENDING / NOT GRANTED statements above for the reported gameplay interaction defect. Those earlier statements remain as historical status at the time they were written.
+- Owner confirmation covers the previously reported working interaction path: direct touch, physical mouse/click and simulated mouse. No separate Gamepad acceptance is implied.
+
+### Protected implementation contract — do not casually modify
+- nu-world.css must retain #game-view.active .game-stage{pointer-events:auto}.
+- nu-world.css must retain #game-view.active .game-stage canvas{pointer-events:auto;touch-action:none}.
+- index.html must load nu-world.css?v=20261119-gameplay-input-r3 (or a newer key only when the CSS asset itself is intentionally changed).
+- The CSS rule is not cosmetic: it routes browser pointer/touch events to the active game canvas. Removing or overriding it makes the runtime's canvas-target checks reject the events and breaks play.
+- The HUD remains independently non-interactive where designed. Do not "fix" gameplay by globally enabling pointer events or changing HUD layers.
+- Any proposed change to these exact selectors, canvas touch-action, game-stage stacking/pointer routing, or the stylesheet cache key must first reproduce the intended behavior in a focused test and be reviewed as an explicit gameplay-input change. Preserve direct mouse, touch, click and simulated-mouse paths.
+- No broad CSS cleanup, z-index rewrite, pointer-event normalization, controller refactor or unrelated game changes are authorized by this record.
+
+### Evidence and state
+- The owner performed the real-world retest and confirmed interaction works. This is human acceptance for the reported input defect, not merely a machine-test claim.
+- The focused regression guard is in tests/nu-interaction-core.test.js.
+- This acceptance record does not claim separate Gamepad QA or acceptance of unrelated interaction subsystems.
