@@ -312,3 +312,23 @@ test("Simulated pointer still enters Gateway only after 1000ms",()=>{
  h.advance(999);assert.equal(h.root.classList.contains("is-open"),false);
  h.advance(1);assert.equal(h.root.classList.contains("is-open"),true);
 });
+
+
+test("Direct physical Gateway dwell is 200ms while simulated-pointer entry remains 1000ms",()=>{
+ assert.match(js,/scheduleOpen\(200,"physical-mouse"\)/);
+ assert.match(js,/scheduleOpen\(200,"touch"\)/);
+ assert.match(js,/scheduleOpen\(1000,"simulated-pointer"\)/);
+ assert.match(js,/optionHoverTimer=window\.setTimeout/);
+ assert.match(js,/touchOptionTimer=window\.setTimeout/);
+ for(const page of [html,casino,launcher,studio]){
+  assert.match(page,/nu-hex-gateway\.js\?v=20261119-gateway-200ms-r1/);
+ }
+});
+
+test("Direct dwell never edits or reclassifies the shared simulated-pointer adapter",()=>{
+ const pointer=read("nu-controller-pointer.js");
+ assert.match(pointer,/mode:"simulated-mouse"/);
+ assert.match(pointer,/setGatewayNavigation\(value\)/);
+ assert.match(js,/scheduleOpen\(1000,"simulated-pointer"\)/);
+ assert.match(js,/event\.nuSimulated/);
+});
