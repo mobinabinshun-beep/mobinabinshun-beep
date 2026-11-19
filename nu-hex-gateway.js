@@ -193,6 +193,7 @@
     event.preventDefault();
     touchTriggerPointerId=event.pointerId;
     touchTriggerDwellFired=false;
+    touchOptionCompletedPointerId=null;
     suppressClickUntil=Date.now()+1200;
     scheduleOpen(200,"touch");
   });
