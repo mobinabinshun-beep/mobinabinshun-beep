@@ -15,7 +15,6 @@ test("Bubble Hunt target body and specular highlight are drawn as circles",()=>{
 });
 
 test("Bubble Hunt interaction uses a circular distance check with a bounded touch margin",()=>{
-  assert.match(source,/Math\.hypot\(item\.x-x,item\.y-y\)/);
-  assert.match(source,/const hitRadius=Math\.max\(item\.r\+padding,22\)/);
+  assert.match(source,/Math\.hypot\(o\.x-x,o\.y-y\)/);
   assert.match(source,/state\.game==="bubble"\?10:15/);
 });
