@@ -397,3 +397,25 @@ test("Simulated mouse clicks cannot bypass 1000ms entry or the separate Gateway 
  h.windowDispatch("nu:gateway-confirm",{});
  h.advance(120);assert.equal(h.menuClicks(),1);
 });
+
+
+test("Cancelled long-held touch gestures suppress compatibility clicks after pointerup",()=>{
+ const trigger=gatewayRuntimeHarness();
+ trigger.trigger.dispatch("pointerdown",{pointerType:"touch",pointerId:10});
+ trigger.advance(100);trigger.setHit(null);
+ trigger.dispatchDocument("pointermove",{pointerType:"touch",pointerId:10,clientX:300,clientY:300});
+ trigger.advance(1800);
+ trigger.dispatchDocument("pointerup",{pointerType:"touch",pointerId:10,clientX:300,clientY:300});
+ trigger.trigger.dispatch("click",{detail:1});
+ assert.equal(trigger.root.classList.contains("is-open"),false);
+
+ const option=gatewayRuntimeHarness();option.openByClick();option.setHit(option.items[0]);
+ option.items[0].dispatch("pointerdown",{pointerType:"touch",pointerId:11});
+ option.advance(100);option.setHit(null);
+ option.dispatchDocument("pointermove",{pointerType:"touch",pointerId:11,clientX:300,clientY:300});
+ option.advance(1800);
+ option.dispatchDocument("pointerup",{pointerType:"touch",pointerId:11,clientX:300,clientY:300});
+ option.items[0].dispatch("click",{detail:1});
+ option.advance(120);
+ assert.equal(option.menuClicks(),0);assert.equal(option.root.classList.contains("is-open"),true);
+});
