@@ -377,3 +377,23 @@ test("A long-held touch option gesture still suppresses the compatibility click 
  h.items[0].dispatch("click",{detail:1});
  assert.equal(h.menuClicks(),1);
 });
+
+
+test("Physical mouse leaving the Gateway trigger before 200ms cancels its pending open",()=>{
+ const h=gatewayRuntimeHarness();
+ h.trigger.dispatch("pointerenter",{pointerType:"mouse"});
+ h.advance(199);h.trigger.dispatch("pointerleave",{pointerType:"mouse"});
+ h.advance(1);assert.equal(h.root.classList.contains("is-open"),false);
+});
+
+test("Simulated mouse clicks cannot bypass 1000ms entry or the separate Gateway confirmation",()=>{
+ const h=gatewayRuntimeHarness();
+ h.trigger.dispatch("click",{detail:1,nuSimulated:true});
+ assert.equal(h.root.classList.contains("is-open"),false);
+ h.windowDispatch("nu:simulated-pointer-target",{target:h.trigger,previousTarget:null});
+ h.advance(1000);assert.equal(h.root.classList.contains("is-open"),true);
+ h.items[0].dispatch("click",{detail:1,nuSimulated:true});
+ assert.equal(h.menuClicks(),0);assert.equal(h.root.classList.contains("is-open"),true);
+ h.windowDispatch("nu:gateway-confirm",{});
+ h.advance(120);assert.equal(h.menuClicks(),1);
+});
