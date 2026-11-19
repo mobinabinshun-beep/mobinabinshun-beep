@@ -305,7 +305,6 @@ function initTargets(){
  while(points.length<count&&attempts++<2400){
   const margin=state.game==="chaos"?34:Math.max(26,Math.min(44,h*.08));
   const x=rnd(margin,w-margin),y=state.game==="chaos"?rnd(70,Math.max(90,h*.43)):rnd(70,h-margin);
-  if(!download&&x>w*.22&&x<w*.78)continue;
   if(readingRect&&x>readingRect.left-18&&x<readingRect.right+18&&y>readingRect.top-18&&y<readingRect.bottom+18)continue;
   if(points.some(p=>Math.hypot(p.x-x,p.y-y)<minGap))continue;
   points.push({x,y});
