@@ -91,3 +91,11 @@ test("online game targets use the playable canvas instead of being confined to n
  assert.match(gameSource,/const overlapsReading=\(x,y\)=>!!\(readingBounds/);
  assert.doesNotMatch(gameSource,/if\(!download&&x>w\*\.22&&x<w\*\.78\)continue/);
 });
+
+const worldCss=fs.readFileSync("nu-world.css","utf8");
+const indexHtml=fs.readFileSync("index.html","utf8");
+test("active gameplay canvas receives direct pointer and touch input",()=>{
+ assert.match(worldCss,/#game-view\\.active \\.game-stage\\{pointer-events:auto\\}/);
+ assert.match(worldCss,/#game-view\\.active \\.game-stage canvas\\{pointer-events:auto;touch-action:none\\}/);
+ assert.match(indexHtml,/nu-world\\.css\\?v=20261119-gameplay-input-r2/);
+});
