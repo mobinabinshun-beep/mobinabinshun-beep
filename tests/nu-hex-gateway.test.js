@@ -159,3 +159,156 @@ test("Gateway removes redundant utility-page menu and back controls while Profil
   assert.match(html,/profile-wallet-tabs/);
   assert.doesNotMatch(html,/id="profile-back"/);
 });
+
+
+// A deterministic DOM/timer harness exercises the actual Gateway runtime rather than
+// relying only on source-pattern assertions. The controller adapter is stubbed so this
+// suite can prove the direct-input boundary without changing simulated-pointer behavior.
+function gatewayRuntimeHarness(){
+ const vm=require("node:vm");
+ let now=0,nextTimer=0,hitTarget=null,menuClicks=0;
+ const timers=new Map(),windowListeners=new Map(),documentListeners=new Map();
+ const schedule=(fn,delay)=>{const id=++nextTimer;timers.set(id,{at:now+Number(delay||0),fn});return id;};
+ const cancel=id=>timers.delete(id);
+ const advance=ms=>{
+  const end=now+ms;
+  for(;;){
+   let chosen=null;
+   for(const [id,timer] of timers){if(timer.at<=end&&(!chosen||timer.at<chosen.timer.at))chosen={id,timer};}
+   if(!chosen)break;
+   timers.delete(chosen.id);now=chosen.timer.at;chosen.timer.fn();
+  }
+  now=end;
+ };
+ class ClassList{
+  constructor(){this.values=new Set();}
+  add(value){this.values.add(value);}
+  remove(value){this.values.delete(value);}
+  contains(value){return this.values.has(value);}
+  toggle(value,force){const next=force===undefined?!this.values.has(value):!!force;if(next)this.values.add(value);else this.values.delete(value);return next;}
+ }
+ class Element{
+  constructor(kind){this.kind=kind;this.listeners=new Map();this.classList=new ClassList();this.attributes={};this.dataset={};this.style={setProperty(){}};this.tabIndex=0;}
+  addEventListener(type,fn){if(!this.listeners.has(type))this.listeners.set(type,[]);this.listeners.get(type).push(fn);}
+  dispatch(type,init={}){
+   const event={type,target:this,currentTarget:this,isPrimary:true,preventDefault(){this.defaultPrevented=true;},stopPropagation(){this.propagationStopped=true;},...init};
+   for(const fn of this.listeners.get(type)||[])fn(event);
+   return event;
+  }
+  closest(selector){if(selector===".nu-gateway-trigger"&&this.kind==="trigger")return this;if(selector===".nu-gateway-item"&&this.kind==="item")return this;return null;}
+  setAttribute(key,value){this.attributes[key]=String(value);}
+  focus(){document.activeElement=this;}
+  getBoundingClientRect(){return {left:100,right:160,top:100,bottom:160};}
+ }
+ const trigger=new Element("trigger"),items=[new Element("item"),new Element("item"),new Element("item")];
+ items[0].dataset.action="menu";items[1].dataset.action="menu";items[2].dataset.action="menu";
+ const root=new Element("root"),scrim=new Element("scrim"),gameView=new Element("game-view"),menuButton={click(){menuClicks++;}};
+ root.querySelector=selector=>selector===".nu-gateway-trigger"?trigger:null;
+ root.querySelectorAll=selector=>selector===".nu-gateway-item"?items:[];
+ const body=new Element("body");
+ const document={
+  body,activeElement:null,
+  getElementById(id){if(id==="nu-hex-gateway")return root;if(id==="game-view")return gameView;if(id==="menu-open")return menuButton;return null;},
+  querySelector(selector){return selector===".nu-gateway-scrim"?scrim:null;},
+  addEventListener(type,fn){if(!documentListeners.has(type))documentListeners.set(type,[]);documentListeners.get(type).push(fn);},
+  dispatchEvent(event){for(const fn of documentListeners.get(event.type)||[])fn(event);return true;},
+  elementFromPoint(){return hitTarget;}
+ };
+ const dispatchDocument=(type,init={})=>{
+  const event={type,target:init.target||hitTarget,currentTarget:document,isPrimary:true,preventDefault(){this.defaultPrevented=true;},stopPropagation(){this.propagationStopped=true;},...init};
+  for(const fn of documentListeners.get(type)||[])fn(event);
+  return event;
+ };
+ class FakeEvent{constructor(type,options={}){this.type=type;this.detail=options.detail;}}
+ class MutationObserver{constructor(fn){this.fn=fn;}observe(){}disconnect(){}}
+ const window={
+  document,location:{search:"",href:""},navigator:{getGamepads(){return[];}},
+  matchMedia(){return{matches:false};},
+  setTimeout:schedule,clearTimeout:cancel,
+  addEventListener(type,fn){if(!windowListeners.has(type))windowListeners.set(type,[]);windowListeners.get(type).push(fn);},
+  dispatchEvent(event){for(const fn of windowListeners.get(event.type)||[])fn(event);return true;},
+  NUControllerPointer:{setEnabled(){},setGatewayNavigation(){}}
+ };
+ const windowDispatch=(type,detail)=>window.dispatchEvent(new FakeEvent(type,{detail}));
+ vm.runInNewContext(fs.readFileSync("nu-hex-gateway.js","utf8"),{
+  window,document,MutationObserver,URLSearchParams,Event:FakeEvent,Date,Math,Number,Array,Object,String,
+  setTimeout:schedule,clearTimeout:cancel,performance:{now:()=>now}
+ });
+ return{
+  trigger,items,root,document,advance,
+  dispatchDocument,
+  setHit(target){hitTarget=target;},
+  windowDispatch,
+  openByClick(){trigger.dispatch("click",{detail:1});},
+  menuClicks(){return menuClicks;}
+ };
+}
+
+test("Direct physical mouse opens Gateway at 200ms, not 199ms",()=>{
+ const h=gatewayRuntimeHarness();
+ h.trigger.dispatch("pointerenter",{pointerType:"mouse"});
+ h.advance(199);assert.equal(h.root.classList.contains("is-open"),false);
+ h.advance(1);assert.equal(h.root.classList.contains("is-open"),true);
+});
+
+test("A short touch tap opens Gateway immediately; a 200ms touch dwell opens once and pointerup does not toggle it closed",()=>{
+ const tap=gatewayRuntimeHarness();
+ tap.trigger.dispatch("pointerdown",{pointerType:"touch",pointerId:1});
+ tap.trigger.dispatch("pointerup",{pointerType:"touch",pointerId:1});
+ assert.equal(tap.root.classList.contains("is-open"),true);
+
+ const dwell=gatewayRuntimeHarness();
+ dwell.trigger.dispatch("pointerdown",{pointerType:"touch",pointerId:2});
+ dwell.advance(199);assert.equal(dwell.root.classList.contains("is-open"),false);
+ dwell.advance(1);assert.equal(dwell.root.classList.contains("is-open"),true);
+ dwell.trigger.dispatch("pointerup",{pointerType:"touch",pointerId:2});
+ assert.equal(dwell.root.classList.contains("is-open"),true);
+});
+
+test("Physical mouse hover on an actionable option executes after 200ms without a prior Select",()=>{
+ const h=gatewayRuntimeHarness();h.openByClick();
+ h.items[0].dispatch("pointerenter",{pointerType:"mouse"});
+ h.advance(199);assert.equal(h.menuClicks(),0);assert.equal(h.root.classList.contains("is-open"),true);
+ h.advance(1);assert.equal(h.menuClicks(),1);assert.equal(h.root.classList.contains("is-open"),false);
+});
+
+test("Leaving an option before 200ms cancels its pending mouse dwell action",()=>{
+ const h=gatewayRuntimeHarness();h.openByClick();
+ h.items[0].dispatch("pointerenter",{pointerType:"mouse"});
+ h.advance(199);h.items[0].dispatch("pointerleave",{pointerType:"mouse"});
+ h.advance(1);assert.equal(h.menuClicks(),0);assert.equal(h.root.classList.contains("is-open"),true);
+});
+
+test("Touch option dwell executes once at 200ms and suppresses its compatibility click",()=>{
+ const h=gatewayRuntimeHarness();h.openByClick();h.setHit(h.items[0]);
+ h.items[0].dispatch("pointerdown",{pointerType:"touch",pointerId:3});
+ h.advance(199);assert.equal(h.menuClicks(),0);
+ h.advance(1);assert.equal(h.menuClicks(),1);
+ h.dispatchDocument("pointerup",{pointerType:"touch",pointerId:3,clientX:10,clientY:10});
+ h.items[0].dispatch("click",{detail:1});
+ assert.equal(h.menuClicks(),1);
+});
+
+test("A short touch tap on an option remains immediate and does not double-execute",()=>{
+ const h=gatewayRuntimeHarness();h.openByClick();h.setHit(h.items[0]);
+ h.items[0].dispatch("pointerdown",{pointerType:"touch",pointerId:4});
+ h.dispatchDocument("pointerup",{pointerType:"touch",pointerId:4,clientX:10,clientY:10});
+ h.items[0].dispatch("click",{detail:1});
+ h.advance(120);assert.equal(h.menuClicks(),1);
+});
+
+test("Changing touch target cancels the old option dwell and starts a fresh 200ms window",()=>{
+ const h=gatewayRuntimeHarness();h.openByClick();h.setHit(h.items[0]);
+ h.items[0].dispatch("pointerdown",{pointerType:"touch",pointerId:5});
+ h.advance(199);h.setHit(h.items[1]);
+ h.dispatchDocument("pointermove",{pointerType:"touch",pointerId:5,clientX:20,clientY:20});
+ h.advance(1);assert.equal(h.menuClicks(),0);
+ h.advance(199);assert.equal(h.menuClicks(),1);
+});
+
+test("Simulated pointer still enters Gateway only after 1000ms",()=>{
+ const h=gatewayRuntimeHarness();
+ h.windowDispatch("nu:simulated-pointer-target",{target:h.trigger,previousTarget:null});
+ h.advance(999);assert.equal(h.root.classList.contains("is-open"),false);
+ h.advance(1);assert.equal(h.root.classList.contains("is-open"),true);
+});
