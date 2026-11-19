@@ -310,12 +310,11 @@ function initTargets(){
   if(points.some(p=>Math.hypot(p.x-x,p.y-y)<minGap))continue;
   points.push({x,y});
  }
- // Narrow online viewports may not fit ten widely spaced targets; fill remaining slots
- // only in the allowed side lanes, with reduced spacing rather than placing over reading content.
+ // Narrow viewports may need closer spacing; fill remaining slots across the playable canvas.
  let fallback=0;
  while(points.length<count&&fallback++<1600){
-  const margin=22,side=Math.random()<.5?"left":"right";
-  const x=download?rnd(margin,w-margin):(side==="left"?rnd(margin,w*.21):rnd(w*.79,w-margin));
+  const margin=22;
+  const x=rnd(margin,w-margin);
   const y=rnd(70,Math.max(90,h-38));
   if(readingRect&&x>readingRect.left-18&&x<readingRect.right+18&&y>readingRect.top-18&&y<readingRect.bottom+18)continue;
   if(points.some(p=>Math.hypot(p.x-x,p.y-y)<minGap*.48))continue;
@@ -342,9 +341,17 @@ function closeGame(){const exitResolution=resolveRemainingChaosMasses("CHAOS_PLA
 function drawGame(){const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;ctx.clearRect(0,0,w,h);ctx.save();ctx.globalAlpha=.22;for(let i=0;i<30;i++){let x=(i*97+Date.now()*.004)%w,y=(i*61)%h;ctx.fillStyle="#9cddff";ctx.fillRect(x,y,1,1);}ctx.restore();state.targets.forEach((o,i)=>{if(!o.alive)return;o.phase+=.015;const bob=Math.sin(o.phase)*2;ctx.save();if(state.game==="bubble"){const g=ctx.createRadialGradient(o.x-o.r*.3,o.y-o.r*.4,1,o.x,o.y,o.r*1.4);g.addColorStop(0,"rgba(255,255,255,.7)");g.addColorStop(.3,"rgba(255,180,210,.18)");g.addColorStop(.75,"rgba(96,185,255,.13)");g.addColorStop(1,"rgba(255,196,95,.03)");ctx.fillStyle=g;ctx.strokeStyle="rgba(255,202,111,.85)";ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(o.x,o.y+bob,o.r,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.beginPath();ctx.strokeStyle="rgba(255,255,255,.52)";ctx.lineWidth=Math.max(1,o.r*.035);ctx.arc(o.x-o.r*.22,o.y-o.r*.24+bob,o.r*.22,-Math.PI*.78,Math.PI*.18);ctx.stroke();}else if(state.game==="mana"){ctx.translate(o.x,o.y+bob);ctx.rotate(Math.PI/6);ctx.fillStyle="rgba(64,190,255,.16)";ctx.strokeStyle="#68dfff";ctx.lineWidth=1.5;ctx.shadowBlur=5;ctx.shadowColor="#43cfff";ctx.beginPath();ctx.moveTo(0,-o.r);for(let j=1;j<6;j++)ctx.lineTo(Math.cos(j*Math.PI/3)*o.r,Math.sin(j*Math.PI/3)*o.r);ctx.closePath();ctx.fill();ctx.stroke();ctx.shadowBlur=0;ctx.fillStyle="#d9faff";ctx.fillRect(-1,-2,2,4);if(window.NUMaterials)window.NUMaterials.drawMana(ctx,0,0,o.r,o.phase);}else{ctx.translate(o.x,o.y+bob);ctx.fillStyle="rgba(255,54,85,.16)";ctx.strokeStyle="#ff526c";ctx.lineWidth=1.5;ctx.shadowBlur=13;ctx.shadowColor="#ff3658";ctx.beginPath();for(let j=0;j<9;j++){const a=j*Math.PI*2/9,rr=o.r*(j%2?.78:1);if(!j)ctx.moveTo(Math.cos(a)*rr,Math.sin(a)*rr);else ctx.lineTo(Math.cos(a)*rr,Math.sin(a)*rr);}ctx.closePath();ctx.fill();ctx.stroke();ctx.shadowBlur=0;ctx.fillStyle="#ffd6df";ctx.font="10px sans-serif";ctx.textAlign="center";}ctx.restore();});if(window.NUMaterials)window.NUMaterials.drawEffects(ctx);if(state.game==="chaos"){ctx.save();ctx.strokeStyle="rgba(255,174,96,.5)";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(w-18,h-18);ctx.lineTo(w-90,h-75);ctx.stroke();ctx.fillStyle="#ffca75";ctx.shadowBlur=12;ctx.shadowColor="#ffb44e";ctx.beginPath();ctx.arc(w-18,h-18,4,0,Math.PI*2);ctx.fill();ctx.restore();}if(state.keyboardMode&&document.activeElement===canvas)drawKeyboardTarget();}
 function interact(e){if(!state.active||state.paused||state.turn>=10)return;
 
- const rect=canvas.getBoundingClientRect(),x=e.clientX-rect.left,y=e.clientY-rect.top;
+ const rect=canvas.getBoundingClientRect();
+ const scaleX=rect.width>0?canvas.clientWidth/rect.width:1;
+ const scaleY=rect.height>0?canvas.clientHeight/rect.height:1;
+ const x=(e.clientX-rect.left)*scaleX,y=(e.clientY-rect.top)*scaleY;
  let target=null,best=Infinity;
- state.targets.forEach(o=>{if(!o.alive)return;const d=Math.hypot(o.x-x,o.y-y);if(d<o.r+(state.game==="mana"?8:state.game==="bubble"?10:15)&&d<best){best=d;target=o;}});
+ state.targets.forEach(o=>{
+  if(!o.alive)return;
+  const d=Math.hypot(o.x-x,o.y-y);
+  const hitRadius=state.game==="mana"?Math.max(22,o.r+8):o.r+(state.game==="bubble"?10:15);
+  if(d<hitRadius&&d<best){best=d;target=o;}
+ });
  const source=interactionSource(e);
  if(!target){recordGameObjectEvent(null,"hit-test","miss",source,{x,y});return;}
  lastGameObjectHoverId=target.id;
@@ -410,7 +417,7 @@ syncWorldTime();setInterval(syncWorldTime,60000);
 let mouseCameraReady=false,touchCameraReady=false,touchMoved=false,touchStart=null,touchLast=null,cameraX=0,cameraY=0,cameraQueued=false,lastCamera=0;
 function applyCamera(){if(cameraQueued)return;cameraQueued=true;requestAnimationFrame(t=>{cameraQueued=false;if(t-lastCamera<24)return;lastCamera=t;document.documentElement.style.setProperty("--camera-x",cameraX.toFixed(1)+"px");document.documentElement.style.setProperty("--camera-y",cameraY.toFixed(1)+"px");if(window.NUPixelWorld)window.NUPixelWorld.setCamera(cameraX,cameraY);});}
 function mouseMove(e){if(e.pointerType!=="mouse"||NU.clamp(state.quality,1,10)<=1||document.body.classList.contains("nu-gateway-open"))return;cameraX=((e.clientX/(innerWidth||1)-.5)*22);cameraY=((e.clientY/(innerHeight||1)-.5)*16);applyCamera();}
-function touchDown(e){if(e.pointerType!=="touch"||NU.clamp(state.quality,1,10)<=1||document.body.classList.contains("nu-gateway-open")||e.target.closest("button,a,input,textarea,select,[role=button]"))return;touchStart={x:e.clientX,y:e.clientY,id:e.pointerId};touchLast={x:e.clientX,y:e.clientY};touchMoved=false;if(window.NUPixelWorld)window.NUPixelWorld.lastTouchWasDrag=false;if(!touchCameraReady){touchCameraReady=true;window.addEventListener("pointermove",touchMove,{passive:true});window.addEventListener("pointerup",touchUp,{passive:true});window.addEventListener("pointercancel",touchUp,{passive:true});}}
+function touchDown(e){if(e.pointerType!=="touch"||NU.clamp(state.quality,1,10)<=1||document.body.classList.contains("nu-gateway-open")||e.target.closest("button,a,input,textarea,select,[role=button]"))return;if(canvas.contains(e.target)&&typeof canvas.setPointerCapture==="function"){try{canvas.setPointerCapture(e.pointerId);}catch(_){/* pointer capture is best-effort on older mobile browsers */}}touchStart={x:e.clientX,y:e.clientY,id:e.pointerId};touchLast={x:e.clientX,y:e.clientY};touchMoved=false;if(window.NUPixelWorld)window.NUPixelWorld.lastTouchWasDrag=false;if(!touchCameraReady){touchCameraReady=true;window.addEventListener("pointermove",touchMove,{passive:true});window.addEventListener("pointerup",touchUp,{passive:true});window.addEventListener("pointercancel",touchUp,{passive:true});}}
 function touchMove(e){if(document.body.classList.contains("nu-gateway-open")||!touchStart||e.pointerId!==touchStart.id)return;const dx=e.clientX-touchLast.x,dy=e.clientY-touchLast.y;if(Math.hypot(e.clientX-touchStart.x,e.clientY-touchStart.y)>7)touchMoved=true;if(touchMoved){cameraX=NU.clamp(cameraX-dx*.75,-28,28);cameraY=NU.clamp(cameraY-dy*.75,-20,20);applyCamera();}touchLast={x:e.clientX,y:e.clientY};}
 function touchUp(e){if(!touchStart||e.pointerId!==touchStart.id)return;const wasDrag=touchMoved;touchStart=null;touchLast=null;touchMoved=false;if(window.NUPixelWorld)window.NUPixelWorld.lastTouchWasDrag=wasDrag;}
 function mouseCameraBootstrap(e){if(e.pointerType!=="mouse")return;mouseCameraReady=true;window.removeEventListener("pointermove",mouseCameraBootstrap);window.addEventListener("pointermove",mouseMove,{passive:true});mouseMove(e);}
