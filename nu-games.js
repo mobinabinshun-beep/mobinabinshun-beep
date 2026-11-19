@@ -80,6 +80,29 @@ state.save.hp=Number.isFinite(state.save.hp)?state.save.hp:10;state.save.hpPills
 function save(){const ok=NU.save(state.save);if(ok){renderWallet();window.dispatchEvent(new CustomEvent("nu:save-updated"));}return ok;}function persistWalletState(next){const previous=state.save;state.save=next;if(!save()){state.save=previous;renderWallet();announceTransaction("SAVE FAILED · WALLET WAS NOT CHANGED","warning");return false;}return true;}function recordGameDelta(asset,amount,category,successfulInteraction,rate){const result=NUWallet.recordWaveDelta(state.save,asset,amount,category,{successfulInteraction:!!successfulInteraction,rate});if(!result.ok)return false;return persistWalletState(result.state);}
 function settleActiveWave(reason){if(!state.save.activeWave)return false;const wave=state.save.activeWave;const hpRows=Object.values(wave.aggregates||{}).filter(row=>row&&row.asset==="hp");const hpDelta=hpRows.reduce((sum,row)=>sum+Number(row.amount||0),0);const damageTaken=hpRows.reduce((sum,row)=>sum+Math.max(0,-Number(row.amount||0)),0);const result=NUWallet.settleWave(state.save,reason);if(!result.ok)return false;const saved=persistWalletState(result.state);if(saved&&window.NUHealth)window.NUHealth.recordWaveSummary({gameId:wave.gameId,waveId:wave.id,damageTaken,hpDelta,successfulInteractions:wave.successfulInteractions,reason});return saved;}
 function awardXP(amount,source){return recordGameDelta("xp",amount,"GAME_REWARD",true,amount);}
+function interactionSource(event){
+ if(event&&event.keyboard)return "keyboard";
+ if(event&&event.nuSimulated)return "simulated-mouse";
+ if(event&&event.pointerType==="touch")return "direct-touch";
+ if(event&&event.pointerType==="mouse")return "physical-mouse";
+ return "game-input";
+}
+function recordGameObjectEvent(target,action,outcome,source,extra){
+ const core=window.NUInteractionCore;
+ if(!core||typeof core.record!=="function")return null;
+ const gameId=target&&target.gameId||state.game||"unknown";
+ const objectType=gameId==="bubble"?"bubble":gameId==="mana"?"mana-orb":gameId==="chaos"?"chaos-mass":"unknown";
+ const detail=Object.assign({},extra||{},{
+  gameId,
+  waveId:target&&target.waveId||state.save.activeWave&&state.save.activeWave.id||null,
+  objectType,
+  objectId:target&&target.id!=null?String(target.id):null,
+  action:String(action||"unknown"),
+  outcome:String(outcome||"unknown")
+ });
+ const semanticAction=action==="target"?"hover":action==="activate"?"activate":action==="hit-test"?"select":"execute";
+ try{return core.record(semanticAction,source||"game-runtime",canvas,detail);}catch(_){return null;}
+}
 function renderGameAssetProfile(){
  const root=$("game-asset-profile");if(!root||!state.game)return;
  const names={bubble:"BUBBLE HUNT · ASSET PROFILE",mana:"MANA COLLECTOR · ASSET PROFILE",chaos:"CHAOS ATTACK · ASSET PROFILE"};
@@ -233,8 +256,13 @@ function chargeArcaneShieldInGame(){
 function resolveChaosMasses(targetIds,reason){
  const waveId=state.save.activeWave&&state.save.activeWave.id,hpBefore=state.save.hp;
  const result=NUWallet.resolveChaosHits(state.save,targetIds);
- if(!result.ok||!result.resolvedCount)return result;
- if(!persistWalletState(result.state))return {ok:false,reason:"SAVE_FAILED",resolvedCount:0};
+ const recordResolution=(outcome,details)=>targetIds.forEach(id=>{
+  const target=state.targets.find(item=>item.id===id)||{id,gameId:"chaos",waveId};
+  recordGameObjectEvent(target,"resolve",outcome,"chaos-resolution",Object.assign({reason:reason||"unspecified",resolutionBatchCount:targetIds.length},details||{}));
+ });
+ if(!result.ok||!result.resolvedCount){recordResolution(result.ok?"no-op":"failed",{resolvedCount:result.resolvedCount||0});return result;}
+ if(!persistWalletState(result.state)){recordResolution("persist-failed",{resolvedCount:0});return {ok:false,reason:"SAVE_FAILED",resolvedCount:0};}
+ recordResolution(result.hpDamage>0?"hp-damage":result.absorbed>0?"shield-absorbed":"resolved",{resolvedCount:result.resolvedCount,absorbed:result.absorbed||0,hpDamage:result.hpDamage||0,hpAfter:result.state.hp});
  if(result.hpDamage>0&&window.NUHealth)window.NUHealth.recordDamage({gameId:"chaos",waveId,amount:result.hpDamage,hpAfter:state.save.hp,reason:reason||"CHAOS_BREACH_DAMAGE"});
  if(result.died){
   if(window.NUHealth)window.NUHealth.recordDeath({gameId:"chaos",waveId,hpBefore,reason:"CHAOS_BREACH_DAMAGE"});
@@ -254,7 +282,7 @@ function resolveRemainingChaosMasses(reason){
  if(!ids.length)return {ok:true,resolvedCount:0};
  const result=resolveChaosMasses(ids,reason||"CHAOS_EXIT_DAMAGE");
  if(!result||!result.ok)return result||{ok:false,reason:"CHAOS_RESOLUTION_FAILED"};
- remaining.forEach(target=>{target.alive=false;});
+ remaining.forEach(target=>{target.alive=false;recordGameObjectEvent(target,"despawn","resolved-on-exit","chaos-resolution",{reason:reason||"CHAOS_EXIT_DAMAGE"});});
  drawGame();
  return result;
 }
@@ -293,10 +321,22 @@ function initTargets(){
   if(points.some(p=>Math.hypot(p.x-x,p.y-y)<minGap*.48))continue;
   points.push({x,y});
  }
- state.targets=points.map((p,i)=>({id:String(state.save.activeWave&&state.save.activeWave.id||"wave")+":mass:"+targetBatch+":"+i,x:p.x,y:p.y,r:state.game==="bubble"?rnd(25,39):state.game==="mana"?rnd(4,6):rnd(15,23),hp:1,phase:Math.random()*6,vx:rnd(-.34,.34),vy:rnd(-.26,.26),speed:state.game==="chaos"?Math.min(8,Math.pow(2,i)):1,alive:true,damaged:false}));
+ const previousTargets=state.targets.slice();
+ previousTargets.forEach(target=>{if(target.alive)recordGameObjectEvent(target,"despawn","replaced","game-runtime",{reason:"target-batch-replaced"});});
+ state.targets=points.map((p,i)=>({
+  id:String(state.save.activeWave&&state.save.activeWave.id||"wave")+":mass:"+targetBatch+":"+i,
+  gameId:state.game,waveId:state.save.activeWave&&state.save.activeWave.id||null,
+  x:p.x,y:p.y,r:state.game==="bubble"?rnd(25,39):state.game==="mana"?rnd(4,6):rnd(15,23),
+  hp:1,phase:Math.random()*6,vx:rnd(-.34,.34),vy:rnd(-.26,.26),
+  speed:state.game==="chaos"?Math.min(8,Math.pow(2,i)):1,alive:true,damaged:false
+ }));
+ lastGameObjectHoverId=null;
+ state.targets.forEach(target=>recordGameObjectEvent(target,"spawn","spawned","game-runtime",{x:target.x,y:target.y,radius:target.r}));
  if(state.game==="chaos"&&state.save.activeWave){const registered=NUWallet.registerChaosTargets(state.save,state.targets.map(target=>target.id));if(registered.ok)persistWalletState(registered.state);}
 }
-function animateGame(t){if(!state.active)return;const minFrame=state.quality<=3?70:state.quality<=6?45:30;if(t-state.lastFrame>=minFrame){state.lastFrame=t;const w=canvas.clientWidth,h=canvas.clientHeight;state.targets.forEach(o=>{if(!state.active||!o.alive)return;o.x+=o.vx;if(state.game==="chaos"){o.y+=o.speed;if(o.x<o.r+8||o.x>w-o.r-8)o.vx*=-1;if(!o.damaged&&o.y>h-92){const hit=resolveChaosMasses([o.id],"CHAOS_BREACH_DAMAGE");if(!hit||!hit.ok)return;o.damaged=true;o.alive=false;if(hit.died)return;}}else{o.y+=o.vy;if(o.y<55||o.y>h-o.r-40)o.vy*=-1;}});drawGame();}state.raf=requestAnimationFrame(animateGame);}
+function animateGame(t){if(!state.active)return;const minFrame=state.quality<=3?70:state.quality<=6?45:30;if(t-state.lastFrame>=minFrame){state.lastFrame=t;const w=canvas.clientWidth,h=canvas.clientHeight;state.targets.forEach(o=>{if(!state.active||!o.alive)return;o.x+=o.vx;if(state.game==="chaos"){o.y+=o.speed;if(o.x<o.r+8||o.x>w-o.r-8)o.vx*=-1;if(!o.damaged&&o.y>h-92){const hit=resolveChaosMasses([o.id],"CHAOS_BREACH_DAMAGE");if(!hit||!hit.ok)return;
+ recordGameObjectEvent(o,"collision",hit.hpDamage>0?"hp-damage":hit.absorbed>0?"shield-absorbed":"resolved","chaos-engine",{hpDamage:hit.hpDamage||0,shieldAbsorbed:hit.absorbed||0});
+ o.damaged=true;o.alive=false;recordGameObjectEvent(o,"despawn","breached","chaos-engine",{x:o.x,y:o.y});if(hit.died)return;}}else{o.y+=o.vy;if(o.y<55||o.y>h-o.r-40)o.vy*=-1;}});drawGame();}state.raf=requestAnimationFrame(animateGame);}
 function chooseGame(id){window.dispatchEvent(new Event("nu:gateway-close"));if(window.NUPixelWorld)window.NUPixelWorld.setWeatherMode("game");if(state.raf)cancelAnimationFrame(state.raf);const exitResolution=resolveRemainingChaosMasses("CHAOS_NEW_ROUND_EXIT");if(exitResolution&&exitResolution.ok===false){$("game-info").textContent="Unable to save remaining Chaos damage. Please retry.";return;}settleActiveWave("new_round");state.game=id||games[Math.floor(Math.random()*games.length)].id;const started=NUWallet.beginWave(state.save,state.game);if(started.ok)persistWalletState(started.state);state.turn=0;state.active=true;state.paused=false;state.shots=0;initTargets();$("home-view").classList.remove("active");$("article-view").classList.remove("active");$("game-view").classList.add("active");state.keyboardTargetIndex=state.targets.findIndex(target=>target.alive);state.keyboardMode=false;canvas.focus({preventScroll:true});$("game-title").textContent=games.find(g=>g.id===state.game).name;renderRoundProgress();$("game-info").textContent=state.game==="chaos"?"Tap a Chaos mass to mark it. N-BI fires automatically and consumes one full 10-Mana capsule per mass." :"Tap a target to interact.";renderWallet();requestAnimationFrame(()=>{resize();initTargets();drawGame();state.lastFrame=0;state.raf=requestAnimationFrame(animateGame);});}
 function closeGame(){const exitResolution=resolveRemainingChaosMasses("CHAOS_PLAYER_EXIT");if(exitResolution&&exitResolution.ok===false){$("game-info").textContent="Unable to save remaining Chaos damage. Please retry.";return;}settleActiveWave("player_exit");window.dispatchEvent(new Event("nu:gateway-close"));window.dispatchEvent(new Event("nu:game-view-exit"));gatewayPause.reset();if(window.NUPixelWorld)window.NUPixelWorld.setWeatherMode("sleep");state.active=false;state.paused=false;if(state.raf)cancelAnimationFrame(state.raf);state.raf=0;$("game-view").classList.remove("active");$("home-view").classList.add("active");document.body.classList.remove("article-mode");}
 function drawGame(){const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;ctx.clearRect(0,0,w,h);ctx.save();ctx.globalAlpha=.22;for(let i=0;i<30;i++){let x=(i*97+Date.now()*.004)%w,y=(i*61)%h;ctx.fillStyle="#9cddff";ctx.fillRect(x,y,1,1);}ctx.restore();state.targets.forEach((o,i)=>{if(!o.alive)return;o.phase+=.015;const bob=Math.sin(o.phase)*2;ctx.save();if(state.game==="bubble"){const g=ctx.createRadialGradient(o.x-o.r*.3,o.y-o.r*.4,1,o.x,o.y,o.r*1.4);g.addColorStop(0,"rgba(255,255,255,.7)");g.addColorStop(.3,"rgba(255,180,210,.18)");g.addColorStop(.75,"rgba(96,185,255,.13)");g.addColorStop(1,"rgba(255,196,95,.03)");ctx.fillStyle=g;ctx.strokeStyle="rgba(255,202,111,.85)";ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(o.x,o.y+bob,o.r,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.beginPath();ctx.strokeStyle="rgba(255,255,255,.52)";ctx.lineWidth=Math.max(1,o.r*.035);ctx.arc(o.x-o.r*.22,o.y-o.r*.24+bob,o.r*.22,-Math.PI*.78,Math.PI*.18);ctx.stroke();}else if(state.game==="mana"){ctx.translate(o.x,o.y+bob);ctx.rotate(Math.PI/6);ctx.fillStyle="rgba(64,190,255,.16)";ctx.strokeStyle="#68dfff";ctx.lineWidth=1.5;ctx.shadowBlur=5;ctx.shadowColor="#43cfff";ctx.beginPath();ctx.moveTo(0,-o.r);for(let j=1;j<6;j++)ctx.lineTo(Math.cos(j*Math.PI/3)*o.r,Math.sin(j*Math.PI/3)*o.r);ctx.closePath();ctx.fill();ctx.stroke();ctx.shadowBlur=0;ctx.fillStyle="#d9faff";ctx.fillRect(-1,-2,2,4);if(window.NUMaterials)window.NUMaterials.drawMana(ctx,0,0,o.r,o.phase);}else{ctx.translate(o.x,o.y+bob);ctx.fillStyle="rgba(255,54,85,.16)";ctx.strokeStyle="#ff526c";ctx.lineWidth=1.5;ctx.shadowBlur=13;ctx.shadowColor="#ff3658";ctx.beginPath();for(let j=0;j<9;j++){const a=j*Math.PI*2/9,rr=o.r*(j%2?.78:1);if(!j)ctx.moveTo(Math.cos(a)*rr,Math.sin(a)*rr);else ctx.lineTo(Math.cos(a)*rr,Math.sin(a)*rr);}ctx.closePath();ctx.fill();ctx.stroke();ctx.shadowBlur=0;ctx.fillStyle="#ffd6df";ctx.font="10px sans-serif";ctx.textAlign="center";}ctx.restore();});if(window.NUMaterials)window.NUMaterials.drawEffects(ctx);if(state.game==="chaos"){ctx.save();ctx.strokeStyle="rgba(255,174,96,.5)";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(w-18,h-18);ctx.lineTo(w-90,h-75);ctx.stroke();ctx.fillStyle="#ffca75";ctx.shadowBlur=12;ctx.shadowColor="#ffb44e";ctx.beginPath();ctx.arc(w-18,h-18,4,0,Math.PI*2);ctx.fill();ctx.restore();}if(state.keyboardMode&&document.activeElement===canvas)drawKeyboardTarget();}
@@ -305,40 +345,56 @@ function interact(e){if(!state.active||state.paused||state.turn>=10)return;
  const rect=canvas.getBoundingClientRect(),x=e.clientX-rect.left,y=e.clientY-rect.top;
  let target=null,best=Infinity;
  state.targets.forEach(o=>{if(!o.alive)return;const d=Math.hypot(o.x-x,o.y-y);if(d<o.r+(state.game==="mana"?8:state.game==="bubble"?10:15)&&d<best){best=d;target=o;}});
- if(!target)return;
+ const source=interactionSource(e);
+ if(!target){recordGameObjectEvent(null,"hit-test","miss",source,{x,y});return;}
+ lastGameObjectHoverId=target.id;
+ recordGameObjectEvent(target,"hit-test","hit",source,{x,y});
+ recordGameObjectEvent(target,"activate","attempted",source,{x,y});
  if(!e.keyboard)state.keyboardMode=false;
  if(state.game==="mana"&&state.save.mana>=state.save.manaCapsules*10){
   $("game-info").textContent="Mana storage is full. Upgrade or spend a capsule first.";
-  announceTransaction("MANA STORAGE FULL · UPGRADE OR SPEND A CAPSULE","warning");return;
+  announceTransaction("MANA STORAGE FULL · UPGRADE OR SPEND A CAPSULE","warning");
+  recordGameObjectEvent(target,"collect","blocked",source,{reason:"MANA_STORAGE_FULL",mana:state.save.mana});
+  return;
  }
  if(state.game==="chaos"&&state.save.mana<10){
   $("game-info").textContent="N-BI cannot fire: one complete Mana Capsule (10 Mana) is required.";
-  announceTransaction("N-BI UNAVAILABLE · NEED 10 MANA","warning");return;
+  announceTransaction("N-BI UNAVAILABLE · NEED 10 MANA","warning");
+  recordGameObjectEvent(target,"fire","blocked",source,{reason:"INSUFFICIENT_MANA",mana:state.save.mana});
+  return;
  }
  state.turn++;renderRoundProgress();showHitProgress(target.x,target.y);
  if(state.game==="bubble"){
   target.alive=false;
   const awarded=awardXP(1,"Bubble Hunt reward");
+  recordGameObjectEvent(target,"pop",awarded?"rewarded":"reward-persist-failed",source,{asset:"xp",delta:awarded?1:0});
+  recordGameObjectEvent(target,"despawn","popped",source,{x:target.x,y:target.y});
   if(awarded){showCapsuleGain("+1","xp");announceTransaction("BUBBLE HUNT · +1 XP","success");}
   $("game-info").textContent="";
  }else if(state.game==="mana"){
   target.alive=false;
   if(window.NUMaterials)window.NUMaterials.emit(target.x,target.y);
   const collected=recordGameDelta("mana",1,"GAME_REWARD",true,1);
+  recordGameObjectEvent(target,"collect",collected?"collected":"persist-failed",source,{asset:"mana",delta:collected?1:0});
+  recordGameObjectEvent(target,"despawn","collected",source,{x:target.x,y:target.y});
   if(collected){showCapsuleGain("+1","mana");announceTransaction("MANA COLLECTED · +1","success");}
   $("game-info").textContent="";
  }else{
   const shot=NUWallet.fireNbiShot(state.save,target.id);
   if(!shot.ok){
    state.turn=Math.max(0,state.turn-1);renderRoundProgress();
+   recordGameObjectEvent(target,"fire","blocked",source,{reason:shot.reason||"NBI_SHOT_FAILED"});
    $("game-info").textContent=shot.reason==="INSUFFICIENT_MANA"?"N-BI requires one full 10-Mana container.":"N-BI shot could not be completed. Try again.";
    announceTransaction(shot.reason==="INSUFFICIENT_MANA"?"N-BI UNAVAILABLE · NEED 10 MANA":"N-BI SHOT FAILED","warning");return;
   }
   if(!persistWalletState(shot.state)){
    state.turn=Math.max(0,state.turn-1);renderRoundProgress();
+   recordGameObjectEvent(target,"fire","persist-failed",source,{reason:"SAVE_FAILED"});
    $("game-info").textContent="N-BI shot could not be saved. Try again.";return;
   }
   animateManaContainerDrain();state.shots++;target.alive=false;$("game-info").textContent="";
+  recordGameObjectEvent(target,"fire","fired",source,{asset:"mana",delta:-10,shotId:shot.shotId||null});
+  recordGameObjectEvent(target,"despawn","destroyed-by-nbi",source,{x:target.x,y:target.y});
   announceTransaction("N-BI FIRED · −10 MANA","success");
  }
  if(state.keyboardMode)state.keyboardTargetIndex=state.targets.findIndex(o=>o.alive);
@@ -359,6 +415,18 @@ function touchMove(e){if(document.body.classList.contains("nu-gateway-open")||!t
 function touchUp(e){if(!touchStart||e.pointerId!==touchStart.id)return;const wasDrag=touchMoved;touchStart=null;touchLast=null;touchMoved=false;if(window.NUPixelWorld)window.NUPixelWorld.lastTouchWasDrag=wasDrag;}
 function mouseCameraBootstrap(e){if(e.pointerType!=="mouse")return;mouseCameraReady=true;window.removeEventListener("pointermove",mouseCameraBootstrap);window.addEventListener("pointermove",mouseMove,{passive:true});mouseMove(e);}
 window.addEventListener("pointermove",mouseCameraBootstrap,{passive:true});window.addEventListener("pointerdown",e=>{if(e.pointerType==="touch")touchDown(e);},{passive:true});
+let lastGameObjectHoverId=null;
+function traceGameObjectHover(event){
+ if(!state.active||state.paused||!event||!canvas.contains(event.target))return;
+ const rect=canvas.getBoundingClientRect(),x=event.clientX-rect.left,y=event.clientY-rect.top;
+ let target=null,best=Infinity;
+ state.targets.forEach(item=>{if(!item.alive)return;const distance=Math.hypot(item.x-x,item.y-y);if(distance<item.r+(state.game==="mana"?8:state.game==="bubble"?10:15)&&distance<best){best=distance;target=item;}});
+ const nextId=target?target.id:null;
+ if(nextId===lastGameObjectHoverId)return;
+ lastGameObjectHoverId=nextId;
+ if(target)recordGameObjectEvent(target,"target","hit",interactionSource(event),{x,y});
+}
+canvas.addEventListener("pointermove",traceGameObjectHover,{passive:true});
 function settleAfterPageExit(){const resolution=resolveRemainingChaosMasses("CHAOS_PAGE_UNLOAD");if(!resolution||resolution.ok===false)return false;return settleActiveWave("page_unload");}
 window.addEventListener("beforeunload",()=>{settleAfterPageExit();});
 document.addEventListener("visibilitychange",()=>{if(document.hidden){if(state.raf)cancelAnimationFrame(state.raf);state.raf=0;syncGatewayBackgrounds(true);}else{const gatewayOpen=document.body.classList.contains("nu-gateway-open");if(!gatewayOpen){syncGatewayBackgrounds(state.paused||gatewayPause.isAwaitingInteraction());if(state.active&&!state.paused)state.raf=requestAnimationFrame(animateGame);}}});
