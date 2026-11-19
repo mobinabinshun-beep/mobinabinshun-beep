@@ -211,6 +211,7 @@
     }
   });
   trigger.addEventListener("click",event=>{
+    if(event.nuSimulated)return;
     event.preventDefault();
     if(Date.now()<suppressClickUntil)return;
     if(event.detail===0||event.detail>0){
@@ -283,6 +284,7 @@
     });
     item.addEventListener("focus",()=>select(item));
     item.addEventListener("click",event=>{
+      if(event.nuSimulated)return;
       event.preventDefault();event.stopPropagation();
       if(Date.now()<suppressClickUntil)return;
       clearOptionHover();
