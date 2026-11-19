@@ -419,3 +419,14 @@ test("Cancelled long-held touch gestures suppress compatibility clicks after poi
  option.advance(120);
  assert.equal(option.menuClicks(),0);assert.equal(option.root.classList.contains("is-open"),true);
 });
+
+
+test("Cancelling a physical mouse dwell cannot cancel the simulated pointer's independent 1000ms entry timer",()=>{
+ const h=gatewayRuntimeHarness();
+ h.trigger.dispatch("pointerenter",{pointerType:"mouse"});
+ h.windowDispatch("nu:simulated-pointer-target",{target:h.trigger,previousTarget:null});
+ h.advance(100);
+ h.trigger.dispatch("pointerleave",{pointerType:"mouse"});
+ h.advance(899);assert.equal(h.root.classList.contains("is-open"),false);
+ h.advance(1);assert.equal(h.root.classList.contains("is-open"),true);
+});
