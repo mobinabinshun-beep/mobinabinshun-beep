@@ -111,3 +111,8 @@ The owner explicitly authorized Issue #179 to extract and restore only the histo
 - After the authorized correction is reviewed and accepted, the classic HUD lock is reinstated for the exact restored layout. No further styling/layout edits are permitted without another direct owner instruction.
 
 This record documents a one-time narrow exception; it does not permanently unlock the protected HUD.
+
+
+## Owner-authorized scoped Gateway touch-dwell correction — 2026-11-20
+
+The owner explicitly reopened only the direct-touch activation behavior in two approval stages. The authorized change requires a 500 ms dwell on the Gateway trigger; early pointer release or cancellation cancels opening, and synthetic click suppression remains. The one-time scope and evidence are recorded in [GATEWAY-TOUCH-DWELL-CHANGE-RECORD-2026-11-20.md](./GATEWAY-TOUCH-DWELL-CHANGE-RECORD-2026-11-20.md). This does not unlock any other Gateway behavior or adjacent subsystem. Re-lock remains active after this scoped correction.
