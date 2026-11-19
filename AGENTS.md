@@ -114,3 +114,14 @@
 - Preserve immediate direct click/tap/select as an alternative activation path.
 - Do not change simulated mouse: 1000 ms trigger dwell, directional navigation/highlight and A/Enter confirmation remain unchanged.
 - See the normative acceptance checklist in docs/operations/GATEWAY-AND-CONTROLLER-INPUT-CONTRACT-2026-11-17.md and the live debug backlog in docs/operations/INTERACTION-DEBUG-BACKLOG-2026-11-19.md.
+
+
+## Mandatory release and human-acceptance gate — 2026-11-19
+- Machine approval (CI/test/build/static checks) proves only MACHINE-PASS. It does not prove deployment, live behavior, human QA or owner acceptance.
+- The public demo is the project's operational acceptance laboratory. Deploy the exact machine-approved candidate, then read back and verify the live build identity against that candidate.
+- Only after successful deployment and live-identity verification may the change enter the human-QA waiting queue as READY-FOR-HUMAN-QA.
+- Human QA must test that exact public-demo URL/build and record criteria, device/environment, expected/actual results, evidence and PASS/FAIL/BLOCKED.
+- Owner acceptance is a separate, explicit decision tied to the exact tested build identity. CI success, deployment success, queue entry or silence is never owner acceptance.
+- Required chain: MACHINE-PASS → PUBLIC-DEMO-DEPLOYMENT → DEMO-IDENTITY-VERIFIED → READY-FOR-HUMAN-QA → HUMAN-QA report → explicit OWNER-ACCEPTED.
+- If live identity cannot be verified, remain BLOCKED; do not claim human-QA readiness. Any post-test change creates a new candidate and requires the gate to be repeated.
+- Normative project protocol: `Operations/2026-11-18/NU-UNIFIED-OPERATING-PROTOCOL-fa.md`, section 21; archive evidence protocol section 17.
