@@ -266,7 +266,7 @@ function resolveChaosMasses(targetIds,reason){
  if(result.hpDamage>0&&window.NUHealth)window.NUHealth.recordDamage({gameId:"chaos",waveId,amount:result.hpDamage,hpAfter:state.save.hp,reason:reason||"CHAOS_BREACH_DAMAGE"});
  if(result.died){
   if(window.NUHealth)window.NUHealth.recordDeath({gameId:"chaos",waveId,hpBefore,reason:"CHAOS_BREACH_DAMAGE"});
-  state.save.xp=Math.floor(state.save.xp/100)*100;state.save.hp=10;state.targets.forEach(target=>target.alive=false);state.active=false;
+  state.save.xp=Math.floor(state.save.xp/100)*100;state.save.hp=10;state.targets.forEach(target=>{if(target.alive){target.alive=false;recordGameObjectEvent(target,"despawn","round-ended-by-death","chaos-engine",{reason:"PLAYER_DEATH"});}});state.active=false;
   if(state.raf)cancelAnimationFrame(state.raf);state.raf=0;save();
   $("game-info").textContent="YOU DIED · 0 HP.";
  }else if(result.absorbed>0&&result.hpDamage===0){
