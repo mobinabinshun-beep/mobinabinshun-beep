@@ -52,3 +52,27 @@ test("instrumentation is bounded and caller errors cannot break interaction disp
  for(let i=0;i<260;i++)h.core.record("execute","test",h.target,{index:i});
  assert.equal(h.core.snapshot().length,240);
 });
+
+const gameSource=fs.readFileSync("nu-games.js","utf8");
+test("Generation 1 game-object events carry stable game/object identity and outcomes",()=>{
+ assert.match(gameSource,/function recordGameObjectEvent\(target,action,outcome,source,extra\)/);
+ assert.match(gameSource,/objectType=gameId==="bubble"\?"bubble":gameId==="mana"\?"mana-orb":gameId==="chaos"\?"chaos-mass"/);
+ assert.match(gameSource,/objectId:target&&target.id!=null\?String\(target.id\):null/);
+ assert.match(gameSource,/gameId:state.game,waveId:state.save.activeWave/);
+ assert.match(gameSource,/recordGameObjectEvent\(target,"spawn","spawned"/);
+ assert.match(gameSource,/function traceGameObjectHover\(event\)/);
+ assert.match(gameSource,/recordGameObjectEvent\(target,"hit-test","hit"/);
+ assert.match(gameSource,/recordGameObjectEvent\(null,"hit-test","miss"/);
+});
+test("Bubble Hunt, Mana Collector and Chaos Attack emit action, outcome and despawn evidence",()=>{
+ assert.match(gameSource,/recordGameObjectEvent\(target,"pop",awarded\?"rewarded":"reward-persist-failed"/);
+ assert.match(gameSource,/recordGameObjectEvent\(target,"collect",collected\?"collected":"persist-failed"/);
+ assert.match(gameSource,/recordGameObjectEvent\(target,"fire","fired"/);
+ assert.match(gameSource,/recordGameObjectEvent\(o,"collision"/);
+ assert.match(gameSource,/recordGameObjectEvent\(target,"resolve"/);
+ assert.match(gameSource,/recordGameObjectEvent\(target,"despawn"/);
+});
+test("game-object diagnostics are non-intrusive when the shared core is unavailable or throws",()=>{
+ assert.match(gameSource,/if\(!core\|\|typeof core\.record!=="function"\)return null/);
+ assert.match(gameSource,/catch\(_\)\{return null;\}/);
+});
