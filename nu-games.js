@@ -2,7 +2,7 @@
 (function(){
 "use strict";
 const $=id=>document.getElementById(id);
-const state={save:NUWallet.normalizeSave(NU.load()),game:null,turn:0,active:false,paused:false,quality:5,engine:null,roundSeed:0,targets:[],targetSequence:0,shots:0,raf:0,lastFrame:0,keyboardTargetIndex:-1,keyboardMode:false,pointerTargetIndex:-1};
+const state={save:NUWallet.normalizeSave(NU.load()),game:null,turn:0,active:false,paused:false,quality:5,engine:null,roundSeed:0,targets:[],targetSequence:0,shots:0,raf:0,lastFrame:0,keyboardTargetIndex:-1,keyboardMode:false};
 const gatewayPause=window.NUGatewayPause.create();
 
 function syncGatewayBackgrounds(frozen){
@@ -298,24 +298,26 @@ function resize(){const r=canvas.getBoundingClientRect(),d=Math.min(devicePixelR
 function rnd(min,max){return min+Math.random()*(max-min);}
 function initTargets(){
  const w=canvas.clientWidth,h=canvas.clientHeight;if(w<80||h<120)return;
- const count=10,points=[],reading=document.querySelector("#article-view.active"),readingRect=reading?reading.getBoundingClientRect():null,canvasRect=canvas.getBoundingClientRect();
- const readingBounds=readingRect?{left:readingRect.left-canvasRect.left,right:readingRect.right-canvasRect.left,top:readingRect.top-canvasRect.top,bottom:readingRect.bottom-canvasRect.top}:null;
- const targetBatch=++state.targetSequence;
+ const count=10,points=[],reading=document.querySelector("#article-view.active"),readingRect=reading?reading.getBoundingClientRect():null;
+ const download=document.documentElement.dataset.delivery==="download",targetBatch=++state.targetSequence;
  const minGap=Math.max(26,Math.min(54,w*.075));
- const overlapsReading=(x,y)=>!!(readingBounds&&x>readingBounds.left-18&&x<readingBounds.right+18&&y>readingBounds.top-18&&y<readingBounds.bottom+18);
  let attempts=0;
  while(points.length<count&&attempts++<2400){
   const margin=state.game==="chaos"?34:Math.max(26,Math.min(44,h*.08));
   const x=rnd(margin,w-margin),y=state.game==="chaos"?rnd(70,Math.max(90,h*.43)):rnd(70,h-margin);
-  if(overlapsReading(x,y))continue;
+  if(!download&&x>w*.22&&x<w*.78)continue;
+  if(readingRect&&x>readingRect.left-18&&x<readingRect.right+18&&y>readingRect.top-18&&y<readingRect.bottom+18)continue;
   if(points.some(p=>Math.hypot(p.x-x,p.y-y)<minGap))continue;
   points.push({x,y});
  }
- // If spacing is tight, fill the available canvas area; only a visible reading column is excluded.
+ // Narrow online viewports may not fit ten widely spaced targets; fill remaining slots
+ // only in the allowed side lanes, with reduced spacing rather than placing over reading content.
  let fallback=0;
  while(points.length<count&&fallback++<1600){
-  const margin=22,x=rnd(margin,w-margin),y=rnd(70,Math.max(90,h-38));
-  if(overlapsReading(x,y))continue;
+  const margin=22,side=Math.random()<.5?"left":"right";
+  const x=download?rnd(margin,w-margin):(side==="left"?rnd(margin,w*.21):rnd(w*.79,w-margin));
+  const y=rnd(70,Math.max(90,h-38));
+  if(readingRect&&x>readingRect.left-18&&x<readingRect.right+18&&y>readingRect.top-18&&y<readingRect.bottom+18)continue;
   if(points.some(p=>Math.hypot(p.x-x,p.y-y)<minGap*.48))continue;
   points.push({x,y});
  }
@@ -328,7 +330,7 @@ function initTargets(){
   hp:1,phase:Math.random()*6,vx:rnd(-.34,.34),vy:rnd(-.26,.26),
   speed:state.game==="chaos"?Math.min(8,Math.pow(2,i)):1,alive:true,damaged:false
  }));
- lastGameObjectHoverId=null;state.pointerTargetIndex=-1;
+ lastGameObjectHoverId=null;
  state.targets.forEach(target=>recordGameObjectEvent(target,"spawn","spawned","game-runtime",{x:target.x,y:target.y,radius:target.r}));
  if(state.game==="chaos"&&state.save.activeWave){const registered=NUWallet.registerChaosTargets(state.save,state.targets.map(target=>target.id));if(registered.ok)persistWalletState(registered.state);}
 }
@@ -337,30 +339,15 @@ function animateGame(t){if(!state.active)return;const minFrame=state.quality<=3?
  o.damaged=true;o.alive=false;recordGameObjectEvent(o,"despawn","breached","chaos-engine",{x:o.x,y:o.y});if(hit.died)return;}}else{o.y+=o.vy;if(o.y<55||o.y>h-o.r-40)o.vy*=-1;}});drawGame();}state.raf=requestAnimationFrame(animateGame);}
 function chooseGame(id){window.dispatchEvent(new Event("nu:gateway-close"));if(window.NUPixelWorld)window.NUPixelWorld.setWeatherMode("game");if(state.raf)cancelAnimationFrame(state.raf);const exitResolution=resolveRemainingChaosMasses("CHAOS_NEW_ROUND_EXIT");if(exitResolution&&exitResolution.ok===false){$("game-info").textContent="Unable to save remaining Chaos damage. Please retry.";return;}settleActiveWave("new_round");state.game=id||games[Math.floor(Math.random()*games.length)].id;const started=NUWallet.beginWave(state.save,state.game);if(started.ok)persistWalletState(started.state);state.turn=0;state.active=true;state.paused=false;state.shots=0;initTargets();$("home-view").classList.remove("active");$("article-view").classList.remove("active");$("game-view").classList.add("active");state.keyboardTargetIndex=state.targets.findIndex(target=>target.alive);state.keyboardMode=false;canvas.focus({preventScroll:true});$("game-title").textContent=games.find(g=>g.id===state.game).name;renderRoundProgress();$("game-info").textContent=state.game==="chaos"?"Tap a Chaos mass to mark it. N-BI fires automatically and consumes one full 10-Mana capsule per mass." :"Tap a target to interact.";renderWallet();requestAnimationFrame(()=>{resize();initTargets();drawGame();state.lastFrame=0;state.raf=requestAnimationFrame(animateGame);});}
 function closeGame(){const exitResolution=resolveRemainingChaosMasses("CHAOS_PLAYER_EXIT");if(exitResolution&&exitResolution.ok===false){$("game-info").textContent="Unable to save remaining Chaos damage. Please retry.";return;}settleActiveWave("player_exit");window.dispatchEvent(new Event("nu:gateway-close"));window.dispatchEvent(new Event("nu:game-view-exit"));gatewayPause.reset();if(window.NUPixelWorld)window.NUPixelWorld.setWeatherMode("sleep");state.active=false;state.paused=false;if(state.raf)cancelAnimationFrame(state.raf);state.raf=0;$("game-view").classList.remove("active");$("home-view").classList.add("active");document.body.classList.remove("article-mode");}
-function drawGame(){const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;ctx.clearRect(0,0,w,h);ctx.save();ctx.globalAlpha=.22;for(let i=0;i<30;i++){let x=(i*97+Date.now()*.004)%w,y=(i*61)%h;ctx.fillStyle="#9cddff";ctx.fillRect(x,y,1,1);}ctx.restore();state.targets.forEach((o,i)=>{if(!o.alive)return;o.phase+=.015;const bob=Math.sin(o.phase)*2;ctx.save();if(state.game==="bubble"){const g=ctx.createRadialGradient(o.x-o.r*.3,o.y-o.r*.4,1,o.x,o.y,o.r*1.4);g.addColorStop(0,"rgba(255,255,255,.7)");g.addColorStop(.3,"rgba(255,180,210,.18)");g.addColorStop(.75,"rgba(96,185,255,.13)");g.addColorStop(1,"rgba(255,196,95,.03)");ctx.fillStyle=g;ctx.strokeStyle="rgba(255,202,111,.85)";ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(o.x,o.y+bob,o.r,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.beginPath();ctx.strokeStyle="rgba(255,255,255,.52)";ctx.lineWidth=Math.max(1,o.r*.035);ctx.arc(o.x-o.r*.22,o.y-o.r*.24+bob,o.r*.22,-Math.PI*.78,Math.PI*.18);ctx.stroke();}else if(state.game==="mana"){ctx.translate(o.x,o.y+bob);ctx.rotate(Math.PI/6);ctx.fillStyle="rgba(64,190,255,.16)";ctx.strokeStyle="#68dfff";ctx.lineWidth=1.5;ctx.shadowBlur=5;ctx.shadowColor="#43cfff";ctx.beginPath();ctx.moveTo(0,-o.r);for(let j=1;j<6;j++)ctx.lineTo(Math.cos(j*Math.PI/3)*o.r,Math.sin(j*Math.PI/3)*o.r);ctx.closePath();ctx.fill();ctx.stroke();ctx.shadowBlur=0;ctx.fillStyle="#d9faff";ctx.fillRect(-1,-2,2,4);if(window.NUMaterials)window.NUMaterials.drawMana(ctx,0,0,o.r,o.phase);}else{ctx.translate(o.x,o.y+bob);ctx.fillStyle="rgba(255,54,85,.16)";ctx.strokeStyle="#ff526c";ctx.lineWidth=1.5;ctx.shadowBlur=13;ctx.shadowColor="#ff3658";ctx.beginPath();for(let j=0;j<9;j++){const a=j*Math.PI*2/9,rr=o.r*(j%2?.78:1);if(!j)ctx.moveTo(Math.cos(a)*rr,Math.sin(a)*rr);else ctx.lineTo(Math.cos(a)*rr,Math.sin(a)*rr);}ctx.closePath();ctx.fill();ctx.stroke();ctx.shadowBlur=0;ctx.fillStyle="#ffd6df";ctx.font="10px sans-serif";ctx.textAlign="center";}ctx.restore();});if(window.NUMaterials)window.NUMaterials.drawEffects(ctx);if(state.game==="chaos"){ctx.save();ctx.strokeStyle="rgba(255,174,96,.5)";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(w-18,h-18);ctx.lineTo(w-90,h-75);ctx.stroke();ctx.fillStyle="#ffca75";ctx.shadowBlur=12;ctx.shadowColor="#ffb44e";ctx.beginPath();ctx.arc(w-18,h-18,4,0,Math.PI*2);ctx.fill();ctx.restore();}if(state.keyboardMode&&document.activeElement===canvas)drawKeyboardTarget();else if(state.pointerTargetIndex>=0)drawPointerTarget();}
-function gamePointFromEvent(event){
- const rect=canvas.getBoundingClientRect();
- if(!rect.width||!rect.height)return null;
- return {x:(event.clientX-rect.left)*(canvas.clientWidth/rect.width),y:(event.clientY-rect.top)*(canvas.clientHeight/rect.height)};
-}
-function hitTestGameTarget(x,y){
- let target=null,index=-1,best=Infinity;
- state.targets.forEach((item,i)=>{
-  if(!item.alive)return;
-  const distance=Math.hypot(item.x-x,item.y-y);
-  const padding=state.game==="mana"?8:state.game==="bubble"?10:15;
-  const hitRadius=Math.max(item.r+padding,22);
-  if(distance<=hitRadius&&distance<best){best=distance;target=item;index=i;}
- });
- return {target,index};
-}
+function drawGame(){const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;ctx.clearRect(0,0,w,h);ctx.save();ctx.globalAlpha=.22;for(let i=0;i<30;i++){let x=(i*97+Date.now()*.004)%w,y=(i*61)%h;ctx.fillStyle="#9cddff";ctx.fillRect(x,y,1,1);}ctx.restore();state.targets.forEach((o,i)=>{if(!o.alive)return;o.phase+=.015;const bob=Math.sin(o.phase)*2;ctx.save();if(state.game==="bubble"){const g=ctx.createRadialGradient(o.x-o.r*.3,o.y-o.r*.4,1,o.x,o.y,o.r*1.4);g.addColorStop(0,"rgba(255,255,255,.7)");g.addColorStop(.3,"rgba(255,180,210,.18)");g.addColorStop(.75,"rgba(96,185,255,.13)");g.addColorStop(1,"rgba(255,196,95,.03)");ctx.fillStyle=g;ctx.strokeStyle="rgba(255,202,111,.85)";ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(o.x,o.y+bob,o.r,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.beginPath();ctx.strokeStyle="rgba(255,255,255,.52)";ctx.lineWidth=Math.max(1,o.r*.035);ctx.arc(o.x-o.r*.22,o.y-o.r*.24+bob,o.r*.22,-Math.PI*.78,Math.PI*.18);ctx.stroke();}else if(state.game==="mana"){ctx.translate(o.x,o.y+bob);ctx.rotate(Math.PI/6);ctx.fillStyle="rgba(64,190,255,.16)";ctx.strokeStyle="#68dfff";ctx.lineWidth=1.5;ctx.shadowBlur=5;ctx.shadowColor="#43cfff";ctx.beginPath();ctx.moveTo(0,-o.r);for(let j=1;j<6;j++)ctx.lineTo(Math.cos(j*Math.PI/3)*o.r,Math.sin(j*Math.PI/3)*o.r);ctx.closePath();ctx.fill();ctx.stroke();ctx.shadowBlur=0;ctx.fillStyle="#d9faff";ctx.fillRect(-1,-2,2,4);if(window.NUMaterials)window.NUMaterials.drawMana(ctx,0,0,o.r,o.phase);}else{ctx.translate(o.x,o.y+bob);ctx.fillStyle="rgba(255,54,85,.16)";ctx.strokeStyle="#ff526c";ctx.lineWidth=1.5;ctx.shadowBlur=13;ctx.shadowColor="#ff3658";ctx.beginPath();for(let j=0;j<9;j++){const a=j*Math.PI*2/9,rr=o.r*(j%2?.78:1);if(!j)ctx.moveTo(Math.cos(a)*rr,Math.sin(a)*rr);else ctx.lineTo(Math.cos(a)*rr,Math.sin(a)*rr);}ctx.closePath();ctx.fill();ctx.stroke();ctx.shadowBlur=0;ctx.fillStyle="#ffd6df";ctx.font="10px sans-serif";ctx.textAlign="center";}ctx.restore();});if(window.NUMaterials)window.NUMaterials.drawEffects(ctx);if(state.game==="chaos"){ctx.save();ctx.strokeStyle="rgba(255,174,96,.5)";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(w-18,h-18);ctx.lineTo(w-90,h-75);ctx.stroke();ctx.fillStyle="#ffca75";ctx.shadowBlur=12;ctx.shadowColor="#ffb44e";ctx.beginPath();ctx.arc(w-18,h-18,4,0,Math.PI*2);ctx.fill();ctx.restore();}if(state.keyboardMode&&document.activeElement===canvas)drawKeyboardTarget();}
 function interact(e){if(!state.active||state.paused||state.turn>=10)return;
 
- const point=gamePointFromEvent(e);if(!point)return;
- const {x,y}=point,{target,index}=hitTestGameTarget(x,y);
+ const rect=canvas.getBoundingClientRect(),x=e.clientX-rect.left,y=e.clientY-rect.top;
+ let target=null,best=Infinity;
+ state.targets.forEach(o=>{if(!o.alive)return;const d=Math.hypot(o.x-x,o.y-y);if(d<o.r+(state.game==="mana"?8:state.game==="bubble"?10:15)&&d<best){best=d;target=o;}});
  const source=interactionSource(e);
- if(!target){state.pointerTargetIndex=-1;recordGameObjectEvent(null,"hit-test","miss",source,{x,y});return;}
- state.pointerTargetIndex=index;lastGameObjectHoverId=target.id;
+ if(!target){recordGameObjectEvent(null,"hit-test","miss",source,{x,y});return;}
+ lastGameObjectHoverId=target.id;
  recordGameObjectEvent(target,"hit-test","hit",source,{x,y});
  recordGameObjectEvent(target,"activate","attempted",source,{x,y});
  if(!e.keyboard)state.keyboardMode=false;
@@ -431,13 +418,13 @@ window.addEventListener("pointermove",mouseCameraBootstrap,{passive:true});windo
 let lastGameObjectHoverId=null;
 function traceGameObjectHover(event){
  if(!state.active||state.paused||!event||!canvas.contains(event.target))return;
- const point=gamePointFromEvent(event);if(!point)return;
- const {x,y}=point,{target,index}=hitTestGameTarget(x,y);
+ const rect=canvas.getBoundingClientRect(),x=event.clientX-rect.left,y=event.clientY-rect.top;
+ let target=null,best=Infinity;
+ state.targets.forEach(item=>{if(!item.alive)return;const distance=Math.hypot(item.x-x,item.y-y);if(distance<item.r+(state.game==="mana"?8:state.game==="bubble"?10:15)&&distance<best){best=distance;target=item;}});
  const nextId=target?target.id:null;
  if(nextId===lastGameObjectHoverId)return;
- lastGameObjectHoverId=nextId;state.pointerTargetIndex=index;
+ lastGameObjectHoverId=nextId;
  if(target)recordGameObjectEvent(target,"target","hit",interactionSource(event),{x,y});
- drawGame();
 }
 canvas.addEventListener("pointermove",traceGameObjectHover,{passive:true});
 function settleAfterPageExit(){const resolution=resolveRemainingChaosMasses("CHAOS_PAGE_UNLOAD");if(!resolution||resolution.ok===false)return false;return settleActiveWave("page_unload");}
@@ -452,10 +439,6 @@ function openArticle(title,url){$("article-title").textContent=title;$("article-
 function drawKeyboardTarget(){
  const target=state.targets[state.keyboardTargetIndex];if(!target||!target.alive)return;
  ctx.save();ctx.strokeStyle="#e8fbff";ctx.lineWidth=2.5;ctx.setLineDash([5,4]);ctx.shadowColor="#56dfff";ctx.shadowBlur=14;ctx.beginPath();ctx.arc(target.x,target.y,target.r+8,0,Math.PI*2);ctx.stroke();ctx.restore();
-}
-function drawPointerTarget(){
- const target=state.targets[state.pointerTargetIndex];if(!target||!target.alive)return;
- ctx.save();ctx.strokeStyle="#b8f7ff";ctx.lineWidth=2.5;ctx.setLineDash([4,3]);ctx.shadowColor="#56dfff";ctx.shadowBlur=12;ctx.beginPath();ctx.arc(target.x,target.y,Math.max(target.r+8,22),0,Math.PI*2);ctx.stroke();ctx.restore();
 }
 function moveKeyboardTarget(direction){
  const alive=state.targets.map((target,index)=>target.alive?index:-1).filter(index=>index>=0);
