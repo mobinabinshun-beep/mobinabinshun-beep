@@ -20,7 +20,7 @@
 - Touch `pointerup` cancels the timer if Gateway has not opened; it does not immediately toggle Gateway.
 - Touch `pointercancel` cancels the pending timer.
 - Existing synthetic-click suppression remains in place.
-- The focused test asserts dwell scheduling, early-release cancellation, pointer-cancel handling and absence of immediate pointerup toggle.
+- The focused Gateway pointer/controller test and the broader Gateway controller-input regression both assert dwell scheduling and early-release cancellation; neither permits immediate pointerup activation.
 
 ## Verification state
 - Machine QA: PENDING exact-head CI.
