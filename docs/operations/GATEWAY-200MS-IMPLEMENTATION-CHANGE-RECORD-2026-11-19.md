@@ -55,7 +55,22 @@ The shared `nu-controller-pointer.js` adapter is unchanged. Its contract remains
 
 ## 5. Implementation and verification
 
-Implementation and test status are recorded against the exact candidate SHA in this PR and the linked workflow runs. Do not infer machine approval from this document or from the earlier documentation-only PR #224.
+Candidate head SHA at this assessment: `7be547379085abf2e40d3c435856d5825653330d`.
+
+### Machine evidence for this candidate SHA
+
+- Gateway workflow run [#495](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44549576572): JavaScript syntax step **PASS**; test step **89 PASS / 2 FAIL**.
+- All tests in the changed Gateway test files passed, including the 16 direct-input / dwell / cancellation / simulated-pointer isolation checks added for this change.
+- The two failing assertions are outside this PR's changed files:
+  1. `tests/nu-controller-pointer.test.js:23` expects the stale `nu-games.js?v=20261119-game-object-events-r1` token in `index.html`.
+  2. `tests/nu-interaction-core.test.js:83-84` uses an over-escaped CSS selector regex for the game canvas.
+- These are recorded as **unrelated baseline blockers**, not silently fixed by expanding this Gateway scope.
+- Graphics preview/static validation [run #1398](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44549577207): **PASS**.
+- Graphics integrity [run #756](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44549576655): **PASS**.
+- Exchange [run #315](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44549576756), wallet/profile [run #455](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44549576900), and HUD layout [run #454](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44549576823): **PASS**.
+- Studio export [run #1279](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44549576738) and full Generation 1 [run #129](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44549577371): **FAIL** on the same two unrelated assertions. The focused Arcane/Mana tests passed.
+
+Do not infer machine approval from the documentation-only PR #224 or from a partial workflow pass.
 
 Required focused checks:
 - 199 ms does not trigger; 200 ms does.
@@ -69,9 +84,9 @@ Required focused checks:
 
 ## 6. Release and acceptance state
 
-- Runtime implementation: **IN PROGRESS**.
-- Implementation-specific machine validation: **PENDING**.
-- PRE-RELEASE candidate backup: **PENDING**.
+- Runtime implementation: **CANDIDATE IMPLEMENTED; PR #225 OPEN**.
+- Changed Gateway tests: **PASS**; overall Gateway/Generation 1 CI: **PARTIAL / BLOCKED BY 2 UNRELATED ASSERTIONS**.
+- PRE-RELEASE candidate backup: **NOT CREATED** (full CI gate not green).
 - Deployment and live build identity: **NOT VERIFIED**.
 - Physical mouse/touch device QA: **PENDING**.
 - Simulated-pointer physical-device regression QA: **PENDING**.
