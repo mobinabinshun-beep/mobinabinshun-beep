@@ -77,3 +77,14 @@
 - Never conflate pointer movement/highlight with select, confirm, activate or execute. Gateway owns its hierarchy while open.
 - Instrument system/platform controls and game objects (Bubble Hunt bubbles, Mana particles/orbs, Chaos masses/clusters) with stable object/game/action/source/outcome identifiers. Diagnostic failures must never block gameplay.
 - Preserve original human findings and debug exports as linked issue/change-record evidence. A failed human report reopens the affected behavior; do not overwrite it with a later pass.
+
+
+## Mandatory explicit-scope / anti-destruction lock
+- The user instruction is a strict boundary: modify only the named target and proven direct dependencies; do not touch adjacent features, global styles, unrelated tests, data, architecture, or documentation as "cleanup".
+- Before writing, record exact in-scope paths, forbidden areas, baseline commit/checkpoint and the minimum change budget. Inspect the complete proposed diff before committing; any unrelated path or behavior must be removed.
+- If scope, dependency, ownership or recovery cannot be verified, stop before writing. Never use a whole-repository reset, force push or broad rollback to solve a scoped defect.
+- A rollback request authorizes restoration only of the exact named scope from a verified checkpoint. Preserve later unrelated work and explicitly disclose any known defect contained in the checkpoint.
+- Any unplanned side effect, unexpected diff, or unrelated regression triggers an immediate stop and recovery of only the affected scope.
+- These rules apply to every model, agent, bot, script and contributor operating in this repository. Further development outside the current lock requires a new explicit, focused user instruction.
+- Full mandatory protocol: [ANTI-DESTRUCTION-EXPLICIT-SCOPE-PROTOCOL-2026-11-19.md](./docs/operations/ANTI-DESTRUCTION-EXPLICIT-SCOPE-PROTOCOL-2026-11-19.md).
+- This is a repository instruction, not a claim of platform-enforced branch protection. Do not claim GitHub ruleset/branch protection unless independently verified in repository settings.
