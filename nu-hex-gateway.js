@@ -9,7 +9,7 @@
 
   const trigger=root.querySelector(".nu-gateway-trigger");
   const items=[...root.querySelectorAll(".nu-gateway-item")];
-  let open=false,selected=null,activationTimer=0,openTimer=0,outsideSince=0,suppressClickUntil=0;
+  let open=false,selected=null,activationTimer=0,openTimer=0,physicalOpenTimer=0,outsideSince=0,suppressClickUntil=0;
   let pendingItem=null,requiresSimulatedPointerExit=false,simulatedPointerOutside=false;
   let touchTriggerPointerId=null,touchTriggerDwellFired=false,touchTriggerCancelledPointerId=null;
   let touchOptionPointerId=null,touchOptionItem=null,touchOptionTimer=0,touchOptionDwellFired=false,touchOptionCompletedPointerId=null,touchOptionCancelledPointerId=null;
@@ -77,7 +77,7 @@
     trigger.setAttribute("aria-label",open?"Close N.U navigation gateway":"Open N.U navigation gateway");
     items.forEach(item=>{item.tabIndex=open?0:-1;});
     if(open){
-      clearTimeout(openTimer);openTimer=0;
+      clearTimeout(openTimer);openTimer=0;clearTimeout(physicalOpenTimer);physicalOpenTimer=0;
       selected=null;
       items.forEach(item=>{item.classList.remove("is-selected","is-confirming");item.setAttribute("aria-pressed","false");});
       window.NUControllerPointer?.setEnabled(true);
@@ -169,17 +169,24 @@
   }
 
   function scheduleOpen(delay,source){
-    if(open||openTimer)return;
-    openTimer=window.setTimeout(()=>{
-      openTimer=0;
+    if(open)return;
+    const simulated=source==="simulated-pointer";
+    if(simulated?openTimer:physicalOpenTimer)return;
+    const timer=window.setTimeout(()=>{
+      if(simulated)openTimer=0;else physicalOpenTimer=0;
       if(!open){
         if(source==="touch")touchTriggerDwellFired=true;
         setOpen(true,true,source);
       }
     },delay);
+    if(simulated)openTimer=timer;else physicalOpenTimer=timer;
   }
-  function cancelScheduledOpen(){
-    if(openTimer){clearTimeout(openTimer);openTimer=0;}
+  function cancelScheduledOpen(source="physical"){
+    if(source==="simulated-pointer"){
+      if(openTimer){clearTimeout(openTimer);openTimer=0;}
+      return;
+    }
+    if(physicalOpenTimer){clearTimeout(physicalOpenTimer);physicalOpenTimer=0;}
   }
 
   trigger.addEventListener("pointerenter",event=>{
@@ -316,7 +323,7 @@
     }
     if(!open&&target&&!previous&&!requiresSimulatedPointerExit)scheduleOpen(1000,"simulated-pointer");
     if(!open&&target&&previous!==target&&!requiresSimulatedPointerExit)scheduleOpen(1000,"simulated-pointer");
-    if(!target&&!open)cancelScheduledOpen();
+    if(!target&&!open)cancelScheduledOpen("simulated-pointer");
   });
   window.addEventListener("nu:gateway-direction",event=>{
     if(!open)return;
