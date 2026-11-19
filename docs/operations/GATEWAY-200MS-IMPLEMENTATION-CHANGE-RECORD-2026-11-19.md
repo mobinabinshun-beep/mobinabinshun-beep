@@ -13,7 +13,7 @@
 ### Allow-list
 - `nu-hex-gateway.js`: direct physical mouse/touch trigger dwell, actionable-option dwell, cancellation and duplicate-event handling.
 - `index.html`, `launcher.html`, `casino.html`, `pixel-art-studio.html`: Gateway runtime script cache key only.
-- `tests/nu-gateway-controller-input.test.js`, `tests/nu-hex-gateway.test.js`: focused contract and timed runtime regression coverage.
+- `tests/nu-gateway-controller-input.test.js`, `tests/nu-gateway-pointer-controller-mode.test.js`, `tests/nu-hex-gateway.test.js`: focused contract and timed runtime regression coverage.
 - This change record.
 
 ### Deny-list
