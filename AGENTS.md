@@ -1,6 +1,7 @@
 # N.U contributor operating rules — fast, safe, owner-directed
 
 ## Mandatory protocol-first execution order
+- For software change intake, fail-closed operational assessment, continuous documentation and versioned backup/archive, follow the canonical [four execution-governance protocols](https://github.com/mobinabinshun-beep/Repository/blob/main/Operations/2026-11-19/NU-FOUR-EXECUTION-GOVERNANCE-PROTOCOLS-fa.md). This is the software lifecycle overlay; product-specific locks, demo sequence and human QA remain governed by this file and the unified archive protocol.
 - Start every task by reading this repository's AGENTS.md and the canonical N.U operating/change protocols in the Repository archive. Read the protocol instructions before inspecting implementation data or issuing write/deploy commands.
 - Next read the relevant product specifications, owner decisions, protected-area locks, recent change records, QA reports and related Issue/PR history.
 - Only then inspect repository state: actual default branch and SHA, relevant source/tests/assets, refs/backups, workflow evidence, build/deploy configuration and the identity/content of the currently running public demo.
