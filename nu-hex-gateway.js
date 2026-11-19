@@ -153,22 +153,20 @@
   trigger.addEventListener("pointerleave",event=>{
     if(event.pointerType==="mouse"&&!open)cancelScheduledOpen();
   });
-  // Android browsers dispatch a short pointerdown/pointerup pair for a normal tap.
-  // Opening was previously scheduled on pointerdown and cancelled on pointerup, so
-  // an ordinary touch could never open Gateway. Treat a completed touch as the
-  // direct activation; keep the 500 ms dwell exclusively for physical mouse hover.
+  // Direct touch follows the owner contract: hold on the trigger for 500 ms.
+  // Releasing or cancelling before the dwell completes must not open Gateway.
   trigger.addEventListener("pointerdown",event=>{
-    if(event.pointerType==="touch"){
-      event.preventDefault();
-      suppressClickUntil=Date.now()+1000;
-    }
+    if(event.pointerType!=="touch"||event.isPrimary===false)return;
+    event.preventDefault();
+    suppressClickUntil=Date.now()+1000;
+    scheduleOpen(500,"touch");
   });
   trigger.addEventListener("pointerup",event=>{
     if(event.pointerType!=="touch"||event.isPrimary===false)return;
     event.preventDefault();
     event.stopPropagation();
     suppressClickUntil=Date.now()+1000;
-    setOpen(!open,true,"touch");
+    if(!open)cancelScheduledOpen();
   });
   trigger.addEventListener("pointercancel",event=>{
     if(event.pointerType==="touch")cancelScheduledOpen();
