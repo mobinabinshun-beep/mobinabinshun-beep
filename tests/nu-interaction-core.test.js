@@ -76,3 +76,18 @@ test("game-object diagnostics are non-intrusive when the shared core is unavaila
  assert.match(gameSource,/if\(!core\|\|typeof core\.record!=="function"\)return null/);
  assert.match(gameSource,/catch\(_\)\{return null;\}/);
 });
+
+test("game objects share one CSS-pixel hit-test between hover preview and activation",()=>{
+ assert.match(gameSource,/function gamePointFromEvent\(event\)/);
+ assert.match(gameSource,/canvas\.clientWidth\/rect\.width/);
+ assert.match(gameSource,/function hitTestGameTarget\(x,y\)/);
+ assert.match(gameSource,/Math\.max\(item\.r\+padding,22\)/);
+ assert.match(gameSource,/const \{x,y\}=point,\{target,index\}=hitTestGameTarget\(x,y\)/);
+ assert.match(gameSource,/state\.pointerTargetIndex=index/);
+ assert.match(gameSource,/else if\(state\.pointerTargetIndex>=0\)drawPointerTarget\(\)/);
+});
+test("online game targets use the playable canvas instead of being confined to narrow side lanes",()=>{
+ assert.match(gameSource,/const readingBounds=readingRect\?\{left:readingRect\.left-canvasRect\.left/);
+ assert.match(gameSource,/const overlapsReading=\(x,y\)=>!!\(readingBounds/);
+ assert.doesNotMatch(gameSource,/if\(!download&&x>w\*\.22&&x<w\*\.78\)continue/);
+});
