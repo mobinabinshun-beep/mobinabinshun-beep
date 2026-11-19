@@ -24,6 +24,11 @@
 
 **Canonical order:** Code → machine tests/debugging → verified machine backup → public demo → link-check/report → human QA/owner acceptance.
 
+## Protocol-first discovery and decomposed public-demo backup
+The execution order is mandatory: (1) read applicable AGENTS and canonical operating/change protocols; (2) read relevant specifications, owner decisions, locks, change records, QA and Issue/PR history; (3) inspect actual repository state and the live demo identity/data; (4) record explicit scope and exclusions; (5) preserve the running demo as a versioned decomposed Runtime Baseline Snapshot; (6) implement only the authorized scope; (7) machine-test; (8) verify the exact pre-release candidate backup; (9) deploy the authorized candidate to the public demo; (10) verify the live build and leave the candidate in the human QA queue.
+
+The runtime snapshot is not just a branch or source ZIP. It must contain version-bound, independently manifested baskets for source/entrypoints, routes/pages, UI/styles, runtime modules, assets/media, build/config/dependencies, data schemas/storage (without private user data), input/events/state flows, tests/observed behavior, live deployment evidence, dependency/integration map and restore/rollback instructions. Every artifact is linked to one Snapshot ID, live URL, capture time and exact build identity where available, with hashes and CAPTURED/PARTIAL/NOT ACCESSIBLE status. Keep this separate from the pre-change source ref and post-test pre-release candidate backup. Full required format and restore gate: canonical archive protocol sections 18–19.
+
 ## DOC-ONLY and non-runtime documentation
 A documentation-only clarification that does not alter product behavior is recorded as DOC-ONLY, verified by PR review and fetch-back, and does not trigger a runtime deployment. If documentation changes product requirements or public behavior, treat it as a product change and follow the full candidate/QA lifecycle.
 
