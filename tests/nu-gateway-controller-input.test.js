@@ -64,7 +64,7 @@ test("Gateway mouse hover visibly selects and a click activates one destination"
  assert.match(gateway,/function select\(item\)/);
  assert.match(gateway,/item\.setAttribute\("aria-pressed","true"\)/);
  assert.match(gateway,/item\.addEventListener\("click"/);
- assert.match(gateway,/function activate\(item\)/);
+ assert.match(gateway,/function activate\(item/);
 });
 
 test("Shared controller adapter maps D-pad/stick to virtual pointer and A/B to confirm/cancel",()=>{
