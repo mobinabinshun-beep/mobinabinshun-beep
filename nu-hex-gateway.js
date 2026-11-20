@@ -253,6 +253,17 @@
   window.addEventListener("nu:gateway-cancel",()=>{if(open)setOpen(false);});
 
   scrim.addEventListener("click",()=>setOpen(false));
+  document.addEventListener("pointerup",event=>{
+    if(event.pointerType==="touch"&&touchPointerId!==null&&event.pointerId===touchPointerId){
+      touchPointerId=null;touchMoved=false;
+      if(dwellItem&&(!open||!items.includes(event.target.closest?.(".nu-gateway-item"))))cancelDwellActivation();
+    }
+  });
+  document.addEventListener("pointercancel",event=>{
+    if(event.pointerType==="touch"&&(touchPointerId===null||event.pointerId===touchPointerId)){
+      touchPointerId=null;touchMoved=false;cancelDwellActivation();cancelScheduledOpen();
+    }
+  });
   document.addEventListener("pointermove",event=>{
     if(!open||!["mouse","touch","pen"].includes(event.pointerType))return;
     if(event.pointerType==="touch"&&touchPointerId!==null&&event.pointerId===touchPointerId){
