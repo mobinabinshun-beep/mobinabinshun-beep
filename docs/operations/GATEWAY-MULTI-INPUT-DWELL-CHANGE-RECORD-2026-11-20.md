@@ -34,7 +34,7 @@ Goal: offer dwell-to-open/activate as a fast alternative alongside existing clic
 - `tests/nu-gateway-controller-input.test.js`
 
 ## QA / release gates
-- Machine CI: PENDING.
+- Machine CI (initial candidate): PASS on exact SHA `f8af8bfb60cf965a87476236ee388e80409f8f20` (8/8 checks).
 - Browser/device tests (mouse, touch, simulated controller): PENDING.
 - Public demo deployment: NOT PERFORMED.
 - Human report and approval: PENDING.
@@ -46,16 +46,23 @@ Goal: offer dwell-to-open/activate as a fast alternative alongside existing clic
 - Corrected by tracking the active touch pointer ID, applying a 10 px movement threshold, cancelling trigger-open dwell after movement, hit-testing the current option during an open-Gateway drag, and suppressing release activation after movement.
 - Touch pointer-up/cancel now clears pointer state and pending dwell; stationary touch keeps the existing tap activation.
 - CSS now applies `touch-action: none` to the Gateway trigger and options, matching the approved candidate interaction contract.
-- Machine CI: NOT YET VERIFIED for this follow-up. Browser/device QA and public demo remain pending. After exact-SHA MACHINE-PASS and BACKUP-VERIFIED, publish the experimental demo build for human QA under the binding owner decision; no merge/final release is implied.
+- Machine CI: PASS on exact SHA `f8af8bfb60cf965a87476236ee388e80409f8f20` (8/8 checks). This status applies only to that SHA; any successor commit requires its own exact-SHA validation. Browser/device QA and public demo remain pending.
 
 
 ## CI diagnosis and test correction — 2026-11-21
 - First follow-up CI run exposed a test-fixture defect, not a Gateway runtime syntax error: the new touch-action assertion referenced `gatewayCss` without loading the CSS fixture.
 - Added the missing CSS fixture import to the pointer/controller regression test.
-- Exact-head CI rerun for the corrected test commit was not yet observed at the time of this record update; no PASS is claimed until all required checks complete successfully.
+- Exact-head CI rerun for the corrected test commit later completed successfully: 8/8 checks PASS on `f8af8bfb60cf965a87476236ee388e80409f8f20`.
 
 ## Corrected release gate — 2026-11-21
 - MACHINE-PASS is the gate that unlocks the demo-test release, not final acceptance.
 - For this authorized/open/demo-eligible Gateway scope, after MACHINE-PASS on the exact candidate SHA and BACKUP-VERIFIED, deploy the same candidate to the public experimental demo without waiting for a second/pre-test human approval.
 - Verify live URL and build identity, run post-deploy smoke checks, then hand the deployed build to human testers and collect evidence/reports.
 - HUMAN-PASS / owner approval and Final ACCEPT remain pending until human testing is complete. Merge or final production release is not implied by demo-test deployment.
+
+
+## Candidate release checkpoint — 2026-11-21
+- Exact candidate CI: PASS, 8/8 checks on `f8af8bfb60cf965a87476236ee388e80409f8f20`.
+- Candidate backup ref: `backup/gateway-mouse-touch-controller-dwell-candidate-2026-11-21`, verified to point to the exact same SHA `f8af8bfb60cf965a87476236ee388e80409f8f20`.
+- The Gateway lock entry was aligned with the owner's corrected gate. That documentation change creates a successor head and therefore the exact-SHA CI and backup gates must be reverified for the final candidate before demo deployment.
+- Public experimental demo deployment: PENDING. Human/device QA: PENDING. Final ACCEPT: NOT GRANTED.
