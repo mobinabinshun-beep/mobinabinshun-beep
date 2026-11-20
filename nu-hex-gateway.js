@@ -10,7 +10,7 @@
   const trigger=root.querySelector(".nu-gateway-trigger");
   const items=[...root.querySelectorAll(".nu-gateway-item")];
   let open=false,selected=null,activationTimer=0,openTimer=0,outsideSince=0,suppressClickUntil=0;
-  let pendingItem=null,requiresSimulatedPointerExit=false,simulatedPointerOutside=false;
+  let pendingItem=null,requiresSimulatedPointerExit=false,simulatedPointerOutside=false,dwellTimer=0,dwellItem=null,touchStartX=0,touchStartY=0,touchMoved=false,touchPointerId=null;
 
   function syncGatewayScope(){
     const active=!!(gameView&&gameView.classList.contains("active"));
@@ -115,11 +115,27 @@
         setOpen(false,true,"simulated-pointer");
         return;
       }
-      select(items[current+1]);
+      scheduleDwellActivation(items[current+1],"simulated-controller");
       return;
     }
-    if(current<0){select(items[0]);return;}
-    if(current>0)select(items[current-1]);
+    if(current<0){scheduleDwellActivation(items[0],"simulated-controller");return;}
+    if(current>0)scheduleDwellActivation(items[current-1],"simulated-controller");
+  }
+  function cancelDwellActivation(){
+    if(dwellTimer){clearTimeout(dwellTimer);dwellTimer=0;}
+    if(dwellItem)dwellItem.classList.remove('is-confirming');
+    dwellItem=null;
+  }
+  function scheduleDwellActivation(item,source){
+    if(!open||!item)return;
+    if(dwellItem===item&&dwellTimer)return;
+    cancelDwellActivation();select(item);dwellItem=item;item.classList.add('is-confirming');
+    dwellTimer=window.setTimeout(()=>{
+      dwellTimer=0;const target=dwellItem;dwellItem=null;
+      if(!open||selected!==target||!target)return;
+      target.classList.remove('is-confirming');setOpen(false,false,'dwell-'+(source||'pointer'));
+      routes[target.dataset.action]?.();
+    },500);
   }
   function activate(item){
     if(!item||!item.dataset)return;
@@ -158,6 +174,7 @@
   trigger.addEventListener("pointerdown",event=>{
     if(event.pointerType!=="touch"||event.isPrimary===false)return;
     event.preventDefault();
+    touchStartX=event.clientX;touchStartY=event.clientY;touchMoved=false;touchPointerId=event.pointerId;
     suppressClickUntil=Date.now()+1000;
     scheduleOpen(500,"touch");
   });
@@ -167,9 +184,10 @@
     event.stopPropagation();
     suppressClickUntil=Date.now()+1000;
     if(!open)cancelScheduledOpen();
+    touchPointerId=null;touchMoved=false;
   });
   trigger.addEventListener("pointercancel",event=>{
-    if(event.pointerType==="touch")cancelScheduledOpen();
+    if(event.pointerType==="touch"){cancelScheduledOpen();touchPointerId=null;touchMoved=false;}
   });
   trigger.addEventListener("click",event=>{
     event.preventDefault();
@@ -179,19 +197,27 @@
   });
   items.forEach(item=>{
     item.addEventListener("pointerenter",event=>{
-      if(event.pointerType==="mouse"&&open)select(item);
+      if(event.pointerType==="mouse"&&open)scheduleDwellActivation(item,"physical-mouse");
     });
     item.addEventListener("pointerleave",event=>{
+      if(event.pointerType==="mouse"&&dwellItem===item)cancelDwellActivation();
       if(event.pointerType==="mouse"&&pendingItem===item){
         clearTimeout(activationTimer);activationTimer=0;pendingItem=null;
         item.classList.remove("is-confirming");
       }
     });
     item.addEventListener("focus",()=>select(item));
+    item.addEventListener("pointerdown",event=>{
+      if(event.pointerType!=="touch"||!open)return;
+      touchStartX=event.clientX;touchStartY=event.clientY;touchMoved=false;touchPointerId=event.pointerId;
+      scheduleDwellActivation(item,"touch-hold");
+    });
     item.addEventListener("pointerup",event=>{
       if(event.pointerType!=="touch"||!open)return;
       event.preventDefault();event.stopPropagation();
-      suppressClickUntil=Date.now()+900;activate(item);
+      suppressClickUntil=Date.now()+900;
+      const wasMoved=touchMoved;touchPointerId=null;touchMoved=false;cancelDwellActivation();
+      if(!wasMoved)activate(item);
     });
     item.addEventListener("click",event=>{
       event.preventDefault();event.stopPropagation();
@@ -214,6 +240,7 @@
     }
     if(!open&&target&&!previous&&!requiresSimulatedPointerExit)scheduleOpen(1000,"simulated-pointer");
     if(!open&&target&&previous!==target&&!requiresSimulatedPointerExit)scheduleOpen(1000,"simulated-pointer");
+    if(open&&detail.target){const item=detail.target.closest?detail.target.closest(".nu-gateway-item"):null;if(item)scheduleDwellActivation(item,"simulated-mouse");else if(dwellItem)cancelDwellActivation();}
     if(!target&&!open)cancelScheduledOpen();
   });
   window.addEventListener("nu:gateway-direction",event=>{
@@ -226,8 +253,32 @@
   window.addEventListener("nu:gateway-cancel",()=>{if(open)setOpen(false);});
 
   scrim.addEventListener("click",()=>setOpen(false));
+  document.addEventListener("pointerup",event=>{
+    if(event.pointerType==="touch"&&touchPointerId!==null&&event.pointerId===touchPointerId){
+      touchPointerId=null;touchMoved=false;
+      if(dwellItem&&(!open||!items.includes(event.target.closest?.(".nu-gateway-item"))))cancelDwellActivation();
+    }
+  });
+  document.addEventListener("pointercancel",event=>{
+    if(event.pointerType==="touch"&&(touchPointerId===null||event.pointerId===touchPointerId)){
+      touchPointerId=null;touchMoved=false;cancelDwellActivation();cancelScheduledOpen();
+    }
+  });
   document.addEventListener("pointermove",event=>{
-    if(!open||!["mouse","touch","pen"].includes(event.pointerType))return;
+    if(!["mouse","touch","pen"].includes(event.pointerType))return;
+    if(event.pointerType==="touch"&&touchPointerId!==null&&event.pointerId===touchPointerId){
+      if(Math.hypot(event.clientX-touchStartX,event.clientY-touchStartY)>10){
+        touchMoved=true;
+        if(!open)cancelScheduledOpen();
+      }
+      if(open&&touchMoved){
+        const hit=document.elementFromPoint(event.clientX,event.clientY);
+        const item=hit&&hit.closest?hit.closest(".nu-gateway-item"):null;
+        if(item)scheduleDwellActivation(item,"touch-drag");
+        else if(dwellItem)cancelDwellActivation();
+      }
+    }
+    if(!open)return;
     const tolerance=10,rect=root.getBoundingClientRect();
     const orbit=window.matchMedia("(max-width: 600px)").matches?112:126;
     const inside=event.clientX>=rect.left-orbit-tolerance&&event.clientX<=rect.right+tolerance&&

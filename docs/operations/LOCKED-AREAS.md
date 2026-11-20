@@ -116,3 +116,8 @@ This record documents a one-time narrow exception; it does not permanently unloc
 ## Owner-authorized scoped Gateway touch-dwell correction — 2026-11-20
 
 The owner explicitly reopened only the direct-touch activation behavior in two approval stages. The authorized change requires a 500 ms dwell on the Gateway trigger; early pointer release or cancellation cancels opening, and synthetic click suppression remains. The one-time scope and evidence are recorded in [GATEWAY-TOUCH-DWELL-CHANGE-RECORD-2026-11-20.md](./GATEWAY-TOUCH-DWELL-CHANGE-RECORD-2026-11-20.md). This does not unlock any other Gateway behavior or adjacent subsystem. Re-lock remains active after this scoped correction.
+
+
+## Owner-reported multi-input Gateway dwell investigation — 2026-11-20
+
+A scoped candidate branch addresses physical mouse item dwell, touch drag/scroll hit-testing, and simulated-pointer/controller dwell activation while preserving click and keyboard confirmation. Scope, baseline, recovery ref, files and QA gates are recorded in [GATEWAY-MULTI-INPUT-DWELL-CHANGE-RECORD-2026-11-20.md](./GATEWAY-MULTI-INPUT-DWELL-CHANGE-RECORD-2026-11-20.md). Release gate: do not publish before exact-head MACHINE-PASS and BACKUP-VERIFIED. Once both are true for this owner-authorized, open, demo-eligible scope, publish the same candidate to the public experimental demo and start human QA without waiting for pre-test approval. Verify live URL/build identity and post-deploy smoke checks; collect human reports and owner decision on that deployed build. This demo-test release is not final ACCEPT or production promotion; those remain blocked until human QA and explicit owner acceptance.
