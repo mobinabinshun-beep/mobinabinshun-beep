@@ -46,6 +46,8 @@ test("Touch movement is tracked by pointer identity; dragging dwells on hit-test
   assert.match(gateway,/touchMoved=true/);
   assert.match(gateway,/if\(!wasMoved\)activate\(item\)/);
   assert.match(gateway,/if\(open&&touchMoved\)/);
+  assert.match(gateway,/pointermove",event=>\{\s*if\(!\["mouse","touch","pen"\]\.includes\(event\.pointerType\)\)return/);
+  assert.match(gateway,/if\(open&&touchMoved\)[\s\S]*?if\(!open\)return/);
   assert.match(gateway,/elementFromPoint\(event\.clientX,event\.clientY\)/);
   assert.match(gateway,/cancelDwellActivation\(\)/);
 });
