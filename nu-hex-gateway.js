@@ -265,7 +265,7 @@
     }
   });
   document.addEventListener("pointermove",event=>{
-    if(!open||!["mouse","touch","pen"].includes(event.pointerType))return;
+    if(!["mouse","touch","pen"].includes(event.pointerType))return;
     if(event.pointerType==="touch"&&touchPointerId!==null&&event.pointerId===touchPointerId){
       if(Math.hypot(event.clientX-touchStartX,event.clientY-touchStartY)>10){
         touchMoved=true;
@@ -278,6 +278,7 @@
         else if(dwellItem)cancelDwellActivation();
       }
     }
+    if(!open)return;
     const tolerance=10,rect=root.getBoundingClientRect();
     const orbit=window.matchMedia("(max-width: 600px)").matches?112:126;
     const inside=event.clientX>=rect.left-orbit-tolerance&&event.clientX<=rect.right+tolerance&&
