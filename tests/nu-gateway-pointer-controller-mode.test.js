@@ -3,6 +3,7 @@ const test=require("node:test");
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const gateway=fs.readFileSync("nu-hex-gateway.js","utf8");
+const gatewayCss=fs.readFileSync("nu-hex-gateway.css","utf8");
 
 test("Mouse entering the Gateway trigger opens it without requiring a click",()=>{
   assert.match(gateway,/trigger\.addEventListener\("pointerenter",event=>\{/);
