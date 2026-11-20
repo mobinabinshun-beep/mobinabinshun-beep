@@ -115,11 +115,11 @@
         setOpen(false,true,"simulated-pointer");
         return;
       }
-      scheduleDwellActivation(items[current+1],'simulated-controller');
+      scheduleDwellActivation(items[current+1],"simulated-controller");
       return;
     }
-    if(current<0){scheduleDwellActivation(items[0],'simulated-controller');return;}
-    if(current>0)scheduleDwellActivation(items[current-1],'simulated-controller');
+    if(current<0){scheduleDwellActivation(items[0],"simulated-controller");return;}
+    if(current>0)scheduleDwellActivation(items[current-1],"simulated-controller");
   }
   function cancelDwellActivation(){
     if(dwellTimer){clearTimeout(dwellTimer);dwellTimer=0;}
