@@ -10,7 +10,7 @@
   const trigger=root.querySelector(".nu-gateway-trigger");
   const items=[...root.querySelectorAll(".nu-gateway-item")];
   let open=false,selected=null,activationTimer=0,openTimer=0,outsideSince=0,suppressClickUntil=0;
-  let pendingItem=null,requiresSimulatedPointerExit=false,simulatedPointerOutside=false,dwellTimer=0,dwellItem=null;
+  let pendingItem=null,requiresSimulatedPointerExit=false,simulatedPointerOutside=false,dwellTimer=0,dwellItem=null,touchStartX=0,touchStartY=0,touchMoved=false;
 
   function syncGatewayScope(){
     const active=!!(gameView&&gameView.classList.contains("active"));
@@ -174,6 +174,7 @@
   trigger.addEventListener("pointerdown",event=>{
     if(event.pointerType!=="touch"||event.isPrimary===false)return;
     event.preventDefault();
+    touchStartX=event.clientX;touchStartY=event.clientY;touchMoved=false;
     suppressClickUntil=Date.now()+1000;
     scheduleOpen(500,"touch");
   });
@@ -205,10 +206,16 @@
       }
     });
     item.addEventListener("focus",()=>select(item));
+    item.addEventListener("pointerdown",event=>{
+      if(event.pointerType!=="touch"||!open)return;
+      touchStartX=event.clientX;touchStartY=event.clientY;touchMoved=false;
+      scheduleDwellActivation(item,"touch-hold");
+    });
     item.addEventListener("pointerup",event=>{
       if(event.pointerType!=="touch"||!open)return;
       event.preventDefault();event.stopPropagation();
-      suppressClickUntil=Date.now()+900;activate(item);
+      suppressClickUntil=Date.now()+900;
+      if(!touchMoved)activate(item);
     });
     item.addEventListener("click",event=>{
       event.preventDefault();event.stopPropagation();
