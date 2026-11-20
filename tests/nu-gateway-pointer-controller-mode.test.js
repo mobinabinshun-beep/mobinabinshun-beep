@@ -37,3 +37,24 @@ test("Gamepad simulated mouse is delegated to the shared launcher-core adapter",
   assert.match(pointer,/if\(input\.confirm&&!confirmDown\)\{if\(gatewayNavigation\)emit\("nu:gateway-confirm",\{\}\);else clickTarget\(\);\}/);
   assert.doesNotMatch(gateway,/function pollController\(/);
 });
+
+
+test("Touch movement is tracked by pointer identity; dragging dwells on hit-tested options instead of activating on release",()=>{
+  assert.match(gateway,/touchPointerId=null/);
+  assert.match(gateway,/touchPointerId=event\.pointerId/);
+  assert.match(gateway,/Math\.hypot\(event\.clientX-touchStartX,event\.clientY-touchStartY\)>10/);
+  assert.match(gateway,/touchMoved=true/);
+  assert.match(gateway,/if\(!wasMoved\)activate\(item\)/);
+  assert.match(gateway,/if\(open&&touchMoved\)/);
+  assert.match(gateway,/elementFromPoint\(event\.clientX,event\.clientY\)/);
+  assert.match(gateway,/cancelDwellActivation\(\)/);
+});
+
+test("Touch pointer cancellation clears pointer and dwell state",()=>{
+  assert.match(gateway,/pointercancel[\s\S]*?touchPointerId=null;touchMoved=false/);
+});
+
+test("Gateway trigger and options own touch gestures while active",()=>{
+  assert.match(gatewayCss,/nu-gateway-trigger[\s\S]*?touch-action:none/);
+  assert.match(gatewayCss,/nu-gateway-item[\s\S]*?touch-action:none/);
+});
