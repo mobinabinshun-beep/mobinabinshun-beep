@@ -39,3 +39,11 @@ Goal: offer dwell-to-open/activate as a fast alternative alongside existing clic
 - Public demo deployment: NOT PERFORMED.
 - Human report and approval: PENDING.
 - Final ACCEPT: NOT GRANTED. Keep this candidate isolated until CI passes and a demo build is published for owner testing.
+
+
+## Follow-up correction — 2026-11-21
+- Static audit confirmed the documented touch-drag path was incomplete: movement was never recorded, so release could activate the original option after a drag.
+- Corrected by tracking the active touch pointer ID, applying a 10 px movement threshold, cancelling trigger-open dwell after movement, hit-testing the current option during an open-Gateway drag, and suppressing release activation after movement.
+- Touch pointer-up/cancel now clears pointer state and pending dwell; stationary touch keeps the existing tap activation.
+- CSS now applies `touch-action: none` to the Gateway trigger and options, matching the approved candidate interaction contract.
+- Machine CI: NOT YET RUN for this follow-up. Browser/device QA and public demo remain pending; no merge or deployment authorized.
