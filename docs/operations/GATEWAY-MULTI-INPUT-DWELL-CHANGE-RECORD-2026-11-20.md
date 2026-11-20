@@ -47,3 +47,9 @@ Goal: offer dwell-to-open/activate as a fast alternative alongside existing clic
 - Touch pointer-up/cancel now clears pointer state and pending dwell; stationary touch keeps the existing tap activation.
 - CSS now applies `touch-action: none` to the Gateway trigger and options, matching the approved candidate interaction contract.
 - Machine CI: NOT YET RUN for this follow-up. Browser/device QA and public demo remain pending; no merge or deployment authorized.
+
+
+## CI diagnosis and test correction — 2026-11-21
+- First follow-up CI run exposed a test-fixture defect, not a Gateway runtime syntax error: the new touch-action assertion referenced `gatewayCss` without loading the CSS fixture.
+- Added the missing CSS fixture import to the pointer/controller regression test.
+- Exact-head CI rerun for the corrected test commit is queued; no PASS is claimed until all checks complete successfully.
