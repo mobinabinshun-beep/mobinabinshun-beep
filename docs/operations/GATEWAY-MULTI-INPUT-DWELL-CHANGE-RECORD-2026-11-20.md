@@ -35,10 +35,10 @@ Goal: offer dwell-to-open/activate as a fast alternative alongside existing clic
 
 ## QA / release gates
 - Machine CI (initial candidate): PASS on exact SHA `f8af8bfb60cf965a87476236ee388e80409f8f20` (8/8 checks).
-- Browser/device tests (mouse, touch, simulated controller): PENDING.
-- Public demo deployment: NOT PERFORMED.
+- Browser/device tests (mouse, touch, simulated controller): PENDING — human QA handoff is now open on the deployed demo.
+- Public demo deployment: VERIFIED SUCCESS — GitHub Pages run `44837990921`, deployed commit `aacb211c7282439bbca1cab256aa30859909951a`.
 - Human report and approval: PENDING.
-- Final ACCEPT: NOT GRANTED. Once CI passes on the exact candidate SHA and its backup is verified, publish it to the public experimental demo and start owner/human testing; do not wait for pre-test approval.
+- Final ACCEPT: NOT GRANTED. Candidate is published to the public experimental demo; human/device testing and owner approval are now pending.
 
 
 ## Follow-up correction — 2026-11-21
@@ -65,4 +65,16 @@ Goal: offer dwell-to-open/activate as a fast alternative alongside existing clic
 - Exact candidate CI: PASS, 8/8 checks on `f8af8bfb60cf965a87476236ee388e80409f8f20`.
 - Candidate backup ref: `backup/gateway-mouse-touch-controller-dwell-candidate-2026-11-21`, verified to point to the exact same SHA `f8af8bfb60cf965a87476236ee388e80409f8f20`.
 - The Gateway lock entry was aligned with the owner's corrected gate. That documentation change creates a successor head and therefore the exact-SHA CI and backup gates must be reverified for the final candidate before demo deployment.
-- Public experimental demo deployment: PENDING. Human/device QA: PENDING. Final ACCEPT: NOT GRANTED.
+- Public experimental demo deployment: VERIFIED SUCCESS. Human/device QA: PENDING. Final ACCEPT: NOT GRANTED.
+
+
+## Demo-test release execution — 2026-11-21
+- Final candidate SHA: `ec1473ec7e46c73058fe3357732ef71b1441dfd8`.
+- Exact-SHA machine validation: 8/8 checks PASS.
+- Candidate recovery ref: `backup/gateway-mouse-touch-controller-dwell-candidate-2026-11-21-final`; independently read back and verified to point to the exact candidate SHA.
+- PR #230 merged for the explicitly authorized public demo-test release: merge/deployment commit `aacb211c7282439bbca1cab256aa30859909951a`.
+- GitHub Pages build and deployment run: `44837990921`; build, report-build-status and deploy jobs all SUCCESS. Deployment log reports Pages deployment created for the exact merge SHA and the public environment URL below.
+- Public experimental demo: https://mobinabinshun-beep.github.io/mobinabinshun-beep/
+- Direct HTTP/browser content read-back was unavailable in this execution environment; the Pages deployment status and deployed SHA are verified from the official deployment job log. Record this limitation; do not claim a manual browser smoke test.
+- Human QA is now the active next stage: test physical mouse dwell, stationary touch, touch drag across options, scroll/cancel behavior, simulated mouse, directional controller dwell, click/keyboard fallback, and regression-free pause/resume. Record device/OS/browser, steps, expected/actual, evidence and report.
+- Human approval and Final ACCEPT: PENDING. No final production promotion is claimed.
