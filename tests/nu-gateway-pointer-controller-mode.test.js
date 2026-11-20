@@ -21,7 +21,7 @@ test("Touch must dwell for 500 ms and release/cancel before the threshold must n
 });
 
 test("Mouse hover activates a Gateway option directly and leaving cancels pending activation",()=>{
-  assert.match(gateway,/item\.addEventListener\("pointerenter",event=>\{\s*if\(event\.pointerType==="mouse"&&open\)select\(item\)/);
+  assert.match(gateway,/item\.addEventListener\("pointerenter",event=>\{\s*if\(event\.pointerType==="mouse"&&open\)scheduleDwellActivation\(item,"physical-mouse"\)/);
   assert.match(gateway,/item\.addEventListener\("pointerleave",event=>\{/);
   assert.match(gateway,/pendingItem===item/);
   assert.match(gateway,/scheduleDwellActivation\(item,"physical-mouse"\)/);
