@@ -1,0 +1,122 @@
+# N.U Native Runtime — Generation 1 foundation
+
+- Date: 2026-11-18
+- Status: IMPLEMENTED-CANDIDATE / PORTABLE-CI-PASSED / XP-CROSS-COMPILE-PASSED / XP-EXECUTION-UNVERIFIED / HUMAN-QA-PENDING
+- Branch: feat/nu-native-runtime-gen1-foundation
+- Scope: isolated native runtime foundation; no existing game, HUD, adaptive baseline or public demo changed.
+
+## Owner request operationalized
+
+Start a browser-independent, modular N.U execution substrate, prioritize low-capability hardware, preserve Generation 1 as the active line, and formalize the shared 250 MiB / 1 GiB disk / alternating CPU-GPU profile.
+
+## Existing constraints inspected
+
+- AGENTS.md: candidate branch required; do not touch locked classic LV/XP/Mana HUD; preserve newer Gateway/controller contract.
+- ENGINE-LOCK.md: nu-engine.js is a frozen baseline; no edits made.
+- NU-LAUNCHER-ARCHITECTURE.md and NU-LAUNCHER-MANIFEST.json: existing browser preview is not a native installer or enforceable resource controller.
+- Existing Generation 1 games remain browser modules; no game logic was rewritten in this candidate.
+
+## Implemented
+
+- native/nu_runtime.h and native/nu_runtime.c: portable C90 resource policy, scheduler admission, CRC32 package validation and NUVM/1 interpreter.
+- native/win32_host.c: minimal native Win32 GUI host, legacy API surface, package-open dialog, below-normal process priority.
+- native/tests/test_runtime.c: deterministic unit tests.
+- native/CMakeLists.txt and .github/workflows/nu-native-runtime.yml: portable build/test path.
+- native/README.md: architecture, binary format, resource model and limitations.
+
+## Initial profile
+
+- Shared working/RAM ceiling: min(50% physical RAM, 50% currently available RAM, 250 MiB).
+- Shared cache: split evenly between short-term and repeated-pattern cache; 125 MiB each at the full 250 MiB profile.
+- Disk package/cache ceiling: 1 GiB.
+- CPU work admission: one N.U cooperative slot per two scheduler slots.
+- GPU work admission: alternating N.U render admission; app-side renderer ceiling 640×480 / 30 FPS.
+- The scheduler is cooperative and does not claim a kernel-enforced 50% CPU/GPU quota.
+
+## NUVM/1 package contract
+
+16-byte header: magic NUVM, ABI major/minor, generation, flags, little-endian payload length, CRC32; followed by bounded bytecode. ABI major 1, Generation 1, flags zero. Bytecode executes only in the interpreter, with 8 registers, 4 KiB VM memory and instruction budget. CRC32 is corruption detection, not cryptographic authentication.
+
+## Explicitly not implemented
+
+- Playable NUVM ports of Bubble Hunt, Mana Collector and Chaos Attack.
+- Native XP binary build and actual Windows XP execution test.
+- Disk-backed FIFO/pattern cache I/O and atomic package installation.
+- Publisher signatures, SHA-256 trust chain, dependency resolver, permissions and rollback.
+- Real GPU telemetry or OS-level hard quotas.
+- Production installer, code signing and release artifacts.
+
+## Automated validation
+
+- Portable C90 build and unit tests: PASSED, 1/1 test, GitHub Actions run [44228203925](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44228203925).
+- 32-bit MinGW Win32 host cross-build with WINVER/_WIN32_WINNT 0x0501 and PE subsystem 5.01: PASSED in the same run.
+- A second run adds explicit PE subsystem inspection and artifact upload: [44228295525](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44228295525), pending at the time of this record update.
+- These checks prove source compilation and target metadata only; they do not prove the executable starts on a real Windows XP installation.
+
+## Recovery and release boundary
+
+All changes are isolated on the candidate branch. The default branch and public Pages deployment were not modified. Do not merge or publish this candidate as a playable launcher until the three game modules, package manager, XP toolchain compatibility, and human QA gates are completed.
+
+## Pull request
+
+Draft PR: [#195 — N.U native runtime Generation 1 foundation](https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/195). The PR remains draft because game ports, installer/package manager, cryptographic signing and actual XP execution are not complete.
+
+## Human QA checklist
+
+- [ ] Build on an actual 32-bit Windows XP SP3 environment or a verified XP VM.
+- [ ] Confirm application starts, opens/closes package dialog, and exits cleanly.
+- [ ] Test valid package, bad CRC, unsupported generation, malformed opcode and instruction exhaustion.
+- [ ] Confirm no module can exceed VM memory or instruction limits.
+- [ ] Verify real CPU/RAM use with OS tools; do not infer a strict percentage from scheduler counters.
+- [ ] Confirm existing Generation 1 browser games and public demo are unchanged.
+
+
+## Follow-up implementation — 2026-11-18
+
+- Added the Generation-1 neutral IR translator backend (IR instruction records → bounded NUVM/1 bytecode).
+- Added a disk-backed FIFO cache spool with per-record CRC32, 64 KiB maximum chunk, caller-owned read buffer, disk quota and deletion after the queue drains.
+- Added translator execution and cache FIFO/capacity/deletion regression tests.
+- Reworked the Win32 host to execute at most 64 VM instructions per admitted timer slice; the message loop remains responsive between slices.
+- Added the Generation-1 module/translator contract at native/NUVM-1-GENERATION-1-MODULE-CONTRACT.md.
+- Successful machine checks for the Win32 host + translator/cache candidate: [workflow run 44250986834](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44250986834). Portable C90 tests, static validation and XP-target cross-build passed. The PE artifact was uploaded as nu-launcher-win32-xp-candidate (43,667 bytes; 14-day retention at upload).
+- This artifact is a host/VM smoke-test candidate only. It is not a setup installer, contains no native ports of the three games and has not been executed on Windows XP.
+
+### Remaining release blockers
+
+- Digital publisher signature and trust-root/key rotation.
+- Manifest parser, dependency resolver, package staging/atomic activation/rollback.
+- Streaming cache integration into module loading and crash-recovery semantics.
+- Generation-specific game translators and native ports of Bubble Hunt, Mana Collector and Chaos Attack.
+- GPU renderer/adapter and actual resource allocation enforcement.
+- XP-compatible toolchain/import audit, actual XP boot/run test and old-hardware QA.
+- Signed installer, uninstall/repair and release packaging.
+
+## Follow-up implementation — manifest, cache safety and RAM budget (2026-11-18)
+
+This section supersedes older "not implemented" bullets above where noted; historical records remain intact.
+
+- Added `native/nu_manifest.h/.c`: strict fixed-order Generation-1 canonical manifest parser, bounded ASCII fields, package basename/path-traversal rejection, ABI/generation validation and digest/signature syntax checks.
+- Added `NU_ManifestVerifyProvider` boundary. Verification fails closed if no crypto provider exists, if the manifest is unsigned, or if package size does not match. No SHA-256 or asymmetric signature implementation is claimed.
+- Hardened `NU_CacheLoadAll`: preflight the complete record queue and destination capacity before consuming records. An undersized destination no longer drains a partial module.
+- Tightened NUVM validation to reject unsupported ABI minor versions.
+- Added `NU_BudgetReserve/NU_BudgetRelease` RAM reservation ledger. It rejects N.U reservations above the calibrated ceiling and has saturating release. It only accounts for allocations explicitly reserved through the API; every allocation path still needs integration.
+- Expanded tests for manifest acceptance/rejection, unsigned/provider-absent fail-closed behavior, ABI minor rejection, cache non-destructive preflight and RAM budget reservation/release.
+- Updated the unified engineering spec and `native/README.md`.
+
+### Latest automated validation
+
+At branch head `993d614568da9ee52c6121034650de5794b31fda`, [GitHub Actions run 44265242894](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44265242894) completed successfully:
+- `portable-core`: strict C90 configure, build and unit tests passed.
+- `win32-xp-api-cross-build`: Win32 host compile, PE subsystem 5.01 inspection and artifact upload passed.
+- Artifact: `nu-launcher-win32-xp-candidate`, artifact ID 14410420354, 43,804 bytes, retention through 2026-12-02.
+
+The build artifact is a native host/VM smoke-test executable, **not an installer and not a playable game launcher**. It has not been executed on actual Windows XP. The passing CI result proves compile/test and PE metadata only.
+
+### Remaining release blockers (current)
+
+- Actual SHA-256 calculation, production asymmetric signature verifier, trust roots, key rotation and revocation.
+- Dependency graph validation/resolution and transactional package install/update/rollback/recovery.
+- Integrate RAM reservation ledger into every module, cache and renderer allocation.
+- Native Bubble Hunt, Mana Collector and Chaos Attack ports, with save/wallet preservation tests.
+- Native renderer and measured per-platform resource telemetry/enforcement.
+- Signed setup/repair/uninstall, real XP execution and low-end hardware human QA.

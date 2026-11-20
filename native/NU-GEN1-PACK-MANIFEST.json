@@ -1,0 +1,49 @@
+{
+  "format": "NUPACK-MANIFEST/1",
+  "product": "N.U",
+  "pack_id": "nu.gen1.core-pack",
+  "generation": 1,
+  "install_policy": {
+    "default_enabled": true,
+    "user_may_uninstall": true,
+    "uninstall_requires_confirmation": true,
+    "preserve_user_saves": true,
+    "reinstall_supported": true
+  },
+  "entries": [
+    {
+      "id": "nu.gen1.bubble-hunt",
+      "title": "Bubble Hunt",
+      "kind": "game",
+      "default_enabled": true,
+      "source_binding": "pending",
+      "package_state": "not-yet-bound"
+    },
+    {
+      "id": "nu.gen1.mana-collector",
+      "title": "Mana Collector",
+      "kind": "game",
+      "default_enabled": true,
+      "source_binding": "pending",
+      "package_state": "not-yet-bound"
+    },
+    {
+      "id": "nu.gen1.chaos-attack",
+      "title": "Chaos Attack",
+      "kind": "game",
+      "default_enabled": true,
+      "source_binding": "pending",
+      "package_state": "not-yet-bound"
+    }
+  ],
+  "integrity": {
+    "algorithm": "SHA-256",
+    "signature_required_for_release": true,
+    "unsigned_development_packages_allowed": false
+  },
+  "notes": [
+    "This manifest registers the required first-run pack; it does not claim that game payloads are bundled.",
+    "A pack entry becomes installable only after its real source, assets, dependencies, hash and tests are bound.",
+    "Uninstalling a game must not silently delete its save/profile data."
+  ]
+}
