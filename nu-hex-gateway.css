@@ -3,7 +3,7 @@
 body.nu-game-active #nu-hex-gateway,body.nu-game-active .nu-gateway-scrim,body.nu-gateway-utility-active #nu-hex-gateway,body.nu-gateway-utility-active .nu-gateway-scrim{display:block}
 #nu-hex-gateway{position:fixed;z-index:var(--nu-layer-gateway,120);top:clamp(118px,17vh,154px);right:clamp(12px,2.4vw,28px);width:58px;height:58px;pointer-events:none;font-family:inherit}
 #nu-hex-gateway *{box-sizing:border-box}
-#nu-hex-gateway .nu-gateway-trigger{position:absolute;inset:0;z-index:3;display:grid;place-items:center;width:58px;height:58px;padding:0;border:0;background:transparent;color:#b8f2ff;cursor:pointer;pointer-events:auto;filter:drop-shadow(0 0 10px #51dfff66);transition:transform .22s ease,filter .22s ease;touch-action:manipulation}
+#nu-hex-gateway .nu-gateway-trigger{position:absolute;inset:0;z-index:3;display:grid;place-items:center;width:58px;height:58px;padding:0;border:0;background:transparent;color:#b8f2ff;cursor:pointer;pointer-events:auto;filter:drop-shadow(0 0 10px #51dfff66);transition:transform .22s ease,filter .22s ease;touch-action:none}
 #nu-hex-gateway .nu-gateway-trigger svg{width:100%;height:100%;overflow:visible}
 #nu-hex-gateway .nu-gateway-trigger .hex-core{fill:rgba(7,24,38,.78);stroke:#7ce8ff;stroke-width:1.6}
 #nu-hex-gateway .nu-gateway-trigger .hex-inner{fill:none;stroke:rgba(151,239,255,.42);stroke-width:.8}
