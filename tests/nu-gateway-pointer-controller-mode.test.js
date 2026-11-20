@@ -61,3 +61,9 @@ test("Gateway trigger and options own touch gestures while active",()=>{
   assert.match(gatewayCss,/nu-gateway-trigger[\s\S]*?touch-action:none/);
   assert.match(gatewayCss,/nu-gateway-item[\s\S]*?touch-action:none/);
 });
+
+
+test("Touch release outside an option and pointer cancellation clear stale gesture state",()=>{
+  assert.match(gateway,/document\.addEventListener\("pointerup",event=>\{[\s\S]*?touchPointerId=null;touchMoved=false/);
+  assert.match(gateway,/document\.addEventListener\("pointercancel",event=>\{[\s\S]*?cancelDwellActivation\(\);cancelScheduledOpen\(\)/);
+});
