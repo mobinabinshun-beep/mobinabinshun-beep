@@ -112,6 +112,7 @@ function renderGameAssetProfile(){
  }
  const visible=rows.filter(row=>Number.isFinite(Number(row.value))&&Number(row.value)>0);
  if(!visible.length){root.replaceChildren();root.hidden=true;return;}
+ root.hidden=false;
  root.innerHTML='<div class="game-asset-rows">'+visible.map(row=>'<span>'+row.label+' '+row.value+row.unit+'</span>').join("")+'</div>';
 }
 function setAssetProfileExpanded(value){
