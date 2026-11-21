@@ -295,4 +295,4 @@ A test that only checks source strings or dispatches synthetic custom events is 
 
 ### 12.7 Current implementation status
 
-This amendment records the owner's required behavior only. It does not claim that the current runtime implements it, that CI has passed it, that the live demo has been updated, or that human QA has passed. Any implementation must be a separately scoped successor candidate, with exact-head tests, verified backup, demo deployment and human QA under the repository lifecycle.
+This amendment records the owner's required behavior only. It does not claim that the current runtime implements it, that CI has passed it, that the live demo has been updated, or that human QA has passed. Any implementation must be a separately scoped successor candidate, with exact-head tests, verified backup, demo deployment and human QA under the repository lifecycle. Change record: [GATEWAY-VIRTUAL-MOUSE-BOUNDARY-AMENDMENT-2026-11-21.md](./GATEWAY-VIRTUAL-MOUSE-BOUNDARY-AMENDMENT-2026-11-21.md).
