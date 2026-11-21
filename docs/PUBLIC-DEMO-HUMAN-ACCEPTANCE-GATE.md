@@ -6,7 +6,7 @@
 
 ## Purpose
 
-The public demo is the required surface for human QA. Machine verification and a recoverable backup authorize the assistant to deploy a candidate to the public demo; human approval is collected after deployment and testing, not before it.
+The public demo is the required surface for human QA. Machine verification and a recoverable backup authorize the assistant to deploy a clearly labelled QA-only candidate to the demo; this is not a product release. Human approval is collected after deployment and testing, not before it.
 
 ## Required sequence
 
@@ -23,12 +23,12 @@ The public demo is the required surface for human QA. Machine verification and a
 
 ## Authority and boundaries
 
-- **Machine PASS + verified backup = authorization to deploy to the public demo.**
+- **Machine PASS + verified exact-candidate backup + required runtime-baseline capture = authorization to deploy a QA-only candidate to the public demo.**
 - Machine checks do not constitute human acceptance and must never be represented as visual/device/human QA.
-- Public demo deployment is not production promotion and does not itself lock a feature.
+- Public demo deployment is not product publication, production promotion, launch, or release and does not itself lock or accept a feature.
 - No branch preview, PR page, local build or screenshot substitutes for the public demo.
 - A candidate may be live on the public demo while human QA is pending.
-- Do not promote beyond the demo or perform an additional release/promotion action without explicit owner approval where required.
+- Do not perform any beyond-demo product release, production promotion, stable-version publication, package/store release or public launch unless the owner has first accepted the human QA result for that exact demo build/scope and then gives a separate, direct, unambiguous instruction naming the release action. Human PASS, CI, merge, demo deployment or silence is not authorization.
 - Preserve all existing feature locks. This document changes the release order only; it does not unlock feature scopes.
 - If deployment cannot be completed through the configured public-demo mechanism, report the exact technical blocker. Do not claim deployment or ask the owner to test a non-public preview.
 
@@ -58,3 +58,15 @@ Human approval may cover one item, one section or a whole pack. Record the exact
 - Human QA state: pending until a human report is supplied.
 - Owner approval/rejection: recorded only from explicit owner decision.
 - Lock state: recorded per accepted scope, never inferred from deployment or CI.
+
+
+## Owner amendment — QA demo is not a product release (2026-11-21)
+
+The project owner's latest direct instruction controls over any older wording that conflates demo delivery with publishing/release:
+
+- The public demo is a **human-test environment only**. Deploying a TEST CANDIDATE there is a QA handoff, not a product release, production publication, launch, promotion, or announcement.
+- The execution assistant may prepare and place an already-authorized, machine-passed candidate on the designated demo solely to enable human testing, following the required runtime-baseline capture, exact-candidate backup, deployment and live-build verification gates.
+- The candidate must be visibly labelled **TEST CANDIDATE — NOT HUMAN-APPROVED**, with its exact build/commit identity and known limitations. Keep the change isolated to the demo candidate; do not imply owner acceptance.
+- **No product release, production promotion, stable-version publication, package/store release, public launch announcement, or other beyond-demo publication may occur unless BOTH conditions are met:** (1) the owner has reviewed and explicitly accepted the human QA results for the exact demo build/scope; and (2) the owner then gives a separate, direct, unambiguous instruction authorizing that named release/promotion action.
+- Human QA PASS, owner acceptance of the demo, green CI, merge, a backup, a demo deployment, or silence is never by itself permission to release or promote. If no separate release instruction exists, remain at the demo QA stage.
+- Do not repeatedly frame the absence of a release as a pending assistant decision. The assistant's current task is the authorized work and QA handoff; release is outside the active workflow unless the owner later directs it.
