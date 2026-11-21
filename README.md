@@ -579,3 +579,9 @@ The public Generation 1 demo is the mandatory shared surface for real human test
 ## Documentation
 
 - [Project documentation hub](docs/README.md) — canonical guides, operations, audits, tests and feature records.
+
+
+## Pixel Art Studio 2D — operational checklist
+
+- [Operational checklist & machine verification](docs/operations/PIXEL-ART-STUDIO-2D-OPERATIONAL-CHECKLIST.md) — current-version comparison, test matrix, CI evidence, export and device QA gates.
+- [Canonical requirements archive](https://github.com/mobinabinshun-beep/Repository/blob/main/Operations/2026-11-21/PIXEL-ART-STUDIO-2D-TOOLS-UNIFIED-CHECKLIST-fa.md) · [Deferred work / resume point](https://github.com/mobinabinshun-beep/Repository/blob/main/Operations/2026-11-21/DEFERRED-WORK-PIXEL-ART-STUDIO-2D-TOOLS-fa.md) · [Scope Issue #62](https://github.com/mobinabinshun-beep/Repository/issues/62) · [Candidate PR #238](https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/238).
