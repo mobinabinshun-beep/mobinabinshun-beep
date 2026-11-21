@@ -251,6 +251,18 @@ test("Touch can open Gateway, lift the opening finger, then tap an option separa
  assert.equal(h.body.classList.contains("nu-gateway-open"),false);
 });
 
+test("A short touch tap opens Gateway immediately on release, then allows a separate option tap",()=>{
+ const h=makeGatewayHarness();
+ h.trigger.handlers.get("pointerdown")[0]({pointerType:"touch",isPrimary:true,pointerId:17,clientX:120,clientY:120,preventDefault(){}});
+ h.trigger.handlers.get("pointerup")[0]({pointerType:"touch",isPrimary:true,pointerId:17,preventDefault(){},stopPropagation(){}});
+ assert.equal(h.body.classList.contains("nu-gateway-open"),true);
+ h.items[1].handlers.get("pointerdown")[0]({pointerType:"touch",pointerId:18,clientX:120,clientY:220});
+ h.items[1].handlers.get("pointerup")[0]({pointerType:"touch",pointerId:18,preventDefault(){},stopPropagation(){}});
+ h.advance(120);
+ assert.equal(h.menuOpen.clicked,1);
+ assert.equal(h.body.classList.contains("nu-gateway-open"),false);
+});
+
 test("A fresh outside touch after lifting the opening finger closes Gateway",()=>{
  const h=makeGatewayHarness();
  h.trigger.handlers.get("pointerdown")[0]({pointerType:"touch",isPrimary:true,pointerId:7,clientX:120,clientY:120,preventDefault(){}});
