@@ -217,3 +217,82 @@ The shared translator architecture and debug retention rules are normative in [I
 - Focused regression test: `tests/nu-interaction-core.test.js`.
 - Gateway workflow now includes core syntax and focused test execution.
 - The first implementation provides independent translator declarations, normalized event observation and a bounded JSON debug export. Full object-level producer instrumentation and runtime/CI execution remain pending; this amendment does not claim machine approval or human acceptance.
+
+
+## 12. Binding owner amendment — Gateway and virtual mouse are independent (2026-11-21)
+
+**Authority:** explicit owner instruction dated 2026-11-21.  
+**Precedence:** This amendment supersedes any conflicting earlier wording in sections 4–6 and 8–9 that makes the simulated mouse move through, own, or navigate Gateway options. Earlier implementation records remain historical evidence; they are not permission to preserve the conflicting behavior.  
+**Scope:** Gateway input behavior and the activation boundary of the existing shared virtual-mouse adapter. This is a contract correction, not authorization for runtime changes in this documentation change.
+
+### 12.1 Hard ownership boundary
+
+- The simulated/virtual mouse is a controller-to-pointer translator for gameplay screens and games that require pointer/mouse interaction. It is not a Gateway controller and must not be repurposed as one.
+- Enable/use the virtual mouse only while the user is in a game screen whose gameplay requires mouse interaction. Do not activate it globally, on ordinary pages, or merely because Gateway exists.
+- Gateway must not start, stop, enable, disable, reposition, reset, or otherwise take ownership of the virtual-mouse adapter.
+- The virtual mouse may enter the Gateway trigger zone to open Gateway. Once Gateway opens, the virtual pointer stays at its gameplay position and is frozen there; it does not travel over Gateway options or become a Gateway cursor.
+- Gateway directional option navigation is a separate selective-action path. It consumes controller Up/Down and confirm/cancel input without moving the virtual pointer.
+- Keep direct physical mouse, direct touch, selective Gateway actions, and simulated mouse as separate translators. Do not merge their state machines or infer one source from another.
+
+### 12.2 Touch, physical mouse and Gateway opening
+
+- While the active game interaction surface is in use, prevent page scrolling caused by touch; preserve direct touch delivery to the game and Gateway. Do not change the protected canvas routing or touch-action rules as an incidental part of Gateway work.
+- Touch contact in the Gateway trigger zone opens Gateway. After it opens, the user may lift their finger and then selectively tap any Gateway option.
+- Physical mouse movement into the Gateway trigger zone opens Gateway. While it is open, moving the physical pointer over an option activates that option directly; a physical click remains an additional direct activation path.
+- Preserve the currently owner-approved trigger dwell/cancellation thresholds and synthetic-click suppression. Do not silently invent, remove, or alter timing thresholds as part of this ownership correction.
+- Gateway opening must dispatch its pause/freeze event before its options become visible or actionable.
+
+### 12.3 Gateway option behavior by input source
+
+**Direct touch**
+- After opening, the finger may be lifted; options remain available for separate, selective taps.
+- A tap on an option selects/activates that option once. Do not require the opening touch to remain held.
+- If the same touch remains down and moves out of the combined Gateway trigger/options interaction zone without entering an option, close Gateway.
+- Alternatively, the user may lift the finger and tap outside the Gateway trigger/options interaction zone; close Gateway.
+- Both exit paths leave gameplay and ambient rendering frozen. The game waits for the first fresh gameplay interaction before continuing.
+
+**Physical mouse**
+- Moving the pointer out of the Gateway trigger/options interaction zone closes Gateway; gameplay remains frozen pending the first fresh gameplay interaction.
+- Clicking/selecting outside that interaction zone also closes Gateway with the same frozen-until-next-input behavior.
+- Pointer movement over an option activates it directly; click remains available. Do not require a separate selection stage for physical mouse hover activation.
+
+**Simulated/virtual mouse (controller)**
+- On entry to Gateway, leave the virtual pointer at its current game-space position and freeze its coordinates. Do not route its cursor, hit-test target, pointermove, or mousemove across Gateway options.
+- Gateway options are traversed through the controller's separate Up/Down selection controls. Each discrete press advances exactly one option (selective/step mode).
+- A sustained Up/Down hold repeats traversal continuously through options (continuous/hold mode). Repetition must be deterministic and must not create accidental duplicate confirms.
+- Selection/highlight and confirmation/activation remain distinct: directional traversal selects; the existing confirm action activates the selected option. Do not turn pointer movement into a click.
+- Moving Down past the final option closes Gateway without selecting an extra item. This exit works both by repeated one-step presses and by continuous hold through the options.
+- After Gateway closes, keep gameplay frozen until the first fresh gameplay-space interaction. A direction/confirm input held through closure must not count as that fresh interaction.
+
+### 12.4 Return-to-game invariant
+
+Every Gateway exit path above returns to the same game context and preserves its state. Closing Gateway is not itself a gameplay input and must not resume the round. The game and ambient renderers remain frozen until the first new, intentional interaction in the gameplay area. Existing pause ownership and held-input safeguards remain in force.
+
+### 12.5 Explicit non-goals and forbidden cross-effects
+
+- Do not change the virtual mouse's in-game movement, pointer hit-testing, target highlight, pointer/mouse event delivery, confirm behavior, activation, or per-game availability while implementing Gateway behavior.
+- Do not let Gateway consume the virtual pointer's movement events or move the virtual cursor into the Gateway DOM.
+- Do not let the virtual mouse own Gateway option navigation, trigger a global pointer mode, or become active on non-game screens.
+- Do not alter game rules, object interaction, HUD, economy, Wallet, save data, page navigation outside Gateway, or unrelated input translators.
+- Do not change the approved touch/canvas routing selectors or cache keys unless a separate explicit owner instruction names that exact gameplay-input scope.
+
+### 12.6 Required regression matrix before any runtime implementation
+
+1. Virtual mouse is enabled only on a mouse-required game screen; it is not enabled on unrelated pages.
+2. In gameplay, controller directions move the virtual pointer and highlight targets; separate confirm activates the target.
+3. Entering the Gateway trigger opens it without transferring virtual-pointer ownership to Gateway.
+4. While Gateway is open, the virtual pointer remains at the exact game-space coordinates and emits no movement across Gateway options.
+5. Gateway Up/Down one-press mode advances one option per press; held mode repeats through options without duplicate activation.
+6. Down beyond the last option closes Gateway without selecting another item.
+7. Touch opens Gateway; the opening finger can be lifted; each later option tap works selectively.
+8. A continuing touch that exits the Gateway interaction zone closes Gateway; a later outside tap also closes it.
+9. Physical mouse movement over options activates them; leaving the interaction zone or clicking outside closes Gateway.
+10. Every exit leaves the game frozen until a fresh gameplay-area input; held controller input cannot resume it.
+11. Page scrolling is prevented for the active game touch surface without breaking direct touch gameplay.
+12. All three input sources remain independent; no Gateway test is allowed to require virtual-pointer movement through Gateway options.
+
+A test that only checks source strings or dispatches synthetic custom events is insufficient for runtime behavior. Include behavior-level tests for pointer coordinates, event delivery, one-step/held navigation, touch exit, mouse exit, and fresh-input resume.
+
+### 12.7 Current implementation status
+
+This amendment records the owner's required behavior only. It does not claim that the current runtime implements it, that CI has passed it, that the live demo has been updated, or that human QA has passed. Any implementation must be a separately scoped successor candidate, with exact-head tests, verified backup, demo deployment and human QA under the repository lifecycle.
