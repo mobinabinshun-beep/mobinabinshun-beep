@@ -16,7 +16,7 @@
 3. **Implement in isolation:** use the existing authorized working line by default and avoid a new branch for every defect. Create a dedicated candidate branch only when a protected lock, parallel release, destructive risk, security boundary or explicit owner direction materially requires isolation. A direct owner instruction may authorize the existing default/development line for that exact scope only.
 4. **Machine test and debug:** run focused tests, syntax/build checks and relevant regression workflows. Fix failures before continuing. Record exact test names, environment and outcomes.
 5. **PRE-RELEASE backup:** after the candidate passes required checks and before deploy, create or reuse a recoverable checkpoint for the exact candidate SHA and verify its ref and restoration path. This is separate from the PRE-CHANGE BASELINE created before editing; never report one as the other.
-6. **Publish a human-test candidate:** once machine checks and PRE-RELEASE backup are verified, deploy the exact candidate to the designated public demo/preview. Display the visible label **TEST CANDIDATE — NOT HUMAN-APPROVED** together with its version/full commit SHA and known limitations. If the public demo cannot safely host an isolated candidate, use a controlled preview and do not imply the stable demo contains the change. **No additional human pre-approval is required** for changes already authorized and within an unlocked scope.
+6. **Deploy a QA-only candidate to the human-test demo:** once machine checks and PRE-RELEASE backup are verified, deploy the exact candidate to the designated public demo QA surface. Display the visible label **TEST CANDIDATE — NOT HUMAN-APPROVED** together with its version/full commit SHA and known limitations. If the public demo cannot safely host an isolated candidate, use a controlled preview and do not imply the stable demo contains the change. **No additional human pre-approval is required** for changes already authorized and within an unlocked scope.
 7. **Verify and report:** check the public URL and actual build/commit identity. If the platform does not provide sufficient evidence, mark deployment UNVERIFIED; source merge alone is not proof of live deployment.
 8. **Human QA:** give the owner and invited testers the demo/preview link, exact scope/build SHA, test steps, expected outcomes, known limitations and rollback reference. Each report must identify the candidate SHA/URL, test date, device/OS/browser/version, viewport/orientation, input method, scenario, expected and actual result, PASS/FAIL/BLOCKED outcome, and reproducible evidence where possible. Never collect credentials or unnecessary personal data.
 9. **Accept and lock:** only an explicit owner acceptance creates a lock. The lock applies only to the named item, section or pack and the exact accepted scope/build.
@@ -38,6 +38,19 @@ A documentation-only clarification that does not alter product behavior is recor
 - Reopening one item does not unlock adjacent components or dependencies.
 - If a requested edit to an unlocked item requires changing a locked dependency, stop before changing that dependency. Explain the relationship and impact, present three practical options with trade-offs, recommend the best option against the project specifications and wait for the owner's direction.
 - After the authorized correction, repeat the full release sequence and seek human acceptance again.
+
+
+
+## Owner amendment — QA demo is not a product release (2026-11-21)
+
+The project owner's latest direct instruction controls over any older wording that conflates demo delivery with publishing/release:
+
+- The public demo is a **human-test environment only**. Deploying a TEST CANDIDATE there is a QA handoff, not a product release, production publication, launch, promotion, or announcement.
+- The execution assistant may prepare and place an already-authorized, machine-passed candidate on the designated demo solely to enable human testing, following the required runtime-baseline capture, exact-candidate backup, deployment and live-build verification gates.
+- The candidate must be visibly labelled **TEST CANDIDATE — NOT HUMAN-APPROVED**, with its exact build/commit identity and known limitations. Keep the change isolated to the demo candidate; do not imply owner acceptance.
+- **No product release, production promotion, stable-version publication, package/store release, public launch announcement, or other beyond-demo publication may occur unless BOTH conditions are met:** (1) the owner has reviewed and explicitly accepted the human QA results for the exact demo build/scope; and (2) the owner then gives a separate, direct, unambiguous instruction authorizing that named release/promotion action.
+- Human QA PASS, owner acceptance of the demo, green CI, merge, a backup, a demo deployment, or silence is never by itself permission to release or promote. If no separate release instruction exists, remain at the demo QA stage.
+- Do not repeatedly frame the absence of a release as a pending assistant decision. The assistant's current task is the authorized work and QA handoff; release is outside the active workflow unless the owner later directs it.
 
 ## Actions that still require explicit authorization
 Do not infer permission to expand scope, change a protected dependency, reopen a lock, make destructive/irreversible data changes, weaken security/privacy, incur costs, expose secrets, or take unrelated external actions. The no-preapproval rule applies only to implementation and demo deployment already covered by an explicit owner request and an unlocked scope.
