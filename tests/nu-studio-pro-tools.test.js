@@ -39,3 +39,23 @@ test("layer blend modes and masks are applied without mutating source",()=>{
  assert.equal(P.blendPixel("#000000","#ffffff","screen"),"#ffffff");
  assert.deepEqual(P.applyMask(["#ff0000","#00ff00"],[1,0]),["#ff0000",null]);
 });
+
+test("selection inversion complements inside and outside masks without mutating input",()=>{
+ const original=Uint8Array.from([1,0,1,0]),outside=P.invertSelection(original);
+ assert.deepEqual([...outside],[0,1,0,1]);assert.deepEqual([...original],[1,0,1,0]);
+});
+test("free rotation preserves an unselected layer region and returns a tight rotated mask",()=>{
+ const pixels=["#ff0000",null,null,null,null,null,null,null,null],mask=Uint8Array.from([1,0,0,0,0,0,0,0,0]);
+ const rotated=P.rotatePixels(pixels,3,3,90,mask);
+ assert.equal(rotated.pixels.length,9);assert.equal(rotated.pixels.filter(Boolean).length,1);
+ assert.equal(rotated.selection.reduce((a,b)=>a+b,0),1);
+ assert.equal(pixels[0],"#ff0000");
+});
+test("rotation geometry maps a point around its center independently of artwork storage",()=>{
+ const p=P.rotatePoint({x:2,y:1},{x:1,y:1},90);
+ assert.ok(Math.abs(p.x-1)<1e-9);assert.ok(Math.abs(p.y-2)<1e-9);
+});
+test("rotation rejects invalid angles and mismatched selection dimensions",()=>{
+ assert.throws(()=>P.rotatePoint({x:0,y:0},{x:0,y:0},NaN),/finite/);
+ assert.throws(()=>P.rotatePixels([null],1,1,45,new Uint8Array(2)),/selection/);
+});
