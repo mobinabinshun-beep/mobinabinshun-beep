@@ -104,3 +104,11 @@ test("ICO export is wired to both the main and advanced export panels",()=>{
  assert.match(js,/id="adv-ico"/);
  assert.match(html,/nu-ico-export\.js/);
 });
+
+test("selection clipping also constrains clear, replace, chroma key, image overlay and text",()=>{
+ assert.match(js,/pixels=pixels\.map\(\(c,i\)=>c===old&&\(!adv\.selection\|\|adv\.selection\[i\]\)\?n:c\)/);
+ assert.match(js,/pixels=pixels\.map\(\(c,i\)=>!adv\.selection\|\|adv\.selection\[i\]\?null:c\)/);
+ assert.match(js,/\(!adv\.selection\|\|adv\.selection\[i\]\)&&dist\(c,key\)<=t\?null:c/);
+ assert.match(js,/d\[i\*4\+3\]>20&&\(!adv\.selection\|\|adv\.selection\[i\]\)/);
+ assert.match(js,/d\[i\*4\+3\]>128&&\(!adv\.selection\|\|adv\.selection\[i\]\)/);
+});
