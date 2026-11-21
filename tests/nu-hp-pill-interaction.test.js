@@ -53,7 +53,8 @@ test("HP HUD shows a zero-count capsule only when purchase is affordable and kee
   assert.ok(games.includes('pill.classList.toggle("is-purchasable",state.save.hp<10&&empty&&affordable)'));
   assert.ok(games.includes("0 HP CAPSULES · BUY FOR 10 XP IN STORE"));
   assert.ok(games.includes("0 HP CAPSULES · EARN 10 XP TO UNLOCK"));
-  assert.doesNotMatch(games,/value:0,unit:""\}\)/);\n  assert.match(games,/gameAssetRows\(state\.save,state\.game\)\.filter\(row=>Number\(row\.value\)>0\)/);
+  assert.doesNotMatch(games,/value:0,unit:""\}\)/);
+  assert.match(games,/gameAssetRows\(state\.save,state\.game\)\.filter\(row=>Number\(row\.value\)>0\)/);
   assert.ok(css.includes(".hp-pill-use.is-purchasable{"));
   assert.ok(css.includes("#game-view.active .hp-bar #hp-pill-use.unavailable{"));
 });
