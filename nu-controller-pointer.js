@@ -49,7 +49,7 @@
   }
   function emit(name,detail){if(doc&&typeof win.CustomEvent==="function")win.dispatchEvent(new win.CustomEvent(name,{detail}));}
   function movePointer(dx,dy,source){
-   if(!enabled||gatewayNavigation||gatewayBlockedUntilNeutral)return false;
+   if(!enabled||gatewayBlockedUntilNeutral)return false;
    dx=Math.sign(Number(dx)||0);dy=Math.sign(Number(dy)||0);
    if(!dx&&!dy)return false;
    const nextX=Math.max(1,Math.min(win.innerWidth-1,x+dx*step));
@@ -105,7 +105,7 @@
     const input=direction(pad);
     if(gatewayBlockedUntilNeutral){if(!input.dx&&!input.dy){gatewayBlockedUntilNeutral=false;lastMove=time;}}
     else if((input.dx||input.dy)&&time-lastMove>=repeat){
-     if(gatewayNavigation)emit("nu:gateway-direction",{x:input.dx,y:input.dy});
+     if(gatewayNavigation)movePointer(input.dx,input.dy,"gamepad-gateway");
      else movePointer(input.dx,input.dy,"gamepad");
      lastMove=time;
     }
