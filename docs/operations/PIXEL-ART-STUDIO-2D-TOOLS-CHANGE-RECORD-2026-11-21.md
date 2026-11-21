@@ -138,3 +138,14 @@ Human QA has not yet been performed. Required areas include fading brush, select
 ### Authority boundary
 
 This candidate is for **demo-only human QA**, not product release. The owner has explicitly directed that no release, production promotion, stable publication, package/store release or launch may occur unless the owner first accepts human QA for the exact demo build/scope and then issues a separate direct instruction naming the specific release action. No such release instruction is part of this task.
+
+
+### Final workflow revision verification
+
+- Final branch/workflow revision: `4b817ed5b8fc1b9aff3f79db94588a7a8acfc06d` (the application/test source remains the exact code candidate `6db7811e2481756f93f8225613c88d281f071714`; this revision adds the docs-path trigger so QA handoff changes also run CI).
+- Pixel Art Studio PR run **44903671261** PASS; push run **44903667233** PASS — **48/48 tests, 0 failed, 0 skipped**.
+- Studio export PR run **44903671292** PASS.
+- Arcane Shield/Mana PR run **44903671265** PASS.
+- Graphics preview PR run **44903671284** PASS.
+- Gateway main-game PR run **44903671277** PASS.
+- Candidate backup `backup/pre-public-demo-pixel-art-studio-candidate-2026-11-21-r4` remains identical to the application/test source SHA `6db7811e2481756f93f8225613c88d281f071714`; final branch state receives a separate exact-ref backup before demo merge.
