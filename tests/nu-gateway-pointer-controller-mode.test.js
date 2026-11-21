@@ -25,7 +25,6 @@ test("Mouse hover activates a Gateway option directly and leaving cancels pendin
   assert.match(gateway,/item\.addEventListener\("pointerenter",event=>\{\s*if\(event\.pointerType==="mouse"&&open\)activate\(item\)/);
   assert.match(gateway,/item\.addEventListener\("pointerleave",event=>\{/);
   assert.match(gateway,/pendingItem===item/);
-  assert.match(gateway,/scheduleDwellActivation\(item,"physical-mouse"\)/);
   assert.match(gateway,/select\(items\[current\+1\]\)/);
   assert.match(gateway,/pointerenter",event=>\{\s*if\(event\.pointerType==="mouse"&&open\)activate\(item\)/);
 });
@@ -40,20 +39,18 @@ test("Gamepad simulated mouse is delegated to the shared launcher-core adapter",
 });
 
 
-test("Touch movement is tracked by pointer identity; dragging dwells on hit-tested options instead of activating on release",()=>{
+test("Touch movement is tracked by pointer identity; taps activate on release and outside movement closes Gateway",()=>{
   assert.match(gateway,/touchPointerId=null/);
   assert.match(gateway,/touchPointerId=event\.pointerId/);
   assert.match(gateway,/Math\.hypot\(event\.clientX-touchStartX,event\.clientY-touchStartY\)>10/);
   assert.match(gateway,/touchMoved=true/);
   assert.match(gateway,/if\(!wasMoved\)activate\(item\)/);
-  assert.match(gateway,/if\(open&&touchMoved\)/);
   assert.match(gateway,/pointermove",event=>\{\s*if\(!\["mouse","touch","pen"\]\.includes\(event\.pointerType\)\)return/);
-  assert.match(gateway,/if\(open&&touchMoved\)[\s\S]*?if\(!open\)return/);
-  assert.match(gateway,/elementFromPoint\(event\.clientX,event\.clientY\)/);
-  assert.match(gateway,/cancelDwellActivation\(\)/);
+  assert.doesNotMatch(gateway,/elementFromPoint/);
+  assert.doesNotMatch(gateway,/cancelDwellActivation|scheduleDwellActivation/);
 });
 
-test("Touch pointer cancellation clears pointer and dwell state",()=>{
+test("Touch pointer cancellation clears stale pointer and open timers",()=>{
   assert.match(gateway,/pointercancel[\s\S]*?touchPointerId=null;touchMoved=false;cancelScheduledOpen\(\)/);
 });
 
