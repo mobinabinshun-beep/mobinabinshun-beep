@@ -45,10 +45,14 @@
 - Reload is not a Gateway action and never runs automatically on page entry unless a future explicit module-specific owner directive says otherwise.
 - Gateway Exit = Back = Home = the main/home page; do not silently restore an unrelated nested-history destination.
 - Direct physical mouse and direct touch remain direct input. Stepwise cursor movement through controller buttons is simulated mouse, irrespective of cursor artwork.
-- Simulated mouse outside Gateway: four directions move the virtual pointer and only highlight targets; separate confirm clicks. The shared adapter starts when a gamepad is connected.
-- Simulated mouse inside Gateway: vertical directions navigate the ordered Gateway options; a further Down after the final option closes Gateway without selecting anything. A/Enter confirms the highlighted option; B/Escape remains a cancel path.
-- Direct physical mouse and touch enter Gateway after a 500 ms dwell; simulated-pointer entry uses 1000 ms. Opening dispatches the pause event before options become visible/actionable.
-- After directional exit, the virtual pointer remains at the Gateway trigger. It must leave the trigger hit-zone and re-enter before Gateway can open again.
+- Simulated mouse is a gameplay-only controller translator, enabled only on game screens/games that require mouse interaction. It is not a Gateway controller and must not be globally enabled or activated on unrelated pages.
+- In gameplay, controller directions move the virtual pointer and highlight targets; separate confirm activates. Preserve this behavior independently of Gateway.
+- Gateway must never enable/disable, move, reset, or take ownership of the virtual mouse. The virtual pointer may enter the Gateway trigger to open it; once Gateway opens, it stays at its exact game-space position and is frozen. It never moves over Gateway options.
+- Gateway Up/Down option traversal is a separate selective-action path: one discrete press advances one option; sustained hold repeats continuously. Direction selects/highlights; separate confirm activates. Down beyond the final option exits without selecting another item.
+- Direct touch and physical mouse remain independent Gateway inputs. Touch can open Gateway, be lifted, and later tap options selectively; physical mouse movement over options activates directly, with click also available. Touch/mouse exit outside the Gateway interaction zone closes Gateway.
+- Preserve currently owner-approved trigger dwell/cancellation thresholds and synthetic-click suppression; do not invent or silently alter timing. Opening dispatches pause before options become actionable.
+- Touch scrolling is disabled on the active game interaction surface without breaking direct touch delivery or the protected canvas routing.
+- Every Gateway exit keeps gameplay frozen until the first fresh gameplay-area interaction; held controller input cannot resume it. Full normative scenarios and regression matrix: [Gateway & simulated-mouse contract, section 12](./docs/operations/GATEWAY-AND-CONTROLLER-INPUT-CONTRACT-2026-11-17.md#12-binding-owner-amendment--gateway-and-virtual-mouse-are-independent-2026-11-21).
 - Implement controller input as a shared launcher-core adapter. Gateway and future modules consume the adapter; do not fork controller-specific logic per page.
 - Keep adapters extensible for future controller types through stable interfaces and documented capability references.
 
