@@ -74,3 +74,50 @@ On the public demo, verify:
 6. Every exit keeps gameplay frozen until the first fresh gameplay-space input; held controller input does not release the pause.
 
 **Acceptance:** HUMAN-QA-PENDING. No final ACCEPT or owner approval is claimed. The merge to the Pages source is a trial publication only; do not treat it as a human QA pass.
+
+
+## 2026-11-21 follow-up — historical behavior composition and deferred human QA
+
+**Follow-up candidate:** `fix/gateway-touch-tap-multisource-2026-11-21`  
+**Initial implementation commit:** `97f6370711830f59a0cbda68c71c0afb61eb11b5`  
+**Latest candidate commit after cache-bust and regression guards:** `032298e4bdea7a67136dbb3eceb189df7e154974`  
+**Recovery ref:** `backup/gateway-touch-tap-multisource-candidate-2026-11-21` — created at the latest candidate SHA and compared identical (0 ahead / 0 behind).  
+**PR:** [#235](https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/235) — open; not merged.  
+**Machine checks:** 8/8 relevant GitHub Actions runs succeeded on exact candidate SHA `032298e4bdea7a67136dbb3eceb189df7e154974`: Gateway, Arcane Shield/Mana, Wallet/Profile, HUD, Exchange, Graphics Integrity, Graphics Preview and Studio Export.  
+**Deployment:** not performed for this follow-up candidate.  
+**Human QA:** DEFERRED / PENDING.
+
+### Historical comparison and chosen composition
+
+- Historical commit `d48039d06039385fcb5c837f0f28cc0a2d13e54e` contained the touch pointer-up path that opened Gateway on a short deliberate tap. This is the useful behavior restored here.
+- Historical dwell implementation `aacb211c7282439bbca1cab256aa30859909951a` supplied the 500 ms stationary touch dwell, 500 ms physical-mouse trigger hover, and 1000 ms simulated-pointer trigger dwell. The hold path is retained; the short touch tap is no longer discarded.
+- Independent-pointer candidate `062a3594496cd4047ad942c2bd78c6f469008677` supplied the separation boundary: virtual pointer belongs to active gameplay only, remains frozen at its game-space location while Gateway is open, and controller direction selects without activating; confirm remains separate.
+- These are composed as a forward correction, not a wholesale rollback to any historical commit.
+
+### Exact behavior now represented in candidate source
+
+1. Direct touch on the Gateway trigger: a stationary hold can open after 500 ms; a deliberate pointer-up before that threshold now opens immediately. Releasing after the hold already opened does not toggle-close the Gateway.
+2. Physical mouse: trigger hover opens after 500 ms; while Gateway is open, hovering an actionable option invokes its action. Direct click remains available.
+3. Simulated mouse: trigger entry opens after 1000 ms through the `nu:simulated-pointer-target` event; Gateway navigation remains a separate direction/confirm path. The virtual pointer is not moved by Gateway navigation.
+4. Gateway option touch: opening touch may be lifted; a later, separate touch on an option activates it.
+5. JavaScript asset query version changed on index, launcher, casino and studio pages to `20261121-touch-tap-r2`, with a test guard against stale versions.
+
+### Important unresolved verification
+
+- The candidate source and automated workflows are verified, but PR #235 is not merged and this follow-up is not published to the public demo.
+- The current deployed build identity is still not independently verified.
+- The exact live behavior of touch, physical mouse and simulated mouse has not been observed on the public demo or owner devices.
+- Therefore do not mark the scenario as operationally accepted. The prior owner report that it did not work remains open and authoritative.
+
+### Deferred agenda — resume from this exact point
+
+- [ ] Merge/deploy PR #235 only after reviewing its exact candidate and CI evidence; publish to the public experimental demo for human QA, not final acceptance.
+- [ ] Verify live build identity and loaded Gateway script query version `20261121-touch-tap-r2`.
+- [ ] Human QA: touch tap opens; touch hold opens; lift then separately tap a Gateway option; outside-zone touch exit and resume-on-fresh-input.
+- [ ] Human QA: physical mouse hover opens; option hover activates; click remains functional; exit by leaving/clicking outside.
+- [ ] Human QA: virtual pointer enters trigger and opens after 1000 ms; stays frozen at exact game-space position while open; Up/Down selects only; hold repeats; confirm activates; Down beyond last item exits without activation; leave/re-enter gating works.
+- [ ] Confirm all three input methods leave gameplay paused until a fresh gameplay-space input; no held input leaks through closure.
+- [ ] Record each scenario separately as PASS/FAIL with device, browser, page/game, exact deployed SHA, expected/actual result and evidence. Any failure reopens only the affected scope for a successor candidate.
+- [ ] Only after owner human approval may the operational evaluation report ACCEPT. CI success alone is not human acceptance.
+
+**Resume pointer:** start with PR #235, candidate SHA `032298e4bdea7a67136dbb3eceb189df7e154974`, backup ref above, and this deferred agenda. Do not restart the investigation or overwrite prior human reports.
