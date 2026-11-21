@@ -200,3 +200,21 @@ Known limitations:
 7. Hand the exact deployed build to human QA only after the applicable machine and runtime gates pass.
 
 No code change, deployment, PR merge, or human acceptance is authorized merely by this checklist.
+
+
+## Owner addendum — Mobile touch UX and cross-page Gateway audit (2026-11-21)
+
+Requirements and source-level inventory are documented in:
+[PIXEL-ART-STUDIO-MOBILE-TOUCH-UX-AND-GATEWAY-AUDIT-2026-11-21.md](./PIXEL-ART-STUDIO-MOBILE-TOUCH-UX-AND-GATEWAY-AUDIT-2026-11-21.md).
+
+This addendum adds the following required scope before implementation:
+- Full-viewport mobile workspace, with canvas as the dominant usable surface and safe-area/visual-viewport handling.
+- Compact collapsible edge rails and categorized tool drawers; quiet recognizable icons, accessible names and active-tool indication.
+- A circular single-axis viewport rotation dial with zoom-in/out, zoom percentage and reset; viewport transforms must never mutate artwork pixels.
+- Portrait, landscape-left and landscape-right support, with control placement aligned to the physical bottom edge and no forced OS orientation lock.
+- Separate selected-artwork rotation with preview/cancel/commit, outside-selection pixel preservation and exact Undo/Redo.
+- Gateway touch/route audit on every intended page, including short tap, hold, multi-touch, orientation changes, safe areas, route correctness and desktop/controller regressions.
+
+Initial root HTML inventory: shared Gateway assets are present in index.html, launcher.html, casino.html and pixel-art-studio.html; absent in 404.html, background-candidates.html and exchange.html. All four Gateway-enabled pages declare a viewport meta tag. This is static source inspection only, not mobile browser/device verification. Nested pages and iframes remain to be inventoried.
+
+**Status: DOCUMENTED / IMPLEMENTATION NOT STARTED.** No executable source was changed in this documentation step. Before coding, recheck locks, baseline and backup; implement on an isolated branch; run automated and physical-device QA; deliver only a demo QA candidate.
