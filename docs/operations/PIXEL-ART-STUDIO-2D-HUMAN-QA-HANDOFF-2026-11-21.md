@@ -74,3 +74,10 @@ For each finding include: candidate build SHA shown on the page / final Pages bu
 ## Authority boundary
 
 This is a **demo-only QA handoff**. It is not product release, production promotion, stable publication or a public launch. Even after human QA and owner acceptance of this exact demo build, any action beyond the demo requires a separate, direct and unambiguous owner instruction naming that action.
+
+
+## Owner clarification — Fading and Brush are separate tools (2026-11-21)
+
+The owner clarified that the intended tools are **Fading (محوکن)** and **Brush (قلم ترکیب و قاطی کردن رنگ‌ها)**. They are independent tools, not one combined Fading Brush. See [the separate tool requirements and continuation record](./PIXEL-ART-STUDIO-FADING-AND-COLOR-MIXING-BRUSH-SPEC-2026-11-21.md).
+
+The current candidate audit found a Fading Brush path but did not find a separate user-facing color-mixing Brush. Existing 48/48 machine evidence does not cover that missing Brush feature. The clarified requirement is recorded as an implementation gap; a docs/regression workflow PASS must not be represented as feature-complete approval. Human QA for the distinct two-tool behavior remains pending until the Brush implementation and its exact-SHA machine tests exist. The next session must resume from the requirements document, implement the missing Brush separately, rerun machine gates, and then collect written human reports.
