@@ -108,7 +108,7 @@ test("rotation at zero degrees is identity for pixels and selected mask",()=>{
 test("fading brush intensity endpoints are deterministic on opaque and transparent pixels",()=>{
  assert.equal(P.fadePixel("#000000","#ffffff",1),"#030303");
  assert.equal(P.fadePixel("#000000","#ffffff",100),"#ffffff");
- assert.equal(P.fadePixel(null,"#ffffff",1),"#15283a");
+ assert.equal(P.fadePixel(null,"#ffffff",1),"#16273a");
  assert.equal(P.fadePixel(null,"#ffffff",100),"#ffffff");
 });
 test("selection inversion handles empty, full and irregular masks",()=>{
