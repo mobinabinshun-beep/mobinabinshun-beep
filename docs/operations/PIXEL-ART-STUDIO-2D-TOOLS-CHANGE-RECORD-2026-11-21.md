@@ -6,7 +6,7 @@
 **Draft PR:** [#238](https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/238)  
 **Baseline:** `e1428c2501901975cc3410159bb89216b9459922`  
 **Initial machine-tested candidate:** `5933090148a20bfe4f12d8e1a0d8896381ac4da4`  
-**Verified implementation head:** `921088f1381d8a419be305aa69f692dc3a6a2789`  
+**Verified implementation head:** `c1dde9c2fe76e350a0c4e88263865d6623a9d759`  
 **Runtime snapshot:** `NOT CAPTURED`
 
 ## Scope authorized for this candidate
@@ -42,7 +42,7 @@ At candidate SHA `5933090148a20bfe4f12d8e1a0d8896381ac4da4`, these Actions runs 
 - Graphics preview smoke checks — run `44883360087`
 - Arcane Shield and Mana regression — run `44883360027`
 
-Initial candidate checks passed at `5933090148a20bfe4f12d8e1a0d8896381ac4da4`. The expanded implementation first exposed an incorrect test expectation for an unselected pixel overwritten by a selected rotation; the assertion was corrected to verify an untouched pixel outside the transformed destination. At code head `dc3c37567c53df3899d677f8069dde15fe1ebaf9`, all four workflows passed. A follow-up hardening commit `921088f1381d8a419be305aa69f692dc3a6a2789` additionally cancels in-progress paint/selection gestures when a two-touch viewport gesture begins and normalizes angle wraparound. All five runs for that head passed: Pixel Art Studio machine checks (PR run `44894397168`, push run `44894393259`), Studio export regressions (PR run `44894397217`, push run `44894393349`), graphics preview smoke checks (run `44894397206`), and Arcane Shield/Mana regression (run `44894397185`).
+Initial candidate checks passed at `5933090148a20bfe4f12d8e1a0d8896381ac4da4`. The expanded implementation first exposed an incorrect test expectation for an unselected pixel overwritten by a selected rotation; the assertion was corrected to verify an untouched pixel outside the transformed destination. At code head `dc3c37567c53df3899d677f8069dde15fe1ebaf9`, all four workflows passed. A follow-up hardening commit `921088f1381d8a419be305aa69f692dc3a6a2789` additionally cancels in-progress paint/selection gestures when a two-touch viewport gesture begins and normalizes angle wraparound. All five runs for that head passed. The follow-on selection-clipping patch applies selection consistently to clear, color replacement, chroma-key removal, image overlays and rasterized text, with a dedicated regression assertion. Ruler tick marks and diagonal angular axes were refined. At exact code head `c1dde9c2fe76e350a0c4e88263865d6623a9d759`, all six runs passed: Pixel Art Studio machine checks (PR run `44894499113`, push run `44894494454`), Studio export regressions (PR run `44894499121`, push run `44894494465`), graphics preview smoke checks (run `44894499123`), and Arcane Shield/Mana regression (run `44894499062`).
 
 ## Outstanding work
 
@@ -59,4 +59,4 @@ The current candidate contains first-pass integration for fading brush, free lay
 
 ## Status
 
-**DOCUMENTED / FIRST-PASS IMPLEMENTATION — MACHINE PASS at `921088f1381d8a419be305aa69f692dc3a6a2789`; NOT COMPLETE; HUMAN QA NOT READY; DEPLOYMENT BLOCKED.**
+**DOCUMENTED / FIRST-PASS IMPLEMENTATION — MACHINE PASS at `c1dde9c2fe76e350a0c4e88263865d6623a9d759`; NOT COMPLETE; HUMAN QA NOT READY; DEPLOYMENT BLOCKED.**
