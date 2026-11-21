@@ -82,7 +82,7 @@ const indexHtml=fs.readFileSync("index.html","utf8");
 test("active game canvas receives physical pointer and touch input",()=>{
  assert.ok(worldCss.includes("#game-view.active .game-stage{pointer-events:auto}"));
  assert.ok(worldCss.includes("#game-view.active .game-stage canvas{pointer-events:auto;touch-action:none}"));
- assert.ok(indexHtml.includes("nu-world.css?v=20261119-gameplay-input-r3"));
+ assert.ok(indexHtml.includes("nu-world.css?v=20261121-asset-profile-hover-only-r1"));
 });
 
 
