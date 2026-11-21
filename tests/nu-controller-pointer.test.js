@@ -35,7 +35,7 @@ test("D-pad and stick directions move the virtual pointer without activating tar
  assert.match(pointer,/y\+dy\*step/);
  assert.match(pointer,/updateTarget\(\)/);
  assert.match(pointer,/lastMove=time/);
- assert.match(pointer,/gatewayNavigation\)emit\("nu:gateway-direction"/);
+ assert.match(pointer,/emit\("nu:gateway-direction"/);
  assert.match(pointer,/if\(\(input\.dx\|\|input\.dy\)&&time-lastMove>=repeat\)/);
  assert.doesNotMatch(pointer,/if\(\(input\.dx\|\|input\.dy\)[^}]*clickTarget/);
 });
@@ -45,7 +45,7 @@ test("Keyboard-emulated click-controller arrows are captured by the shared point
  assert.match(pointer,/keyboard-click-controller/);
  assert.match(pointer,/addEventListener\("keydown",onKeyboardInput,true\)/);
  assert.match(pointer,/if\(event\.key==="Enter"\|\|event\.key===" "\|\|event\.key==="NumpadEnter"\)/);
- assert.match(pointer,/gatewayNavigation\)return/);
+ assert.match(pointer,/isGatewayOpen\(\)\|\|!isGameplayPointerScreen\(\)/);
 });
 test("Click-controller directions have an explicit path to move the simulated pointer",()=>{
  assert.match(pointer,/function movePointer\(dx,dy,source\)/);
@@ -57,21 +57,21 @@ test("Click-controller directions have an explicit path to move the simulated po
  assert.match(pointer,/emit\("nu:simulated-pointer-move"/);
 });
 test("A held Down used to exit Gateway cannot move the virtual pointer away from the trigger",()=>{
- assert.match(pointer,/if\(gatewayBlockedUntilNeutral\)\{if\(!input\.dx&&!input\.dy\)/);
- assert.match(pointer,/gatewayBlockedUntilNeutral=!!\(current\.dx\|\|current\.dy\)/);
- assert.match(pointer,/gatewayNavigation=true;const current=direction\(event\.gamepad\)/);
- assert.ok(gateway.includes("setGatewayNavigation(false)"));
+ assert.match(pointer,/if\(gatewayBlockedUntilNeutral\)\{[\s\S]*?isNeutral\(input\)/);
+ assert.match(pointer,/gatewayBlockedUntilNeutral=!isNeutral\(input\)/);
+ assert.match(pointer,/if\(gatewayOpen!==gatewayWasOpen\)/);
+ assert.doesNotMatch(gateway,/NUControllerPointer/);
 });
 test("Confirm is a separate click; B remains Gateway cancel",()=>{
  assert.match(pointer,/if\(!primed\)/);
- assert.match(pointer,/if\(input\.confirm&&!confirmDown\)\{if\(gatewayNavigation\)emit\("nu:gateway-confirm",\{\}\);else clickTarget\(\);\}/);
+ assert.match(pointer,/if\(input\.confirm&&!confirmDown\)emit\("nu:gateway-confirm",\{\}\)/);
  assert.match(pointer,/if\(input\.cancel&&!cancelDown\).*key:"Escape"/);
  assert.match(pointer,/new win\.MouseEvent\("click"/);
 });
 
 test("Gateway delegates simulated pointer ownership to the shared adapter",()=>{
- assert.match(gateway,/NUControllerPointer\?\.setEnabled\(true\)/);
- assert.match(gateway,/NUControllerPointer\?\.setGatewayNavigation\(true\)/);
+ assert.doesNotMatch(gateway,/NUControllerPointer/);
+ assert.match(pointer,/gameplayOnly:true/);
  assert.ok(gateway.includes("setGatewayNavigation(false)"));
  assert.doesNotMatch(gateway,/window\.addEventListener\("gamepadconnected",startController\)/);
 });
