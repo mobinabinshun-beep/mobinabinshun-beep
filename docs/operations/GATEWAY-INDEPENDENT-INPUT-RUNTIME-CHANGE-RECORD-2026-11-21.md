@@ -36,6 +36,7 @@
 - `casino.html`
 - `pixel-art-studio.html`
 - `tests/nu-controller-pointer.test.js`
+- `tests/nu-controller-pointer-runtime.test.js`
 - `tests/nu-gateway-controller-input.test.js`
 - `tests/nu-gateway-pointer-controller-mode.test.js`
 - This change record.
@@ -48,7 +49,7 @@ No HUD, game rules, game-object interaction code, Wallet/economy/save data, CSS,
 - Exact virtual-pointer coordinates remain unchanged while Gateway is open.
 - No pointermove/mousemove delivery over Gateway; separate controller direction events continue.
 - One-press and held-repeat Gateway direction; separate confirm edge; no duplicate confirm.
-- Held input through Gateway closure is blocked until neutral and a fresh press; fresh gameplay movement is emitted only after that transition.
+- Held gamepad and keyboard input through Gateway closure is blocked (including suppressing held keyboard repeats from reaching the game resume handler) until neutral and a fresh press; fresh gameplay movement is emitted only after that transition.
 - Gateway direction selects one item without activation; separate confirm activates; Down past the last item exits without selecting/activating another.
 - Physical mouse hover activation and mouse-outside exit.
 - Touch open → lift → separate option tap; continuing touch outside exit; lifted-finger outside tap exit.
