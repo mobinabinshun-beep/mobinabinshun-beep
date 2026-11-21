@@ -57,7 +57,7 @@ test("game asset profile follows transient touch, physical mouse and simulated m
 test("game asset profile is floating text and never renders zero-valued assets", () => {
   assert.match(games, /gameAssetRows\(state\.save,state\.game\)\.filter\(row=>Number\(row\.value\)>0\)/);
   assert.match(games, /root\.hidden=false;\s*root\.innerHTML=/);
-  assert.match(games, /if\(Number\(state\.save\.xp\)>0\)rows\.unshift\(\{key:"level",label:"LV"/);
+  assert.match(games, /if\(Number\(state\.save\.xp\)>0\)\{[\s\S]*?rows\.unshift\(\{key:"xp",label:"XP"/);\n  assert.match(games, /rows\.unshift\(\{key:"level",label:"LV"/);
   assert.doesNotMatch(games, /value:0,unit:""\}\)/);
   assert.doesNotMatch(games, /SHARED WALLET|GAME-SCOPED VIEW|ASSET PROFILE/);
   assert.match(css, /#game-asset-profile\{[^}]*background:transparent/);
