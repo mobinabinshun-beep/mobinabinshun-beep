@@ -60,7 +60,7 @@ The tests are behavior-level Node harnesses for the pointer adapter and Gateway 
 - A recovery branch was created before runtime edits from the last-known deployed runtime source: `backup/pre-gateway-independent-input-runtime-2026-11-21`.
 - GitHub compare verified that recovery ref is identical to `aacb211c7282439bbca1cab256aa30859909951a` (0 ahead / 0 behind).
 - The prior deployment record identifies Pages run `44837990921` for that source commit. The public URL could not be independently fetched in this session (web cache miss), so the current live build and a decomposed browser-observed runtime snapshot remain **UNVERIFIED**. The source recovery point is verified; this record does not claim a complete live-runtime snapshot, live smoke test, or deployment verification.
-- The exact-SHA machine-passed candidate checkpoint is now created and verified. The next release action is a trial publish to the public experimental demo, solely to begin human QA; it is not final production acceptance. Human acceptance remains pending the owner’s retest.
+- The exact-SHA machine-passed candidate checkpoint was created and verified. **Trial merge/deploy source update:** PR #234 was squash-merged to the default Pages source on 2026-11-21 as commit `9e902456469e3b939cb16ba6b35245bf10f38751`. This is a trial publish for human QA only, not final production acceptance. A post-merge recovery ref `backup/gateway-independent-input-trial-merge-2026-11-21` is verified identical to that merge commit (0 ahead / 0 behind). The Pages build/deploy run for this new commit and the live demo content could not be independently retrieved in this session; therefore **LIVE-DEPLOYMENT-VERIFICATION remains UNVERIFIED**. Human acceptance remains pending the owner’s retest.
 
 ## Required human QA
 
@@ -72,4 +72,4 @@ On the public demo, verify:
 5. Physical mouse hover activates an option; leaving/clicking outside closes Gateway.
 6. Every exit keeps gameplay frozen until the first fresh gameplay-space input; held controller input does not release the pause.
 
-**Acceptance:** HUMAN-QA-PENDING. No final ACCEPT or owner approval is claimed.
+**Acceptance:** HUMAN-QA-PENDING. No final ACCEPT or owner approval is claimed. The merge to the Pages source is a trial publication only; do not treat it as a human QA pass.
