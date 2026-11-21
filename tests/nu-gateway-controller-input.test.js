@@ -2,6 +2,7 @@
 const test=require("node:test");
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const vm=require("node:vm");
 const html=fs.readFileSync("index.html","utf8");
 const gateway=fs.readFileSync("nu-hex-gateway.js","utf8");
 const gatewayCss=fs.readFileSync("nu-hex-gateway.css","utf8");
@@ -135,4 +136,102 @@ test("Hidden tabs freeze gameplay while the shared pointer adapter remains the o
  assert.match(gateway,/window\.addEventListener\("blur"/);
  assert.match(gateway,/setGatewayNavigation\(false\)/);
  assert.match(pointer,/function tick\(time\)/);
+});
+
+
+function makeGatewayHarness(){
+ let now=0,nextTimer=1;
+ const timers=new Map(),windowListeners=new Map(),documentListeners=new Map(),events=[];
+ const makeClassList=()=>{const values=new Set();return {contains:name=>values.has(name),add:name=>values.add(name),remove:name=>values.delete(name),toggle(name,force){if(force===undefined)force=!values.has(name);force?values.add(name):values.delete(name);return force;}};};
+ const listeners=()=>({addEventListener(type,fn){if(!this.listeners.has(type))this.listeners.set(type,[]);this.listeners.get(type).push(fn);},listeners:new Map()});
+ const makeElement=(action)=>{const el={dataset:{action},classList:makeClassList(),style:{setProperty(){}},tabIndex:-1,attributes:{},handlers:new Map(),addEventListener(type,fn){if(!this.handlers.has(type))this.handlers.set(type,[]);this.handlers.get(type).push(fn);},setAttribute(name,value){this.attributes[name]=value;},focus(){document.activeElement=this;},click(){this.clicked=(this.clicked||0)+1;for(const fn of this.handlers.get("click")||[])fn({preventDefault(){},stopPropagation(){},detail:0});},getBoundingClientRect(){return {left:100,top:100,right:160,bottom:160};}};return el;};
+ const trigger=makeElement("trigger"),items=["back","menu","profile"].map(makeElement),scrim=makeElement("scrim"),root=makeElement("root");
+ root.querySelector=()=>trigger;root.querySelectorAll=()=>items;
+ const gameView={classList:makeClassList()};gameView.classList.add("active");
+ const backHome=makeElement("back-home"),menuOpen=makeElement("menu-open");
+ const body={classList:makeClassList()};
+ const document={body,activeElement:trigger,handlers:documentListeners,
+  getElementById(id){return id==="nu-hex-gateway"?root:id==="game-view"?gameView:id==="back-home"?backHome:id==="menu-open"?menuOpen:null;},
+  querySelector(selector){return selector===".nu-gateway-scrim"?scrim:null;},
+  addEventListener(type,fn){if(!documentListeners.has(type))documentListeners.set(type,[]);documentListeners.get(type).push(fn);}
+ };
+ const window={document,innerWidth:1200,location:{search:"",href:""},handlers:windowListeners,
+  matchMedia(){return {matches:false};},
+  addEventListener(type,fn){if(!windowListeners.has(type))windowListeners.set(type,[]);windowListeners.get(type).push(fn);},
+  dispatchEvent(event){events.push(event.type);for(const fn of windowListeners.get(event.type)||[])fn(event);return true;},
+  setTimeout(fn,delay){const id=nextTimer++;timers.set(id,{at:now+delay,fn});return id;},
+  clearTimeout(id){timers.delete(id);},
+  MutationObserver:class{observe(){}disconnect(){}}
+ };
+ function advance(ms){now+=ms;let ran=true;while(ran){ran=false;const due=[...timers.entries()].filter(([,timer])=>timer.at<=now).sort((a,b)=>a[1].at-b[1].at);if(due.length){const [id,timer]=due[0];timers.delete(id);timer.fn();ran=true;}}}
+ function dispatchWindow(type,detail={}){window.dispatchEvent({type,detail});}
+ function dispatchDocument(type,event){for(const fn of documentListeners.get(type)||[])fn(event);}
+ const EventClass=class{constructor(type){this.type=type;}};
+ vm.runInNewContext(gateway,{window,document,Event:EventClass,URLSearchParams,performance:{now:()=>now},Date,Math,Map,Set,Array,String,Number,Boolean,clearTimeout:id=>window.clearTimeout(id),setTimeout:(fn,delay)=>window.setTimeout(fn,delay)});
+ return {window,document,body,trigger,items,scrim,backHome,menuOpen,events,advance,dispatchWindow,dispatchDocument};
+}
+
+test("Gateway controller directions select one option per event; only separate confirm activates",()=>{
+ const h=makeGatewayHarness();
+ h.trigger.handlers.get("pointerenter")[0]({pointerType:"mouse"});
+ h.advance(500);
+ assert.equal(h.body.classList.contains("nu-gateway-open"),true);
+ h.dispatchWindow("nu:gateway-direction",{x:0,y:1});
+ assert.equal(h.items[0].classList.contains("is-selected"),true);
+ assert.equal(h.menuOpen.clicked||0,0);
+ h.dispatchWindow("nu:gateway-direction",{x:0,y:1});
+ assert.equal(h.items[0].classList.contains("is-selected"),false);
+ assert.equal(h.items[1].classList.contains("is-selected"),true);
+ assert.equal(h.menuOpen.clicked||0,0);
+ h.dispatchWindow("nu:gateway-confirm",{});
+ h.advance(120);
+ assert.equal(h.menuOpen.clicked,1);
+ assert.equal(h.body.classList.contains("nu-gateway-open"),false);
+});
+
+test("Down beyond the final Gateway option exits without activating any option",()=>{
+ const h=makeGatewayHarness();
+ h.trigger.handlers.get("pointerenter")[0]({pointerType:"mouse"});
+ h.advance(500);
+ h.dispatchWindow("nu:gateway-direction",{x:0,y:1});
+ h.dispatchWindow("nu:gateway-direction",{x:0,y:1});
+ h.dispatchWindow("nu:gateway-direction",{x:0,y:1});
+ assert.equal(h.items[2].classList.contains("is-selected"),true);
+ h.dispatchWindow("nu:gateway-direction",{x:0,y:1});
+ assert.equal(h.body.classList.contains("nu-gateway-open"),false);
+ assert.equal(h.backHome.clicked||0,0);
+ assert.equal(h.menuOpen.clicked||0,0);
+ assert.ok(h.events.includes("nu:gateway-close"));
+});
+
+test("Physical mouse hover activates an option directly without a click",()=>{
+ const h=makeGatewayHarness();
+ h.trigger.handlers.get("pointerenter")[0]({pointerType:"mouse"});
+ h.advance(500);
+ h.items[1].handlers.get("pointerenter")[0]({pointerType:"mouse"});
+ h.advance(120);
+ assert.equal(h.menuOpen.clicked,1);
+});
+
+test("A continuing touch leaving the Gateway interaction zone closes it and keeps the return hold",()=>{
+ const h=makeGatewayHarness();
+ h.trigger.handlers.get("pointerdown")[0]({pointerType:"touch",isPrimary:true,pointerId:7,clientX:120,clientY:120,preventDefault(){}});
+ h.advance(500);
+ assert.equal(h.body.classList.contains("nu-gateway-open"),true);
+ h.dispatchDocument("pointermove",{pointerType:"touch",pointerId:7,clientX:500,clientY:500});
+ h.advance(111);
+ h.dispatchDocument("pointermove",{pointerType:"touch",pointerId:7,clientX:500,clientY:500});
+ assert.equal(h.body.classList.contains("nu-gateway-open"),false);
+ assert.ok(h.events.includes("nu:gateway-close"));
+});
+
+test("Physical mouse leaving the Gateway interaction zone closes it",()=>{
+ const h=makeGatewayHarness();
+ h.trigger.handlers.get("pointerenter")[0]({pointerType:"mouse"});
+ h.advance(500);
+ h.dispatchDocument("pointermove",{pointerType:"mouse",clientX:500,clientY:500});
+ h.advance(111);
+ h.dispatchDocument("pointermove",{pointerType:"mouse",clientX:500,clientY:500});
+ assert.equal(h.body.classList.contains("nu-gateway-open"),false);
+ assert.ok(h.events.includes("nu:gateway-close"));
 });
