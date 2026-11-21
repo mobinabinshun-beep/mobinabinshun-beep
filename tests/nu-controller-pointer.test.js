@@ -45,7 +45,7 @@ test("Keyboard-emulated click-controller arrows are captured by the shared point
  assert.match(pointer,/function onKeyboardInput\(event\)/);
  assert.match(pointer,/keyboard-click-controller/);
  assert.match(pointer,/addEventListener\("keydown",onKeyboardInput,true\)/);
- assert.match(pointer,/if\(event\.key==="Enter"\|\|event\.key===" "\|\|event\.key==="NumpadEnter"\)/);
+ assert.match(pointer,/isConfirm=event\.key==="Enter"\|\|event\.key===" "\|\|event\.key==="NumpadEnter"/);
  assert.match(pointer,/if\(isGatewayOpen\(\)\)\{keyboardBlockedUntilNeutral=true;return;\}/);
  assert.match(pointer,/if\(!isGameplayPointerScreen\(\)\|\|keyboardBlockedUntilNeutral\)return/);
 });
@@ -151,6 +151,7 @@ test("Gateway freezes virtual-pointer coordinates and event delivery while separ
 test("A controller input held through Gateway closure cannot move the pointer until neutral and a fresh press",()=>{
  const h=makePointerHarness(true);
  h.pointer.startClickController();
+ h.targetEvents.length=0;
  h.doc.body.classList.add("nu-gateway-open");
  h.pad.buttons[13].pressed=true;
  h.frame(16);
