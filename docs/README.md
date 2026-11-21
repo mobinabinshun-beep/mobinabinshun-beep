@@ -102,3 +102,10 @@ A test file or a successful static check is not the same as browser QA or owner 
 - There are multiple dated QA and implementation records. They are intentionally retained as history, but their current validity must be checked against the canonical contracts and current code.
 - Some subjects have multiple revisioned documents (for example visual bible and QA generations). This index groups them but does not claim that every historical revision is current.
 - This pass establishes navigation and document roles; it does **not** rewrite every historical document or certify every claim against a live browser/device run.
+
+
+## Pixel Art Studio 2D — operational verification
+
+- [Operational checklist & machine verification](operations/PIXEL-ART-STUDIO-2D-OPERATIONAL-CHECKLIST.md) — version identity, baseline comparison, machine-test matrix, historical regression gates, runtime/device QA and deferred scope.
+- [Canonical detailed requirements and archive checklist](https://github.com/mobinabinshun-beep/Repository/blob/main/Operations/2026-11-21/PIXEL-ART-STUDIO-2D-TOOLS-UNIFIED-CHECKLIST-fa.md) — requirements source of truth in the private archive.
+- [Deferred work / resume point](https://github.com/mobinabinshun-beep/Repository/blob/main/Operations/2026-11-21/DEFERRED-WORK-PIXEL-ART-STUDIO-2D-TOOLS-fa.md) — owner scope, locks and restart instructions.
