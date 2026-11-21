@@ -1,0 +1,1690 @@
+{
+  "snapshot_id": "NU-PUBLIC-DEMO-20261121T121811Z-f9b42ac",
+  "source_commit": "f9b42ac092304ec2fce8978427af9b13070e59c8",
+  "git_tree_sha": "f9b42ac092304ec2fce8978427af9b13070e59c8",
+  "tracked_blob_count": 280,
+  "truncated": false,
+  "blob_sha_algorithm": "Git object SHA-1 as returned by GitHub tree API; not a SHA-256 checksum",
+  "files": [
+    {
+      "path": ".github/ISSUE_TEMPLATE/launcher-human-test.yml",
+      "git_blob_sha": "d44fef1d6db8257c10dc444ef7d4d803eb627d48",
+      "size_bytes": 2446,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/mana-material-human-test.yml",
+      "git_blob_sha": "7daa5a83496665ebeb4e264e7cac5a70a9e94e67",
+      "size_bytes": 2071,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/studio-human-test.yml",
+      "git_blob_sha": "81c1ce9045b891e94bad564da485d349e3c17622",
+      "size_bytes": 3921,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/arcane-shield-regression.yml",
+      "git_blob_sha": "eded99c692f3c75f639601b7c913ee4d096cbe2e",
+      "size_bytes": 1425,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/exchange-feature-tests.yml",
+      "git_blob_sha": "2c41a8eeb5bb2e8c3bdcdd9d5cb986013c782b53",
+      "size_bytes": 1376,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/gateway-main-game.yml",
+      "git_blob_sha": "800aa8c5508938dc02ebd8f2670f0985c9b834fc",
+      "size_bytes": 2569,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/graphics-ci.yml",
+      "git_blob_sha": "f19fec703c46562ce83f9ff1bd5ae4b408afccd0",
+      "size_bytes": 2869,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/graphics-preview-check.yml",
+      "git_blob_sha": "0e30137f1256d22d1e9cbf7fe25c961edfe7b115",
+      "size_bytes": 6305,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/hud-layout-regression.yml",
+      "git_blob_sha": "4a6e6a78765a05c8e26fc2427edfb3c9a228315e",
+      "size_bytes": 665,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/studio-export-regression.yml",
+      "git_blob_sha": "06b21cf7f6b6225a34cf04632796499ea9582b82",
+      "size_bytes": 1489,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/wallet-regression.yml",
+      "git_blob_sha": "41b4a54d9b530f59285c9c50bf2583e89f05f641",
+      "size_bytes": 1200,
+      "mode": "100644"
+    },
+    {
+      "path": ".nojekyll",
+      "git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "size_bytes": 0,
+      "mode": "100644"
+    },
+    {
+      "path": "404.html",
+      "git_blob_sha": "e84aefc13f3dfbe56f6551d206d0cbb01df023d7",
+      "size_bytes": 789,
+      "mode": "100644"
+    },
+    {
+      "path": "AGENTS.md",
+      "git_blob_sha": "f313a673d4ac441d2b3c4eaa9d36f9ac998d737b",
+      "size_bytes": 20970,
+      "mode": "100644"
+    },
+    {
+      "path": "BACKUPS/GEN1-PRE-PROFILE-CORRECTION-2026-11-11/README.md.bak",
+      "git_blob_sha": "e15f9e2c9a59eecc7fbfba642f260bfc4f0dde7d",
+      "size_bytes": 10241,
+      "mode": "100644"
+    },
+    {
+      "path": "BACKUPS/GEN1-PRE-PROFILE-CORRECTION-2026-11-11/index.html.bak",
+      "git_blob_sha": "dd7aac1cfcd06e6c07c57dd8a9dcb79643c52b0a",
+      "size_bytes": 7805,
+      "mode": "100644"
+    },
+    {
+      "path": "BACKUPS/GEN1-PRE-PROFILE-CORRECTION-2026-11-11/nu-games.js.bak",
+      "git_blob_sha": "9d54d2d0b2f522bb96b575a4c27bd6108871b63a",
+      "size_bytes": 18807,
+      "mode": "100644"
+    },
+    {
+      "path": "BACKUPS/GEN1-PRE-PROFILE-CORRECTION-2026-11-11/nu-world.css.bak",
+      "git_blob_sha": "88ef9635cd1387c0d5685ac94e05a9204cffcdd5",
+      "size_bytes": 21850,
+      "mode": "100644"
+    },
+    {
+      "path": "BACKUPS/GEN1-PROFILE-BACKDROP-ENTER-2026-11-11/nu-games.js.bak",
+      "git_blob_sha": "465836afac4bb7ed92b66f6923763dfcd78f14c9",
+      "size_bytes": 19742,
+      "mode": "100644"
+    },
+    {
+      "path": "BACKUPS/HEX-GATEWAY-PRE-CALIBRATION-2026-11-13/ARCHIVE-README.md",
+      "git_blob_sha": "8d7f3a58e22adecc790f6186afdc2353fc0b7302",
+      "size_bytes": 499,
+      "mode": "100644"
+    },
+    {
+      "path": "BACKUPS/HEX-GATEWAY-PRE-CALIBRATION-2026-11-13/index.html.bak",
+      "git_blob_sha": "c69529a6ece17a3561bc4e164168862a17248ee4",
+      "size_bytes": 13235,
+      "mode": "100644"
+    },
+    {
+      "path": "BACKUPS/HEX-GATEWAY-PRE-CALIBRATION-2026-11-13/nu-hex-gateway.css.bak",
+      "git_blob_sha": "2ff943d3f2cc6004607ea1f44d8e851fc4cc87d1",
+      "size_bytes": 4826,
+      "mode": "100644"
+    },
+    {
+      "path": "BACKUPS/HEX-GATEWAY-PRE-CALIBRATION-2026-11-13/nu-hex-gateway.js.bak",
+      "git_blob_sha": "f7e3985aa214a401ab02c400cfeadcb6c29a1db5",
+      "size_bytes": 6707,
+      "mode": "100644"
+    },
+    {
+      "path": "BACKUPS/HEX-GATEWAY-PRE-CALIBRATION-2026-11-13/tests__nu-hex-gateway.test.js.bak",
+      "git_blob_sha": "85954ecf4800da54f8d0964d819ffe62bbef663b",
+      "size_bytes": 2732,
+      "mode": "100644"
+    },
+    {
+      "path": "CHANGE-AND-DEMO-PROTOCOL.md",
+      "git_blob_sha": "3a3813085885f625ff4d634f5f22001369fc9edc",
+      "size_bytes": 13819,
+      "mode": "100644"
+    },
+    {
+      "path": "ENGINE-LOCK.md",
+      "git_blob_sha": "63b30005d1ff450db3cf04c70a84bbf271a0e1dd",
+      "size_bytes": 2129,
+      "mode": "100644"
+    },
+    {
+      "path": "NU-GENERATION-1-MANIFEST.json",
+      "git_blob_sha": "819a3bce34bdb45a7acaa5cd4fc94d190b826c44",
+      "size_bytes": 21003,
+      "mode": "100644"
+    },
+    {
+      "path": "NU-LAUNCHER-ARCHITECTURE.md",
+      "git_blob_sha": "101843b509cc9c51572e50133471f142dea94ffe",
+      "size_bytes": 6151,
+      "mode": "100644"
+    },
+    {
+      "path": "NU-LAUNCHER-HUMAN-QA.md",
+      "git_blob_sha": "fcb1ee06bbb73a4bf14a4d798923e5ee240ed920",
+      "size_bytes": 2205,
+      "mode": "100644"
+    },
+    {
+      "path": "NU-LAUNCHER-MANIFEST.json",
+      "git_blob_sha": "64b6aca88e9a2c69a726607d31db8e6241f848c8",
+      "size_bytes": 1510,
+      "mode": "100644"
+    },
+    {
+      "path": "NU-MODULAR-GRAPHICS-ARCHITECTURE-2026-11-11.md",
+      "git_blob_sha": "33090bd31fbf70cccef11026dee28a698bf1ef1c",
+      "size_bytes": 3991,
+      "mode": "100644"
+    },
+    {
+      "path": "NU-WORLD-VISUAL-BIBLE-G1.5.md",
+      "git_blob_sha": "6074da23b10be17b236b80a5380af86b8c398e40",
+      "size_bytes": 7009,
+      "mode": "100644"
+    },
+    {
+      "path": "NU-WORLD-VISUAL-BIBLE-G1.6.md",
+      "git_blob_sha": "75096d015939f9b84e2d2a63a1514d892604774c",
+      "size_bytes": 4882,
+      "mode": "100644"
+    },
+    {
+      "path": "PLAYER-PROFILE-INITIAL-BASELINE-2026-11-11.md",
+      "git_blob_sha": "bb289c425b829056d630900bd66b4694925e0359",
+      "size_bytes": 1235,
+      "mode": "100644"
+    },
+    {
+      "path": "PLAYER-PROFILE-PREVIEW-AND-WALLET-TABS-2026-11-14.md",
+      "git_blob_sha": "f238f2d93305f5c1bd2483c16782555b6a41bd2a",
+      "size_bytes": 3612,
+      "mode": "100644"
+    },
+    {
+      "path": "PROJECT-HANDOFF-AND-CONVERSATION-ARCHIVE-2026-11-13.md",
+      "git_blob_sha": "81d394366a8cc2aeb9ae066de678b136cf6dfc14",
+      "size_bytes": 10428,
+      "mode": "100644"
+    },
+    {
+      "path": "QA-GEN-1.4.md",
+      "git_blob_sha": "0cf676a968890e0ff5799140fc14823dcf1136c9",
+      "size_bytes": 4063,
+      "mode": "100644"
+    },
+    {
+      "path": "QA-GEN-1.5.md",
+      "git_blob_sha": "3b0229390b6505264dd1265bb19790a897b4e7ee",
+      "size_bytes": 3314,
+      "mode": "100644"
+    },
+    {
+      "path": "QA-GEN-1.6.md",
+      "git_blob_sha": "f87bc711ab0c2ae981eb3734eda1e5a2cb83d7fa",
+      "size_bytes": 2706,
+      "mode": "100644"
+    },
+    {
+      "path": "QA-MANA-MATERIAL-HUMAN-TEST.md",
+      "git_blob_sha": "56643d0267b44dce24c17ebbb861a28ef8ae50c0",
+      "size_bytes": 18504,
+      "mode": "100644"
+    },
+    {
+      "path": "QA-MODULAR-GRAPHICS-2026-11-11.md",
+      "git_blob_sha": "11262c049f7379cb87f43f9abdb20d4528613ee8",
+      "size_bytes": 1846,
+      "mode": "100644"
+    },
+    {
+      "path": "README.md",
+      "git_blob_sha": "3c3113ab3fe8fe2292e83d3d666f6eeb6154fdb0",
+      "size_bytes": 58870,
+      "mode": "100644"
+    },
+    {
+      "path": "REPOSITORY-AUDIT-2026-11-10.md",
+      "git_blob_sha": "abfdb1af636656679eaa9eba8bf784b5b785b4b8",
+      "size_bytes": 4516,
+      "mode": "100644"
+    },
+    {
+      "path": "STUDIO-EXPORT-LOCK.md",
+      "git_blob_sha": "7d165ecfb26edeefd2203acfa068c09e1f9bddb6",
+      "size_bytes": 4075,
+      "mode": "100644"
+    },
+    {
+      "path": "STUDIO-KNOWN-GOOD-LOCK.md",
+      "git_blob_sha": "ad247158f08915ae37176b3827f728be89e733d6",
+      "size_bytes": 1029,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/latest-default-before-merge/2026-11-15/NU-GENERATION-1-MANIFEST.json.snapshot",
+      "git_blob_sha": "37f8254ff0b38b4ffda018b6197a12ff69d79870",
+      "size_bytes": 15796,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/latest-default-before-merge/2026-11-15/docs/operations/NU-EXCHANGE-CHART-CONTROLS-2026-11-15.md.snapshot",
+      "git_blob_sha": "3711a790bd0007860f503153e057f87b2a0f04f0",
+      "size_bytes": 3116,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/latest-default-before-merge/2026-11-15/exchange.html.snapshot",
+      "git_blob_sha": "7090ddb5a9a372e8c702ba081f916897b6bb45c2",
+      "size_bytes": 9001,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/latest-default-before-merge/2026-11-15/nu-exchange-replay.js.snapshot",
+      "git_blob_sha": "0c9fd7456cc823ad4bcfb30f7513c32cc2e54d15",
+      "size_bytes": 1099,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/latest-default-before-merge/2026-11-15/nu-exchange.css.snapshot",
+      "git_blob_sha": "ded78280a7e567ba4f891c1f24c05c4d69cb73fe",
+      "size_bytes": 10392,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/latest-default-before-merge/2026-11-15/nu-exchange.js.snapshot",
+      "git_blob_sha": "3a018c99dd6a518a8fcacc357568832614de4f0a",
+      "size_bytes": 17186,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/latest-default-before-merge/2026-11-15/nu-market-sim.js.snapshot",
+      "git_blob_sha": "3c6bbe0b178d243257eb796509f4c32b1994280a",
+      "size_bytes": 3830,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/latest-default-before-merge/2026-11-15/tests/nu-exchange-runtime.test.js.snapshot",
+      "git_blob_sha": "b9b0d23d93cac6f622b150d17317619e22c6509e",
+      "size_bytes": 3038,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/latest-default-before-merge/2026-11-15/tests/nu-hp-pill-interaction.test.js.snapshot",
+      "git_blob_sha": "1615480fe783c3b4053149099e5328918dfb4950",
+      "size_bytes": 9581,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/latest-default-before-merge/2026-11-15/tests/nu-market-sim.test.js.snapshot",
+      "git_blob_sha": "468ad3f3aeab44df2b7c3af0da02581f482e9f56",
+      "size_bytes": 3426,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-15-test-contract-repair-01/MANIFEST.md",
+      "git_blob_sha": "74661338425a452ad86bf6dd53c890518cb07e22",
+      "size_bytes": 1095,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-15-test-contract-repair-01/tests/nu-hp-pill-interaction.test.js",
+      "git_blob_sha": "cf6ce0e168d3e593c94195e5c5a06de414b8c3da",
+      "size_bytes": 9778,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-15-test-contract-repair-01/tests/nu-wallet.test.js",
+      "git_blob_sha": "070c04a58fd485203a1b12116da16c5557f440fd",
+      "size_bytes": 7677,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-15-test-contract-repair-01/tests/nu-world-entry-calibration.test.js",
+      "git_blob_sha": "5b6c584cdc355cbbc436292319016496d1c65836",
+      "size_bytes": 1363,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-15-test-contract-status-01/MANIFEST.md",
+      "git_blob_sha": "fe23b2ce89117b13999be1b6a1484bd7a7dd2d1e",
+      "size_bytes": 514,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-15-test-contract-status-01/TEST-CONTRACT-REPAIR-2026-11-15.md",
+      "git_blob_sha": "3cc909183a89a43cade56b51a128e2359eabd125",
+      "size_bytes": 2485,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-15/gateway-menu-exchange/NU-GENERATION-1-MANIFEST.json.snapshot",
+      "git_blob_sha": "ffb1dc1c65bcf509c8a7ae69b79c971dfcc6f9e3",
+      "size_bytes": 14753,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-15/gateway-menu-exchange/README.md.snapshot",
+      "git_blob_sha": "2fa315d9f100947958071b6d7549a0b2bf27a941",
+      "size_bytes": 49455,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-15/gateway-menu-exchange/docs/operations/NU-OPS-IMPLEMENT-01.md.snapshot",
+      "git_blob_sha": "8d1e70a14f4f649a3d623e0a451358a1cf2cf820",
+      "size_bytes": 4059,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-15/gateway-menu-exchange/exchange.html.snapshot",
+      "git_blob_sha": "e162ae62ceb634a66244b48bd103c73928616804",
+      "size_bytes": 7407,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-15/gateway-menu-exchange/index.html.snapshot",
+      "git_blob_sha": "97415daf4a7119c672e6d8238acc500201927e61",
+      "size_bytes": 30398,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-15/gateway-menu-exchange/nu-exchange.js.snapshot",
+      "git_blob_sha": "2e08b36f18add58e48acb165cd0d8090703a5b0a",
+      "size_bytes": 11961,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-15/gateway-menu-exchange/nu-games.js.snapshot",
+      "git_blob_sha": "2e5de1c2523c97765930d2c8f2820ebda278ec03",
+      "size_bytes": 34673,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-15/gateway-menu-exchange/nu-graphics-runtime.js.snapshot",
+      "git_blob_sha": "67176ff06f2dae25a0b3fb7c926aa6dad3b38e48",
+      "size_bytes": 2965,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-15/gateway-menu-exchange/nu-hex-gateway.css.snapshot",
+      "git_blob_sha": "f2a4bf07df410969564c01dcdc8026246ff1ad98",
+      "size_bytes": 5215,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-15/gateway-menu-exchange/nu-hex-gateway.js.snapshot",
+      "git_blob_sha": "c20a5c3f30df9929a65076fcdfcd75c700d72afb",
+      "size_bytes": 7305,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-15/gateway-menu-exchange/nu-market-sim.js.snapshot",
+      "git_blob_sha": "b07c42c9f8c3eb3b2e1da033a8a0785475bb359e",
+      "size_bytes": 2783,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-15/gateway-menu-exchange/nu-wallet.js.snapshot",
+      "git_blob_sha": "d4ef2c6c1425b667030a8edba5f63d321c10cb39",
+      "size_bytes": 7778,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-15/gateway-menu-exchange/nu-world.css.snapshot",
+      "git_blob_sha": "a319fab2e4c5beb2b627b59f2b6d61ce84a969b1",
+      "size_bytes": 75081,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-15/gateway-menu-exchange/tests/nu-exchange-runtime.test.js.snapshot",
+      "git_blob_sha": "fdf1e19f57f7056e2bef60d2d6116a4fd1596d82",
+      "size_bytes": 2861,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-15/gateway-menu-exchange/tests/nu-hex-gateway.test.js.snapshot",
+      "git_blob_sha": "7d41341abbca2ce7143271e5d22a94578affea5b",
+      "size_bytes": 3940,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-15/gateway-menu-exchange/tests/nu-market-sim.test.js.snapshot",
+      "git_blob_sha": "123cb1dc69aff28712e3a1aeca933f9082e656cf",
+      "size_bytes": 2191,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-15/gateway-menu-exchange/tests/nu-wallet.test.js.snapshot",
+      "git_blob_sha": "5bae222058427d257b01dad343cd916d8250acd1",
+      "size_bytes": 6114,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-15/gateway-menu-exchange/tests/nu-world-entry-calibration.test.js.snapshot",
+      "git_blob_sha": "183b501e7037b7d31edaa9aeec94673b121cab35",
+      "size_bytes": 1346,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-16-NU-BAG-WALLET-01/original/MANIFEST.md",
+      "git_blob_sha": "7b04efdd2cc703244a147282fe5c3adf6a57e902",
+      "size_bytes": 2721,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-16-NU-BAG-WALLET-01/original/index.html",
+      "git_blob_sha": "8bdf1fee1b2634fb7da5be0f2386aab5cfce72dd",
+      "size_bytes": 31857,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-16-NU-BAG-WALLET-01/original/nu-games.js",
+      "git_blob_sha": "2e40579140349ee4f7fbd4dd251e14d1c24e890f",
+      "size_bytes": 41147,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-16-NU-BAG-WALLET-01/original/nu-health.js",
+      "git_blob_sha": "b1c085fb4d0ea1dc1f696f92d7ecb940da02d972",
+      "size_bytes": 3925,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-16-NU-BAG-WALLET-01/original/nu-hex-gateway.css",
+      "git_blob_sha": "b4dd693e0f15e8e7cdac5f817d95ddd1d5acf5f5",
+      "size_bytes": 5361,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-16-NU-BAG-WALLET-01/original/nu-hex-gateway.js",
+      "git_blob_sha": "d6f45924bf0dd7cce6305169270fed7ce6bc61e2",
+      "size_bytes": 5926,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-16-NU-BAG-WALLET-01/original/nu-player-ui.js",
+      "git_blob_sha": "9c46ca564d6773c979ecce4cb9e9dc4aa84433bb",
+      "size_bytes": 29461,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-16-NU-BAG-WALLET-01/original/nu-wallet.js",
+      "git_blob_sha": "f89c9081cea2fa3983dc1cd001f93e7aff3416f0",
+      "size_bytes": 17870,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-16-NU-BAG-WALLET-01/original/nu-world.css",
+      "git_blob_sha": "8c99d4479a657cdcf83fa5fdf0e5fd1db2ca8aa7",
+      "size_bytes": 78425,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-16-NU-BAG-WALLET-01/original/tests/nu-health.test.js",
+      "git_blob_sha": "9f5b5f9cc108d98af6009490a7d6598eeffaa3dc",
+      "size_bytes": 3333,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-16-NU-BAG-WALLET-01/original/tests/nu-hex-gateway.test.js",
+      "git_blob_sha": "c2d58c086f5140a85217f1783a9599389835d3bb",
+      "size_bytes": 5224,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-16-NU-BAG-WALLET-01/original/tests/nu-hp-pill-interaction.test.js",
+      "git_blob_sha": "cf6ce0e168d3e593c94195e5c5a06de414b8c3da",
+      "size_bytes": 9778,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-16-NU-BAG-WALLET-01/original/tests/nu-hud-layout.test.js",
+      "git_blob_sha": "3fed4402352d16a0063fa54bc3b5b86b3e9a1d0f",
+      "size_bytes": 2277,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-16-NU-BAG-WALLET-01/original/tests/nu-wallet.test.js",
+      "git_blob_sha": "d6ef704c9737dceeb44f432eb9afcdf97298adb2",
+      "size_bytes": 7792,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-16-NU-BAG-WALLET-01/original/tests/nu-world-entry-calibration.test.js",
+      "git_blob_sha": "5b6c584cdc355cbbc436292319016496d1c65836",
+      "size_bytes": 1363,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-18-arcane-shield/index.html.snapshot",
+      "git_blob_sha": "cc20317865fee7b998e4a1bbad38a8a262e1f419",
+      "size_bytes": 34413,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-18-arcane-shield/nu-games.js.snapshot",
+      "git_blob_sha": "07e1e4bea31b6532c776721d8c624fb39dfad8c2",
+      "size_bytes": 50120,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/pre-change/2026-11-18-arcane-shield/nu-wallet.js.snapshot",
+      "git_blob_sha": "1203a844f5913ed07611415156d8ab3d2ab6f5cb",
+      "size_bytes": 18287,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/visual-layers/nu-dynamic-layers.js",
+      "git_blob_sha": "4478336c6318652d5cd2ae7b8d748e6ddb596344",
+      "size_bytes": 4534,
+      "mode": "100644"
+    },
+    {
+      "path": "archive/visual-layers/nu-pixel-world.js",
+      "git_blob_sha": "656fc4daac949faa5c638f25c5e5244f53615fe7",
+      "size_bytes": 8227,
+      "mode": "100644"
+    },
+    {
+      "path": "assets/Original reference image file for Niroo Universe (N.U).png",
+      "git_blob_sha": "d73afd484ef8b459c908c1942ee0f47d27f93aa5",
+      "size_bytes": 2467298,
+      "mode": "100644"
+    },
+    {
+      "path": "assets/README.md",
+      "git_blob_sha": "2f2c422a743883e7ef153405c2d46c43606039d8",
+      "size_bytes": 1420,
+      "mode": "100644"
+    },
+    {
+      "path": "assets/backgrounds/README.md",
+      "git_blob_sha": "3f6b497d7758ab463245a44f5c5c983393556780",
+      "size_bytes": 712,
+      "mode": "100644"
+    },
+    {
+      "path": "assets/backgrounds/niroo-universe-background.svg",
+      "git_blob_sha": "63dd85a479354406cc5739f4603ccc1d0989e5b0",
+      "size_bytes": 2767594,
+      "mode": "100644"
+    },
+    {
+      "path": "assets/material/Mana-icon-in-the-game-N-U (1).svg",
+      "git_blob_sha": "8d440f42ccdf7ee358481fbf876ccf3af2d38bf7",
+      "size_bytes": 1019,
+      "mode": "100644"
+    },
+    {
+      "path": "assets/material/Mana-icon-in-the-game-N-U (2).svg",
+      "git_blob_sha": "2f130553ea0329185b8ee15b8934aa3cbf402978",
+      "size_bytes": 767,
+      "mode": "100644"
+    },
+    {
+      "path": "assets/material/Mana-icon-in-the-game-N-U (3).svg",
+      "git_blob_sha": "f3f0cc17e617050eabc732c0bc5a2f47b5ddd21d",
+      "size_bytes": 571,
+      "mode": "100644"
+    },
+    {
+      "path": "assets/material/Mana-icon-in-the-game-N-U (4).svg",
+      "git_blob_sha": "bbfeb328fe5318554308ac9fb7efd31a9ec978f0",
+      "size_bytes": 487,
+      "mode": "100644"
+    },
+    {
+      "path": "assets/material/Mana-icon-in-the-game-N-U.svg",
+      "git_blob_sha": "246f8b2ff245e0fdd546c319259e5d69e659d922",
+      "size_bytes": 1035,
+      "mode": "100644"
+    },
+    {
+      "path": "assets/material/nu-arcane-shield.svg",
+      "git_blob_sha": "34a0c1e4bef2ecb5b43b6ae415604174e5848bb1",
+      "size_bytes": 1057,
+      "mode": "100644"
+    },
+    {
+      "path": "assets/nu-hp-pill-golden-pixel.png",
+      "git_blob_sha": "be1dc0fbae1047fb7c0e0568c87a3e189faa967c",
+      "size_bytes": 1983,
+      "mode": "100644"
+    },
+    {
+      "path": "assets/nu-hp-pill-golden-pixel.svg",
+      "git_blob_sha": "d01a959d1f6c2a512a910be7c77c9f4f449993bf",
+      "size_bytes": 1130,
+      "mode": "100644"
+    },
+    {
+      "path": "background-candidates.html",
+      "git_blob_sha": "c560dac08f7f84a15b48c81c76e955a5dece37dd",
+      "size_bytes": 2791819,
+      "mode": "100644"
+    },
+    {
+      "path": "casino.html",
+      "git_blob_sha": "5cdf81934874cbf52c2a86ca9238adb9ec764e95",
+      "size_bytes": 6125,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/GEN1-ADAPTIVE-PIXEL-WORKSPACE-2026-11-12.md",
+      "git_blob_sha": "ef81afdde6813914922a5c3bf8e37ee86f4ba529",
+      "size_bytes": 3274,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/GEN1-STUDIO-ORIGINAL-DIMENSION-IMPORT-2026-11-12.md",
+      "git_blob_sha": "4893809a0ab30214e5621780c1b9f6d2e82ca4c6",
+      "size_bytes": 1960,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/GEN1-TECHNICAL-AUDIT-2026-11-12.md",
+      "git_blob_sha": "ec3053eecd1a1f84fdb7736407c956b4274e7aaf",
+      "size_bytes": 9677,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/PUBLIC-DEMO-HUMAN-ACCEPTANCE-GATE.md",
+      "git_blob_sha": "f1ebc604a503d1faeaf1afdd63e6cd628f181d90",
+      "size_bytes": 6174,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/README.md",
+      "git_blob_sha": "2b2f81b5dc9590043d05f840607e16b542e44f8b",
+      "size_bytes": 9019,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/architecture/NU-CASINO-WALLET-BETTING-ECONOMY.md",
+      "git_blob_sha": "0635693b35d741eae34368498d549e3b70271656",
+      "size_bytes": 3762,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/architecture/NU-MANA-CAPSULE-ARCANE-SHIELD-SPEC.md",
+      "git_blob_sha": "107aa4855458ee68b5afc4afb7fe33ba79e8bf18",
+      "size_bytes": 10932,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/architecture/NU-PLAYER-IDENTITY-ASSETS-AND-EXECUTION-MODES.md",
+      "git_blob_sha": "73a8b4e8d8fb029848cfad8c43af7c20bff651e7",
+      "size_bytes": 14668,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/architecture/NU-UI-LAYER-AND-EXTENSION-ISOLATION-PROTOCOL.md",
+      "git_blob_sha": "79609b930477b17ab283222bca301cc173cb92b4",
+      "size_bytes": 11729,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/architecture/NU-WAVE-AND-WALLET-TRANSACTION-ECONOMY.md",
+      "git_blob_sha": "f608fe5610e055fe8c94726432c440a343a8c3fd",
+      "size_bytes": 13414,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/archive/2026-11-15-wallet-health-module.md",
+      "git_blob_sha": "85930b6912584390c454c8c1ed0709cdbc0d944c",
+      "size_bytes": 1050,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/archive/2026-11-15/classic-resource-hud/README.md",
+      "git_blob_sha": "e0dfb3b1dbf9f2e3aed1b2d1aa448b0d25c507dc",
+      "size_bytes": 568,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/archive/2026-11-15/classic-resource-hud/nu-world.css.snapshot",
+      "git_blob_sha": "a319fab2e4c5beb2b627b59f2b6d61ce84a969b1",
+      "size_bytes": 75081,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/archive/2026-11-18/gen1-xp-rail-icon-feedback/nu-world.css.snapshot",
+      "git_blob_sha": "25bcbcfd2bf91f1aa5778f6a7b3a5fb9fa5951a3",
+      "size_bytes": 84475,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/background-assets-inventory-2026-11-14.md",
+      "git_blob_sha": "98968518f4d56eee71f7506ff2d31d50b5475742",
+      "size_bytes": 4326,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/creative-studio/NU-2D-PRO-TOOLS-LOCK-2026-11-16.md",
+      "git_blob_sha": "aa91bf7569e08725389efed66fc0927dd66a0d3f",
+      "size_bytes": 2113,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/creative-studio/NU-2D-STUDIO-TOOL-INVENTORY-AND-ICON-EXPORT-2026-11-16.md",
+      "git_blob_sha": "c26193aefda1effbb6f8b041e477dd0550fe4740",
+      "size_bytes": 6019,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/creative-studio/NU-CREATIVE-SUITE-FUTURE-ARCHIVE-2026-11-16.md",
+      "git_blob_sha": "14a97e88de2dd7a998c83adf8cea37970bbbc27b",
+      "size_bytes": 2346,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/debug/INTERACTION-SYSTEM-2026-11-19.md",
+      "git_blob_sha": "278b6a1afc940113ad1fc6c86473d4c2d268c777",
+      "size_bytes": 7963,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/debug/README.md",
+      "git_blob_sha": "98eb07c29e68552bf4d81516f09f0f990cb2d64e",
+      "size_bytes": 6017,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/implementation/NU-G1-PLAYER-PROFILE-OPERATIONAL-SPEC.md",
+      "git_blob_sha": "2482a327a1263a9cf2d6f3b26408a1c541b4a5b0",
+      "size_bytes": 8065,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/2026-11-15-wallet-health-module.md",
+      "git_blob_sha": "9fd7e9b475a992df8dbce9d930bf70441c74af97",
+      "size_bytes": 2770,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/2026-11-16-bag-wallet-inventory-mhl.md",
+      "git_blob_sha": "b0f144b4d9d71ed813975656a287f638d668881a",
+      "size_bytes": 10601,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/2026-11-18/GEN1-OPERATIONAL-AUDIT-AND-STATUS-fa.md",
+      "git_blob_sha": "e3d8d0aa5ad75e28e3afa7bcce8be630dc6b31a0",
+      "size_bytes": 12879,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/2026-11-18/NU-G1-OWNER-REPORTED-DEFECTS-AND-EXECUTION-BACKLOG-fa.md",
+      "git_blob_sha": "4fe57dfc0d74d300b82fcae7385d459dd4b15394",
+      "size_bytes": 27860,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/ANTI-DESTRUCTION-EXPLICIT-SCOPE-PROTOCOL-2026-11-19.md",
+      "git_blob_sha": "aaccff1c73ee681b4846c1af0e1c28309e8e8ac2",
+      "size_bytes": 4909,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/ASSET-PROFILE-TRANSIENT-HOVER-2026-11-21.md",
+      "git_blob_sha": "8b24500137b1febf835b7a4b8b22abefbb68fd62",
+      "size_bytes": 8030,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/CLASSIC-XP-MANA-RESOURCE-HUD-RESTORE-2026-11-14.md",
+      "git_blob_sha": "231caebbba7df56e0417d2ee499709aa1415751b",
+      "size_bytes": 2359,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/DEFERRED-XP-PROGRESSION-AND-GAME-NOTIFICATIONS-2026-11-21.md",
+      "git_blob_sha": "bc75dbf0456825869b3bddfe62211a5d23a2e1bf",
+      "size_bytes": 3296,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/DEMO-DEPLOYMENT-REPORT-2026-11-16.md",
+      "git_blob_sha": "75b9c8410e6c60bad1ae0a3e021b0244ee669fc6",
+      "size_bytes": 3629,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/EXCHANGE-AMBIENT-FLOW-CHART-DRAWING-2026-11-15.md",
+      "git_blob_sha": "3228254b1ad2b5581911276d1c53b679985034d4",
+      "size_bytes": 6080,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/EXCHANGE-WALLET-BRIDGE-LIFECYCLE-2026-11-15.md",
+      "git_blob_sha": "e92d98afca678ce27d952a1b77f31b5595265396",
+      "size_bytes": 2797,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/GATEWAY-AND-CONTROLLER-INPUT-CONTRACT-2026-11-17.md",
+      "git_blob_sha": "5144d684f7b543ec977d9641d8db933240aef5b5",
+      "size_bytes": 28158,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/GATEWAY-CONTROLLER-NAVIGATION-2026-11-17.md",
+      "git_blob_sha": "131481b5cb678d86347c45c7e420c60de339ced1",
+      "size_bytes": 5394,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/GATEWAY-INDEPENDENT-INPUT-RUNTIME-CHANGE-RECORD-2026-11-21.md",
+      "git_blob_sha": "4b342c6f760cd0f6456088700079aa7332c6d589",
+      "size_bytes": 7597,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/GATEWAY-MAIN-GAME-IMPLEMENTATION-2026-11-15.md",
+      "git_blob_sha": "8b70f503f7a3450d8ef12e4b4213f7e8ce02b8a5",
+      "size_bytes": 7074,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/GATEWAY-MAIN-GAME-UNFREEZE-2026-11-14.md",
+      "git_blob_sha": "e75ab32543a8a89be096dc0173f9533b0061b52f",
+      "size_bytes": 4136,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/GATEWAY-MAIN-GAME-UNFREEZE-CONVERSATION-ARCHIVE-2026-11-14.md",
+      "git_blob_sha": "cdb6cd4b8ecaeb93fc19adbd0c92087f633d116c",
+      "size_bytes": 2264,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/GATEWAY-MENU-EXCHANGE-IMPLEMENTATION-2026-11-15.md",
+      "git_blob_sha": "18b0f397cc166e5b4c5276e49e4001e06681000e",
+      "size_bytes": 16519,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/GATEWAY-MULTI-INPUT-DWELL-CHANGE-RECORD-2026-11-20.md",
+      "git_blob_sha": "dcf1fa02b71ab3bac02056f3b59e9b63158313c2",
+      "size_bytes": 5873,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/GATEWAY-PAUSE-MACHINE-ACCEPTANCE.md",
+      "git_blob_sha": "4605b3137189d2393cefd6bd5b2b5245c0379056",
+      "size_bytes": 1917,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/GATEWAY-TOUCH-DWELL-CHANGE-RECORD-2026-11-20.md",
+      "git_blob_sha": "cc2c4587c5b8c5b155b834c252ba8e909f7676f2",
+      "size_bytes": 2637,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/GATEWAY-VIRTUAL-MOUSE-BOUNDARY-AMENDMENT-2026-11-21.md",
+      "git_blob_sha": "849413e34fa476a5ad108b8ead6ad31a3fd0d147",
+      "size_bytes": 3523,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/GEN1-HUD-CAPSULE-LAYOUT-2026-11-14.md",
+      "git_blob_sha": "49e458ede265e6bf787e745c2624b50399ed6cf6",
+      "size_bytes": 2544,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/HUMAN-TEST-REPORT-TEMPLATE.md",
+      "git_blob_sha": "ab6595a1ce537c125f3094e021de94bad9314ef5",
+      "size_bytes": 3427,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/INTERACTION-CORE-AND-DEBUG-PROTOCOL-2026-11-19.md",
+      "git_blob_sha": "61c0b20600a4552830f1bbc08ebd3f1d9e3cfb3f",
+      "size_bytes": 9183,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/INTERACTION-DEBUG-BACKLOG-2026-11-19.md",
+      "git_blob_sha": "cecb87347c31ef011fd2f3e9a36f61e3626040e2",
+      "size_bytes": 17513,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/INTERACTION-GAME-OBJECT-PRODUCERS-CHANGE-RECORD-2026-11-19.md",
+      "git_blob_sha": "9bb01e8cb492d009b7fb19c7ca1489f27530b542",
+      "size_bytes": 15495,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/LOCKED-AREAS.md",
+      "git_blob_sha": "8f3cd1581ae369e079f0239082f65323af66bb49",
+      "size_bytes": 16182,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/NU-EXCHANGE-CHART-CONTROLS-2026-11-15.md",
+      "git_blob_sha": "3711a790bd0007860f503153e057f87b2a0f04f0",
+      "size_bytes": 3116,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/NU-EXCHANGE-MODULAR-RUNTIME-2026-11-14.md",
+      "git_blob_sha": "6343b76796cb2272b7bc3e88fa068e251304f0d3",
+      "size_bytes": 3707,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/NU-OPS-IMPLEMENT-01.md",
+      "git_blob_sha": "0e44d546d821854f57841223ec82d8d7789755a9",
+      "size_bytes": 12962,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/NU-VIRTUAL-MARKET-SIMULATOR.md",
+      "git_blob_sha": "f7588ea950120059c08a1f6436219af6c39c9fef",
+      "size_bytes": 3888,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/OWNER-WORKFLOW-CORRECTION-2026-11-16.md",
+      "git_blob_sha": "2830986fd72609f4fd2d5ccf16f0bb81e41beea1",
+      "size_bytes": 3416,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/PIXEL-ART-STUDIO-2D-OPERATIONAL-CHECKLIST.md",
+      "git_blob_sha": "74a97784ae0a9c942c5f6319ccbffc7931f52ef4",
+      "size_bytes": 11132,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/PUBLIC-DEMO-HUMAN-QA-OPERATING-PRINCIPLE.md",
+      "git_blob_sha": "a737b3f3e978b7575f848bbad030dcc7c8375894",
+      "size_bytes": 4629,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/TEST-CONTRACT-REPAIR-2026-11-15.md",
+      "git_blob_sha": "4aa18d0275e84be8d6b60c2fe12129d292cfaa5c",
+      "size_bytes": 2618,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/TEST-CONTRACT-STATUS-2026-11-15.md",
+      "git_blob_sha": "898f4a5f32625b68fe8f0eb7d299468afbe9aceb",
+      "size_bytes": 651,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/USER-INPUT-MODES-AND-CONTROLLER-SETTINGS-2026-11-21.md",
+      "git_blob_sha": "8de7e33422c8425990dcc868e604536fdd839af1",
+      "size_bytes": 8420,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/WALLET-AUDIT-ANIMATION-LAYER-2026-11-15.md",
+      "git_blob_sha": "30049fa2f1746946c331fa7e13050db151abc0da",
+      "size_bytes": 2853,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/conversation-archive/2026-11-13-hud-gateway-request.md",
+      "git_blob_sha": "8aedb45e91eb8fdf258ca2827e3de9dfd367d2ba",
+      "size_bytes": 2044,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/conversation-archive/2026-11-14-hud-capsule-layout.md",
+      "git_blob_sha": "fc2baee1fb5757616a69b2e69440ccd4d03d0454",
+      "size_bytes": 1328,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/gen1-xp-rail-icon-feedback-2026-11-18.md",
+      "git_blob_sha": "b67de917ddcba3a18af13bc8b0686ca372d3d10c",
+      "size_bytes": 3790,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/implementation-records/2026-11-13-generation-1.33.md",
+      "git_blob_sha": "ceb9efd8b434d7ed24e3b4480b84dc04d0284075",
+      "size_bytes": 2140,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/operations/launcher-bottom-background-fix-2026-11-18.md",
+      "git_blob_sha": "e82436a2e049504d7931c760673a95cbb038431e",
+      "size_bytes": 2638,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/qa/NU-G1-PROFILE-APPEARANCE-HUMAN-QA-2026-11-14.md",
+      "git_blob_sha": "0a10cf3c8311c41c509307d7eb0fdaab92918643",
+      "size_bytes": 6840,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/testing/NU-PUBLIC-DEMO-WAVE-WALLET-HUMAN-QA.md",
+      "git_blob_sha": "ea1bf59bbfd8cf8e5560663d14d148558ac43657",
+      "size_bytes": 8674,
+      "mode": "100644"
+    },
+    {
+      "path": "exchange.html",
+      "git_blob_sha": "acd8a0ba4075595aee1b6efd38813bfb0a2b13e1",
+      "size_bytes": 12665,
+      "mode": "100644"
+    },
+    {
+      "path": "index.html",
+      "git_blob_sha": "c4529fc35d7e2d5553ea5e989d7d592ecd7cf3b5",
+      "size_bytes": 36437,
+      "mode": "100644"
+    },
+    {
+      "path": "launcher.html",
+      "git_blob_sha": "46855408d546af95aaed1b9d248fa9115b464f64",
+      "size_bytes": 11360,
+      "mode": "100644"
+    },
+    {
+      "path": "niroo-universe-github-files.zip",
+      "git_blob_sha": "e214b43288e33cfbceb6162d1cb6462df6718e6e",
+      "size_bytes": 2237,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-adaptive-game-engine-v0.1.zip",
+      "git_blob_sha": "c419fe2c8e6b79ead568fa561d2961389bc7117a",
+      "size_bytes": 5010,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-arcane-shield.css",
+      "git_blob_sha": "74870de659d370e5397db8ab62e67ef213df95a5",
+      "size_bytes": 2502,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-background-engine.js",
+      "git_blob_sha": "69440a986c520d27261e93406088d3a548cb5b6a",
+      "size_bytes": 3574,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-casino.css",
+      "git_blob_sha": "3d0bc20e02f115175bcd530f30cbe4982d705b23",
+      "size_bytes": 6076,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-casino.js",
+      "git_blob_sha": "301a1d8a557aa737d6fb61183780f731f59d1689",
+      "size_bytes": 8014,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-controller-pointer.js",
+      "git_blob_sha": "63f7de60998509d0b7165590f2f5fa904358da11",
+      "size_bytes": 13154,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-dynamic-layers.js",
+      "git_blob_sha": "159770a616085bf6d38066893719710a3a0450ed",
+      "size_bytes": 4477,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-engine.js",
+      "git_blob_sha": "cda4f4157628aefaaac9ab95c047e4ca818c5f02",
+      "size_bytes": 4571,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-exchange-analytics.js",
+      "git_blob_sha": "aed20b76eb34bf457484f5da58db1a7d694788a8",
+      "size_bytes": 3692,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-exchange-core.js",
+      "git_blob_sha": "d85b5301323007192ad85cb2b9d6b16ff66bf07f",
+      "size_bytes": 3389,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-exchange-engines.js",
+      "git_blob_sha": "a635e47f2748b26ceea59dc8b407b75320f9bafb",
+      "size_bytes": 5156,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-exchange-guard.js",
+      "git_blob_sha": "0a84c238fe53333cfd0de784166e183c869a0738",
+      "size_bytes": 1568,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-exchange-lock.js",
+      "git_blob_sha": "63f1105651585b5cb4490f1f55a8dd14fa733849",
+      "size_bytes": 1296,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-exchange-replay.js",
+      "git_blob_sha": "0c9fd7456cc823ad4bcfb30f7513c32cc2e54d15",
+      "size_bytes": 1099,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-exchange-sw.js",
+      "git_blob_sha": "250377b1bb03f77c26f446d4f0c5b18a08b7e912",
+      "size_bytes": 2247,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-exchange-visuals.js",
+      "git_blob_sha": "2d1357582894467e868524fe21a4954a272ef361",
+      "size_bytes": 9509,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-exchange.css",
+      "git_blob_sha": "6dd932f194e56a1059e53d5ca9999b3173a6dcae",
+      "size_bytes": 13578,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-exchange.js",
+      "git_blob_sha": "cea0c7674c7e0b39b652daa12e3e7e1641f1fa5a",
+      "size_bytes": 21249,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-game-render-adapter.js",
+      "git_blob_sha": "23f1e83520efeaea8cf4360adfa7f4cbe4392ec4",
+      "size_bytes": 1029,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-games.js",
+      "git_blob_sha": "a013f831a4cd901a0ab5cb4dedb9e72ef322b7d6",
+      "size_bytes": 62037,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-gateway-pause.js",
+      "git_blob_sha": "b6ac58f6a15fc2abcf1b4c5f3fcd09ceb734d574",
+      "size_bytes": 1387,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-graphics-analysis.js",
+      "git_blob_sha": "73690b4545db34fde0e8335748425a0414272591",
+      "size_bytes": 6853,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-graphics-core.js",
+      "git_blob_sha": "4ea60934a6fa6f96402c4def961fd259a2b830bc",
+      "size_bytes": 2158,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-graphics-runtime.js",
+      "git_blob_sha": "eff9a7d1f552caaeac305cd4806959ac84fdb9dd",
+      "size_bytes": 3446,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-health.js",
+      "git_blob_sha": "a853202dff3754496557e52d1f59b41dc5587c97",
+      "size_bytes": 7473,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-hex-gateway.css",
+      "git_blob_sha": "267634aec1b626bce3054fe3639f8ec83212bc74",
+      "size_bytes": 6550,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-hex-gateway.js",
+      "git_blob_sha": "316eae386d1cca6a3b2b120c7132fbe6bc26ac84",
+      "size_bytes": 13204,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-ico-export.js",
+      "git_blob_sha": "0a2f5b6013af139a6cfbbe4d88c7273f8468fae5",
+      "size_bytes": 3569,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-interaction-core.js",
+      "git_blob_sha": "0d783fa6339ae32a136b2ab57e6d3aab2fbe65f2",
+      "size_bytes": 6325,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-launcher.css",
+      "git_blob_sha": "3e67e7907e4ea4321f8447a2e7bca00cc5c4ecaf",
+      "size_bytes": 6005,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-launcher.js",
+      "git_blob_sha": "b6e8f61903423b4545f70097f78be332dea2c1ce",
+      "size_bytes": 11186,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-market-sim.js",
+      "git_blob_sha": "2da9e9127655798988daa8018d0832df2a117925",
+      "size_bytes": 4211,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-materials.js",
+      "git_blob_sha": "1c7f8a8b5307b4dc184e6292788936d68573815c",
+      "size_bytes": 2286,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-motion.js",
+      "git_blob_sha": "4dabd21ac1959724a5ab3dcb113ee94576445beb",
+      "size_bytes": 1862,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-pixel-art-studio.js",
+      "git_blob_sha": "cade1ac4253af24a4540b81c2805dd7c29baf863",
+      "size_bytes": 70377,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-pixel-world.js",
+      "git_blob_sha": "4fe3f69bcfe1d856b2ce1c32587eb683b716deaf",
+      "size_bytes": 8145,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-player-ui.js",
+      "git_blob_sha": "0b8cb9b223d34c5eae8c5890d7ddc9f69d6d03a5",
+      "size_bytes": 36417,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-profile-preview.js",
+      "git_blob_sha": "0cd8a7f0ec26571ea5384daeeac4f92ba734826e",
+      "size_bytes": 2621,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-raster-import.js",
+      "git_blob_sha": "d0cc810c6f1ec696d9f5e25e0a04e2d4b55a03e0",
+      "size_bytes": 2619,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-studio-export.js",
+      "git_blob_sha": "6e5c459f5252bda026777713bc584208d9cb8b96",
+      "size_bytes": 1909,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-studio-layout.js",
+      "git_blob_sha": "d9f918521e6b5a066717dc09df8e9be343504036",
+      "size_bytes": 1792,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-studio-pro-tools.js",
+      "git_blob_sha": "f2b82308e261f7dd7ec737aba60559c55ed1f0a8",
+      "size_bytes": 6321,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-svg-vectorizer.js",
+      "git_blob_sha": "ff1163e4c3358e37eb0e29e2cc52b3e1a11bc5c5",
+      "size_bytes": 4504,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-wallet.js",
+      "git_blob_sha": "0d8304dc7f2a1ebc0b582d3009993e8575c1bd91",
+      "size_bytes": 27210,
+      "mode": "100644"
+    },
+    {
+      "path": "nu-world.css",
+      "git_blob_sha": "35cc816c740bf10dd65e7da98244c8409830e672",
+      "size_bytes": 84607,
+      "mode": "100644"
+    },
+    {
+      "path": "pixel-art-studio.html",
+      "git_blob_sha": "5f699db2fab7e4f32a429a48acbfc32c4a3f28cf",
+      "size_bytes": 21753,
+      "mode": "100644"
+    },
+    {
+      "path": "sitemap.xml",
+      "git_blob_sha": "b1f34ad702e05d16921f39a6ec22ea6423b79560",
+      "size_bytes": 199,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-arcane-shield.test.js",
+      "git_blob_sha": "77fb80a76e023a810370429a0852d0d01d35628c",
+      "size_bytes": 11054,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-background-engine.test.js",
+      "git_blob_sha": "faeff02ceff149ea02ae68f6af3d8676b0f776bd",
+      "size_bytes": 4004,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-bubble-round.test.js",
+      "git_blob_sha": "c82a7d818115e2284e4a5f1186a43b998fda77b3",
+      "size_bytes": 1002,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-casino.test.js",
+      "git_blob_sha": "5e93531f88c7517b313f398887bc48a26476a4f2",
+      "size_bytes": 2130,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-controller-pointer-runtime.test.js",
+      "git_blob_sha": "2435193e2cd998b59febef3986afdd1044638295",
+      "size_bytes": 7960,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-controller-pointer.test.js",
+      "git_blob_sha": "183e91a0f42c8a0b5c373f17e9d767dd595fc4e1",
+      "size_bytes": 10852,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-demo-hud-cleanup.test.js",
+      "git_blob_sha": "a5f2fde26dcef6a2bcfeff1b1bb635f78276ca33",
+      "size_bytes": 1061,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-exchange-analytics.test.js",
+      "git_blob_sha": "beb41f8c6a961f2b126fbfd8fecd30ef2ff6dc6c",
+      "size_bytes": 1670,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-exchange-audit.test.js",
+      "git_blob_sha": "b0a666017c60297e8087eeee9443e0f299b5bfa8",
+      "size_bytes": 2940,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-exchange-engines.test.js",
+      "git_blob_sha": "1587fe51b1a79e385ca279df88eab780c84974df",
+      "size_bytes": 3913,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-exchange-offline.test.js",
+      "git_blob_sha": "9f2f87670c560105aec2e5c630508229ad6db350",
+      "size_bytes": 2267,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-exchange-runtime.test.js",
+      "git_blob_sha": "a084e08a7459b7fee051bb700ed2b8930a02b080",
+      "size_bytes": 3826,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-exchange-visuals.test.js",
+      "git_blob_sha": "abb3cac4712904950baaa586c29a865c0f7e7eab",
+      "size_bytes": 5078,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-game-icon-feedback.test.js",
+      "git_blob_sha": "d1420aa66b9b0e0dee0d728e1af7b843a8f0344f",
+      "size_bytes": 2156,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-gateway-controller-input.test.js",
+      "git_blob_sha": "08c642dcaa6c25154685843f010d3524dab80a2a",
+      "size_bytes": 15609,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-gateway-exclusive-controls.test.js",
+      "git_blob_sha": "56c43a95337357ff7238ff59d6b43725490a4a08",
+      "size_bytes": 2039,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-gateway-pause.test.js",
+      "git_blob_sha": "465611e0f7f8b871272623b7182fb02402255b8a",
+      "size_bytes": 2233,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-gateway-pointer-controller-mode.test.js",
+      "git_blob_sha": "01c38489b1ffb84b60f4ec0aa4f6464e7335f8b3",
+      "size_bytes": 3609,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-graphics-analysis.test.js",
+      "git_blob_sha": "fc11ad36b18e9074c4ce03ad7b478c0236620cbe",
+      "size_bytes": 2116,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-health.test.js",
+      "git_blob_sha": "086db0e5551210093a609c42e22ad2acfecd3bf1",
+      "size_bytes": 6223,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-hex-gateway.test.js",
+      "git_blob_sha": "010109781cf116f014fdc7f2e0085f7e122f1f49",
+      "size_bytes": 8707,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-hp-bar-mobile-layout.test.js",
+      "git_blob_sha": "1dfb66ac7f7824fd152b6aeef7faec95d65354bd",
+      "size_bytes": 812,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-hp-capsule-animation-dock.test.js",
+      "git_blob_sha": "ed6138f5a861365de4ddf68ca322ad9f43fe5668",
+      "size_bytes": 613,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-hp-capsule-empty-state.test.js",
+      "git_blob_sha": "eba583e6a22f50846f96caaea8c1b1d21a0fe4ca",
+      "size_bytes": 1027,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-hp-pill-interaction.test.js",
+      "git_blob_sha": "45f050eaeb34491cc98e49ee110381aa56c64afb",
+      "size_bytes": 10455,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-hud-layout.test.js",
+      "git_blob_sha": "ef592c6d1e699baa4b9cae20bec6d34490e71867",
+      "size_bytes": 4296,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-ico-export.test.js",
+      "git_blob_sha": "1446e3c8dfb21b63f1ca02f596b1ec4812c454ef",
+      "size_bytes": 2183,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-interaction-core.test.js",
+      "git_blob_sha": "9696ff272dbb9aac81b2fbad42b703d38d2979d5",
+      "size_bytes": 6232,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-keyboard-gameplay.test.js",
+      "git_blob_sha": "47d0c482e920ab928f1c8920ddc80ba9f2ede912",
+      "size_bytes": 2114,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-launcher-background.test.js",
+      "git_blob_sha": "e4bf5360ac7a0c25ffe90707dd109b1078992eac",
+      "size_bytes": 553,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-layer-contract.test.js",
+      "git_blob_sha": "918c550bd3e3fdeb95b9b5b622e6ebaa626b227d",
+      "size_bytes": 3262,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-market-sim.test.js",
+      "git_blob_sha": "e3a8c336676577ba0a8b45e05496c765390f4e7b",
+      "size_bytes": 4683,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-materials.test.js",
+      "git_blob_sha": "7ae69c1e44d669575391fb2ce446f41b6e26c72d",
+      "size_bytes": 1671,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-motion.test.js",
+      "git_blob_sha": "2ded938a24ce4712332391d10030842e7e5e3d10",
+      "size_bytes": 1728,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-profile-preview.test.js",
+      "git_blob_sha": "c29e9fb159583509dff6e14956d8e05ef7cf3b94",
+      "size_bytes": 2903,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-raster-import.test.js",
+      "git_blob_sha": "e59014de7a5842b2ced769cae01b9fddcaad2289",
+      "size_bytes": 2503,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-studio-advanced-tools.test.js",
+      "git_blob_sha": "8473fb23b925e6db59e797234e487f5c348f026f",
+      "size_bytes": 5381,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-studio-bootstrap.test.js",
+      "git_blob_sha": "c6d93eea0a90eeb8bc5f5a85e32d99fe22b3487d",
+      "size_bytes": 1103,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-studio-compact-ux.test.js",
+      "git_blob_sha": "3a917b71629a971a0f9aa7493e47fdc5703212c4",
+      "size_bytes": 1465,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-studio-export.test.js",
+      "git_blob_sha": "fc09cfc5fa12c264826ddb0e04b65d2c7c487f7a",
+      "size_bytes": 1095,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-studio-layout.test.js",
+      "git_blob_sha": "424d826a9f39d6606d993a8b8459b1ec5d05c1ff",
+      "size_bytes": 1473,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-studio-native-dimension-import.test.js",
+      "git_blob_sha": "a028929e215a427f7f27230388da5a9336f86f32",
+      "size_bytes": 2743,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-studio-pro-integration.test.js",
+      "git_blob_sha": "b68d8c866fcee0823cd6ac0f09a17470ec7c5ca5",
+      "size_bytes": 2607,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-studio-pro-tools.test.js",
+      "git_blob_sha": "184d26813dee1d8993d522cbacb29d484a9ac24e",
+      "size_bytes": 2663,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-svg-vectorizer.test.js",
+      "git_blob_sha": "c932e9c8b19cb1c20c3bb391d52f1cace8b2ea83",
+      "size_bytes": 1419,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-wallet-history-presentation.test.js",
+      "git_blob_sha": "fee8c5cedd12dd3e0b2e4d9d6d20237b0a82441e",
+      "size_bytes": 1467,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-wallet-tabs.test.js",
+      "git_blob_sha": "d174dbd5c039acd46f6b15d95fcbe9c000e3de46",
+      "size_bytes": 2362,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-wallet.test.js",
+      "git_blob_sha": "174f17f68023939321d3f96e733ef2c907a749d4",
+      "size_bytes": 9304,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/nu-world-entry-calibration.test.js",
+      "git_blob_sha": "e7e662afbdd2af425fb9eafd2b74eeca8f5a850d",
+      "size_bytes": 1322,
+      "mode": "100644"
+    }
+  ]
+}
