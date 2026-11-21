@@ -53,7 +53,7 @@
 - Preserve currently owner-approved trigger dwell/cancellation thresholds and synthetic-click suppression; do not invent or silently alter timing. Opening dispatches pause before options become actionable.
 - Touch scrolling is disabled on the active game interaction surface without breaking direct touch delivery or the protected canvas routing.
 - Every Gateway exit keeps gameplay frozen until the first fresh gameplay-area interaction; held controller input cannot resume it. Full normative scenarios and regression matrix: [Gateway & simulated-mouse contract, section 12](./docs/operations/GATEWAY-AND-CONTROLLER-INPUT-CONTRACT-2026-11-17.md#12-binding-owner-amendment--gateway-and-virtual-mouse-are-independent-2026-11-21).
-- Implement controller input as a shared launcher-core adapter. Gateway and future modules consume the adapter; do not fork controller-specific logic per page.
+- Implement simulated mouse as a shared launcher-core gameplay adapter. Game modules consume it through the shared interface; Gateway consumes only its separate selective-action controls and must never take ownership of the virtual pointer. Do not fork controller-specific pointer logic per page.
 - Keep adapters extensible for future controller types through stable interfaces and documented capability references.
 
 ## Machine approval lock and human QA queue
