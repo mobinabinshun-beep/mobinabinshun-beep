@@ -168,3 +168,14 @@ This candidate is for **demo-only human QA**, not product release. The owner has
 **Human QA:** `HUMAN-QA-PENDING`. Use the linked handoff document for desktop/mobile/touch, selection, rotation, Fading Brush, Blueprint, Undo/Redo and export checks.
 
 **Authority:** this is a demo-only QA deployment, not a product release, launch, stable publication or production promotion. A beyond-demo release requires explicit owner acceptance of the human QA for this exact build/scope and a separate direct instruction naming that release action. No release action is included.
+
+
+## Owner clarification — separate Fading and color-mixing Brush (2026-11-21)
+
+The owner clarified the intended pair: **Fading (محوکن)** and **Brush (قلم ترکیب و قاطی کردن رنگ‌ها)**. They are separate capabilities; the label/implementation "Fading Brush" must not be treated as satisfying both.
+
+Source audit of the candidate found a Fading Brush path and fade-intensity control, but no separate user-facing color-mixing Brush. The existing 48/48 candidate test result remains valid only for the exact previously tested scope and SHA; it is not evidence that the newly clarified Brush exists or passes. Existing layer blend modes and the internal color interpolation helper are not substitutes for the requested stroke-based mixing tool.
+
+Detailed requirements, current gap, acceptance criteria, automated test matrix, human QA checklist and next-session resume instructions are recorded in [PIXEL-ART-STUDIO-FADING-AND-COLOR-MIXING-BRUSH-SPEC-2026-11-21.md](./PIXEL-ART-STUDIO-FADING-AND-COLOR-MIXING-BRUSH-SPEC-2026-11-21.md).
+
+**Status:** requirement clarified and documented; separate color-mixing Brush implementation and exact-SHA feature tests remain outstanding; human QA is pending. A documentation-only CI PASS is not feature approval.
