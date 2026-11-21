@@ -44,6 +44,31 @@ test("HP capsule dock remains state-driven and reversibly animated", () => {
   assert.ok(games.includes("function useHpPill("));
 });
 
+test("game asset profile follows transient touch, physical mouse and simulated mouse hover only", () => {
+  assert.match(games, /el\.addEventListener\("pointerenter",\(\)=>showGameAssetProfile\(el\)\)/);
+  assert.match(games, /el\.addEventListener\("pointerleave",hide\)/);
+  assert.match(games, /if\(e\.pointerType==="touch"\)showGameAssetProfile\(el\)/);
+  assert.match(games, /if\(e\.pointerType==="touch"\)hide\(\)/);
+  assert.match(games, /window\.addEventListener\("nu:simulated-pointer-target"/);
+  assert.doesNotMatch(games, /assetProfilePinned|toggleGameAssetProfile/);
+  assert.doesNotMatch(games, /addEventListener\("focus",\(\)=>showGameAssetProfile/);
+});
+
+test("game asset profile is floating text and never renders zero-valued assets", () => {
+  assert.match(games, /gameAssetRows\(state\.save,state\.game\)\.filter\(row=>Number\(row\.value\)>0\)/);
+  const profileRenderer = games.slice(games.indexOf("function renderGameAssetProfile()"), games.indexOf("function setAssetProfileExpanded"));
+  assert.doesNotMatch(profileRenderer, /root\.hidden=false/);
+  assert.match(games, /if\(!renderGameAssetProfile\(\)\)return;\s*root\.hidden=false;/);
+  assert.match(games, /if\(Number\(state\.save\.xp\)>0\)\{[\s\S]*?rows\.unshift\(\{key:"xp",label:"XP"/);
+  assert.match(games, /rows\.unshift\(\{key:"level",label:"LV"/);
+  assert.doesNotMatch(games, /value:0,unit:""\}\)/);
+  assert.doesNotMatch(games, /SHARED WALLET|GAME-SCOPED VIEW|ASSET PROFILE/);
+  assert.match(css, /#game-asset-profile\{[^}]*background:transparent/);
+  assert.match(css, /#game-asset-profile\{[^}]*border:0/);
+  assert.match(css, /#game-asset-profile\{[^}]*box-shadow:none/);
+  assert.doesNotMatch(css, /#game-asset-profile>strong|#game-asset-profile>small/);
+});
+ 
 test("no unsupported N-BI shield meter is introduced", () => {
   assert.ok(!html.includes('id="nbi-shield-bar"'));
 });

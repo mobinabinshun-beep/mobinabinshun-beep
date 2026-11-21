@@ -104,54 +104,75 @@ function recordGameObjectEvent(target,action,outcome,source,extra){
  try{return core.record(semanticAction,source||"game-runtime",canvas,detail);}catch(_){return null;}
 }
 function renderGameAssetProfile(){
- const root=$("game-asset-profile");if(!root||!state.game)return;
- const names={bubble:"BUBBLE HUNT · ASSET PROFILE",mana:"MANA COLLECTOR · ASSET PROFILE",chaos:"CHAOS ATTACK · ASSET PROFILE"};
- const rows=NUWallet.gameAssetRows(state.save,state.game);
- if(state.save.hp<10&&state.save.hpPills===0&&state.save.xp>=NUWallet.HP_PILL_COST&&!rows.some(row=>row.key==="hpPills"))rows.push({key:"hpPills",label:"HP Capsules",value:0,unit:""});
- if(!rows.length){root.replaceChildren();root.hidden=true;return;}
- root.hidden=false;
- root.innerHTML='<strong>'+names[state.game]+'</strong><small>SHARED WALLET · GAME-SCOPED VIEW</small><div class="game-asset-rows">'+rows.map(row=>'<span>'+row.label+'</span><b>'+row.value+row.unit+'</b>').join("")+'</div>';
+ const root=$("game-asset-profile");if(!root)return false;if(!state.game){root.hidden=true;return false;}
+ const rows=NUWallet.gameAssetRows(state.save,state.game).filter(row=>Number(row.value)>0);
+ if(Number(state.save.xp)>0){
+  if(!rows.some(row=>row.key==="xp"))rows.unshift({key:"xp",label:"XP",value:state.save.xp,unit:""});
+  rows.unshift({key:"level",label:"LV",value:state.save.level,unit:""});
+ }
+ if((state.game==="mana"||state.game==="chaos")&&Number(state.save.manaCapsules)>0&&!rows.some(row=>row.key==="manaCapsules")){
+  rows.push({key:"manaCapsules",label:"Mana Capsules",value:state.save.manaCapsules,unit:""});
+ }
+ const visible=rows.filter(row=>Number.isFinite(Number(row.value))&&Number(row.value)>0);
+ if(!visible.length){root.replaceChildren();root.hidden=true;return false;}
+ root.innerHTML='<div class="game-asset-rows">'+visible.map(row=>'<span>'+row.label+' '+row.value+row.unit+'</span>').join("")+'</div>';
+ return true;
 }
-let assetProfilePinned=false;
 function setAssetProfileExpanded(value){
  document.querySelectorAll(".bar-wrap,#hp-bar").forEach(el=>el.setAttribute("aria-expanded",String(value)));
 }
 function positionGameAssetProfile(trigger){
  const root=$("game-asset-profile");if(!root||!trigger)return;
- const rect=trigger.getBoundingClientRect(),width=root.offsetWidth||300,height=root.offsetHeight||110;
- const top=rect.top>innerHeight*.5?rect.top-height-10:rect.bottom+10;
+ const rect=trigger.getBoundingClientRect(),width=root.offsetWidth||160,height=root.offsetHeight||24;
+ const top=rect.top>innerHeight*.5?rect.top-height-8:rect.bottom+8;
  const left=rect.left+rect.width/2-width/2;
  root.style.left=Math.max(8,Math.min(innerWidth-width-8,left))+"px";
  root.style.top=Math.max(8,Math.min(innerHeight-height-8,top))+"px";
  root.style.transform="none";
 }
-function showGameAssetProfile(trigger){
- const root=$("game-asset-profile");if(!root)return;
- renderGameAssetProfile();root.hidden=false;setAssetProfileExpanded(true);positionGameAssetProfile(trigger);
+function hideGameAssetProfile(){
+ const root=$("game-asset-profile");if(root)root.hidden=true;
+ setAssetProfileExpanded(false);
 }
-function toggleGameAssetProfile(trigger){
- assetProfilePinned=!assetProfilePinned;
- if(assetProfilePinned){showGameAssetProfile(trigger);setAssetProfileExpanded(true);}
- else{$("game-asset-profile").hidden=true;setAssetProfileExpanded(false);}
+function showGameAssetProfile(trigger){
+ const root=$("game-asset-profile");if(!root||!trigger)return;
+ if(!renderGameAssetProfile())return;
+ root.hidden=false;
+ setAssetProfileExpanded(true);positionGameAssetProfile(trigger);
 }
 function bindGameAssetProfiles(){
  const triggers=[...document.querySelectorAll(".bar-wrap"),$("hp-bar")].filter(Boolean),root=$("game-asset-profile");
+ const triggerFor=target=>target&&target.closest?target.closest(".bar-wrap,#hp-bar"):null;
+ const hide=()=>hideGameAssetProfile();
  triggers.forEach(el=>{
   el.tabIndex=0;el.setAttribute("role","group");el.setAttribute("aria-label","Show game asset profile");el.setAttribute("aria-describedby","game-asset-profile");el.setAttribute("aria-expanded","false");
-  el.addEventListener("pointerenter",()=>{if(!assetProfilePinned)showGameAssetProfile(el);});
-  el.addEventListener("pointerleave",()=>{if(!assetProfilePinned){root.hidden=true;setAssetProfileExpanded(false);}});
-  el.addEventListener("focus",()=>showGameAssetProfile(el));
-  el.addEventListener("blur",()=>{if(!assetProfilePinned){root.hidden=true;setAssetProfileExpanded(false);}});
-  // Resource bars are HUD controls, never gameplay hit targets or camera gestures.
-  el.addEventListener("pointerdown",e=>e.stopPropagation());
-  el.addEventListener("pointerup",e=>e.stopPropagation());
-  el.addEventListener("click",e=>{e.stopPropagation();if(e.target.closest("#hp-pill-use"))return;toggleGameAssetProfile(el);});
-  el.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();e.stopPropagation();toggleGameAssetProfile(el);}});
+  el.addEventListener("pointerenter",()=>showGameAssetProfile(el));
+  el.addEventListener("pointerleave",hide);
+  el.addEventListener("pointerdown",e=>{
+   e.stopPropagation();
+   if(e.pointerType==="touch")showGameAssetProfile(el);
+  });
+  el.addEventListener("pointerup",e=>{
+   e.stopPropagation();
+   if(e.pointerType==="touch")hide();
+  });
+  el.addEventListener("pointercancel",e=>{
+   if(e.pointerType==="touch")hide();
+  });
+  // Resource bars remain separate from gameplay hit-testing; the HP use control keeps its own click.
+  el.addEventListener("click",e=>{if(!e.target.closest("#hp-pill-use"))e.stopPropagation();});
  });
- document.addEventListener("pointerdown",e=>{
-  if(assetProfilePinned&&!e.target.closest(".bar-wrap,#hp-bar")){assetProfilePinned=false;root.hidden=true;setAssetProfileExpanded(false);}
+ // The virtual mouse dispatches pointermove to its hit target and publishes target transitions here.
+ window.addEventListener("nu:simulated-pointer-target",event=>{
+  const trigger=triggerFor(event.detail&&event.detail.target);
+  if(trigger)showGameAssetProfile(trigger);else hide();
  });
- window.addEventListener("resize",()=>{if(!root.hidden){const active=document.activeElement;if(active&&active.matches(".bar-wrap,#hp-bar"))positionGameAssetProfile(active);}});
+ window.addEventListener("resize",()=>{
+  if(root&&!root.hidden){
+   const trigger=document.querySelector(".bar-wrap.nu-simulated-mouse-target,#hp-bar.nu-simulated-mouse-target");
+   if(trigger)positionGameAssetProfile(trigger);
+  }
+ });
 }
 let lastRenderedHp=null,lastPillDockVisible=null,hpPillTravelAnimation=null,hpPillTravelGhost=null,hpPillTravelLayer=null,hpPillTravelDirection=null,hpPillTravelRun=0;
 function animateHpPillTravel(direction){
@@ -290,7 +311,7 @@ function showFloat(){} // N.U policy: no floating XP/Mana/reward text on interac
 function announceTransaction(message,tone="success"){const el=$("transaction-toast");if(!el)return;el.textContent=message;el.className="transaction-toast "+tone+" visible";clearTimeout(el._hideTimer);el._hideTimer=setTimeout(()=>el.classList.remove("visible"),2200);}function showFloatingChange(message,tone="gain"){const root=$("floating-notifications");if(!root)return;const item=document.createElement("div");item.className="floating-change "+tone;item.textContent=message;root.appendChild(item);setTimeout(()=>item.remove(),1800);}
 function showHpGain(amount){const track=$("hp-fill").parentElement;track.classList.remove("hp-restored");void track.offsetWidth;track.classList.add("hp-restored");const el=document.createElement("span");el.className="hp-gain";el.textContent="+"+amount+" HP";track.appendChild(el);setTimeout(()=>{el.remove();track.classList.remove("hp-restored");},1100);}
 function showHpPillInteraction(anchor,amount){if(!anchor)return;const el=document.createElement("span");el.className="hp-pill-interaction-burst";el.setAttribute("aria-hidden","true");el.style.left=(anchor.left+anchor.width/2)+"px";el.style.top=(anchor.top+anchor.height/2)+"px";const ring=document.createElement("span");ring.className="hp-pill-burst-ring";el.appendChild(ring);for(let i=0;i<8;i++){const particle=document.createElement("span");const angle=(Math.PI*2*i)/8-Math.PI/2;particle.className="hp-pill-burst-particle";particle.style.setProperty("--burst-x",(Math.cos(angle)*34)+"px");particle.style.setProperty("--burst-y",(Math.sin(angle)*34)+"px");el.appendChild(particle);}const label=document.createElement("span");label.className="hp-pill-burst-label";label.textContent="+"+amount+" HP";el.appendChild(label);document.body.appendChild(el);setTimeout(()=>el.remove(),1050);}
-function useHpPill(source){const event=source&&typeof source.preventDefault==="function"?source:null;const button=source&&source.nodeType===1?source:(event?source.currentTarget:null);if(event){event.preventDefault();event.stopPropagation();}const anchor=button&&button.id==="hp-pill-use"?button.getBoundingClientRect():null;const isStoreUse=!!(button&&button.matches("[data-use-hp-pill]"));const result=NUWallet.useHpPill(state.save);if(!result.ok){const message=result.reason==="HP_FULL"?"HP is already full · no capsule consumed.":result.reason==="NO_HP_CAPSULE"?(state.save.xp>=NUWallet.HP_PILL_COST?"0 HP Capsules · open Store to buy one.":"0 HP Capsules · earn 10 XP to unlock Store purchase."):"HP Capsule unavailable.";announceTransaction(message,"warning");return;}if(!persistWalletState(result.state))return;if(window.NUHealth){const gameId=state.active?state.game:"store";window.NUHealth.recordMedicationUse({gameId,waveId:state.save.activeWave&&state.save.activeWave.id,itemName:"Golden HP Capsule",itemType:"medicine",effect:"healing",effectAmount:result.restored});window.NUHealth.recordHealing({gameId,waveId:state.save.activeWave&&state.save.activeWave.id,amount:result.restored,hpAfter:result.state.hp,source:"Golden HP Capsule"});}if(isStoreUse)renderShop("−1 HP Capsule · +"+result.restored+" HP restored.");assetProfilePinned=false;const profile=$("game-asset-profile");if(profile)profile.hidden=true;setAssetProfileExpanded(false);showHpGain(result.restored);if(anchor)showHpPillInteraction(anchor,result.restored);showFloatingChange("+"+result.restored+" HP","hp");showFloatingChange("−1 Capsule","loss");announceTransaction("HP CAPSULE USED · +"+result.restored+" HP · −1 CAPSULE","success");}
+function useHpPill(source){const event=source&&typeof source.preventDefault==="function"?source:null;const button=source&&source.nodeType===1?source:(event?source.currentTarget:null);if(event){event.preventDefault();event.stopPropagation();}const anchor=button&&button.id==="hp-pill-use"?button.getBoundingClientRect():null;const isStoreUse=!!(button&&button.matches("[data-use-hp-pill]"));const result=NUWallet.useHpPill(state.save);if(!result.ok){const message=result.reason==="HP_FULL"?"HP is already full · no capsule consumed.":result.reason==="NO_HP_CAPSULE"?(state.save.xp>=NUWallet.HP_PILL_COST?"0 HP Capsules · open Store to buy one.":"0 HP Capsules · earn 10 XP to unlock Store purchase."):"HP Capsule unavailable.";announceTransaction(message,"warning");return;}if(!persistWalletState(result.state))return;if(window.NUHealth){const gameId=state.active?state.game:"store";window.NUHealth.recordMedicationUse({gameId,waveId:state.save.activeWave&&state.save.activeWave.id,itemName:"Golden HP Capsule",itemType:"medicine",effect:"healing",effectAmount:result.restored});window.NUHealth.recordHealing({gameId,waveId:state.save.activeWave&&state.save.activeWave.id,amount:result.restored,hpAfter:result.state.hp,source:"Golden HP Capsule"});}if(isStoreUse)renderShop("−1 HP Capsule · +"+result.restored+" HP restored.");hideGameAssetProfile();showHpGain(result.restored);if(anchor)showHpPillInteraction(anchor,result.restored);showFloatingChange("+"+result.restored+" HP","hp");showFloatingChange("−1 Capsule","loss");announceTransaction("HP CAPSULE USED · +"+result.restored+" HP · −1 CAPSULE","success");}
 function showCapsuleGain(text,type){const fill=type==="xp"?$("xp-fill"):$("mana-fill");const bar=fill.parentElement;const el=document.createElement("span");el.className="capsule-gain "+type;el.textContent=text;el.style.left=Math.max(1,Math.min(99,(parseFloat(fill.style.width)||0)+1.5))+"%";el.style.transform="translateX(-50%)";bar.appendChild(el);setTimeout(()=>el.remove(),1100);}
 function showHitProgress(x,y){const el=document.createElement("span");el.className="hit-progress";el.textContent=state.turn+"/10";el.style.left=x+"px";el.style.top=y+"px";$("game-stage").appendChild(el);setTimeout(()=>el.remove(),850);}
 function renderRoundProgress(){} // Round count is shown only on the interacted object.
