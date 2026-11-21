@@ -57,9 +57,9 @@ test("fading brush intensity deterministically blends over an existing or transp
  assert.throws(()=>P.fadePixel(null,"#ffffff",101),/intensity/);
 });
 test("selected rotation preserves pixels outside the selection",()=>{
- const source=["#ff0000","#00ff00",null,null],mask=Uint8Array.from([1,0,0,0]);
+ const source=["#ff0000",null,null,"#00ff00"],mask=Uint8Array.from([1,0,0,0]);
  const result=P.rotatePixels(source,2,2,90,mask);
- assert.equal(result.pixels[1],"#00ff00");
+ assert.equal(result.pixels[3],"#00ff00");
  assert.equal(source[0],"#ff0000");
  assert.equal(result.selection.reduce((n,v)=>n+v,0),1);
 });
