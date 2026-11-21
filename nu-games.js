@@ -105,34 +105,36 @@ function recordGameObjectEvent(target,action,outcome,source,extra){
 }
 function renderGameAssetProfile(){
  const root=$("game-asset-profile");if(!root||!state.game)return;
- const names={bubble:"BUBBLE HUNT · ASSET PROFILE",mana:"MANA COLLECTOR · ASSET PROFILE",chaos:"CHAOS ATTACK · ASSET PROFILE"};
- const rows=NUWallet.gameAssetRows(state.save,state.game);
- if(state.save.hp<10&&state.save.hpPills===0&&state.save.xp>=NUWallet.HP_PILL_COST&&!rows.some(row=>row.key==="hpPills"))rows.push({key:"hpPills",label:"HP Capsules",value:0,unit:""});
- if(!rows.length){root.replaceChildren();root.hidden=true;return;}
- root.hidden=false;
- root.innerHTML='<strong>'+names[state.game]+'</strong><small>SHARED WALLET · GAME-SCOPED VIEW</small><div class="game-asset-rows">'+rows.map(row=>'<span>'+row.label+'</span><b>'+row.value+row.unit+'</b>').join("")+'</div>';
+ const rows=NUWallet.gameAssetRows(state.save,state.game).filter(row=>Number(row.value)>0);
+ if(Number(state.save.xp)>0)rows.unshift({key:"level",label:"LV",value:state.save.level,unit:""});
+ if((state.game==="mana"||state.game==="chaos")&&Number(state.save.manaCapsules)>0&&!rows.some(row=>row.key==="manaCapsules")){
+  rows.push({key:"manaCapsules",label:"Mana Capsules",value:state.save.manaCapsules,unit:""});
+ }
+ const visible=rows.filter(row=>Number.isFinite(Number(row.value))&&Number(row.value)>0);
+ if(!visible.length){root.replaceChildren();root.hidden=true;return;}
+ root.innerHTML='<div class="game-asset-rows">'+visible.map(row=>'<span>'+row.label+' '+row.value+row.unit+'</span>').join("")+'</div>';
 }
-let assetProfilePinned=false;
 function setAssetProfileExpanded(value){
  document.querySelectorAll(".bar-wrap,#hp-bar").forEach(el=>el.setAttribute("aria-expanded",String(value)));
 }
 function positionGameAssetProfile(trigger){
  const root=$("game-asset-profile");if(!root||!trigger)return;
- const rect=trigger.getBoundingClientRect(),width=root.offsetWidth||300,height=root.offsetHeight||110;
- const top=rect.top>innerHeight*.5?rect.top-height-10:rect.bottom+10;
+ const rect=trigger.getBoundingClientRect(),width=root.offsetWidth||160,height=root.offsetHeight||24;
+ const top=rect.top>innerHeight*.5?rect.top-height-8:rect.bottom+8;
  const left=rect.left+rect.width/2-width/2;
  root.style.left=Math.max(8,Math.min(innerWidth-width-8,left))+"px";
  root.style.top=Math.max(8,Math.min(innerHeight-height-8,top))+"px";
  root.style.transform="none";
 }
-function showGameAssetProfile(trigger){
- const root=$("game-asset-profile");if(!root)return;
- renderGameAssetProfile();root.hidden=false;setAssetProfileExpanded(true);positionGameAssetProfile(trigger);
+function hideGameAssetProfile(){
+ const root=$("game-asset-profile");if(root)root.hidden=true;
+ setAssetProfileExpanded(false);
 }
-function toggleGameAssetProfile(trigger){
- assetProfilePinned=!assetProfilePinned;
- if(assetProfilePinned){showGameAssetProfile(trigger);setAssetProfileExpanded(true);}
- else{$("game-asset-profile").hidden=true;setAssetProfileExpanded(false);}
+function showGameAssetProfile(trigger){
+ const root=$("game-asset-profile");if(!root||!trigger)return;
+ renderGameAssetProfile();
+ if(root.hidden)return;
+ setAssetProfileExpanded(true);positionGameAssetProfile(trigger);
 }
 function bindGameAssetProfiles(){
  const triggers=[...document.querySelectorAll(".bar-wrap"),$("hp-bar")].filter(Boolean),root=$("game-asset-profile");
