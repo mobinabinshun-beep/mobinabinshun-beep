@@ -85,3 +85,12 @@ At the exact SHA above, all four PR workflow families passed:
 The dedicated Studio job completed successfully; its log reports **47 tests, 47 passed, 0 failed, 0 skipped**. Syntax checks passed. Export, graphics smoke and adjacent regression workflows also passed.
 
 **Machine status:** PASS for the candidate code at the exact SHA above. **Controlled human QA may begin against this exact candidate build.** This does not mean full Issue #62 acceptance: browser/device touch behavior, visual QA, Undo/Redo end-to-end, export-overlay exclusion, and owner review remain open. Runtime snapshot remains `NOT CAPTURED`; no merge, production deployment, or release is authorized.
+
+
+## Owner instruction update — demo QA is not release (2026-11-21)
+
+The owner's latest direct instruction supersedes older wording that treats public-demo delivery as publishing:
+- Demo deployment is only a QA handoff; it is not a product release, launch, stable publication or production promotion.
+- The exact machine-passed candidate may be placed on the public demo after the mandatory runtime baseline and exact candidate backup gates, labelled `TEST CANDIDATE — NOT HUMAN-APPROVED`.
+- Any beyond-demo release requires BOTH explicit human acceptance of the exact demo build/scope and a separate direct, unambiguous owner instruction naming the release action.
+- No CI result, demo deployment, merge, tester PASS, silence or general human acceptance can substitute for that second instruction.
