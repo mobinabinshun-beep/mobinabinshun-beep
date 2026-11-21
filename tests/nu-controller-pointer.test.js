@@ -189,8 +189,11 @@ test("Keyboard-emulated controller input held through Gateway closure is blocked
  h.win.dispatchEvent({type:"keydown",key:"ArrowDown",target:{},preventDefault(){},stopImmediatePropagation(){}});
  h.doc.body.classList.remove("nu-gateway-open");
  h.win.dispatchEvent({type:"nu:gateway-close"});
- h.win.dispatchEvent({type:"keydown",key:"ArrowDown",repeat:true,target:{},preventDefault(){},stopImmediatePropagation(){}});
+ let heldPrevented=false,heldStopped=false;
+ h.win.dispatchEvent({type:"keydown",key:"ArrowDown",repeat:true,target:{},preventDefault(){heldPrevented=true;},stopImmediatePropagation(){heldStopped=true;}});
  assert.equal(h.pointer.getState().y,startY);
+ assert.equal(heldPrevented,true);
+ assert.equal(heldStopped,true);
  h.win.dispatchEvent({type:"keyup",key:"ArrowDown"});
  h.win.dispatchEvent({type:"keydown",key:"ArrowDown",target:{},preventDefault(){},stopImmediatePropagation(){}});
  assert.equal(h.pointer.getState().y,startY+28);
