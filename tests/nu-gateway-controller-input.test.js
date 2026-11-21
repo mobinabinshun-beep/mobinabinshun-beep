@@ -69,7 +69,7 @@ test("Gateway mouse hover visibly selects and a click activates one destination"
 
 test("Shared controller adapter maps D-pad/stick to virtual pointer and A/B to confirm/cancel",()=>{
  const pointer=fs.readFileSync("nu-controller-pointer.js","utf8");
- assert.match(gateway,/NUControllerPointer\?\.setEnabled\(true\)/);
+ assert.doesNotMatch(gateway,/NUControllerPointer/);
  assert.match(pointer,/navigator&&win\.navigator\.getGamepads/);
  assert.match(pointer,/b\[12\]/);
  assert.match(pointer,/b\[15\]/);
@@ -80,7 +80,7 @@ test("Shared controller adapter maps D-pad/stick to virtual pointer and A/B to c
 
 test("Simulated mouse uses the Gateway list, one extra Down exits, and pointer must leave before re-entry",()=>{
  const pointer=fs.readFileSync("nu-controller-pointer.js","utf8");
- assert.match(pointer,/setGatewayNavigation\(value\)/);
+ assert.match(pointer,/function isGatewayOpen\(\)/);
  assert.match(pointer,/nu:gateway-direction/);
  assert.match(pointer,/nu:gateway-confirm/);
  assert.match(pointer,/nu:simulated-pointer-target/);
@@ -89,10 +89,10 @@ test("Simulated mouse uses the Gateway list, one extra Down exits, and pointer m
  assert.match(pointer,/gamepadconnected/);
  assert.match(gateway,/scheduleOpen\(1000,"simulated-pointer"\)/);
  assert.match(gateway,/scheduleOpen\(500,"physical-mouse"\)/);
- assert.match(gateway,/scheduleDwellActivation\(item,"physical-mouse"\)/);
- assert.match(gateway,/scheduleDwellActivation\(item,"simulated-mouse"\)/);
- assert.match(gateway,/scheduleDwellActivation\(item,"touch-drag"\)/);
- assert.match(gateway,/scheduleDwellActivation\(items\[current\+1\],"simulated-controller"\)/);
+ assert.match(gateway,/if\(event\.pointerType==="mouse"&&open\)activate\(item\)/);
+ assert.doesNotMatch(gateway,/scheduleDwellActivation/);
+ assert.match(gateway,/if\(!wasMoved\)activate\(item\)/);
+ assert.match(gateway,/select\(items\[current\+1\]\)/);
  assert.match(gateway,/scheduleOpen\(500,"touch"\)/);
  assert.match(gateway,/if\(!open\)cancelScheduledOpen\(\)/);
  assert.match(gateway,/event.pointerType!=="touch"\|\|event.isPrimary===false/);
@@ -105,8 +105,8 @@ test("Simulated mouse uses the Gateway list, one extra Down exits, and pointer m
 });
 test("Gateway options are frozen before they become actionable and remain controller-selectable",()=>{
  assert.ok(gateway.indexOf('new Event("nu:gateway-open")')<gateway.indexOf('root.classList.toggle("is-open",open)'));
- assert.match(gateway,/setGatewayNavigation\(true\)/);
- assert.match(gateway,/setGatewayNavigation\(false\)/);
+ assert.doesNotMatch(gateway,/NUControllerPointer/);
+ assert.match(gateway,/function moveGatewaySelection\(direction\)/);
 });
 test("One shared adapter owns gamepad pointer movement and activation",()=>{
  const pointer=fs.readFileSync("nu-controller-pointer.js","utf8");
