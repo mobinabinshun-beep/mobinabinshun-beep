@@ -138,22 +138,37 @@ function showGameAssetProfile(trigger){
 }
 function bindGameAssetProfiles(){
  const triggers=[...document.querySelectorAll(".bar-wrap"),$("hp-bar")].filter(Boolean),root=$("game-asset-profile");
+ const triggerFor=target=>target&&target.closest?target.closest(".bar-wrap,#hp-bar"):null;
+ const hide=()=>hideGameAssetProfile();
  triggers.forEach(el=>{
   el.tabIndex=0;el.setAttribute("role","group");el.setAttribute("aria-label","Show game asset profile");el.setAttribute("aria-describedby","game-asset-profile");el.setAttribute("aria-expanded","false");
-  el.addEventListener("pointerenter",()=>{if(!assetProfilePinned)showGameAssetProfile(el);});
-  el.addEventListener("pointerleave",()=>{if(!assetProfilePinned){root.hidden=true;setAssetProfileExpanded(false);}});
-  el.addEventListener("focus",()=>showGameAssetProfile(el));
-  el.addEventListener("blur",()=>{if(!assetProfilePinned){root.hidden=true;setAssetProfileExpanded(false);}});
-  // Resource bars are HUD controls, never gameplay hit targets or camera gestures.
-  el.addEventListener("pointerdown",e=>e.stopPropagation());
-  el.addEventListener("pointerup",e=>e.stopPropagation());
-  el.addEventListener("click",e=>{e.stopPropagation();if(e.target.closest("#hp-pill-use"))return;toggleGameAssetProfile(el);});
-  el.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();e.stopPropagation();toggleGameAssetProfile(el);}});
+  el.addEventListener("pointerenter",()=>showGameAssetProfile(el));
+  el.addEventListener("pointerleave",hide);
+  el.addEventListener("pointerdown",e=>{
+   e.stopPropagation();
+   if(e.pointerType==="touch")showGameAssetProfile(el);
+  });
+  el.addEventListener("pointerup",e=>{
+   e.stopPropagation();
+   if(e.pointerType==="touch")hide();
+  });
+  el.addEventListener("pointercancel",e=>{
+   if(e.pointerType==="touch")hide();
+  });
+  // Resource bars remain separate from gameplay hit-testing; the HP use control keeps its own click.
+  el.addEventListener("click",e=>{if(!e.target.closest("#hp-pill-use"))e.stopPropagation();});
  });
- document.addEventListener("pointerdown",e=>{
-  if(assetProfilePinned&&!e.target.closest(".bar-wrap,#hp-bar")){assetProfilePinned=false;root.hidden=true;setAssetProfileExpanded(false);}
+ // The virtual mouse dispatches pointermove to its hit target and publishes target transitions here.
+ window.addEventListener("nu:simulated-pointer-target",event=>{
+  const trigger=triggerFor(event.detail&&event.detail.target);
+  if(trigger)showGameAssetProfile(trigger);else hide();
  });
- window.addEventListener("resize",()=>{if(!root.hidden){const active=document.activeElement;if(active&&active.matches(".bar-wrap,#hp-bar"))positionGameAssetProfile(active);}});
+ window.addEventListener("resize",()=>{
+  if(root&&!root.hidden){
+   const trigger=document.querySelector(".bar-wrap.nu-simulated-mouse-target,#hp-bar.nu-simulated-mouse-target");
+   if(trigger)positionGameAssetProfile(trigger);
+  }
+ });
 }
 let lastRenderedHp=null,lastPillDockVisible=null,hpPillTravelAnimation=null,hpPillTravelGhost=null,hpPillTravelLayer=null,hpPillTravelDirection=null,hpPillTravelRun=0;
 function animateHpPillTravel(direction){
