@@ -149,3 +149,22 @@ This candidate is for **demo-only human QA**, not product release. The owner has
 - Graphics preview PR run **44903671284** PASS.
 - Gateway main-game PR run **44903671277** PASS.
 - Candidate backup `backup/pre-public-demo-pixel-art-studio-candidate-2026-11-21-r4` remains identical to the application/test source SHA `6db7811e2481756f93f8225613c88d281f071714`; final branch state receives a separate exact-ref backup before demo merge.
+
+
+## Public demo QA deployment — verified by GitHub Pages (2026-11-21)
+
+- PR #238 was merged to the configured GitHub Pages source solely to make the candidate available for human QA.
+- Merge / Pages build SHA: `c35e5b2edec0d48a0d255ed78ce77a207a241a5f`.
+- Pages workflow: [run 44903824271](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44903824271) — **SUCCESS**.
+- Jobs: build SUCCESS, deploy SUCCESS, report-build-status SUCCESS.
+- The deploy job recorded Pages build version `c35e5b2edec0d48a0d255ed78ce77a207a241a5f` and environment URL https://mobinabinshun-beep.github.io/mobinabinshun-beep/.
+- Human test page: https://mobinabinshun-beep.github.io/mobinabinshun-beep/pixel-art-studio.html.
+- The page visibly identifies itself as `TEST CANDIDATE — NOT HUMAN-APPROVED · DEMO QA ONLY` and displays the core logic SHA.
+- Candidate backup: `backup/pre-public-demo-pixel-art-studio-candidate-2026-11-21-final-r3` — identical to the final pre-merge branch head `dd38bdf8ba2b7d55e2733d6e51930b0260a097e2`.
+- Pre-demo source backup: `backup/pre-pixel-art-studio-demo-before-merge-2026-11-21` — identical to `f475e75cdb7e16d4b14a646fe57cfb5e0ccbd266`.
+
+**Post-deploy verification boundary:** GitHub Pages build/deploy is confirmed successful and reports the exact build SHA/URL. Direct external HTTP body/cache read-back and real browser interaction could not be independently captured through the current verification interface. Therefore the Pages workflow is PASS, while direct HTTP/browser smoke is **UNVERIFIED / delegated to human QA**.
+
+**Human QA:** `HUMAN-QA-PENDING`. Use the linked handoff document for desktop/mobile/touch, selection, rotation, Fading Brush, Blueprint, Undo/Redo and export checks.
+
+**Authority:** this is a demo-only QA deployment, not a product release, launch, stable publication or production promotion. A beyond-demo release requires explicit owner acceptance of the human QA for this exact build/scope and a separate direct instruction naming that release action. No release action is included.
