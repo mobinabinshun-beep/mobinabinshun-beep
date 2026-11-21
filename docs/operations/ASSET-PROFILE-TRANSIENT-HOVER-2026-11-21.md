@@ -21,7 +21,7 @@ No click-to-pin, toggle, persistent expansion, focus-triggered display, extra ac
 - Transparent surface; no panel background, border, rounded card, backdrop blur, or box shadow.
 - Floating concise text only. No title, explanatory subtitle, wallet heading, or long description.
 - Show the current game-relevant positive asset values only. A value equal to zero is omitted completely.
-- Show the player's saved level (LV) once XP is positive; the first earned XP therefore reveals the level and the available positive assets together.
+- Show the player's saved level (LV) and earned XP in every game once XP is positive; the first earned XP therefore reveals the level, XP and the available positive assets together.
 - A positive Mana Capsules count remains eligible for display even when current Mana is zero.
 - The profile is read-only and derives its values from the existing wallet/game state. It must not change asset calculations, progression, save data, game rules, or the classic HUD layout.
 
