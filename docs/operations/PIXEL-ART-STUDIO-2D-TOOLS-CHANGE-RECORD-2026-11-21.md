@@ -6,7 +6,7 @@
 **Draft PR:** [#238](https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/238)  
 **Baseline:** `e1428c2501901975cc3410159bb89216b9459922`  
 **Initial machine-tested candidate:** `5933090148a20bfe4f12d8e1a0d8896381ac4da4`  
-**Current implementation head:** `14fa744e5fe275b2a372fed358648cb1065369f5` (awaiting exact-head CI)  
+**Verified implementation head:** `dc3c37567c53df3899d677f8069dde15fe1ebaf9`  
 **Runtime snapshot:** `NOT CAPTURED`
 
 ## Scope authorized for this candidate
@@ -42,7 +42,7 @@ At candidate SHA `5933090148a20bfe4f12d8e1a0d8896381ac4da4`, these Actions runs 
 - Graphics preview smoke checks — run `44883360087`
 - Arcane Shield and Mana regression — run `44883360027`
 
-This evidence applies only to the initial incremental candidate and its tested files. The newer implementation commits have not yet been verified by exact-head Actions; no machine pass is claimed for the current head until those runs complete.
+Initial candidate checks passed at `5933090148a20bfe4f12d8e1a0d8896381ac4da4`. The expanded implementation first exposed an incorrect test expectation for an unselected pixel overwritten by a selected rotation; the assertion was corrected to verify an untouched pixel outside the transformed destination. At exact head `dc3c37567c53df3899d677f8069dde15fe1ebaf9`, all four workflows completed successfully: Pixel Art Studio machine checks (run `44894299002`), Studio export regressions (run `44894298990`), graphics preview smoke checks (run `44894299013`), and Arcane Shield/Mana regression (run `44894299072`).
 
 ## Outstanding work
 
@@ -59,4 +59,4 @@ The current candidate contains first-pass integration for fading brush, free lay
 
 ## Status
 
-**DOCUMENTED / IMPLEMENTATION IN PROGRESS — CURRENT HEAD CI PENDING; NOT COMPLETE; HUMAN QA NOT READY; DEPLOYMENT BLOCKED.**
+**DOCUMENTED / FIRST-PASS IMPLEMENTATION — MACHINE PASS at `dc3c37567c53df3899d677f8069dde15fe1ebaf9`; NOT COMPLETE; HUMAN QA NOT READY; DEPLOYMENT BLOCKED.**
