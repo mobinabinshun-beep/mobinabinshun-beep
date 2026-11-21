@@ -104,3 +104,15 @@ test("rotation at zero degrees is identity for pixels and selected mask",()=>{
  assert.deepEqual(result.pixels,source);
  assert.deepEqual([...result.selection],[...mask]);
 });
+
+test("fading brush intensity endpoints are deterministic on opaque and transparent pixels",()=>{
+ assert.equal(P.fadePixel("#000000","#ffffff",1),"#030303");
+ assert.equal(P.fadePixel("#000000","#ffffff",100),"#ffffff");
+ assert.equal(P.fadePixel(null,"#ffffff",1),"#15283a");
+ assert.equal(P.fadePixel(null,"#ffffff",100),"#ffffff");
+});
+test("selection inversion handles empty, full and irregular masks",()=>{
+ assert.deepEqual([...P.invertSelection(Uint8Array.from([0,0,0]))],[1,1,1]);
+ assert.deepEqual([...P.invertSelection(Uint8Array.from([1,1,1]))],[0,0,0]);
+ assert.deepEqual([...P.invertSelection(Uint8Array.from([1,0,0,1,0]))],[0,1,1,0,1]);
+});
