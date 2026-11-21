@@ -235,3 +235,28 @@ test("Physical mouse leaving the Gateway interaction zone closes it",()=>{
  assert.equal(h.body.classList.contains("nu-gateway-open"),false);
  assert.ok(h.events.includes("nu:gateway-close"));
 });
+
+
+test("Touch can open Gateway, lift the opening finger, then tap an option separately",()=>{
+ const h=makeGatewayHarness();
+ h.trigger.handlers.get("pointerdown")[0]({pointerType:"touch",isPrimary:true,pointerId:7,clientX:120,clientY:120,preventDefault(){}});
+ h.advance(500);
+ h.trigger.handlers.get("pointerup")[0]({pointerType:"touch",isPrimary:true,pointerId:7,preventDefault(){},stopPropagation(){}});
+ assert.equal(h.body.classList.contains("nu-gateway-open"),true);
+ h.items[1].handlers.get("pointerdown")[0]({pointerType:"touch",pointerId:8,clientX:120,clientY:220});
+ h.items[1].handlers.get("pointerup")[0]({pointerType:"touch",pointerId:8,preventDefault(){},stopPropagation(){}});
+ h.advance(120);
+ assert.equal(h.menuOpen.clicked,1);
+ assert.equal(h.body.classList.contains("nu-gateway-open"),false);
+});
+
+test("A fresh outside touch after lifting the opening finger closes Gateway",()=>{
+ const h=makeGatewayHarness();
+ h.trigger.handlers.get("pointerdown")[0]({pointerType:"touch",isPrimary:true,pointerId:7,clientX:120,clientY:120,preventDefault(){}});
+ h.advance(500);
+ h.trigger.handlers.get("pointerup")[0]({pointerType:"touch",isPrimary:true,pointerId:7,preventDefault(){},stopPropagation(){}});
+ assert.equal(h.body.classList.contains("nu-gateway-open"),true);
+ h.scrim.handlers.get("click")[0]();
+ assert.equal(h.body.classList.contains("nu-gateway-open"),false);
+ assert.ok(h.events.includes("nu:gateway-close"));
+});
