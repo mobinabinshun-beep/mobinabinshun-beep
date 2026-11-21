@@ -106,7 +106,10 @@ function recordGameObjectEvent(target,action,outcome,source,extra){
 function renderGameAssetProfile(){
  const root=$("game-asset-profile");if(!root||!state.game)return;
  const rows=NUWallet.gameAssetRows(state.save,state.game).filter(row=>Number(row.value)>0);
- if(Number(state.save.xp)>0)rows.unshift({key:"level",label:"LV",value:state.save.level,unit:""});
+ if(Number(state.save.xp)>0){
+  if(!rows.some(row=>row.key==="xp"))rows.unshift({key:"xp",label:"XP",value:state.save.xp,unit:""});
+  rows.unshift({key:"level",label:"LV",value:state.save.level,unit:""});
+ }
  if((state.game==="mana"||state.game==="chaos")&&Number(state.save.manaCapsules)>0&&!rows.some(row=>row.key==="manaCapsules")){
   rows.push({key:"manaCapsules",label:"Mana Capsules",value:state.save.manaCapsules,unit:""});
  }
