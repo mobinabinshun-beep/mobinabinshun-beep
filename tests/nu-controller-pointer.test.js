@@ -140,7 +140,7 @@ test("Gateway freezes virtual-pointer coordinates and event delivery while separ
  assert.equal(h.pointer.getState().x,before.x);
  assert.equal(h.pointer.getState().y,before.y);
  assert.deepEqual(h.targetEvents,[]);
- h.frame(410);
+ h.frame(411);
  moves=h.semanticEvents.filter(event=>event.type==="nu:gateway-direction");
  assert.equal(moves.length,2,"a sustained hold repeats after the configured interval");
  assert.equal(moves[1].detail.repeat,true);
