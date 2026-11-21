@@ -3,7 +3,7 @@
 **State:** DEMO-QA CANDIDATE / HUMAN-QA-PENDING  
 **Candidate PR:** [#238](https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/238)  
 **Candidate branch:** `feat/pixel-art-studio-2d-tools-2026-11-21`  
-**Exact tested branch head:** `0b57f14279ca2b6ba6f832bab1e7b90d573a0787`  
+**Exact tested code/test candidate SHA:** `6db7811e2481756f93f8225613c88d281f071714`  
 **Studio implementation logic SHA:** `9afab37c373091482d2010350a219856e46728d2`  
 **Dedicated machine run:** [44903363462](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44903363462) — 48/48 passed  
 **Demo URL:** https://mobinabinshun-beep.github.io/mobinabinshun-beep/pixel-art-studio.html  
