@@ -1,7 +1,7 @@
 # Player Game Asset Profile — Transient Hover Contract & Change Record
 
 **Date:** 2026-11-21  
-**Status:** MACHINE-APPROVED-LOCKED · PRE-RELEASE-BACKUP-VERIFIED · DEPLOYMENT-UNVERIFIED · HUMAN-QA-PENDING  
+**Status:** MACHINE-APPROVED · PRE-RELEASE-BACKUP-VERIFIED · MERGED · DEMO-DEPLOYMENT-REPORTED-SUCCESS · HUMAN-REPORT-PARTIAL-PASS  
 **Owner authority:** Direct owner instruction in the 2026-11-21 conversation  
 **Feature name:** پروفایل دارایی های پلیر در هر بازی
 
@@ -87,3 +87,13 @@ For each: enter a resource capsule bar, verify concise floating text; leave the 
 ## Rollback
 
 If the candidate introduces a critical regression, stop rollout and restore only from a verified checkpoint after identifying the exact affected candidate. Preserve this record and the failed candidate as history.
+
+## Post-deployment human report — 2026-11-21
+
+**Owner report:** "تایید مکانیزم دیگه مزاحم بازی نیست" — the owner confirms that the transient Asset Profile mechanism no longer interferes with gameplay.
+
+- Record: HUMAN-REPORT-RECEIVED / PARTIAL-PASS for the specific non-interference criterion.
+- This is valid human evidence that the mechanism is no longer disruptive during the owner's play session.
+- It does not imply that every physical mouse, direct-touch and simulated-mouse scenario was exhaustively tested, nor does it close unrelated gameplay defects.
+- The Asset Profile implementation remains separate from the newly reported XP progression and notification defects. Those are tracked independently in [Issue #237](https://github.com/mobinabinshun-beep/mobinabinshun-beep/issues/237).
+- Release reference: merged PR #236, merge commit `583620692d93ce9c4c9e8c358eda04363a14e77b`; public demo: https://mobinabinshun-beep.github.io/mobinabinshun-beep/.
