@@ -163,7 +163,12 @@
     event.preventDefault();
     event.stopPropagation();
     suppressClickUntil=Date.now()+1000;
-    if(!open)cancelScheduledOpen();
+    if(!open){
+      // Restore the prior short-tap behavior while retaining the 500 ms hold path.
+      // Releasing after the hold has opened Gateway must not toggle it closed.
+      cancelScheduledOpen();
+      setOpen(true,true,"touch");
+    }
     touchPointerId=null;touchMoved=false;
   });
   trigger.addEventListener("pointercancel",event=>{
