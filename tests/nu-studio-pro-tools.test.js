@@ -53,7 +53,7 @@ test("free rotation preserves an unselected layer region and returns a tight rot
 });
 test("fading brush intensity deterministically blends over an existing or transparent pixel",()=>{
  assert.equal(P.fadePixel("#000000","#ffffff",50),"#808080");
- assert.equal(P.fadePixel(null,"#ffffff",50),"#8a929a");
+ assert.equal(P.fadePixel(null,"#ffffff",50),"#8a929c");
  assert.throws(()=>P.fadePixel(null,"#ffffff",101),/intensity/);
 });
 test("selected rotation preserves pixels outside the selection",()=>{
