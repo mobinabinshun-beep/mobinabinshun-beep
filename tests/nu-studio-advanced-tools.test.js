@@ -124,5 +124,5 @@ test("fading brush blends against each destination pixel rather than the stroke 
 test("Studio page visibly identifies the exact human-QA-only candidate",()=>{
  assert.match(html,/TEST CANDIDATE — NOT HUMAN-APPROVED/);
  assert.match(html,/DEMO QA ONLY/);
- assert.match(html,/CODE SHA 9afab37c373091482d2010350a219856e46728d2/);
+ assert.match(html,/LOGIC SHA 9afab37c373091482d2010350a219856e46728d2/);
 });
