@@ -37,11 +37,22 @@ test("Directional events from the click-controller translator move the pointer",
  h.dispatch("nu:controller-direction",{dx:0,dy:1});const after=h.adapter.getState();
  assert.equal(after.x,before.x);assert.equal(after.y,before.y+28);h.adapter.destroy();
 });
-test("Gateway list navigation owns direction and blocks simulated-pointer movement",()=>{
+test("Gateway navigation keeps simulated-pointer movement available",()=>{
  const h=harness();h.adapter.startClickController();const before=h.adapter.getState();
- h.adapter.setGatewayNavigation(true);assert.equal(h.adapter.move(1,0),false);
- assert.equal(h.adapter.getState().x,before.x);assert.equal(h.adapter.getState().y,before.y);
+ h.adapter.setGatewayNavigation(true);assert.equal(h.adapter.move(1,0),true);
+ assert.equal(h.adapter.getState().x,before.x+28);assert.equal(h.adapter.getState().y,before.y);
  h.adapter.setGatewayNavigation(false);assert.equal(h.adapter.move(1,0),true);h.adapter.destroy();
+});
+
+test("Gamepad D-pad moves the virtual cursor across Gateway while navigation mode is active",()=>{
+ const buttons=Array.from({length:16},()=>({pressed:false}));
+ const pad={index:0,connected:true,buttons,axes:[0,0]};
+ const h=harness(pad);h.adapter.setGatewayNavigation(true);let moves=0;
+ h.window.addEventListener("nu:simulated-pointer-move",()=>moves++);
+ assert.equal(h.step(0),true);
+ buttons[15].pressed=true;assert.equal(h.step(200),true);
+ assert.equal(moves,1);assert.equal(h.adapter.getState().x,428);assert.equal(h.adapter.getState().y,300);
+ h.adapter.destroy();
 });
 
 test("Existing Gateway directional event automatically starts and moves the simulated pointer outside Gateway",()=>{
