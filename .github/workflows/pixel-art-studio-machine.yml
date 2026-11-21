@@ -28,4 +28,4 @@ jobs:
           node --check nu-studio-pro-tools.js
           node --check nu-studio-layout.js
       - name: Run focused Studio regression tests
-        run: node --test tests/nu-studio-pro-tools.test.js tests/nu-studio-layout.test.js
+        run: node --test tests/nu-studio-pro-tools.test.js tests/nu-studio-layout.test.js tests/nu-studio-advanced-tools.test.js
