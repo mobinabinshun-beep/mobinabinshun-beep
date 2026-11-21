@@ -8,7 +8,7 @@
  function create(options){
   options=options||{};
   const doc=options.document||root.document,win=options.window||root;
-  let enabled=false,frame=0,lastMove=0,confirmDown=false,cancelDown=false,primed=false,lastTarget=null,x=0,y=0,padIndex=null,gatewayWasOpen=false,gatewayBlockedUntilNeutral=false,lastGatewayDirection="0,0",lastGatewayDirectionAt=0;
+  let enabled=false,frame=0,lastMove=0,confirmDown=false,cancelDown=false,primed=false,lastTarget=null,x=0,y=0,padIndex=null,gatewayWasOpen=false,gatewayBlockedUntilNeutral=false,lastGatewayDirection="0,0",lastGatewayDirectionAt=0,keyboardDown=new Set(),keyboardBlockedUntilNeutral=false;
   let cursor=null,style=null;
   const step=Number(options.step)||28,repeat=Number(options.repeat)||190;
   function isGatewayOpen(){return !!(doc&&doc.body&&doc.body.classList&&doc.body.classList.contains("nu-gateway-open"));}
@@ -70,9 +70,13 @@
   // Keyboard-emulated click controllers send ordinary arrow/confirm keys, not Gamepad API events.
   // Capture them before game-level keyboard targeting; Gateway keeps exclusive ownership while open.
   function onKeyboardInput(event){
-   if(!event||event.altKey||event.ctrlKey||event.metaKey||isGatewayOpen()||!isGameplayPointerScreen())return;
+   if(!event||event.altKey||event.ctrlKey||event.metaKey)return;
    const keys={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]};
-   const delta=keys[event.key];
+   const delta=keys[event.key],isConfirm=event.key==="Enter"||event.key===" "||event.key==="NumpadEnter";
+   const isCancel=event.key==="Escape";
+   if(!delta&&!isConfirm&&!isCancel)return;
+   keyboardDown.add(event.code||event.key);
+   if(isGatewayOpen()||!isGameplayPointerScreen()||keyboardBlockedUntilNeutral)return;
    if(delta){
     if(!enabled)start(true);
     if(movePointer(delta[0],delta[1],"keyboard-click-controller")){
@@ -81,14 +85,19 @@
     }
     return;
    }
-   if(event.key==="Enter"||event.key===" "||event.key==="NumpadEnter"){
-    if(enabled){
-     event.preventDefault&&event.preventDefault();
-     event.stopImmediatePropagation&&event.stopImmediatePropagation();
-     clickTarget();
-    }
+   if(isConfirm&&enabled){
+    event.preventDefault&&event.preventDefault();
+    event.stopImmediatePropagation&&event.stopImmediatePropagation();
+    clickTarget();
    }
   }
+  function onKeyboardRelease(event){
+   if(!event)return;
+   keyboardDown.delete(event.code||event.key);
+   if(keyboardBlockedUntilNeutral&&keyboardDown.size===0)keyboardBlockedUntilNeutral=false;
+  }
+  function onGatewayOpen(){keyboardBlockedUntilNeutral=keyboardDown.size>0;}
+  function onGatewayClose(){keyboardBlockedUntilNeutral=keyboardDown.size>0;}
   function clickTarget(){
    if(!isGameplayPointerScreen()||isGatewayOpen()||gatewayBlockedUntilNeutral)return false;
    const target=targetAt();if(!target)return false;
@@ -160,7 +169,7 @@
    if(!frame)frame=win.requestAnimationFrame(tick);
   }
   function stop(){
-   enabled=false;if(frame)win.cancelAnimationFrame(frame);frame=0;confirmDown=false;cancelDown=false;primed=false;gatewayWasOpen=false;gatewayBlockedUntilNeutral=false;lastGatewayDirection="0,0";
+   enabled=false;if(frame)win.cancelAnimationFrame(frame);frame=0;confirmDown=false;cancelDown=false;primed=false;gatewayWasOpen=false;gatewayBlockedUntilNeutral=false;lastGatewayDirection="0,0";keyboardDown.clear();keyboardBlockedUntilNeutral=false;
    if(lastTarget&&lastTarget.classList)lastTarget.classList.remove("nu-simulated-mouse-target");
    lastTarget=null;if(cursor)cursor.style.display="none";
   }
@@ -168,6 +177,9 @@
   function onDisconnected(){if(!hasConnectedGamepad())stop();}
   win.addEventListener&&win.addEventListener("gamepadconnected",onConnected);
   win.addEventListener&&win.addEventListener("keydown",onKeyboardInput,true);
+  win.addEventListener&&win.addEventListener("keyup",onKeyboardRelease,true);
+  win.addEventListener&&win.addEventListener("nu:gateway-open",onGatewayOpen);
+  win.addEventListener&&win.addEventListener("nu:gateway-close",onGatewayClose);
   win.addEventListener&&win.addEventListener("nu:simulated-pointer-direction",onPointerDirection);
   win.addEventListener&&win.addEventListener("nu:controller-direction",onPointerDirection);
     win.addEventListener&&win.addEventListener("gamepaddisconnected",onDisconnected);
@@ -178,7 +190,7 @@
    scopeObserver.observe(gameView,{attributes:true,attributeFilter:["class"]});
   }
   if(hasConnectedGamepad())start();
-  return {start,stop,startClickController(){start(true);},move(dx,dy){return movePointer(dx,dy,"click-controller");},setEnabled(value){value?start():stop();},isEnabled(){return enabled;},getState(){return {enabled,x,y,padIndex,mode:"simulated-mouse",gatewayOpen:isGatewayOpen(),blockedUntilNeutral:gatewayBlockedUntilNeutral};},destroy(){stop();scopeObserver&&scopeObserver.disconnect();win.removeEventListener&&win.removeEventListener("gamepadconnected",onConnected);win.removeEventListener&&win.removeEventListener("keydown",onKeyboardInput,true);win.removeEventListener&&win.removeEventListener("gamepaddisconnected",onDisconnected);win.removeEventListener&&win.removeEventListener("nu:simulated-pointer-direction",onPointerDirection);win.removeEventListener&&win.removeEventListener("nu:controller-direction",onPointerDirection);cursor&&cursor.remove();style&&style.remove();cursor=null;style=null;}};
+  return {start,stop,startClickController(){start(true);},move(dx,dy){return movePointer(dx,dy,"click-controller");},setEnabled(value){value?start():stop();},isEnabled(){return enabled;},getState(){return {enabled,x,y,padIndex,mode:"simulated-mouse",gatewayOpen:isGatewayOpen(),blockedUntilNeutral:gatewayBlockedUntilNeutral};},destroy(){stop();scopeObserver&&scopeObserver.disconnect();win.removeEventListener&&win.removeEventListener("gamepadconnected",onConnected);win.removeEventListener&&win.removeEventListener("keydown",onKeyboardInput,true);win.removeEventListener&&win.removeEventListener("keyup",onKeyboardRelease,true);win.removeEventListener&&win.removeEventListener("nu:gateway-open",onGatewayOpen);win.removeEventListener&&win.removeEventListener("nu:gateway-close",onGatewayClose);win.removeEventListener&&win.removeEventListener("gamepaddisconnected",onDisconnected);win.removeEventListener&&win.removeEventListener("nu:simulated-pointer-direction",onPointerDirection);win.removeEventListener&&win.removeEventListener("nu:controller-direction",onPointerDirection);cursor&&cursor.remove();style&&style.remove();cursor=null;style=null;}};
  }
  root.NUControllerPointer=Object.assign(create(),{create,mode:"simulated-mouse",capabilities:{directionalPointer:true,separateConfirm:true,gameplayOnly:true,physicalMouseDirect:true,touchDirect:true}});
 })(typeof window!=="undefined"?window:globalThis);
