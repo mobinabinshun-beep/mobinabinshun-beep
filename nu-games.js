@@ -114,9 +114,9 @@ function renderGameAssetProfile(){
   rows.push({key:"manaCapsules",label:"Mana Capsules",value:state.save.manaCapsules,unit:""});
  }
  const visible=rows.filter(row=>Number.isFinite(Number(row.value))&&Number(row.value)>0);
- if(!visible.length){root.replaceChildren();root.hidden=true;return;}
- root.hidden=false;
+ if(!visible.length){root.replaceChildren();root.hidden=true;return false;}
  root.innerHTML='<div class="game-asset-rows">'+visible.map(row=>'<span>'+row.label+' '+row.value+row.unit+'</span>').join("")+'</div>';
+ return true;
 }
 function setAssetProfileExpanded(value){
  document.querySelectorAll(".bar-wrap,#hp-bar").forEach(el=>el.setAttribute("aria-expanded",String(value)));
@@ -136,8 +136,8 @@ function hideGameAssetProfile(){
 }
 function showGameAssetProfile(trigger){
  const root=$("game-asset-profile");if(!root||!trigger)return;
- renderGameAssetProfile();
- if(root.hidden)return;
+ if(!renderGameAssetProfile())return;
+ root.hidden=false;
  setAssetProfileExpanded(true);positionGameAssetProfile(trigger);
 }
 function bindGameAssetProfiles(){
