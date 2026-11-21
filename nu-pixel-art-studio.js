@@ -438,14 +438,13 @@ async function overlayAdv(e){const f=e.target.files&&e.target.files[0];if(!f)ret
 function chromaAdv(){if(adv.layers[adv.active].locked)return announce("Layer locked");const before=histAdv(),key=$("adv-key").value,t=+$("adv-keytol").value;pixels=pixels.map((c,i)=>(!adv.selection||adv.selection[i])&&dist(c,key)<=t?null:c);adv.layers[adv.active].pixels=pixels.slice();commitHistory(before);render();}
 function textAdv(){if(adv.layers[adv.active].locked)return announce("Layer locked");const before=histAdv(),c=document.createElement("canvas");c.width=width;c.height=height;const x=c.getContext("2d");x.fillStyle=color;x.font="bold "+clamp(+$("adv-textsize").value,6,96)+"px monospace";x.textBaseline="top";x.fillText($("adv-text").value,0,0,width);const d=x.getImageData(0,0,width,height).data;for(let i=0;i<pixels.length;i++)if(d[i*4+3]>128&&(!adv.selection||adv.selection[i]))pixels[i]=color;adv.layers[adv.active].pixels=pixels.slice();commitHistory(before);render();}
 const paintAdv=paintBrush;paintBrush=function(x,y,v){
- if(tool==="fading-brush"&&v)v=window.NUStudioProTools.fadePixel(pixels[y*width+x],v,fadeIntensity);
  if(adv.layers[adv.active].locked)return;const alpha=+$("adv-alpha")?.value||100,points=[[x,y]];
  if(adv.symmetry==="horizontal"||adv.symmetry==="both")points.push([width-1-x,y]);if(adv.symmetry==="vertical"||adv.symmetry==="both")points.push([x,height-1-y]);if(adv.symmetry==="both")points.push([width-1-x,height-1-y]);
  const seen=new Set(),texture=adv.texture==="none"&&tool==="texture"?"grain":adv.texture;
  for(const [px,py] of points)for(const [cx,cy] of window.NUStudioProTools.brushCells(px,py,brushSize,adv.brushShape,texture,adv.textureDensity)){
   if(cx<0||cy<0||cx>=width||cy>=height)continue;const key=cy*width+cx;if(seen.has(key))continue;seen.add(key);if(adv.selection&&!adv.selection[key])continue;
   if(adv.maskEdit){const l=adv.layers[adv.active];if(!l.mask)l.mask=new Uint8Array(width*height).fill(1);l.mask[key]=v?1:0;continue;}
-  let value=v;if(v&&alpha<100)value=mix(pixels[key],v,alpha/100);paintAdv(cx,cy,value);
+  let value=v;if(tool==="fading-brush"&&v)value=window.NUStudioProTools.fadePixel(pixels[key],v,fadeIntensity);if(v&&alpha<100)value=mix(pixels[key],value,alpha/100);paintAdv(cx,cy,value);
  }
 };
 const floodAdv=flood;flood=function(x,y,next){
