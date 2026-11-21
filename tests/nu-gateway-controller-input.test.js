@@ -100,7 +100,7 @@ test("Simulated mouse uses the Gateway list, one extra Down exits, and pointer m
  assert.match(gateway,/suppressClickUntil=Date.now\(\)\+1000/);
  assert.match(gateway,/requiresSimulatedPointerExit=true/);
  assert.match(gateway,/current>=items.length-1/);
- assert.match(gateway,/setOpen\(false,true,"simulated-pointer"\)/);
+ assert.match(gateway,/setOpen\(false,true,"controller-exit"\)/);
  assert.match(gateway,/direction\.y>0\)moveGatewaySelection\(1\)/);
  assert.match(gateway,/direction\.y<0\)moveGatewaySelection\(-1\)/);
 });
@@ -134,7 +134,7 @@ test("Hidden tabs freeze gameplay while the shared pointer adapter remains the o
  assert.doesNotMatch(games,/stopGamepad|startGamepad|pollGamepad|navigator\.getGamepads/);
  assert.match(games,/if\(state\.active&&!state\.paused\)/);
  assert.match(gateway,/window\.addEventListener\("blur"/);
- assert.match(gateway,/setGatewayNavigation\(false\)/);
+ assert.doesNotMatch(gateway,/NUControllerPointer/);
  assert.match(pointer,/function tick\(time\)/);
 });
 
