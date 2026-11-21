@@ -108,6 +108,14 @@ test("Gateway options are frozen before they become actionable and remain contro
  assert.match(gateway,/setGatewayNavigation\(true\)/);
  assert.match(gateway,/setGatewayNavigation\(false\)/);
 });
+test("Gamepad virtual mouse keeps moving over Gateway options while Gateway navigation is active",()=>{
+ const pointer=fs.readFileSync("nu-controller-pointer.js","utf8");
+ assert.match(pointer,/if\(!enabled\|\|gatewayBlockedUntilNeutral\)return false/);
+ assert.doesNotMatch(pointer,/if\(!enabled\|\|gatewayNavigation\|\|gatewayBlockedUntilNeutral\)return false/);
+ assert.match(pointer,/if\(gatewayNavigation\)movePointer\(input\.dx,input\.dy,"gamepad-gateway"\)/);
+ assert.match(pointer,/dispatchPointerMove\(next\)/);
+ assert.match(pointer,/nu:simulated-pointer-target/);
+});
 test("One shared adapter owns gamepad pointer movement and activation",()=>{
  const pointer=fs.readFileSync("nu-controller-pointer.js","utf8");
  assert.match(pointer,/navigator&&win\.navigator\.getGamepads/);
