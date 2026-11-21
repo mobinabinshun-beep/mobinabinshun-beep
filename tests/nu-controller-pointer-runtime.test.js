@@ -22,7 +22,7 @@ function harness(gamepad=null,gameActive=true){
   requestAnimationFrame(fn){const id=++frameId;frames.set(id,fn);return id;},
   cancelAnimationFrame(id){frames.delete(id);}};
  vm.runInNewContext(source,{window,globalThis:window,Math,Number,Array,Object,String,Set,Map});
- return {window,target,gameView,adapter:window.NUControllerPointer,dispatch(type,detail){window.dispatchEvent(new CustomEvent(type,{detail}));},
+ return {window,document,target,gameView,adapter:window.NUControllerPointer,dispatch(type,detail){window.dispatchEvent(new CustomEvent(type,{detail}));},
   step(time){const entry=frames.entries().next().value;if(!entry)return false;frames.delete(entry[0]);entry[1](time);return true;},observe(){observerCallback&&observerCallback();}};
 }
 
