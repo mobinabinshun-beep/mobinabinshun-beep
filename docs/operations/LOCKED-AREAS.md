@@ -146,3 +146,30 @@ This amendment supersedes any earlier lock wording that makes the virtual mouse 
 No Gateway-driven virtual-pointer movement, no virtual cursor over Gateway options, no global simulated-mouse activation, no changes to unrelated gameplay input, HUD, game rules, economy, save data or protected touch/canvas routing.
 
 Implementation must follow the canonical contract's full touch/mouse/controller scenarios and regression matrix. This owner amendment does not claim runtime implementation, CI pass, backup, deployment, live verification, HUMAN-QA-PASS or ACCEPT.
+
+
+---
+
+## Owner-authorized transient game asset profile interaction — narrow HUD wiring exception (2026-11-21)
+
+**Authority:** Direct owner instruction, 2026-11-21.  
+**Status:** ONE-TIME, NARROW REOPENING for the asset-profile trigger interaction and its separate overlay only.  
+**Canonical change record:** [ASSET-PROFILE-TRANSIENT-HOVER-2026-11-21.md](./ASSET-PROFILE-TRANSIENT-HOVER-2026-11-21.md).
+
+The owner explicitly requested that the player game asset profile appear while physical touch, physical mouse, or the simulated/virtual mouse is over a game resource capsule bar, and disappear immediately when the pointer/touch leaves. This grants only the minimum additive event-wiring and profile-overlay changes required for that behavior.
+
+### Authorized
+- Add transient pointerenter/pointerleave behavior to the existing resource capsule bars.
+- Add touch-down display and touch release/cancel dismissal.
+- Consume the existing simulated-mouse target-transition event for the same transient behavior.
+- Remove pin/toggle/focus-driven profile behavior.
+- Render the separate asset profile as transparent floating text with positive values only.
+- Show LV when XP first becomes positive.
+
+### Still locked and prohibited
+- Do not change classic LV/XP/Mana HUD markup, order, layout, labels, values, fill calculations, sizing, responsive behavior, colors, or presentation.
+- Do not change wallet calculations, progression, HP/XP/Mana values, save data, game rules, Gateway, canvas routing, or controller ownership.
+- Do not add click-to-pin, persistent expansion, focus-triggered opening, a card/panel, or explanatory copy.
+- Keep the HP capsule's own use action independent and functional.
+
+This is not a permanent unlock. After this one scoped change, the classic HUD lock remains in force. Machine validation, backup, demo verification and human QA are separate evidence states; no human acceptance is implied.
