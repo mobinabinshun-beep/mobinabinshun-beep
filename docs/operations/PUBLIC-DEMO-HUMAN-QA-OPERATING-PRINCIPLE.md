@@ -40,3 +40,13 @@ The project owner's latest direct instruction controls over any older wording th
 - **No product release, production promotion, stable-version publication, package/store release, public launch announcement, or other beyond-demo publication may occur unless BOTH conditions are met:** (1) the owner has reviewed and explicitly accepted the human QA results for the exact demo build/scope; and (2) the owner then gives a separate, direct, unambiguous instruction authorizing that named release/promotion action.
 - Human QA PASS, owner acceptance of the demo, green CI, merge, a backup, a demo deployment, or silence is never by itself permission to release or promote. If no separate release instruction exists, remain at the demo QA stage.
 - Do not repeatedly frame the absence of a release as a pending assistant decision. The assistant's current task is the authorized work and QA handoff; release is outside the active workflow unless the owner later directs it.
+
+
+## Current human QA handoff — Pixel Art Studio 2D (2026-11-21)
+
+- Demo URL: https://mobinabinshun-beep.github.io/mobinabinshun-beep/pixel-art-studio.html
+- Pages build SHA: `c35e5b2edec0d48a0d255ed78ce77a207a241a5f`; Pages run `44903824271` — build/deploy SUCCESS.
+- Candidate PR: [#238](https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/238), merged only to deliver a demo QA candidate.
+- Detailed scenarios/reporting: [Human QA Handoff](https://github.com/mobinabinshun-beep/mobinabinshun-beep/blob/main/docs/operations/PIXEL-ART-STUDIO-2D-HUMAN-QA-HANDOFF-2026-11-21.md).
+- State: HUMAN-QA-PENDING. The page visibly identifies the candidate as not human-approved.
+- This handoff is not product release or production promotion; beyond-demo action requires human acceptance of this exact build/scope and a separate explicit owner instruction.
