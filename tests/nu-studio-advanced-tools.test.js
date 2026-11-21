@@ -112,3 +112,11 @@ test("selection clipping also constrains clear, replace, chroma key, image overl
  assert.match(js,/d\[i\*4\+3\]>20&&\(!adv\.selection\|\|adv\.selection\[i\]\)/);
  assert.match(js,/d\[i\*4\+3\]>128&&\(!adv\.selection\|\|adv\.selection\[i\]\)/);
 });
+
+test("fading brush blends against each destination pixel rather than the stroke origin pixel",()=>{
+ const start=js.indexOf("const paintAdv=paintBrush;paintBrush=function");
+ const end=js.indexOf("const floodAdv=flood;",start);
+ const block=js.slice(start,end);
+ assert.match(block,/fadePixel\(pixels\[key\],v,fadeIntensity\)/);
+ assert.doesNotMatch(block,/fadePixel\(pixels\[y\*width\+x\],v,fadeIntensity\)/);
+});
