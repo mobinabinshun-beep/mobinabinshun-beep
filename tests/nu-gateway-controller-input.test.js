@@ -155,19 +155,20 @@ function makeGatewayHarness(){
   querySelector(selector){return selector===".nu-gateway-scrim"?scrim:null;},
   addEventListener(type,fn){if(!documentListeners.has(type))documentListeners.set(type,[]);documentListeners.get(type).push(fn);}
  };
+ const MutationObserver=class{observe(){}disconnect(){}};
  const window={document,innerWidth:1200,location:{search:"",href:""},handlers:windowListeners,
   matchMedia(){return {matches:false};},
   addEventListener(type,fn){if(!windowListeners.has(type))windowListeners.set(type,[]);windowListeners.get(type).push(fn);},
   dispatchEvent(event){events.push(event.type);for(const fn of windowListeners.get(event.type)||[])fn(event);return true;},
   setTimeout(fn,delay){const id=nextTimer++;timers.set(id,{at:now+delay,fn});return id;},
   clearTimeout(id){timers.delete(id);},
-  MutationObserver:class{observe(){}disconnect(){}}
+  MutationObserver
  };
  function advance(ms){now+=ms;let ran=true;while(ran){ran=false;const due=[...timers.entries()].filter(([,timer])=>timer.at<=now).sort((a,b)=>a[1].at-b[1].at);if(due.length){const [id,timer]=due[0];timers.delete(id);timer.fn();ran=true;}}}
  function dispatchWindow(type,detail={}){window.dispatchEvent({type,detail});}
  function dispatchDocument(type,event){for(const fn of documentListeners.get(type)||[])fn(event);}
  const EventClass=class{constructor(type){this.type=type;}};
- vm.runInNewContext(gateway,{window,document,Event:EventClass,URLSearchParams,performance:{now:()=>now},Date,Math,Map,Set,Array,String,Number,Boolean,clearTimeout:id=>window.clearTimeout(id),setTimeout:(fn,delay)=>window.setTimeout(fn,delay)});
+ vm.runInNewContext(gateway,{window,document,Event:EventClass,URLSearchParams,performance:{now:()=>now},Date,Math,Map,Set,Array,String,Number,Boolean,MutationObserver,clearTimeout:id=>window.clearTimeout(id),setTimeout:(fn,delay)=>window.setTimeout(fn,delay)});
  return {window,document,body,trigger,items,scrim,backHome,menuOpen,events,advance,dispatchWindow,dispatchDocument};
 }
 
