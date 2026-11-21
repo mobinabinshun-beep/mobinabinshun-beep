@@ -163,7 +163,12 @@
     event.preventDefault();
     event.stopPropagation();
     suppressClickUntil=Date.now()+1000;
-    if(!open)cancelScheduledOpen();
+    if(!open){
+      // A short, deliberate touch tap opens immediately; a stationary hold may already
+      // have opened after the preserved 500 ms dwell. Never toggle-close on release.
+      cancelScheduledOpen();
+      setOpen(true,true,"touch");
+    }
     touchPointerId=null;touchMoved=false;
   });
   trigger.addEventListener("pointercancel",event=>{
