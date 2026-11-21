@@ -1,10 +1,12 @@
 # Gateway / gameplay virtual-mouse runtime correction — 2026-11-21
 
 **Type:** Owner-directed runtime correction  
-**Status:** IMPLEMENTED · MACHINE-TEST-PENDING · SOURCE-BACKUP-VERIFIED · LIVE-BASELINE-UNVERIFIED · HUMAN-QA-PENDING  
+**Status:** IMPLEMENTED · MACHINE-PASS · BASELINE-SOURCE-BACKUP-VERIFIED · CANDIDATE-BACKUP-VERIFIED · LIVE-BASELINE-UNVERIFIED · HUMAN-QA-PENDING  
 **Authority:** Owner amendment, canonical Gateway contract section 12  
 **Candidate branch:** `fix/gateway-independent-controller-input-2026-11-21`  
 **Candidate base:** `ea853f01167752747f92347a9f70df095c9182ff`  
+**Exact machine-passed candidate:** `062a3594496cd4047ad942c2bd78c6f469008677`  
+**Candidate recovery ref:** `backup/gateway-independent-input-runtime-candidate-2026-11-21` — verified identical to the machine-passed candidate (0 ahead / 0 behind).  
 **Last-known deployed runtime source:** `aacb211c7282439bbca1cab256aa30859909951a`  
 **Recovery ref:** `backup/pre-gateway-independent-input-runtime-2026-11-21` — verified identical to the last-known deployed source (0 ahead / 0 behind).
 
@@ -51,14 +53,14 @@ No HUD, game rules, game-object interaction code, Wallet/economy/save data, CSS,
 - Physical mouse hover activation and mouse-outside exit.
 - Touch open → lift → separate option tap; continuing touch outside exit; lifted-finger outside tap exit.
 
-The tests are behavior-level Node harnesses for the pointer adapter and Gateway DOM event flow, not source-string checks alone. Exact CI result is pending and will be appended after the candidate workflow completes.
+The tests are behavior-level Node harnesses for the pointer adapter and Gateway DOM event flow, not source-string checks alone. All four focused test files also passed a direct harness execution (50/50). Exact-SHA GitHub Actions regressions passed: Gateway #44853286320, Arcane Shield/Mana #44853286198, Wallet/Profile #44853286276, HUD #44853286183, Exchange #44853286209, Graphics Integrity #44853286205, Graphics Preview #44853286245, and Studio Export #44853286192. All runs are for candidate `062a3594496cd4047ad942c2bd78c6f469008677`.
 
 ## Baseline, backup and live verification boundary
 
 - A recovery branch was created before runtime edits from the last-known deployed runtime source: `backup/pre-gateway-independent-input-runtime-2026-11-21`.
 - GitHub compare verified that recovery ref is identical to `aacb211c7282439bbca1cab256aa30859909951a` (0 ahead / 0 behind).
 - The prior deployment record identifies Pages run `44837990921` for that source commit. The public URL could not be independently fetched in this session (web cache miss), so the current live build and a decomposed browser-observed runtime snapshot remain **UNVERIFIED**. The source recovery point is verified; this record does not claim a complete live-runtime snapshot, live smoke test, or deployment verification.
-- No runtime candidate has been merged or deployed by this change record. After exact-SHA machine PASS, create and verify the candidate checkpoint, then deploy the same candidate to the public experimental demo for human QA. Human acceptance remains pending the owner’s retest.
+- The exact-SHA machine-passed candidate checkpoint is now created and verified. The next release action is a trial publish to the public experimental demo, solely to begin human QA; it is not final production acceptance. Human acceptance remains pending the owner’s retest.
 
 ## Required human QA
 
