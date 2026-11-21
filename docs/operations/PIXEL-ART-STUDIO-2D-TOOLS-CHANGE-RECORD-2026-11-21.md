@@ -5,7 +5,8 @@
 **Candidate branch:** `feat/pixel-art-studio-2d-tools-2026-11-21`  
 **Draft PR:** [#238](https://github.com/mobinabinshun-beep/mobinabinshun-beep/pull/238)  
 **Baseline:** `e1428c2501901975cc3410159bb89216b9459922`  
-**Machine-tested candidate at record creation:** `5933090148a20bfe4f12d8e1a0d8896381ac4da4`  
+**Initial machine-tested candidate:** `5933090148a20bfe4f12d8e1a0d8896381ac4da4`  
+**Current implementation head:** `14fa744e5fe275b2a372fed358648cb1065369f5` (awaiting exact-head CI)  
 **Runtime snapshot:** `NOT CAPTURED`
 
 ## Scope authorized for this candidate
@@ -26,10 +27,10 @@
 
 ## Existing candidate implementation
 
-The initial incremental candidate adds deterministic helper functions in `nu-studio-pro-tools.js`:
+The incremental candidate now includes the following scoped implementation in `nu-studio-pro-tools.js` and `nu-pixel-art-studio.js`:
 - `invertSelection` complements a mask without mutating its input.
 - `rotatePixels` rotates a raster layer/selection around the canvas center with nearest-neighbor sampling.
-- `rotatePoint` rotates geometry around an arbitrary center.
+- `rotatePoint` rotates geometry around an arbitrary center.\n- `fadePixel` blends brush color against the current pixel or a neutral transparent-canvas underlay at a validated 0–100 intensity.\n- Studio UI exposes a Fading Brush and intensity slider; the active layer can be rotated by a free angle, with an existing selection constraining the transform.\n- Two-touch gestures rotate the viewport using a CSS view transform and inverse pointer-coordinate mapping; reset affects the view only, not artwork pixels.\n- Blueprint boundary, ruler ticks, division guides, orthogonal axes and depth-axis overlays can be toggled independently. Existing tool categories remain grouped in collapsible sidebar panels and tabbed dock sections.
 
 Focused tests were added in `tests/nu-studio-pro-tools.test.js`, and the dedicated Node 22 workflow is `.github/workflows/pixel-art-studio-machine.yml`.
 
@@ -41,11 +42,11 @@ At candidate SHA `5933090148a20bfe4f12d8e1a0d8896381ac4da4`, these Actions runs 
 - Graphics preview smoke checks — run `44883360087`
 - Arcane Shield and Mana regression — run `44883360027`
 
-This evidence applies only to the initial incremental candidate and its tested files. It is not proof that all Issue #62 features are implemented or human-tested.
+This evidence applies only to the initial incremental candidate and its tested files. The newer implementation commits have not yet been verified by exact-head Actions; no machine pass is claimed for the current head until those runs complete.
 
 ## Outstanding work
 
-The initial candidate is intentionally incomplete. Remaining work includes product-level integration of the six authorized scope items, full regression coverage, review of gesture conflicts and mobile behavior, and exact-head CI verification after each implementation batch.
+The current candidate contains first-pass integration for fading brush, free layer/selection rotation, two-touch viewport rotation, guide overlays, and grouped tool navigation. Remaining work includes deeper selection inside/outside scenario coverage, validating all gesture edge cases and transform correctness, adding browser-level interaction tests, confirming ruler/blueprint usability at multiple zooms, full regression coverage, and exact-head CI verification. This remains a first-pass implementation, not a human-QA-ready release.
 
 ## Release gates
 
@@ -58,4 +59,4 @@ The initial candidate is intentionally incomplete. Remaining work includes produ
 
 ## Status
 
-**DOCUMENTED / MACHINE-CHECKED INCREMENTAL BASELINE — NOT COMPLETE; HUMAN QA NOT READY; DEPLOYMENT BLOCKED.**
+**DOCUMENTED / IMPLEMENTATION IN PROGRESS — CURRENT HEAD CI PENDING; NOT COMPLETE; HUMAN QA NOT READY; DEPLOYMENT BLOCKED.**
