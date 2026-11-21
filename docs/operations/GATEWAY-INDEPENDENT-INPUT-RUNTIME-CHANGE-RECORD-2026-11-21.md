@@ -1,7 +1,7 @@
 # Gateway / gameplay virtual-mouse runtime correction — 2026-11-21
 
 **Type:** Owner-directed runtime correction  
-**Status:** IMPLEMENTED · MACHINE-PASS · BASELINE-SOURCE-BACKUP-VERIFIED · CANDIDATE-BACKUP-VERIFIED · LIVE-BASELINE-UNVERIFIED · HUMAN-QA-PENDING  
+**Status:** PRIOR CANDIDATE MACHINE-PASS · FOLLOW-UP CANDIDATE MACHINE-PASS (8/8) · FOLLOW-UP BACKUP-VERIFIED · NOT-DEPLOYED · LIVE-BUILD-UNVERIFIED · HUMAN-QA-DEFERRED  
 **Authority:** Owner amendment, canonical Gateway contract section 12  
 **Candidate branch:** `fix/gateway-independent-controller-input-2026-11-21`  
 **Candidate base:** `ea853f01167752747f92347a9f70df095c9182ff`  
