@@ -70,10 +70,10 @@ test("Confirm is a separate click; B remains Gateway cancel",()=>{
  assert.match(pointer,/new win\.MouseEvent\("click"/);
 });
 
-test("Gateway delegates simulated pointer ownership to the shared adapter",()=>{
+test("Gateway never owns or controls the gameplay virtual-pointer adapter",()=>{
  assert.doesNotMatch(gateway,/NUControllerPointer/);
  assert.match(pointer,/gameplayOnly:true/);
- assert.ok(gateway.includes("setGatewayNavigation(false)"));
+ assert.doesNotMatch(gateway,/NUControllerPointer/);
  assert.doesNotMatch(gateway,/window\.addEventListener\("gamepadconnected",startController\)/);
 });
 
