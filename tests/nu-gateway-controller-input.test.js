@@ -95,7 +95,7 @@ test("Simulated mouse uses the Gateway list, one extra Down exits, and pointer m
  assert.match(gateway,/if\(!wasMoved\)activate\(item\)/);
  assert.match(gateway,/select\(items\[current\+1\]\)/);
  assert.match(gateway,/scheduleOpen\(500,"touch"\)/);
- assert.match(gateway,/if\(!open\)cancelScheduledOpen\(\)/);
+ assert.match(gateway,/if\(!open\)\{[\s\S]*?setOpen\(true,true,"touch"\)/);
  assert.match(gateway,/event.pointerType!=="touch"\|\|event.isPrimary===false/);
  assert.match(gateway,/suppressClickUntil=Date.now\(\)\+1000/);
  assert.match(gateway,/requiresSimulatedPointerExit=true/);
@@ -237,6 +237,18 @@ test("Physical mouse leaving the Gateway interaction zone closes it",()=>{
  assert.ok(h.events.includes("nu:gateway-close"));
 });
 
+
+test("A short touch tap opens Gateway immediately on release, then allows a separate option tap",()=>{
+ const h=makeGatewayHarness();
+ h.trigger.handlers.get("pointerdown")[0]({pointerType:"touch",isPrimary:true,pointerId:17,clientX:120,clientY:120,preventDefault(){}});
+ h.trigger.handlers.get("pointerup")[0]({pointerType:"touch",isPrimary:true,pointerId:17,preventDefault(){},stopPropagation(){}});
+ assert.equal(h.body.classList.contains("nu-gateway-open"),true);
+ h.items[1].handlers.get("pointerdown")[0]({pointerType:"touch",pointerId:18,clientX:120,clientY:220});
+ h.items[1].handlers.get("pointerup")[0]({pointerType:"touch",pointerId:18,preventDefault(){},stopPropagation(){}});
+ h.advance(120);
+ assert.equal(h.menuOpen.clicked,1);
+ assert.equal(h.body.classList.contains("nu-gateway-open"),false);
+});
 
 test("Touch can open Gateway, lift the opening finger, then tap an option separately",()=>{
  const h=makeGatewayHarness();
