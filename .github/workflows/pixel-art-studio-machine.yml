@@ -11,6 +11,7 @@ on:
       - "pixel-art-studio.html"
       - "tests/nu-studio-*.test.js"
       - ".github/workflows/pixel-art-studio-machine.yml"
+      - "docs/operations/PIXEL-ART-STUDIO-2D-*.md"
   workflow_dispatch:
 permissions:
   contents: read
