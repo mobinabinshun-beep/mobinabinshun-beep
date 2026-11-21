@@ -5,7 +5,7 @@
 **Candidate branch:** `feat/pixel-art-studio-2d-tools-2026-11-21`  
 **Exact tested code/test candidate SHA:** `6db7811e2481756f93f8225613c88d281f071714`  
 **Studio implementation logic SHA:** `9afab37c373091482d2010350a219856e46728d2`  
-**Dedicated machine run:** [44903363462](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44903363462) — 48/48 passed  
+**Dedicated machine run:** [44903671261](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44903671261) — 48/48 passed; final workflow revision `4b817ed5b8fc1b9aff3f79db94588a7a8acfc06d  
 **Demo URL:** https://mobinabinshun-beep.github.io/mobinabinshun-beep/pixel-art-studio.html  
 **Home / library:** https://mobinabinshun-beep.github.io/mobinabinshun-beep/  
 **Deployment build SHA:** pending the Pages run after the candidate is merged into the demo source; do not substitute the branch SHA for the final Pages build SHA.
