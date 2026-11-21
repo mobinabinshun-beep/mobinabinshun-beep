@@ -119,3 +119,11 @@
 - Exhaust repository discovery and pagination, enumerate trees/paths, fetch requested and relevant files directly, inspect related branches/history/issues/PRs, and record per-repository/per-path coverage. Do not stop at code-search indexing or a failed search; use direct file/tree retrieval alternatives.
 - Never respond to a global coverage request with a blanket “cannot read / did not read”. Exhaust available routes, state exact remaining path/ref/error only after alternatives, continue all independent work, and never claim full coverage without a verifiable manifest.
 - This explicit owner rule overrides the ordinary scoped-task shortcut only when the owner explicitly asks for all repositories/all data; it does not authorize unrelated runtime changes.
+
+
+## Pixel Art Studio 2D — mandatory task-specific checklist
+- Before changing `pixel-art-studio.html` or its proven direct dependencies, read [the operational checklist](./docs/operations/PIXEL-ART-STUDIO-2D-OPERATIONAL-CHECKLIST.md), the [canonical requirements archive](https://github.com/mobinabinshun-beep/Repository/blob/main/Operations/2026-11-21/PIXEL-ART-STUDIO-2D-TOOLS-UNIFIED-CHECKLIST-fa.md), and the [deferred-work record](https://github.com/mobinabinshun-beep/Repository/blob/main/Operations/2026-11-21/DEFERRED-WORK-PIXEL-ART-STUDIO-2D-TOOLS-fa.md).
+- Record the current default-branch SHA, candidate SHA, live-build identity and runtime-snapshot status before comparison. Re-fetch all refs; dated SHAs and workflow IDs are historical until revalidated.
+- Use the checklist's PASS/FAIL/BLOCKED/NOT-TESTED vocabulary. PASS requires exact-SHA test evidence; CI is not browser/device QA, live-build proof or owner acceptance.
+- Keep the Studio scope isolated. Preserve all protected HUD, Wallet/economy, Gateway/controller, gameplay-input, Library, other-game and global-style areas. Do not begin deferred animation/sprite/tile/vector/project-packaging work under this scope.
+- Update the Studio Change Record with exact commands, tested SHA, workflow run IDs, environment, artifacts, failures and human-QA status. Never claim snapshot, deployment, machine approval or acceptance without evidence.
