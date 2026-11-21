@@ -121,3 +121,28 @@ The owner explicitly reopened only the direct-touch activation behavior in two a
 ## Owner-reported multi-input Gateway dwell investigation — 2026-11-20
 
 A scoped candidate branch addresses physical mouse item dwell, touch drag/scroll hit-testing, and simulated-pointer/controller dwell activation while preserving click and keyboard confirmation. Scope, baseline, recovery ref, files and QA gates are recorded in [GATEWAY-MULTI-INPUT-DWELL-CHANGE-RECORD-2026-11-20.md](./GATEWAY-MULTI-INPUT-DWELL-CHANGE-RECORD-2026-11-20.md). Release gate: do not publish before exact-head MACHINE-PASS and BACKUP-VERIFIED. Once both are true for this owner-authorized, open, demo-eligible scope, publish the same candidate to the public experimental demo and start human QA without waiting for pre-test approval. Verify live URL/build identity and post-deploy smoke checks; collect human reports and owner decision on that deployed build. This demo-test release is not final ACCEPT or production promotion; those remain blocked until human QA and explicit owner acceptance.
+
+
+---
+
+## Owner amendment — independent Gateway and gameplay virtual mouse (2026-11-21)
+
+**Authority:** explicit owner instruction, 2026-11-21.  
+**Canonical contract:** [GATEWAY-AND-CONTROLLER-INPUT-CONTRACT-2026-11-17.md, section 12](./GATEWAY-AND-CONTROLLER-INPUT-CONTRACT-2026-11-17.md#12-binding-owner-amendment--gateway-and-virtual-mouse-are-independent-2026-11-21).  
+**Status:** OWNER-DIRECTED CONTRACT REOPENING — documentation scope only; runtime implementation and QA are not claimed.
+
+This amendment supersedes any earlier lock wording that makes the virtual mouse navigate Gateway options or move across Gateway while open.
+
+### Binding behavior
+- The simulated/virtual mouse is enabled only in gameplay screens that require mouse interaction. It is not a global cursor and is not a Gateway controller.
+- Gateway does not start, stop, enable, disable, move, reset, or own the virtual mouse. The virtual pointer may enter the Gateway trigger to open it; when Gateway opens, the pointer remains at its game-space position and freezes.
+- Gateway Up/Down navigation is a separate controller selective-action path. One press moves one option; a sustained hold repeats through options. Direction selects; the separate confirm action activates. Down past the final option exits without selecting another.
+- Touch can open Gateway, be lifted, and later tap options individually. A continuing touch that leaves the Gateway interaction zone closes it; a later outside tap also closes it.
+- Physical mouse movement over options activates them directly; click remains available. Moving or clicking outside the Gateway interaction zone closes it.
+- Touch page scrolling is prevented on the active game interaction surface without breaking direct touch gameplay or protected canvas event routing.
+- All exit paths keep gameplay frozen until the first fresh gameplay-area interaction. An input held through closure cannot resume the game.
+
+### Non-negotiable exclusions
+No Gateway-driven virtual-pointer movement, no virtual cursor over Gateway options, no global simulated-mouse activation, no changes to unrelated gameplay input, HUD, game rules, economy, save data or protected touch/canvas routing.
+
+Implementation must follow the canonical contract's full touch/mouse/controller scenarios and regression matrix. This owner amendment does not claim runtime implementation, CI pass, backup, deployment, live verification, HUMAN-QA-PASS or ACCEPT.
