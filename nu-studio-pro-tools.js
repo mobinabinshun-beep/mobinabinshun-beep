@@ -87,6 +87,11 @@
   const alpha=clamp(opacity,0,100)/100;return hex(a.map((v,i)=>v*(1-alpha)+blend[i]*alpha));
  }
  function applyMask(pixels,mask){if(!pixels||!mask||pixels.length!==mask.length)throw new TypeError("Layer mask size mismatch.");return pixels.map((c,i)=>c&&mask[i]>0?c:null);}
+ function fadePixel(base,top,intensity,underlay="#142538"){
+  if(!Number.isFinite(intensity)||intensity<0||intensity>100)throw new RangeError("Brush intensity must be between 0 and 100.");
+  const a=rgb(base||underlay),b=rgb(top);if(!b)throw new TypeError("Brush color must be hexadecimal.");
+  return hex(a.map((v,i)=>v+(b[i]-v)*intensity/100));
+ }
 
  function invertSelection(selection){
   if(!selection||typeof selection.length!=="number")throw new TypeError("Selection mask is required.");
@@ -114,5 +119,5 @@
   const r=angle*Math.PI/180,c=Math.cos(r),s=Math.sin(r),x=point.x-center.x,y=point.y-center.y;
   return {x:center.x+x*c-y*s,y:center.y+x*s+y*c};
  }
- return {rectSelection,lassoSelection,gradient,moveSelection,scaleSelection,bezier,brushCells,blendPixel,applyMask,invertSelection,rotatePixels,rotatePoint};
+ return {rectSelection,lassoSelection,gradient,moveSelection,scaleSelection,bezier,brushCells,blendPixel,applyMask,fadePixel,invertSelection,rotatePixels,rotatePoint};
 });
