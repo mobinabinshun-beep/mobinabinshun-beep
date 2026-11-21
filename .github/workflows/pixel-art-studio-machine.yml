@@ -1,0 +1,31 @@
+name: Pixel Art Studio machine checks
+on:
+  push:
+    branches:
+      - feat/pixel-art-studio-2d-tools-2026-11-21
+  pull_request:
+    paths:
+      - "nu-pixel-art-studio.js"
+      - "nu-studio-pro-tools.js"
+      - "nu-studio-layout.js"
+      - "pixel-art-studio.html"
+      - "tests/nu-studio-*.test.js"
+      - ".github/workflows/pixel-art-studio-machine.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  studio-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Syntax-check Studio modules
+        run: |
+          node --check nu-pixel-art-studio.js
+          node --check nu-studio-pro-tools.js
+          node --check nu-studio-layout.js
+      - name: Run focused Studio regression tests
+        run: node --test tests/nu-studio-pro-tools.test.js tests/nu-studio-layout.test.js
