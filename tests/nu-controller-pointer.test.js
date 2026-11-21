@@ -178,3 +178,20 @@ test("Gateway confirmation is a separate rising-edge action and never a pointer 
  assert.equal(h.semanticEvents.filter(event=>event.type==="nu:gateway-confirm").length,1);
  assert.equal(h.targetEvents.includes("click"),false);
 });
+
+
+test("Keyboard-emulated controller input held through Gateway closure is blocked until keyup and a fresh press",()=>{
+ const h=makePointerHarness(true);
+ h.pointer.startClickController();
+ const startY=h.pointer.getState().y;
+ h.doc.body.classList.add("nu-gateway-open");
+ h.win.dispatchEvent({type:"nu:gateway-open"});
+ h.win.dispatchEvent({type:"keydown",key:"ArrowDown",target:{},preventDefault(){},stopImmediatePropagation(){}});
+ h.doc.body.classList.remove("nu-gateway-open");
+ h.win.dispatchEvent({type:"nu:gateway-close"});
+ h.win.dispatchEvent({type:"keydown",key:"ArrowDown",repeat:true,target:{},preventDefault(){},stopImmediatePropagation(){}});
+ assert.equal(h.pointer.getState().y,startY);
+ h.win.dispatchEvent({type:"keyup",key:"ArrowDown"});
+ h.win.dispatchEvent({type:"keydown",key:"ArrowDown",target:{},preventDefault(){},stopImmediatePropagation(){}});
+ assert.equal(h.pointer.getState().y,startY+28);
+});
