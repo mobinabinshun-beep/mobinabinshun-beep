@@ -501,7 +501,7 @@ if(stageSurface){
   if(e.pointerType!=="touch")return;
   viewportPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
   if(viewportPointers.size===2){
-   e.preventDefault();e.stopImmediatePropagation();if(drawing)cancelStroke();
+   e.preventDefault();e.stopImmediatePropagation();if(drawing)cancelStroke();if(proGesture){restore(proGesture.before);proGesture=null;}
    const pts=[...viewportPointers.values()];viewportGesture={angle:pointerAngle(pts[0],pts[1]),base:viewRotation};
   }
  },true);
@@ -509,7 +509,7 @@ if(stageSurface){
   if(!viewportPointers.has(e.pointerId))return;
   viewportPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
   if(viewportGesture&&viewportPointers.size>=2){
-   e.preventDefault();e.stopImmediatePropagation();const pts=[...viewportPointers.values()],delta=pointerAngle(pts[0],pts[1])-viewportGesture.angle;
+   e.preventDefault();e.stopImmediatePropagation();const pts=[...viewportPointers.values()],rawDelta=pointerAngle(pts[0],pts[1])-viewportGesture.angle,delta=((rawDelta+540)%360)-180;
    viewRotation=((viewportGesture.base+delta+540)%360)-180;updateViewportRotation();
   }
  },true);
