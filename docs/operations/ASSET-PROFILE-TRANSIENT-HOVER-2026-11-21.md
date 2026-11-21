@@ -53,8 +53,8 @@ No edits to nu-wallet.js, wallet data, HP/XP/Mana calculations, classic HUD stru
 - PRE-CHANGE recovery ref: backup/pre-game-asset-profile-hover-only-2026-11-21.
 - Recovery ref was fetched back and verified to resolve exactly to e1428c2501901975cc3410159bb89216b9459922.
 - Candidate branch: fix/game-asset-profile-hover-only-2026-11-21.
-- Machine-approved candidate SHA: 5349809ee25d26a026d792263eb8047d012401f0.
-- PRE-RELEASE recovery ref: backup/pre-release-game-asset-profile-hover-only-2026-11-21; fetched back and verified to resolve to the exact machine-approved SHA above.
+- Machine-approved runtime candidate SHA: a8b204b2ea8c0709175ffe05a550614f3ada66e8.
+- PRE-RELEASE recovery ref: backup/pre-release-game-asset-profile-hover-only-2026-11-21-r2; fetched back and verified to resolve to the exact machine-approved runtime SHA above. The earlier r1 checkpoint remains preserved for the superseded machine-passed runtime candidate.
 - Pre-change file blob SHAs:
   - nu-games.js: e118c03e9891126cf1244e5aec75a4da38b6ab86
   - nu-world.css: 22b077b2827fa203b0a86a55c5c8e2a931efb719
@@ -67,10 +67,10 @@ No edits to nu-wallet.js, wallet data, HP/XP/Mana calculations, classic HUD stru
 
 - Focused regression assertions were added to the existing HUD layout test suite.
 - Required workflow: N.U Generation 1 HUD layout regression (syntax check plus HUD and HP capsule interaction tests).
-- MACHINE-TEST-PASSED on exact SHA 5349809ee25d26a026d792263eb8047d012401f0. All nine commit checks completed successfully: HUD layout, graphics preview smoke, graphics integrity, wallet/profile, Arcane Shield/Mana, Gateway main-game, Exchange, Studio export and static validation.
-- Focused HUD run: https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44867810495.
-- Full regression examples: https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44867810543 and https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44867810535.
-- Earlier failed candidate runs were superseded by the passing exact SHA; their failures were stale cache-key expectations and a test syntax/assertion correction, not hidden.
+- MACHINE-TEST-PASSED on exact runtime SHA a8b204b2ea8c0709175ffe05a550614f3ada66e8. All nine commit checks completed successfully: HUD layout, graphics preview smoke/static validation, graphics integrity, wallet/profile, Arcane Shield/Mana, Gateway main-game, Exchange and Studio export.
+- Focused HUD run: https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44867899797.
+- Full regression examples: https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44867899903 and https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44867900038.
+- Earlier failed candidate runs were superseded by this passing exact SHA. The failures exposed stale cache-key assertions, a legacy zero-profile-row expectation and test-source formatting errors; all were corrected before the final pass.
 - Before any demo deployment, create/fetch-back a PRE-RELEASE recovery ref for the exact machine-passed candidate.
 - Deployment must be reported with the exact candidate SHA and verified public build identity. If the public demo cannot host the isolated candidate safely, use a controlled preview and do not claim the stable demo contains it.
 - Human QA remains pending after machine approval and deployment; owner acceptance is separate.
