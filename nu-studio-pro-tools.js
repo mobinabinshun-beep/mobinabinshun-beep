@@ -87,5 +87,37 @@
   const alpha=clamp(opacity,0,100)/100;return hex(a.map((v,i)=>v*(1-alpha)+blend[i]*alpha));
  }
  function applyMask(pixels,mask){if(!pixels||!mask||pixels.length!==mask.length)throw new TypeError("Layer mask size mismatch.");return pixels.map((c,i)=>c&&mask[i]>0?c:null);}
- return {rectSelection,lassoSelection,gradient,moveSelection,scaleSelection,bezier,brushCells,blendPixel,applyMask};
+ function fadePixel(base,top,intensity,underlay="#142538"){
+  if(!Number.isFinite(intensity)||intensity<0||intensity>100)throw new RangeError("Brush intensity must be between 0 and 100.");
+  const a=rgb(base||underlay),b=rgb(top);if(!b)throw new TypeError("Brush color must be hexadecimal.");
+  return hex(a.map((v,i)=>v+(b[i]-v)*intensity/100));
+ }
+
+ function invertSelection(selection){
+  if(!selection||typeof selection.length!=="number")throw new TypeError("Selection mask is required.");
+  return Uint8Array.from(selection,v=>v?0:1);
+ }
+ function rotatePixels(pixels,w,h,angle,selection=null){
+  if(!validSize(w,h)||!pixels||pixels.length!==w*h)throw new TypeError("Rotation pixels do not match the canvas.");
+  if(selection&&selection.length!==w*h)throw new TypeError("Rotation selection does not match the canvas.");
+  if(!Number.isFinite(angle))throw new TypeError("Rotation angle must be finite.");
+  const out=pixels.slice(),mask=selection?new Uint8Array(w*h):null,src=pixels.slice();
+  if(mask)mask.fill(0);
+  const radians=angle*Math.PI/180,cos=Math.cos(radians),sin=Math.sin(radians),cx=(w-1)/2,cy=(h-1)/2;
+  if(selection){for(let i=0;i<out.length;i++)if(selection[i])out[i]=null;}
+  else out.fill(null);
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+   const dx=x-cx,dy=y-cy,sx=Math.round(cx+dx*cos+dy*sin),sy=Math.round(cy-dx*sin+dy*cos);
+   if(sx<0||sy<0||sx>=w||sy>=h)continue;
+   const si=idx(sx,sy,w),di=idx(x,y,w);if(selection&&!selection[si])continue;
+   out[di]=src[si];if(mask)mask[di]=1;
+  }
+  return {pixels:out,selection:mask};
+ }
+ function rotatePoint(point,center,angle){
+  if(!point||!center||![point.x,point.y,center.x,center.y,angle].every(Number.isFinite))throw new TypeError("Rotation coordinates and angle must be finite.");
+  const r=angle*Math.PI/180,c=Math.cos(r),s=Math.sin(r),x=point.x-center.x,y=point.y-center.y;
+  return {x:center.x+x*c-y*s,y:center.y+x*s+y*c};
+ }
+ return {rectSelection,lassoSelection,gradient,moveSelection,scaleSelection,bezier,brushCells,blendPixel,applyMask,fadePixel,invertSelection,rotatePixels,rotatePoint};
 });

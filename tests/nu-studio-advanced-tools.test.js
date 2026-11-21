@@ -104,3 +104,25 @@ test("ICO export is wired to both the main and advanced export panels",()=>{
  assert.match(js,/id="adv-ico"/);
  assert.match(html,/nu-ico-export\.js/);
 });
+
+test("selection clipping also constrains clear, replace, chroma key, image overlay and text",()=>{
+ assert.match(js,/pixels=pixels\.map\(\(c,i\)=>c===old&&\(!adv\.selection\|\|adv\.selection\[i\]\)\?n:c\)/);
+ assert.match(js,/pixels=pixels\.map\(\(c,i\)=>!adv\.selection\|\|adv\.selection\[i\]\?null:c\)/);
+ assert.match(js,/\(!adv\.selection\|\|adv\.selection\[i\]\)&&dist\(c,key\)<=t\?null:c/);
+ assert.match(js,/d\[i\*4\+3\]>20&&\(!adv\.selection\|\|adv\.selection\[i\]\)/);
+ assert.match(js,/d\[i\*4\+3\]>128&&\(!adv\.selection\|\|adv\.selection\[i\]\)/);
+});
+
+test("fading brush blends against each destination pixel rather than the stroke origin pixel",()=>{
+ const start=js.indexOf("const paintAdv=paintBrush;paintBrush=function");
+ const end=js.indexOf("const floodAdv=flood;",start);
+ const block=js.slice(start,end);
+ assert.match(block,/fadePixel\(pixels\[key\],v,fadeIntensity\)/);
+ assert.doesNotMatch(block,/fadePixel\(pixels\[y\*width\+x\],v,fadeIntensity\)/);
+});
+
+test("Studio page visibly identifies the exact human-QA-only candidate",()=>{
+ assert.match(html,/TEST CANDIDATE — NOT HUMAN-APPROVED/);
+ assert.match(html,/DEMO QA ONLY/);
+ assert.match(html,/LOGIC SHA 9afab37c373091482d2010350a219856e46728d2/);
+});

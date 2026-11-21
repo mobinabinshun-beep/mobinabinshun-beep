@@ -39,3 +39,80 @@ test("layer blend modes and masks are applied without mutating source",()=>{
  assert.equal(P.blendPixel("#000000","#ffffff","screen"),"#ffffff");
  assert.deepEqual(P.applyMask(["#ff0000","#00ff00"],[1,0]),["#ff0000",null]);
 });
+
+test("selection inversion complements inside and outside masks without mutating input",()=>{
+ const original=Uint8Array.from([1,0,1,0]),outside=P.invertSelection(original);
+ assert.deepEqual([...outside],[0,1,0,1]);assert.deepEqual([...original],[1,0,1,0]);
+});
+test("free rotation preserves an unselected layer region and returns a tight rotated mask",()=>{
+ const pixels=["#ff0000",null,null,null,null,null,null,null,null],mask=Uint8Array.from([1,0,0,0,0,0,0,0,0]);
+ const rotated=P.rotatePixels(pixels,3,3,90,mask);
+ assert.equal(rotated.pixels.length,9);assert.equal(rotated.pixels.filter(Boolean).length,1);
+ assert.equal(rotated.selection.reduce((a,b)=>a+b,0),1);
+ assert.equal(pixels[0],"#ff0000");
+});
+test("fading brush intensity deterministically blends over an existing or transparent pixel",()=>{
+ assert.equal(P.fadePixel("#000000","#ffffff",50),"#808080");
+ assert.equal(P.fadePixel(null,"#ffffff",50),"#8a929c");
+ assert.throws(()=>P.fadePixel(null,"#ffffff",101),/intensity/);
+});
+test("selected rotation preserves pixels outside the selection",()=>{
+ const source=["#ff0000",null,null,"#00ff00"],mask=Uint8Array.from([1,0,0,0]);
+ const result=P.rotatePixels(source,2,2,90,mask);
+ assert.equal(result.pixels[3],"#00ff00");
+ assert.equal(source[0],"#ff0000");
+ assert.equal(result.selection.reduce((n,v)=>n+v,0),1);
+});
+test("rotation geometry maps a point around its center independently of artwork storage",()=>{
+ const p=P.rotatePoint({x:2,y:1},{x:1,y:1},90);
+ assert.ok(Math.abs(p.x-1)<1e-9);assert.ok(Math.abs(p.y-2)<1e-9);
+});
+test("rotation rejects invalid angles and mismatched selection dimensions",()=>{
+ assert.throws(()=>P.rotatePoint({x:0,y:0},{x:0,y:0},NaN),/finite/);
+ assert.throws(()=>P.rotatePixels([null],1,1,45,new Uint8Array(2)),/selection/);
+});
+
+test("free rotation maps exact pixel coordinates for clockwise and counter-clockwise quarter turns",()=>{
+ const source=Array(9).fill(null);source[3]="#ff0000";
+ const cw=P.rotatePixels(source,3,3,90).pixels;
+ const ccw=P.rotatePixels(source,3,3,-90).pixels;
+ const half=P.rotatePixels(source,3,3,180).pixels;
+ assert.equal(cw[1],"#ff0000");
+ assert.equal(ccw[7],"#ff0000");
+ assert.equal(half[5],"#ff0000");
+ assert.equal(cw.filter(Boolean).length,1);
+});
+test("free rotation handles non-square canvases and preserves dimensions at 180 degrees",()=>{
+ const source=Array(12).fill(null);source[0]="#00ff00";source[11]="#0000ff";
+ const result=P.rotatePixels(source,4,3,180).pixels;
+ assert.equal(result.length,12);
+ assert.equal(result[11],"#00ff00");
+ assert.equal(result[0],"#0000ff");
+});
+test("selected rotation preserves a hole and pixels outside the selection",()=>{
+ const source=Array(9).fill(null);source[1]="#ff0000";source[4]="#00ff00";
+ const mask=Uint8Array.from([0,1,0,0,0,0,0,0,0]);
+ const result=P.rotatePixels(source,3,3,90,mask);
+ assert.equal(result.pixels[5],"#ff0000");
+ assert.equal(result.pixels[4],"#00ff00");
+ assert.equal(result.selection[4],0);
+ assert.equal(result.selection.reduce((n,v)=>n+v,0),1);
+});
+test("rotation at zero degrees is identity for pixels and selected mask",()=>{
+ const source=["#111111",null,"#333333",null],mask=Uint8Array.from([1,0,0,1]);
+ const result=P.rotatePixels(source,2,2,0,mask);
+ assert.deepEqual(result.pixels,source);
+ assert.deepEqual([...result.selection],[...mask]);
+});
+
+test("fading brush intensity endpoints are deterministic on opaque and transparent pixels",()=>{
+ assert.equal(P.fadePixel("#000000","#ffffff",1),"#030303");
+ assert.equal(P.fadePixel("#000000","#ffffff",100),"#ffffff");
+ assert.equal(P.fadePixel(null,"#ffffff",1),"#16273a");
+ assert.equal(P.fadePixel(null,"#ffffff",100),"#ffffff");
+});
+test("selection inversion handles empty, full and irregular masks",()=>{
+ assert.deepEqual([...P.invertSelection(Uint8Array.from([0,0,0]))],[1,1,1]);
+ assert.deepEqual([...P.invertSelection(Uint8Array.from([1,1,1]))],[0,0,0]);
+ assert.deepEqual([...P.invertSelection(Uint8Array.from([1,0,0,1,0]))],[0,1,1,0,1]);
+});
