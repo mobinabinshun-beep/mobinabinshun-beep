@@ -127,3 +127,10 @@
 - Use the checklist's PASS/FAIL/BLOCKED/NOT-TESTED vocabulary. PASS requires exact-SHA test evidence; CI is not browser/device QA, live-build proof or owner acceptance.
 - Keep the Studio scope isolated. Preserve all protected HUD, Wallet/economy, Gateway/controller, gameplay-input, Library, other-game and global-style areas. Do not begin deferred animation/sprite/tile/vector/project-packaging work under this scope.
 - Update the Studio Change Record with exact commands, tested SHA, workflow run IDs, environment, artifacts, failures and human-QA status. Never claim snapshot, deployment, machine approval or acceptance without evidence.
+
+
+## Owner delivery boundary — demo QA only; no implied release (2026-11-21)
+- The public demo is a human-test environment, not a product release or launch.
+- A machine-passed, backed-up candidate may be placed on the demo only as a clearly labelled `TEST CANDIDATE — NOT HUMAN-APPROVED`, after the required runtime-baseline and deployment verification steps.
+- No product release, production promotion, stable publication, package/store release or public launch is permitted unless the owner first explicitly accepts human QA for the exact demo build/scope and then gives a separate direct instruction naming that release action.
+- CI PASS, demo deployment, merge, human tester PASS, owner acceptance of the demo, or silence alone never authorizes a release.
