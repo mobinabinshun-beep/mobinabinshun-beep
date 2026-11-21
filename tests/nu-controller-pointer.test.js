@@ -46,7 +46,7 @@ test("Keyboard-emulated click-controller arrows are captured by the shared point
  assert.match(pointer,/keyboard-click-controller/);
  assert.match(pointer,/addEventListener\("keydown",onKeyboardInput,true\)/);
  assert.match(pointer,/if\(event\.key==="Enter"\|\|event\.key===" "\|\|event\.key==="NumpadEnter"\)/);
- assert.match(pointer,/isGatewayOpen\(\)\|\|!isGameplayPointerScreen\(\)/);
+ assert.match(pointer,/if\(isGatewayOpen\(\)\)\{keyboardBlockedUntilNeutral=true;return;\}/);\n assert.match(pointer,/if\(!isGameplayPointerScreen\(\)\|\|keyboardBlockedUntilNeutral\)return/);
 });
 test("Click-controller directions have an explicit path to move the simulated pointer",()=>{
  assert.match(pointer,/function movePointer\(dx,dy,source\)/);
