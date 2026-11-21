@@ -94,3 +94,47 @@ The owner's latest direct instruction supersedes older wording that treats publi
 - The exact machine-passed candidate may be placed on the public demo after the mandatory runtime baseline and exact candidate backup gates, labelled `TEST CANDIDATE — NOT HUMAN-APPROVED`.
 - Any beyond-demo release requires BOTH explicit human acceptance of the exact demo build/scope and a separate direct, unambiguous owner instruction naming the release action.
 - No CI result, demo deployment, merge, tester PASS, silence or general human acceptance can substitute for that second instruction.
+
+
+## Demo-only human QA candidate — exact current evidence (2026-11-21)
+
+**State:** `MACHINE-APPROVED / DEMO-QA-PENDING`  
+**Exact code/test candidate SHA:** `6db7811e2481756f93f8225613c88d281f071714`  
+**Core Studio implementation logic SHA shown on the page:** `9afab37c373091482d2010350a219856e46728d2`  
+**PR:** #238 — still Draft/open at time of this record.
+
+### Machine evidence on the exact candidate SHA
+
+- Pixel Art Studio machine checks — PR run **44903476403** PASS; push run **44903474023** PASS.
+- Studio export regressions — PR run **44903476442** PASS; push run **44903474080** PASS.
+- Arcane Shield/Mana regression — PR run **44903476426** PASS.
+- Graphics preview smoke — PR run **44903476449** PASS.
+- Gateway main-game regression — PR run **44903476397** PASS.
+- Dedicated Studio job: **48 tests, 48 passed, 0 failed, 0 skipped**; syntax checks passed.
+- The Studio page now visibly displays `TEST CANDIDATE — NOT HUMAN-APPROVED · DEMO QA ONLY` and its core implementation logic SHA.
+
+### Verified recovery points
+
+- Exact candidate backup: `backup/pre-public-demo-pixel-art-studio-candidate-2026-11-21-r4` — identical to candidate SHA `6db7811e2481756f93f8225613c88d281f071714` (0 ahead / 0 behind).
+- Pre-demo source backup: `backup/pre-pixel-art-studio-demo-before-merge-2026-11-21` — identical to pre-demo source `f475e75cdb7e16d4b14a646fe57cfb5e0ccbd266` (0 ahead / 0 behind).
+- Earlier candidate backups r1–r3 and baseline backup branches remain preserved.
+
+### Runtime baseline snapshot
+
+- Snapshot: `archive/runtime-baseline/NU-PUBLIC-DEMO-20261121T121811Z-f9b42ac/`
+- Source tree: 280 tracked blobs, exact Git tree/blob SHA index.
+- GitHub Pages baseline run **44903305930** deployed Pages build version `f39f4f2d175e1fa751cb2329c2b63407e9e38efd` successfully; the source delta from parent `f9b42ac...` is only the two snapshot documentation files.
+- Snapshot state remains **PARTIAL**: direct external HTTP response/cache and browser runtime-state capture were unavailable. Source-level pre-demo backup and Pages deployment identity are verified; do not claim a complete runtime snapshot.
+
+### Human QA handoff
+
+Instructions: [PIXEL-ART-STUDIO-2D-HUMAN-QA-HANDOFF-2026-11-21.md](./PIXEL-ART-STUDIO-2D-HUMAN-QA-HANDOFF-2026-11-21.md)
+
+Demo target after candidate deployment:
+https://mobinabinshun-beep.github.io/mobinabinshun-beep/pixel-art-studio.html
+
+Human QA has not yet been performed. Required areas include fading brush, selection inside/outside, free rotation, two-finger viewport rotation, Blueprint overlays, Undo/Redo, import/export, guide exclusion from exports, desktop/mobile/touch and regression boundaries.
+
+### Authority boundary
+
+This candidate is for **demo-only human QA**, not product release. The owner has explicitly directed that no release, production promotion, stable publication, package/store release or launch may occur unless the owner first accepts human QA for the exact demo build/scope and then issues a separate direct instruction naming the specific release action. No such release instruction is part of this task.
