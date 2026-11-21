@@ -60,3 +60,28 @@ The current candidate contains first-pass integration for fading brush, free lay
 ## Status
 
 **DOCUMENTED / FIRST-PASS IMPLEMENTATION — MACHINE PASS at `c1dde9c2fe76e350a0c4e88263865d6623a9d759`; NOT COMPLETE; HUMAN QA NOT READY; DEPLOYMENT BLOCKED.**
+
+
+## Latest machine verification — 2026-11-21
+
+**Verified application/test code SHA:** `9afab37c373091482d2010350a219856e46728d2`
+
+The code review found and fixed a Fading Brush integration defect: the old wrapper blended every brush cell against the stroke-origin pixel. It now calls `fadePixel(pixels[key], ...)` per destination cell, preserving each cell's own underlay. A regression test asserts this behavior.
+
+Additional test coverage now includes:
+- Exact pixel coordinates for +90°, −90°, 180° and identity rotation.
+- Non-square 4×3 canvas rotation.
+- Selection hole and preservation of a pixel outside the selected region.
+- Fading intensity endpoints 1 and 100 on opaque and transparent pixels, plus the existing midpoint test.
+- Empty, full and irregular selection inversion.
+- Workflow execution of `nu-studio-advanced-tools.test.js` in the dedicated Node 22 job.
+
+At the exact SHA above, all four PR workflow families passed:
+- Pixel Art Studio machine checks — PR run **44900204189**, push run **44900200008**.
+- Studio export regression gates — PR run **44900204242**, push run **44900200074**.
+- Graphics preview smoke checks — PR run **44900204214**.
+- Arcane Shield/Mana regression — PR run **44900204219**.
+
+The dedicated Studio job completed successfully; its log reports **47 tests, 47 passed, 0 failed, 0 skipped**. Syntax checks passed. Export, graphics smoke and adjacent regression workflows also passed.
+
+**Machine status:** PASS for the candidate code at the exact SHA above. **Controlled human QA may begin against this exact candidate build.** This does not mean full Issue #62 acceptance: browser/device touch behavior, visual QA, Undo/Redo end-to-end, export-overlay exclusion, and owner review remain open. Runtime snapshot remains `NOT CAPTURED`; no merge, production deployment, or release is authorized.
