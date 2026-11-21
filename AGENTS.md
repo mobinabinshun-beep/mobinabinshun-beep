@@ -134,3 +134,11 @@
 - A machine-passed, backed-up candidate may be placed on the demo only as a clearly labelled `TEST CANDIDATE — NOT HUMAN-APPROVED`, after the required runtime-baseline and deployment verification steps.
 - No product release, production promotion, stable publication, package/store release or public launch is permitted unless the owner first explicitly accepts human QA for the exact demo build/scope and then gives a separate direct instruction naming that release action.
 - CI PASS, demo deployment, merge, human tester PASS, owner acceptance of the demo, or silence alone never authorizes a release.
+
+
+## Owner-mandated additive development and two-stage correction lock (2026-11-22)
+- Canonical governance rule: https://github.com/mobinabinshun-beep/Repository/blob/main/Governance/NU-ADDITIVE-DEVELOPMENT-AND-TWO-STAGE-CORRECTION-LOCK-PROTOCOL-fa.md
+- Development work is additive and preservation-first: do not delete or reduce existing capabilities, data, behavior, interfaces, contracts or documentation; the next version must not be less than its baseline.
+- Keep corrections separate from development. A correction remains locked through its documented intake/scope stage and may be written only after a direct owner command explicitly opens that exact correction ID and scope. Keep machine verification and human QA as separate acceptance gates.
+- Categorize and link reports/tasks in the canonical Deferred-Work registry; preserve source reports and connect dependencies, issues, PRs, commits, tests, backups and QA evidence.
+- This general rule does not silently unlock a named frozen candidate, protected shared contract or correction scope. Follow the task-specific authorization and all local AGENTS/protocol requirements.
