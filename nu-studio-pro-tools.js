@@ -97,7 +97,7 @@
   if(selection&&selection.length!==w*h)throw new TypeError("Rotation selection does not match the canvas.");
   if(!Number.isFinite(angle))throw new TypeError("Rotation angle must be finite.");
   const out=pixels.slice(),mask=selection?new Uint8Array(w*h):null,src=pixels.slice();
-  if(mask){for(let i=0;i<selection.length;i++)mask[i]=selection[i]?1:0;}
+  if(mask)mask.fill(0);
   const radians=angle*Math.PI/180,cos=Math.cos(radians),sin=Math.sin(radians),cx=(w-1)/2,cy=(h-1)/2;
   if(selection){for(let i=0;i<out.length;i++)if(selection[i])out[i]=null;}
   else out.fill(null);
