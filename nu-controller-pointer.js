@@ -76,8 +76,9 @@
    const isCancel=event.key==="Escape";
    if(!delta&&!isConfirm&&!isCancel)return;
    keyboardDown.add(event.code||event.key);
+   if(isGatewayOpen()){keyboardBlockedUntilNeutral=true;return;}
    if(event.target&&event.target.closest&&event.target.closest("#nu-hex-gateway"))return;
-   if(isGatewayOpen()||!isGameplayPointerScreen()||keyboardBlockedUntilNeutral)return;
+   if(!isGameplayPointerScreen()||keyboardBlockedUntilNeutral)return;
    if(delta){
     if(!enabled)start(true);
     if(movePointer(delta[0],delta[1],"keyboard-click-controller")){
