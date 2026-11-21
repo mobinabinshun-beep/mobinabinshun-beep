@@ -62,7 +62,13 @@ $("image-lock").addEventListener("change",e=>{resizeLock=e.target.checked;});
 $("image-width").addEventListener("input",()=>{lastDimension="width";});$("image-height").addEventListener("input",()=>{lastDimension="height";});$("apply-image-size").addEventListener("click",()=>{let w=clamp(Number($("image-width").value)||width,1,2048),h=clamp(Number($("image-height").value)||height,1,2048);if(resizeLock){const ratio=width/height;if(lastDimension==="width")h=Math.max(1,Math.round(w/ratio));else w=Math.max(1,Math.round(h*ratio));}$("image-width").value=w;$("image-height").value=h;resizeArtwork(w,h,"nearest-neighbor");});
 function renderPalette(){const root=$("palette");root.innerHTML="";palette.forEach((c,i)=>{const b=document.createElement("button");b.type="button";b.className="swatch";b.style.background=c;b.title=c;b.setAttribute("aria-label","Palette color "+c);b.setAttribute("aria-pressed",String(c.toLowerCase()===color.toLowerCase()));b.addEventListener("click",()=>{color=c;$("custom-color").value=c;renderPalette();});root.appendChild(b);});const transparent=document.createElement("button");transparent.type="button";transparent.className="swatch";transparent.setAttribute("aria-label","Transparent");transparent.title="Transparent / eraser";transparent.addEventListener("click",()=>setTool("eraser"));root.appendChild(transparent);}
 function setTool(next){tool=next;document.querySelectorAll("[data-tool]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tool===tool)));canvas.style.cursor=tool==="picker"?"copy":tool==="eraser"?"cell":tool==="fill"?"copy":"crosshair";}
-function coords(e){const r=canvas.getBoundingClientRect();return window.NUStudioLayout.pixelAt(e.clientX,e.clientY,r,width,height);}
+function coords(e){
+ const r=canvas.getBoundingClientRect();
+ if(!viewRotation)return window.NUStudioLayout.pixelAt(e.clientX,e.clientY,r,width,height);
+ const cx=r.left+r.width/2,cy=r.top+r.height/2,a=-viewRotation*Math.PI/180,dx=e.clientX-cx,dy=e.clientY-cy;
+ const ux=dx*Math.cos(a)-dy*Math.sin(a)+cx,uy=dx*Math.sin(a)+dy*Math.cos(a)+cy,w=canvas.offsetWidth,h=canvas.offsetHeight;
+ return {x:clamp(Math.floor((ux-(cx-w/2))/w*width),0,width-1),y:clamp(Math.floor((uy-(cy-h/2))/h*height),0,height-1)};
+}
 function put(x,y,value){pixels[y*width+x]=value;}
 function flood(x,y,next){const start=pixels[y*width+x];if(start===next)return;const stack=[[x,y]],seen=new Uint8Array(width*height);while(stack.length){const [cx,cy]=stack.pop(),i=cy*width+cx;if(cx<0||cy<0||cx>=width||cy>=height||seen[i]||pixels[i]!==start)continue;seen[i]=1;pixels[i]=next;stack.push([cx+1,cy],[cx-1,cy],[cx,cy+1],[cx,cy-1]);}}
 function paintBrush(x,y,value){
@@ -472,7 +478,7 @@ function updateProSelection(mask){adv.selection=mask;render();announce(mask&&mas
 function applyFreeLayerRotation(angle){
  if(!Number.isFinite(angle)||Math.abs(angle)>360)return announce("Rotation angle must be between -360° and 360°.");
  const layer=adv.layers[adv.active];if(layer.locked)return announce("Layer locked.");
- const before=histAdv(),result=proTools.rotatePixels(layer.pixels,width,height,angle);
+ const before=histAdv(),result=proTools.rotatePixels(layer.pixels,width,height,angle,adv.selection||null);
  layer.pixels=result.pixels;pixels=layer.pixels.slice();adv.selection=result.selection;commitHistory(before);render();announce("Active layer rotated "+angle+"° with nearest-neighbour sampling.");
 }
 function installStudio2DControls(){
@@ -486,6 +492,31 @@ function installStudio2DControls(){
  $("view-rotate-reset")?.addEventListener("click",()=>{viewRotation=0;canvas.style.transform="";announce("Viewport rotation reset; artwork unchanged.");});
 }
 installStudio2DControls();
+const viewportPointers=new Map();let viewportGesture=null;
+function pointerAngle(a,b){return Math.atan2(b.y-a.y,b.x-a.x)*180/Math.PI;}
+function updateViewportRotation(){canvas.style.transform="rotate("+viewRotation+"deg)";canvas.style.transformOrigin="50% 50%";}
+const stageSurface=document.querySelector(".stage");
+if(stageSurface){
+ stageSurface.addEventListener("pointerdown",e=>{
+  if(e.pointerType!=="touch")return;
+  viewportPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(viewportPointers.size===2){
+   e.preventDefault();e.stopImmediatePropagation();if(drawing)cancelStroke();
+   const pts=[...viewportPointers.values()];viewportGesture={angle:pointerAngle(pts[0],pts[1]),base:viewRotation};
+  }
+ },true);
+ stageSurface.addEventListener("pointermove",e=>{
+  if(!viewportPointers.has(e.pointerId))return;
+  viewportPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(viewportGesture&&viewportPointers.size>=2){
+   e.preventDefault();e.stopImmediatePropagation();const pts=[...viewportPointers.values()],delta=pointerAngle(pts[0],pts[1])-viewportGesture.angle;
+   viewRotation=((viewportGesture.base+delta+540)%360)-180;updateViewportRotation();
+  }
+ },true);
+ const finishViewportPointer=e=>{if(viewportGesture){e.preventDefault();e.stopImmediatePropagation();}viewportPointers.delete(e.pointerId);if(viewportPointers.size<2)viewportGesture=null;};
+ stageSurface.addEventListener("pointerup",finishViewportPointer,true);
+ stageSurface.addEventListener("pointercancel",finishViewportPointer,true);
+}
 
 let proGesture=null;
 function proPointerStart(e){if(!["select-rect","select-lasso","move-selection","gradient","bezier"].includes(tool))return;e.preventDefault();e.stopImmediatePropagation();if(canvas.setPointerCapture)canvas.setPointerCapture(e.pointerId);const p=coords(e),before=snapshot();
