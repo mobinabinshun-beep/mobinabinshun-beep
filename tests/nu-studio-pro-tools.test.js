@@ -51,6 +51,18 @@ test("free rotation preserves an unselected layer region and returns a tight rot
  assert.equal(rotated.selection.reduce((a,b)=>a+b,0),1);
  assert.equal(pixels[0],"#ff0000");
 });
+test("fading brush intensity deterministically blends over an existing or transparent pixel",()=>{
+ assert.equal(P.fadePixel("#000000","#ffffff",50),"#808080");
+ assert.equal(P.fadePixel(null,"#ffffff",50),"#8a929a");
+ assert.throws(()=>P.fadePixel(null,"#ffffff",101),/intensity/);
+});
+test("selected rotation preserves pixels outside the selection",()=>{
+ const source=["#ff0000","#00ff00",null,null],mask=Uint8Array.from([1,0,0,0]);
+ const result=P.rotatePixels(source,2,2,90,mask);
+ assert.equal(result.pixels[1],"#00ff00");
+ assert.equal(source[0],"#ff0000");
+ assert.equal(result.selection.reduce((n,v)=>n+v,0),1);
+});
 test("rotation geometry maps a point around its center independently of artwork storage",()=>{
  const p=P.rotatePoint({x:2,y:1},{x:1,y:1},90);
  assert.ok(Math.abs(p.x-1)<1e-9);assert.ok(Math.abs(p.y-2)<1e-9);
