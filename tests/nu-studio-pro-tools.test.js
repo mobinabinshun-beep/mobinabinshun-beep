@@ -71,3 +71,36 @@ test("rotation rejects invalid angles and mismatched selection dimensions",()=>{
  assert.throws(()=>P.rotatePoint({x:0,y:0},{x:0,y:0},NaN),/finite/);
  assert.throws(()=>P.rotatePixels([null],1,1,45,new Uint8Array(2)),/selection/);
 });
+
+test("free rotation maps exact pixel coordinates for clockwise and counter-clockwise quarter turns",()=>{
+ const source=Array(9).fill(null);source[3]="#ff0000";
+ const cw=P.rotatePixels(source,3,3,90).pixels;
+ const ccw=P.rotatePixels(source,3,3,-90).pixels;
+ const half=P.rotatePixels(source,3,3,180).pixels;
+ assert.equal(cw[1],"#ff0000");
+ assert.equal(ccw[7],"#ff0000");
+ assert.equal(half[5],"#ff0000");
+ assert.equal(cw.filter(Boolean).length,1);
+});
+test("free rotation handles non-square canvases and preserves dimensions at 180 degrees",()=>{
+ const source=Array(12).fill(null);source[0]="#00ff00";source[11]="#0000ff";
+ const result=P.rotatePixels(source,4,3,180).pixels;
+ assert.equal(result.length,12);
+ assert.equal(result[11],"#00ff00");
+ assert.equal(result[0],"#0000ff");
+});
+test("selected rotation preserves a hole and pixels outside the selection",()=>{
+ const source=Array(9).fill(null);source[1]="#ff0000";source[4]="#00ff00";
+ const mask=Uint8Array.from([0,1,0,0,0,0,0,0,0]);
+ const result=P.rotatePixels(source,3,3,90,mask);
+ assert.equal(result.pixels[5],"#ff0000");
+ assert.equal(result.pixels[4],"#00ff00");
+ assert.equal(result.selection[4],0);
+ assert.equal(result.selection.reduce((n,v)=>n+v,0),1);
+});
+test("rotation at zero degrees is identity for pixels and selected mask",()=>{
+ const source=["#111111",null,"#333333",null],mask=Uint8Array.from([1,0,0,1]);
+ const result=P.rotatePixels(source,2,2,0,mask);
+ assert.deepEqual(result.pixels,source);
+ assert.deepEqual([...result.selection],[...mask]);
+});
