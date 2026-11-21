@@ -438,7 +438,7 @@ async function overlayAdv(e){const f=e.target.files&&e.target.files[0];if(!f)ret
 function chromaAdv(){if(adv.layers[adv.active].locked)return announce("Layer locked");const before=histAdv(),key=$("adv-key").value,t=+$("adv-keytol").value;pixels=pixels.map(c=>dist(c,key)<=t?null:c);adv.layers[adv.active].pixels=pixels.slice();commitHistory(before);render();}
 function textAdv(){if(adv.layers[adv.active].locked)return announce("Layer locked");const before=histAdv(),c=document.createElement("canvas");c.width=width;c.height=height;const x=c.getContext("2d");x.fillStyle=color;x.font="bold "+clamp(+$("adv-textsize").value,6,96)+"px monospace";x.textBaseline="top";x.fillText($("adv-text").value,0,0,width);const d=x.getImageData(0,0,width,height).data;for(let i=0;i<pixels.length;i++)if(d[i*4+3]>128)pixels[i]=color;adv.layers[adv.active].pixels=pixels.slice();commitHistory(before);render();}
 const paintAdv=paintBrush;paintBrush=function(x,y,v){
- if(tool==="fading-brush"&&v){const i=y*width+x;v=mix(pixels[i],v,fadeIntensity/100);}
+ if(tool==="fading-brush"&&v)v=window.NUStudioProTools.fadePixel(pixels[y*width+x],v,fadeIntensity);
  if(adv.layers[adv.active].locked)return;const alpha=+$("adv-alpha")?.value||100,points=[[x,y]];
  if(adv.symmetry==="horizontal"||adv.symmetry==="both")points.push([width-1-x,y]);if(adv.symmetry==="vertical"||adv.symmetry==="both")points.push([x,height-1-y]);if(adv.symmetry==="both")points.push([width-1-x,height-1-y]);
  const seen=new Set(),texture=adv.texture==="none"&&tool==="texture"?"grain":adv.texture;
