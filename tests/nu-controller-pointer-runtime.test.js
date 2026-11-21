@@ -5,22 +5,25 @@ const fs=require("node:fs");
 const vm=require("node:vm");
 const source=fs.readFileSync("nu-controller-pointer.js","utf8");
 
-function harness(gamepad=null){
+function harness(gamepad=null,gameActive=true){
  const listeners=new Map(),frames=new Map();let frameId=0;
- const makeElement=()=>({style:{},className:"",attributes:{},children:[],classList:{add(){},remove(){}},setAttribute(k,v){this.attributes[k]=v;},appendChild(child){this.children.push(child);},remove(){},dispatchEvent(){return true;}});
+ const makeElement=()=>{const classes=new Set();return {style:{},className:"",attributes:{},children:[],classList:{add(name){classes.add(name);},remove(name){classes.delete(name);},contains(name){return classes.has(name);},toggle(name,force){if(force===undefined)force=!classes.has(name);force?classes.add(name):classes.delete(name);return force;}},setAttribute(k,v){this.attributes[k]=v;},appendChild(child){this.children.push(child);},remove(){},dispatchEvent(){return true;}};};
  const target={classList:{add(){},remove(){}},events:[],dispatchEvent(event){this.events.push(event);return true;}};
- const document={head:makeElement(),body:makeElement(),createElement(){return makeElement();},elementFromPoint(){return target;},dispatchEvent(){return true;}};
+ const gameView=makeElement();if(gameActive)gameView.classList.add("active");const canvas=makeElement();
+ const document={head:makeElement(),body:makeElement(),createElement(){return makeElement();},getElementById(id){return id==="game-view"?gameView:id==="game-canvas"?canvas:null;},elementFromPoint(){return target;},dispatchEvent(){return true;}};
  class CustomEvent{constructor(type,options){this.type=type;this.detail=options&&options.detail;}}
+ let observerCallback=null;
+ class MutationObserver{constructor(fn){observerCallback=fn;}observe(){}disconnect(){}}
  const window={document,innerWidth:800,innerHeight:600,navigator:{getGamepads(){return gamepad?[gamepad]:[];}},
-  CustomEvent,MouseEvent:CustomEvent,PointerEvent:CustomEvent,
+  CustomEvent,MouseEvent:CustomEvent,PointerEvent:CustomEvent,KeyboardEvent:CustomEvent,MutationObserver,
   addEventListener(type,fn){if(!listeners.has(type))listeners.set(type,new Set());listeners.get(type).add(fn);},
   removeEventListener(type,fn){listeners.get(type)?.delete(fn);},
   dispatchEvent(event){for(const fn of listeners.get(event.type)||[])fn(event);return true;},
   requestAnimationFrame(fn){const id=++frameId;frames.set(id,fn);return id;},
   cancelAnimationFrame(id){frames.delete(id);}};
- vm.runInNewContext(source,{window,globalThis:window,Math,Number,Array,Object,String});
- return {window,target,adapter:window.NUControllerPointer,dispatch(type,detail){window.dispatchEvent(new CustomEvent(type,{detail}));},
-  step(time){const entry=frames.entries().next().value;if(!entry)return false;frames.delete(entry[0]);entry[1](time);return true;}};
+ vm.runInNewContext(source,{window,globalThis:window,Math,Number,Array,Object,String,Set,Map});
+ return {window,target,gameView,adapter:window.NUControllerPointer,dispatch(type,detail){window.dispatchEvent(new CustomEvent(type,{detail}));},
+  step(time){const entry=frames.entries().next().value;if(!entry)return false;frames.delete(entry[0]);entry[1](time);return true;},observe(){observerCallback&&observerCallback();}};
 }
 
 test("Click-controller starts the simulated cursor without a connected Gamepad API device",()=>{
@@ -37,18 +40,18 @@ test("Directional events from the click-controller translator move the pointer",
  h.dispatch("nu:controller-direction",{dx:0,dy:1});const after=h.adapter.getState();
  assert.equal(after.x,before.x);assert.equal(after.y,before.y+28);h.adapter.destroy();
 });
-test("Gateway list navigation owns direction and blocks simulated-pointer movement",()=>{
+test("Gateway open freezes the pointer; Gateway direction events never move or start it",()=>{
  const h=harness();h.adapter.startClickController();const before=h.adapter.getState();
- h.adapter.setGatewayNavigation(true);assert.equal(h.adapter.move(1,0),false);
+ h.document.body.classList.add("nu-gateway-open");
+ assert.equal(h.adapter.move(1,0),false);
+ h.dispatch("nu:gateway-direction",{x:1,y:0});
  assert.equal(h.adapter.getState().x,before.x);assert.equal(h.adapter.getState().y,before.y);
- h.adapter.setGatewayNavigation(false);assert.equal(h.adapter.move(1,0),true);h.adapter.destroy();
+ h.adapter.destroy();
 });
 
-test("Existing Gateway directional event automatically starts and moves the simulated pointer outside Gateway",()=>{
+test("Gateway directional events cannot start or move the gameplay virtual pointer",()=>{
  const h=harness();h.dispatch("nu:gateway-direction",{x:1,y:0});
- assert.equal(h.adapter.isEnabled(),true);
- assert.equal(h.adapter.getState().x,428);
- assert.equal(h.adapter.getState().y,300);
+ assert.equal(h.adapter.isEnabled(),false);
  h.adapter.destroy();
 });
 
@@ -60,12 +63,20 @@ test("Real arrow-key input from a keyboard-emulated click controller moves the p
  assert.equal(h.adapter.isEnabled(),true);assert.equal(after.x,428);assert.equal(after.y,300);
  assert.equal(event.defaultPrevented,true);assert.equal(event.stopped,true);h.adapter.destroy();
 });
-test("Gateway keeps exclusive ownership of arrow keys while hierarchical navigation is active",()=>{
- const h=harness();h.adapter.startClickController();h.adapter.setGatewayNavigation(true);const before=h.adapter.getState();
- const event={type:"keydown",key:"ArrowDown",repeat:false,preventDefault(){this.defaultPrevented=true;},stopImmediatePropagation(){this.stopped=true;}};
- h.window.dispatchEvent(event);const after=h.adapter.getState();
- assert.equal(after.x,before.x);assert.equal(after.y,before.y);assert.equal(event.defaultPrevented,undefined);
- h.adapter.setGatewayNavigation(false);h.adapter.destroy();
+test("Keyboard input used inside Gateway cannot move or resume the pointer until keyup and a fresh press",()=>{
+ const h=harness();h.adapter.startClickController();const before=h.adapter.getState();
+ h.document.body.classList.add("nu-gateway-open");h.dispatch("nu:gateway-open",{});
+ const inside={type:"keydown",key:"ArrowDown",repeat:false,preventDefault(){this.defaultPrevented=true;},stopImmediatePropagation(){this.stopped=true;}};
+ h.window.dispatchEvent(inside);
+ h.document.body.classList.remove("nu-gateway-open");h.dispatch("nu:gateway-close",{});
+ const held={type:"keydown",key:"ArrowDown",repeat:true,preventDefault(){this.defaultPrevented=true;},stopImmediatePropagation(){this.stopped=true;}};
+ h.window.dispatchEvent(held);
+ assert.equal(h.adapter.getState().x,before.x);assert.equal(h.adapter.getState().y,before.y);
+ assert.equal(held.defaultPrevented,true);assert.equal(held.stopped,true);
+ h.window.dispatchEvent({type:"keyup",key:"ArrowDown"});
+ const fresh={type:"keydown",key:"ArrowDown",repeat:false,preventDefault(){this.defaultPrevented=true;},stopImmediatePropagation(){this.stopped=true;}};
+ h.window.dispatchEvent(fresh);
+ assert.equal(h.adapter.getState().y,before.y+28);h.adapter.destroy();
 });
 
 test("Virtual pointer movement dispatches pointermove and mousemove to the hit-tested game target",()=>{
