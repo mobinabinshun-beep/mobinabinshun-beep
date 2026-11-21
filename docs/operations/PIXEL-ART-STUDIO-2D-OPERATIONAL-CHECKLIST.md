@@ -218,3 +218,15 @@ This addendum adds the following required scope before implementation:
 Initial root HTML inventory: shared Gateway assets are present in index.html, launcher.html, casino.html and pixel-art-studio.html; absent in 404.html, background-candidates.html and exchange.html. All four Gateway-enabled pages declare a viewport meta tag. This is static source inspection only, not mobile browser/device verification. Nested pages and iframes remain to be inventoried.
 
 **Status: DOCUMENTED / IMPLEMENTATION NOT STARTED.** No executable source was changed in this documentation step. Before coding, recheck locks, baseline and backup; implement on an isolated branch; run automated and physical-device QA; deliver only a demo QA candidate.
+
+
+## Deferred-work registry (2026-11-21)
+
+The categorized backlog and continuation entry point are maintained in the documentation repository:
+[Deferred Work Registry](https://github.com/mobinabinshun-beep/Repository/blob/main/Deferred-Work/README-fa.md).
+
+Domain queues:
+- [Pixel Art Studio](https://github.com/mobinabinshun-beep/Repository/blob/main/Deferred-Work/domains/PIXEL-ART-STUDIO-fa.md)
+- [Shared Gateway](https://github.com/mobinabinshun-beep/Repository/blob/main/Deferred-Work/domains/GATEWAY-fa.md)
+
+Read the registry before resuming work. Re-fetch current refs, locks, runtime baseline, backups, CI and deployment identity; historical notes do not prove current state. Backlog registration is not implementation approval. Demo-only QA and the separate explicit owner release instruction remain mandatory.
