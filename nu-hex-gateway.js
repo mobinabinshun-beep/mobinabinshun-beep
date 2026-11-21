@@ -79,7 +79,7 @@
       items.forEach(item=>{item.classList.remove("is-selected","is-confirming");item.setAttribute("aria-pressed","false");});
       if(source!=="simulated-pointer")trigger.focus({preventScroll:true});
     }else{
-      // Keep the virtual pointer alive after Gateway closes so it can leave and re-enter the trigger zone.
+      // Keep gameplay paused; the independent gameplay pointer resumes only on a fresh input.
       clearTimeout(activationTimer);activationTimer=0;pendingItem=null;
       items.forEach(item=>{item.classList.remove("is-selected","is-confirming");item.setAttribute("aria-pressed","false");});
       if(shouldResume)releaseHeldState();
