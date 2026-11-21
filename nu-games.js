@@ -104,7 +104,7 @@ function recordGameObjectEvent(target,action,outcome,source,extra){
  try{return core.record(semanticAction,source||"game-runtime",canvas,detail);}catch(_){return null;}
 }
 function renderGameAssetProfile(){
- const root=$("game-asset-profile");if(!root||!state.game)return;
+ const root=$("game-asset-profile");if(!root)return false;if(!state.game){root.hidden=true;return false;}
  const rows=NUWallet.gameAssetRows(state.save,state.game).filter(row=>Number(row.value)>0);
  if(Number(state.save.xp)>0){
   if(!rows.some(row=>row.key==="xp"))rows.unshift({key:"xp",label:"XP",value:state.save.xp,unit:""});
