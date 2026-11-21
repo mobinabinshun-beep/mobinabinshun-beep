@@ -8,7 +8,7 @@
 **Dedicated machine run:** [44903671261](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44903671261) — 48/48 passed; final workflow revision `4b817ed5b8fc1b9aff3f79db94588a7a8acfc06d  
 **Demo URL:** https://mobinabinshun-beep.github.io/mobinabinshun-beep/pixel-art-studio.html  
 **Home / library:** https://mobinabinshun-beep.github.io/mobinabinshun-beep/  
-**Deployment build SHA:** pending the Pages run after the candidate is merged into the demo source; do not substitute the branch SHA for the final Pages build SHA.
+**Candidate merge / initial Pages build SHA:** `c35e5b2edec0d48a0d255ed78ce77a207a241a5f`; [Pages run 44903824271](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/44903824271) completed build/deploy successfully. Subsequent documentation-only Pages rebuilds may have a new build SHA without changing Studio runtime code; use the latest Pages build identity recorded in the canonical unified checklist.
 
 ## What to test
 
@@ -58,6 +58,11 @@
 Use the on-page **REPORT STUDIO TEST** link or the [Studio human-test issue template](https://github.com/mobinabinshun-beep/mobinabinshun-beep/issues/new?template=studio-human-test.yml).
 
 For each finding include: candidate build SHA shown on the page / final Pages build SHA, date, device class, OS, browser/version, viewport/orientation, input method, scenario, expected result, actual result, PASS/FAIL/BLOCKED, and reproducible steps. Do not upload private/copyrighted artwork or personal/credential data.
+
+## Deployment verification and known limitations
+
+- GitHub Pages reported successful build/deploy for the candidate merge SHA above. The latest docs-only rebuild identity is maintained in the canonical checklist.
+- Direct external HTTP response/cache read-back and real browser rendering were not independently accessible through the current verification interface; human QA should confirm the page loads and displays the candidate banner.
 
 ## Known limitations / do not pre-mark PASS
 
