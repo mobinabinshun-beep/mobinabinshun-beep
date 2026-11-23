@@ -549,4 +549,60 @@ $("pro-group-assign").onclick=()=>{const before=histAdv();adv.layers[adv.active]
 
 
 
+
+/* Stage 2A mobile workspace controller. Does not alter artwork pixels or Gateway. */
+const mobileWorkspaceQuery=window.matchMedia("(max-width: 700px)");
+const mobileToolsDrawer=document.querySelector(".layout > aside");
+const mobileToolsToggle=$("mobile-tools-toggle");
+if(mobileToolsDrawer)mobileToolsDrawer.id="studio-tools-drawer";
+function setMobileToolsOpen(open){
+ document.body.classList.toggle("nu-mobile-tools-open",!!open);
+ if(mobileToolsToggle)mobileToolsToggle.setAttribute("aria-expanded",String(!!open));
+}
+function syncMobileViewport(){
+ const vv=window.visualViewport;
+ const height=Math.max(240,Math.round(vv&&vv.height?vv.height:window.innerHeight));
+ document.documentElement.style.setProperty("--nu-visual-height",height+"px");
+ document.documentElement.style.setProperty("--nu-visual-top",Math.round(vv&&vv.offsetTop?vv.offsetTop:0)+"px");
+ const angle=Number(window.screen&&window.screen.orientation&&Number.isFinite(window.screen.orientation.angle)?window.screen.orientation.angle:(window.orientation||0));
+ let orientation="portrait";
+ if(window.innerWidth>window.innerHeight)orientation=(angle===90||angle===-270)?"landscape-left":(angle===270||angle===-90)?"landscape-right":"landscape-left";
+ document.documentElement.dataset.nuOrientation=orientation;
+}
+function syncMobileMode(){document.body.classList.toggle("nu-mobile-workspace",mobileWorkspaceQuery.matches);syncMobileViewport();}
+mobileWorkspaceQuery.addEventListener?.("change",syncMobileMode);
+window.addEventListener("resize",syncMobileViewport,{passive:true});
+window.addEventListener("orientationchange",syncMobileViewport,{passive:true});
+window.screen?.orientation?.addEventListener?.("change",syncMobileViewport);
+window.visualViewport?.addEventListener("resize",syncMobileViewport,{passive:true});
+window.visualViewport?.addEventListener("scroll",syncMobileViewport,{passive:true});
+syncMobileMode();
+mobileToolsToggle?.addEventListener("click",()=>setMobileToolsOpen(!document.body.classList.contains("nu-mobile-tools-open")));
+document.addEventListener("keydown",e=>{if(e.key==="Escape")setMobileToolsOpen(false);});
+document.addEventListener("pointerdown",e=>{
+ if(!document.body.classList.contains("nu-mobile-tools-open"))return;
+ if(mobileToolsDrawer?.contains(e.target)||$("mobile-workspace-dock")?.contains(e.target))return;
+ setMobileToolsOpen(false);
+});
+function setMobileZoom(next){
+ workspace.zoom=clamp(next,25,800);
+ $("workspace-zoom").value=workspace.zoom;
+ applyZoom();
+}
+$("mobile-zoom-in")?.addEventListener("click",()=>setMobileZoom(workspace.zoom+25));
+$("mobile-zoom-out")?.addEventListener("click",()=>setMobileZoom(workspace.zoom-25));
+$("mobile-view-rotation")?.addEventListener("input",e=>{
+ viewRotation=clamp(Number(e.target.value)||0,-180,180);
+ updateViewportRotation();
+ $("mobile-view-rotation-value").textContent=viewRotation+"°";
+});
+$("mobile-view-reset")?.addEventListener("click",()=>{
+ viewRotation=0;
+ $("mobile-view-rotation").value=0;
+ $("mobile-view-rotation-value").textContent="0°";
+ updateViewportRotation();
+ $("fit-canvas").click();
+ announce("Viewport reset; artwork pixels and undo history are unchanged.");
+});
+
 })();
