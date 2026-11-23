@@ -122,6 +122,7 @@ async def check_touch(browser, base_url):
     assert response and response.status == 200, "Touch context could not load the Studio page"
     await page.locator("#pixel-canvas").wait_for(state="visible", timeout=30000)
     await set_color(page, "#00ff00")
+    await page.locator("#show-grid").evaluate("el => { el.checked=false; }")
     await page.evaluate("() => { const stage=document.querySelector(\".stage\"); const top=window.scrollY+stage.getBoundingClientRect().top-72; window.scrollTo(0,Math.max(0,top)); }")
     await page.locator("#pixel-canvas").scroll_into_view_if_needed()
     await page.evaluate("() => { window.__nuTouchProbe={pointer:0,touch:0}; const c=document.querySelector(\"#pixel-canvas\"); c.addEventListener(\"pointerdown\",()=>window.__nuTouchProbe.pointer++); c.addEventListener(\"touchstart\",()=>window.__nuTouchProbe.touch++); }")
@@ -132,7 +133,7 @@ async def check_touch(browser, base_url):
     await page.locator("#pixel-canvas").tap(position={"x": 20.5 * box["width"] / 32, "y": 20.5 * box["height"] / 32})
     probe = await page.evaluate("() => ({...window.__nuTouchProbe,tool:document.querySelector(\"#studio-quick-tools [data-tool=\\\"pencil\\\"]\")?.getAttribute(\"aria-pressed\"),status:document.querySelector(\"#studio-status\")?.textContent})")
     pixel = await read_pixel(page, 20, 20)
-    print(f"touch-debug probe={probe} pixel={pixel}")
+    assert probe["pointer"] >= 1 and probe["touch"] >= 1, f"Touch input did not dispatch pointer/touch events: {probe}"
     assert pixel == [0, 255, 0], f"Touch tap did not paint on the canvas: {pixel}"
     await context.close()
 
