@@ -104,18 +104,25 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
         assert await read_pixel(page, 9, 16) == mixed, "Color-mixing brush changed a locked layer"
         await lock.uncheck()
 
-    if touch_test:
-        await set_color(page, "#00ff00")
-        point = await cell_point(page, 20, 20)
-        await page.touchscreen.tap(point["x"], point["y"])
-        assert await read_pixel(page, 20, 20) == [0, 255, 0], "Touch tap did not paint on the canvas"
-
     frame = await page.locator("#workspace-frame").bounding_box()
     canvas = await page.locator("#pixel-canvas").bounding_box()
     assert frame and canvas and frame["width"] > 0 and canvas["width"] > 0, "Responsive workspace or canvas has no measurable size"
     if viewport["width"] <= 600:
         assert canvas["width"] <= frame["width"] + 1, "Canvas exceeds the mobile workspace frame"
     assert not page_errors, f"Uncaught browser errors: {page_errors}"
+    await context.close()
+
+
+async def check_touch(browser, base_url):
+    context = await browser.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, has_touch=True, is_mobile=True)
+    page = await context.new_page()
+    response = await page.goto(urljoin(base_url.rstrip("/") + "/", "pixel-art-studio.html"), wait_until="domcontentloaded", timeout=60000)
+    assert response and response.status == 200, "Touch context could not load the Studio page"
+    await page.locator("#pixel-canvas").wait_for(state="visible", timeout=30000)
+    await set_color(page, "#00ff00")
+    point = await cell_point(page, 20, 20)
+    await page.touchscreen.tap(point["x"], point["y"])
+    assert await read_pixel(page, 20, 20) == [0, 255, 0], "Touch tap did not paint on the canvas"
     await context.close()
 
 
@@ -133,7 +140,9 @@ async def main():
         try:
             await check_entry_pages(browser, args.base_url, {"width": 1280, "height": 900})
             await check_studio(browser, args.base_url, {"width": 1280, "height": 900}, args.require_mix)
-            await check_studio(browser, args.base_url, {"width": 390, "height": 844}, args.require_mix, touch_test=(args.browser == "chromium" and not args.live))
+            await check_studio(browser, args.base_url, {"width": 390, "height": 844}, args.require_mix)
+            if args.browser == "chromium" and not args.live:
+                await check_touch(browser, args.base_url)
         finally:
             await browser.close()
     print(f"PASS: {args.browser} desktop/mobile smoke; color-mix={'PASS' if args.require_mix else 'not required'}; live={args.live}")
