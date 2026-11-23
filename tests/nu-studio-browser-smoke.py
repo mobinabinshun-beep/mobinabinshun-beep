@@ -111,6 +111,20 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     if viewport["width"] <= 600:
         assert canvas["width"] <= frame["width"] + 1, "Canvas exceeds the mobile workspace frame"
         assert canvas["x"] >= 0 and canvas["x"] + canvas["width"] <= viewport["width"] + 1, f"Canvas exceeds mobile viewport width: {canvas}"
+        dock = page.locator("#mobile-workspace-dock")
+        assert await dock.is_visible(), "Mobile workspace dock is not visible"
+        await page.locator("#mobile-tools-toggle").click()
+        assert await page.locator("#mobile-tools-toggle").get_attribute("aria-expanded") == "true", "Tools drawer did not open accessibly"
+        assert await page.locator("#studio-tools-drawer").is_visible(), "Mobile tools drawer did not open"
+        await page.locator("#mobile-tools-toggle").click()
+        assert await page.locator("#mobile-tools-toggle").get_attribute("aria-expanded") == "false", "Tools drawer did not close"
+        await page.locator("#mobile-zoom-in").click()
+        assert await page.locator("#workspace-zoom").input_value() == "125", "Mobile zoom-in control did not update the shared zoom state"
+        await page.locator("#mobile-view-rotation").evaluate("el => { el.value='45'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
+        assert "rotate(45deg)" in (await page.locator("#pixel-canvas").get_attribute("style") or ""), "Viewport rotation control did not rotate the view"
+        assert await page.locator("html").get_attribute("data-nu-orientation") in ("portrait","landscape-left","landscape-right"), "Orientation adaptation state is missing"
+        await page.locator("#mobile-view-reset").click()
+        assert "rotate(0deg)" in (await page.locator("#pixel-canvas").get_attribute("style") or ""), "Viewport reset did not return to zero degrees"
     assert not page_errors, f"Uncaught browser errors: {page_errors}"
     await context.close()
 
