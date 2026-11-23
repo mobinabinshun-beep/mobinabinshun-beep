@@ -583,12 +583,14 @@ mobileToolsToggle?.addEventListener("click",()=>setMobileToolsOpen(!document.bod
 const desktopToolsToggle=$("desktop-tools-toggle");
 function setDesktopToolsOpen(open){
  const isOpen=!!open;
+ const drawer=document.getElementById("studio-tools-drawer")||mobileToolsDrawer;
  document.body.classList.toggle("nu-desktop-tools-open",isOpen);
  if(desktopToolsToggle)desktopToolsToggle.setAttribute("aria-expanded",String(isOpen));
- if(mobileToolsDrawer){
-  mobileToolsDrawer.style.visibility=isOpen?"visible":"hidden";
-  mobileToolsDrawer.style.transform=isOpen?"translateX(0)":"translateX(calc(100% + 28px))";
-  mobileToolsDrawer.style.pointerEvents=isOpen?"auto":"none";
+ if(drawer){
+  drawer.style.setProperty("visibility",isOpen?"visible":"hidden","important");
+  drawer.style.setProperty("transform",isOpen?"translateX(0)":"translateX(calc(100% + 28px))","important");
+  drawer.style.setProperty("pointer-events",isOpen?"auto":"none","important");
+  drawer.dataset.workspaceDrawerState=isOpen?"open":"closed";
  }
 }
 desktopToolsToggle?.addEventListener("click",()=>setDesktopToolsOpen(!document.body.classList.contains("nu-desktop-tools-open")));
