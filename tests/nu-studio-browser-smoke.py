@@ -91,6 +91,7 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
         await drag_cells(page, (8, 16), (9, 16))
         assert await read_pixel(page, 9, 16) == mixed, "Color-mixing brush changed a locked layer"
         assert "Layer locked" in (await page.locator("#studio-status").inner_text()), "Locked-layer feedback was not shown"
+        await page.get_by_label("Lock Layer 1").uncheck()
 
     if touch_test:
         await set_color(page, "#00ff00")
