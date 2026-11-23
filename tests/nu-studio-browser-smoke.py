@@ -115,6 +115,7 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
         assert await toggle.get_attribute("aria-expanded") == "false", "Desktop tools drawer should start collapsed"
         await toggle.click()
         assert await toggle.get_attribute("aria-expanded") == "true", "Desktop tools drawer did not open accessibly"
+        assert await page.locator("#studio-tools-drawer").get_attribute("data-workspace-drawer-state") == "open", "Desktop drawer controller did not set its open state"
         assert await page.locator("#studio-tools-drawer").is_visible(), "Desktop tools drawer did not open"
         canvas_box = await page.locator("#pixel-canvas").bounding_box()
         assert canvas_box, "Canvas has no bounds while desktop drawer is open"
