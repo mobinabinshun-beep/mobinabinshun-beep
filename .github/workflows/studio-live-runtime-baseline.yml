@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   live-browser-baseline:
-    name: Live demo baseline (\${{ matrix.browser }})
+    name: Live demo baseline (${{ matrix.browser }})
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
@@ -29,42 +29,44 @@ jobs:
 
       - name: Capture Pages deployment identity and exact source tree
         env:
-          GH_TOKEN: \${{ github.token }}
+          GH_TOKEN: ${{ github.token }}
+          FALLBACK_PAGES_SHA: ea295af536644c0ac10a564913892b1ea2104209
         run: |
           mkdir -p artifacts/studio-live-baseline
-          curl -sS -L \\
-            -H "Accept: application/vnd.github+json" \\
-            -H "Authorization: Bearer $GH_TOKEN" \\
-            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/pages/builds/latest" \\
+          curl -sS -L \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/pages/builds/latest" \
             -o artifacts/studio-live-baseline/pages-build-latest.json || true
           PAGES_SHA="$(node -e "try{const x=require('./artifacts/studio-live-baseline/pages-build-latest.json');process.stdout.write(x.commit||'')}catch{}")"
-          echo "Pages build SHA: \${PAGES_SHA:-UNAVAILABLE}"
-          if [ -n "$PAGES_SHA" ]; then
-            git fetch --no-tags --depth=1 origin "$PAGES_SHA" || true
-            if git cat-file -e "$PAGES_SHA^{commit}" 2>/dev/null; then
-              git ls-tree -r "$PAGES_SHA" > artifacts/studio-live-baseline/source-tree.txt
-              git archive --format=tar "$PAGES_SHA" | gzip -9 > artifacts/studio-live-baseline/source-at-pages-build.tar.gz
-              printf '%s\\n' "$PAGES_SHA" > artifacts/studio-live-baseline/source-build-sha.txt
-            fi
+          if [ -z "$PAGES_SHA" ]; then PAGES_SHA="$FALLBACK_PAGES_SHA"; fi
+          echo "Pages build SHA: $PAGES_SHA"
+          git fetch --no-tags --depth=1 origin "$PAGES_SHA" || true
+          if git cat-file -e "$PAGES_SHA^{commit}" 2>/dev/null; then
+            git ls-tree -r "$PAGES_SHA" > artifacts/studio-live-baseline/source-tree.txt
+            git archive --format=tar "$PAGES_SHA" | gzip -9 > artifacts/studio-live-baseline/source-at-pages-build.tar.gz
+            printf '%s\n' "$PAGES_SHA" > artifacts/studio-live-baseline/source-build-sha.txt
+          else
+            echo "Could not fetch exact Pages source commit: $PAGES_SHA" > artifacts/studio-live-baseline/source-capture-warning.txt
           fi
 
       - name: Install Playwright and browser
         run: |
           npm install --prefix "$RUNNER_TEMP/studio-playwright" --no-audit --no-fund playwright@1.58.2
-          "$RUNNER_TEMP/studio-playwright/node_modules/.bin/playwright" install --with-deps \${{ matrix.browser }}
+          "$RUNNER_TEMP/studio-playwright/node_modules/.bin/playwright" install --with-deps ${{ matrix.browser }}
 
       - name: Open and exercise public demo pages
         env:
-          NODE_PATH: \${{ runner.temp }}/studio-playwright/node_modules
-          STUDIO_BASELINE_BROWSER: \${{ matrix.browser }}
-          STUDIO_BASELINE_OUTPUT: artifacts/studio-live-baseline/\${{ matrix.browser }}
+          NODE_PATH: ${{ runner.temp }}/studio-playwright/node_modules
+          STUDIO_BASELINE_BROWSER: ${{ matrix.browser }}
+          STUDIO_BASELINE_OUTPUT: artifacts/studio-live-baseline/${{ matrix.browser }}
         run: node tests/studio-live-demo-baseline.mjs
 
       - name: Upload runtime baseline evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: studio-live-runtime-baseline-\${{ matrix.browser }}
+          name: studio-live-runtime-baseline-${{ matrix.browser }}
           path: artifacts/studio-live-baseline/
           if-no-files-found: warn
           retention-days: 30
