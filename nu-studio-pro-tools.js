@@ -99,7 +99,7 @@
   if(!Number.isFinite(x)||!Number.isFinite(y))throw new TypeError("Mixing brush coordinates must be finite.");
   if(!Number.isSafeInteger(size)||size<1||size>64)throw new RangeError("Mixing brush size must be between 1 and 64.");
   if(!Number.isFinite(strength)||strength<0||strength>100)throw new RangeError("Mixing strength must be between 0 and 100.");
-  const out=pixels.slice(),targetX=Math.round(x),targetY=Math.round(y);
+  const out=pixels,targetX=Math.round(x),targetY=Math.round(y);
   let pickup=state&&typeof state.pickup==="string"&&/^#[0-9a-f]{6}$/i.test(state.pickup)?state.pickup.toLowerCase():null;
   const hasLast=state&&Number.isFinite(state.lastX)&&Number.isFinite(state.lastY);
   const dx=hasLast?targetX-state.lastX:0,dy=hasLast?targetY-state.lastY:0,steps=hasLast?Math.max(Math.abs(dx),Math.abs(dy)):0;
