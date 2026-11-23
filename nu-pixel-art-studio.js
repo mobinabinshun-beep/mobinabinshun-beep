@@ -578,11 +578,19 @@ window.visualViewport?.addEventListener("resize",syncMobileViewport,{passive:tru
 window.visualViewport?.addEventListener("scroll",syncMobileViewport,{passive:true});
 syncMobileMode();
 mobileToolsToggle?.addEventListener("click",()=>setMobileToolsOpen(!document.body.classList.contains("nu-mobile-tools-open")));
-document.addEventListener("keydown",e=>{if(e.key==="Escape")setMobileToolsOpen(false);});
+
+/* Stage 2B desktop edge-rail controller; the drawer overlays the canvas without shrinking or blocking it when closed. */
+const desktopToolsToggle=$("desktop-tools-toggle");
+function setDesktopToolsOpen(open){
+ document.body.classList.toggle("nu-desktop-tools-open",!!open);
+ if(desktopToolsToggle)desktopToolsToggle.setAttribute("aria-expanded",String(!!open));
+}
+desktopToolsToggle?.addEventListener("click",()=>setDesktopToolsOpen(!document.body.classList.contains("nu-desktop-tools-open")));
+
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){setMobileToolsOpen(false);setDesktopToolsOpen(false);}});
 document.addEventListener("pointerdown",e=>{
- if(!document.body.classList.contains("nu-mobile-tools-open"))return;
- if(mobileToolsDrawer?.contains(e.target)||$("mobile-workspace-dock")?.contains(e.target))return;
- setMobileToolsOpen(false);
+ if(document.body.classList.contains("nu-mobile-tools-open")&&!mobileToolsDrawer?.contains(e.target)&&!$("mobile-workspace-dock")?.contains(e.target))setMobileToolsOpen(false);
+ if(document.body.classList.contains("nu-desktop-tools-open")&&!mobileToolsDrawer?.contains(e.target)&&!$("desktop-workspace-rail")?.contains(e.target))setDesktopToolsOpen(false);
 });
 function setMobileZoom(next){
  workspace.zoom=clamp(next,25,800);
