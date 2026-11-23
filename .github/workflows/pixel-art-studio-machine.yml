@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - feat/pixel-art-studio-2d-tools-2026-11-21
+      - feat/pixel-art-studio-color-mixing-brush-2026-11-23
   pull_request:
     paths:
       - "nu-pixel-art-studio.js"
@@ -10,6 +11,7 @@ on:
       - "nu-studio-layout.js"
       - "pixel-art-studio.html"
       - "tests/nu-studio-*.test.js"
+      - "tests/nu-studio-browser-smoke.py"
       - ".github/workflows/pixel-art-studio-machine.yml"
       - "docs/operations/PIXEL-ART-STUDIO-2D-*.md"
   workflow_dispatch:
@@ -29,4 +31,32 @@ jobs:
           node --check nu-studio-pro-tools.js
           node --check nu-studio-layout.js
       - name: Run focused Studio regression tests
-        run: node --test tests/nu-studio-pro-tools.test.js tests/nu-studio-layout.test.js tests/nu-studio-advanced-tools.test.js
+        run: node --test tests/nu-studio-pro-tools.test.js tests/nu-studio-layout.test.js tests/nu-studio-advanced-tools.test.js tests/nu-studio-color-mix.test.js
+
+  studio-browser:
+    needs: studio-unit
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Playwright
+        run: python -m pip install playwright
+      - name: Install browser engine
+        run: python -m playwright install --with-deps ${{ matrix.browser }}
+      - name: Start local Studio server
+        run: |
+          python -m http.server 8765 --bind 127.0.0.1 > /tmp/nu-studio-http.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8765/pixel-art-studio.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/nu-studio-http.log
+          exit 1
+      - name: Run desktop and mobile browser interaction checks
+        run: python tests/nu-studio-browser-smoke.py --base-url http://127.0.0.1:8765 --browser ${{ matrix.browser }} --require-mix
