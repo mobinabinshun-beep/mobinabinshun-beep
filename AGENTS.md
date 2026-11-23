@@ -142,3 +142,13 @@
 - Keep corrections separate from development. A correction remains locked through its documented intake/scope stage and may be written only after a direct owner command explicitly opens that exact correction ID and scope. Keep machine verification and human QA as separate acceptance gates.
 - Categorize and link reports/tasks in the canonical Deferred-Work registry; preserve source reports and connect dependencies, issues, PRs, commits, tests, backups and QA evidence.
 - This general rule does not silently unlock a named frozen candidate, protected shared contract or correction scope. Follow the task-specific authorization and all local AGENTS/protocol requirements.
+
+
+## Owner-mandated multistage package and machine-QA workflow (2026-11-23)
+- Canonical workflow: https://github.com/mobinabinshun-beep/Repository/blob/main/Governance/NU-OWNER-MULTISTAGE-PACKAGE-AND-MACHINE-QA-HUMAN-QUEUE-PROTOCOL-fa.md
+- Execute multi-tool packages serially: complete implementation, debugging and machine checks for the current stage before coding the next. Internal stages belong to one package and do not need separate owner responses unless a protected lock or explicit decision gate requires one.
+- Machine approval is independent of human approval. Verify actual runtime behavior using focused/unit/integration/regression tests and available automated browser/platform coverage; bind all results to exact SHA/build and report actual coverage and NOT-TESTED gaps.
+- Once the complete package passes machine QA, create and verify the exact backup, deploy that candidate to the demo for human QA, verify live build identity, freeze the candidate/scope and set HUMAN-QA-PENDING. Demo deployment is a QA handoff, never an implied product release.
+- Owner human acceptance locks only the exact accepted scope. Preserve raw human findings and frozen prior candidates; implement fixes on a successor candidate and rerun the complete relevant machine cycle.
+- Categorize findings as correction, upgrade, debug, incorrect/missing behavior, re-engineering or optimization. Re-engineer existing code in line with project goals and specifications; preserve baseline behavior and do not rewrite from zero.
+- This workflow supplements all local AGENTS instructions, protected contracts, additive-development rules and two-stage correction locks; it does not open any protected scope.
