@@ -71,8 +71,13 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
 
         await set_color(page, "#ff0000")
         assert await page.locator("#studio-quick-tools [data-tool=\"pencil\"]").get_attribute("aria-pressed") == "true", "Foreground color change did not restore Pencil"
+        await page.evaluate("() => { window.__nuPointerProbe=0; document.querySelector(\"#pixel-canvas\").addEventListener(\"pointerdown\",()=>window.__nuPointerProbe++); }")
+        red_point = await cell_point(page, 8, 16)
+        target = await page.evaluate("(p) => document.elementFromPoint(p.x,p.y)?.id || document.elementFromPoint(p.x,p.y)?.tagName", red_point)
         await click_cell(page, 8, 16)
         red_pixel = await read_pixel(page, 8, 16)
+        probe = await page.evaluate("() => ({count:window.__nuPointerProbe,tool:document.querySelector(\"#studio-quick-tools [data-tool=\\\"pencil\\\"]\")?.getAttribute(\"aria-pressed\"),status:document.querySelector(\"#studio-status\")?.textContent})")
+        print(f"pointer-debug target={target} point={red_point} probe={probe} pixel={red_pixel}")
         assert red_pixel == [255, 0, 0], f"Pointer drawing did not place the first red pigment: {red_pixel}"
         await set_color(page, "#0000ff")
         await click_cell(page, 9, 16)
