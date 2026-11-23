@@ -108,6 +108,21 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     frame = await page.locator("#workspace-frame").bounding_box()
     canvas = await page.locator("#pixel-canvas").bounding_box()
     assert frame and canvas and frame["width"] > 0 and canvas["width"] > 0, "Responsive workspace or canvas has no measurable size"
+    if viewport["width"] > 700:
+        rail = page.locator("#desktop-workspace-rail")
+        toggle = page.locator("#desktop-tools-toggle")
+        assert await rail.is_visible(), "Desktop edge rail is not visible"
+        assert await toggle.get_attribute("aria-expanded") == "false", "Desktop tools drawer should start collapsed"
+        await toggle.click()
+        assert await toggle.get_attribute("aria-expanded") == "true", "Desktop tools drawer did not open accessibly"
+        assert await page.locator("#studio-tools-drawer").is_visible(), "Desktop tools drawer did not open"
+        canvas_box = await page.locator("#pixel-canvas").bounding_box()
+        assert canvas_box, "Canvas has no bounds while desktop drawer is open"
+        canvas_center = {"x": canvas_box["x"] + canvas_box["width"] / 2, "y": canvas_box["y"] + canvas_box["height"] / 2}
+        center_target = await page.evaluate("(p) => document.elementFromPoint(p.x,p.y)?.id", canvas_center)
+        assert center_target == "pixel-canvas", f"Desktop drawer blocks the canvas center: {center_target}"
+        await toggle.click()
+        assert await toggle.get_attribute("aria-expanded") == "false", "Desktop tools drawer did not close"
     if viewport["width"] <= 600:
         assert canvas["width"] <= frame["width"] + 1, "Canvas exceeds the mobile workspace frame"
         assert canvas["x"] >= 0 and canvas["x"] + canvas["width"] <= viewport["width"] + 1, f"Canvas exceeds mobile viewport width: {canvas}"
