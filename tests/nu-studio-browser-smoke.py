@@ -120,9 +120,14 @@ async def check_touch(browser, base_url):
     assert response and response.status == 200, "Touch context could not load the Studio page"
     await page.locator("#pixel-canvas").wait_for(state="visible", timeout=30000)
     await set_color(page, "#00ff00")
+    await page.evaluate("() => { window.__nuTouchProbe={pointer:0,touch:0}; const c=document.querySelector(\"#pixel-canvas\"); c.addEventListener(\"pointerdown\",()=>window.__nuTouchProbe.pointer++); c.addEventListener(\"touchstart\",()=>window.__nuTouchProbe.touch++); }")
     point = await cell_point(page, 20, 20)
+    target = await page.evaluate("(p) => document.elementFromPoint(p.x,p.y)?.id || document.elementFromPoint(p.x,p.y)?.tagName", point)
     await page.touchscreen.tap(point["x"], point["y"])
-    assert await read_pixel(page, 20, 20) == [0, 255, 0], "Touch tap did not paint on the canvas"
+    probe = await page.evaluate("() => ({...window.__nuTouchProbe,tool:document.querySelector(\"#studio-quick-tools [data-tool=\\\"pencil\\\"]\")?.getAttribute(\"aria-pressed\"),status:document.querySelector(\"#studio-status\")?.textContent})")
+    pixel = await read_pixel(page, 20, 20)
+    print(f"touch-debug target={target} point={point} probe={probe} pixel={pixel}")
+    assert pixel == [0, 255, 0], f"Touch tap did not paint on the canvas: {pixel}"
     await context.close()
 
 
