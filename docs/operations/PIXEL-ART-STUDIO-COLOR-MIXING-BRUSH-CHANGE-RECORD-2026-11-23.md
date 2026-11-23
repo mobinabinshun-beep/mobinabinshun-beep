@@ -4,7 +4,7 @@
 - Package / work ID: NU-WIP-STUDIO-COLOR-MIXING-BRUSH-20261123
 - Parent: Repository Issue #62
 - Canonical requirements: [Separate Fading and Color-Mixing Brush specification](./PIXEL-ART-STUDIO-FADING-AND-COLOR-MIXING-BRUSH-SPEC-2026-11-21.md)
-- Status: IN_PROGRESS — baseline captured; implementation and machine verification underway
+- Status: IMPLEMENTED / MACHINE-QA-IN-PROGRESS — code and focused unit tests completed; browser CI pending
 - Candidate branch: feat/pixel-art-studio-color-mixing-brush-2026-11-23
 - Baseline SHA: ff00c755378b12eb9c4af035804ab52db5a76908
 - Pre-change backup: backup/pre-color-mixing-brush-2026-11-23 (verified identical; 0 ahead / 0 behind)
@@ -102,3 +102,23 @@ After the complete package stage passes machine checks:
 ## 9. Closeout
 
 This record is updated only with exact candidate SHA, workflow run IDs, actual results, backup identity, deployment build identity and human QA status. A prior candidate's 48/48 tests do not count as evidence for this new Color-Mixing Brush implementation.
+
+
+## 10. Implementation checkpoint — 2026-11-23
+
+- Added exported pure helper smudgeBrush to nu-studio-pro-tools.js. It samples existing pigment from the selected brush footprint, blends the carried pickup along an interpolated stroke path and applies the independent mixing-strength ratio to painted cells.
+- Added the distinct color-mix-brush tool ID, localized label, independent Color mixing strength slider and explanatory help text in nu-pixel-art-studio.js.
+- Kept Fading's existing tool ID, fadePixel implementation and Fading brush intensity control separate.
+- The brush uses the shared size and current square/circle/diamond brush shape; the active selection clips sample and write; locked layers and mask-edit mode stop the operation with feedback.
+- Transparent cells remain transparent and do not contribute the checkerboard display color.
+- Pickup state resets on tool change, stroke completion and cancellation; cancellation restores the complete advanced-layer snapshot.
+- The brush controls wrap on narrow widths to avoid forcing the brush settings into one horizontal row.
+- Updated the demo candidate banner to identify the separate Fading + Color-Mixing Brush QA candidate.
+
+### Focused local evidence
+
+- node --check nu-pixel-art-studio.js: PASS.
+- node --check nu-studio-pro-tools.js: PASS.
+- python -m py_compile tests/nu-studio-browser-smoke.py: PASS.
+- node --test tests/nu-studio-color-mix.test.js: 9 tests, 9 passed, 0 failed.
+- The local container browser blocks navigation with ERR_BLOCKED_BY_ADMINISTRATOR; this is not counted as a browser PASS. Playwright Chromium/Firefox/WebKit runs are configured in GitHub Actions and remain pending.
