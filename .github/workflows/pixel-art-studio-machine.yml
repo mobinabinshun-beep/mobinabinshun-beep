@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - feat/pixel-art-studio-2d-tools-2026-11-21
-      - feat/pixel-art-studio-color-mixing-brush-2026-11-23
   pull_request:
     paths:
       - "nu-pixel-art-studio.js"
