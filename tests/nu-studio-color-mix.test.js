@@ -13,7 +13,8 @@ test("color-mixing brush picks up the first pigment and blends a second color al
  assert.equal(second.pixels[1],"#a60059");
  assert.notEqual(second.pixels[1],"#0000ff");
  assert.notEqual(second.pixels[1],"#ff0000");
- assert.deepEqual(source,["#ff0000","#0000ff"]);
+ assert.equal(first.pixels,source);
+ assert.equal(second.pixels,source);
 });
 
 test("color-mixing brush samples and blends multiple colors with deterministic stroke direction",()=>{
@@ -27,9 +28,9 @@ test("color-mixing brush samples and blends multiple colors with deterministic s
 
 test("continuous pointer movement interpolates missed pixels without gaps",()=>{
  const source=["#ff0000","#00ff00","#0000ff","#ffffff"];
- const jumped=P.smudgeBrush(source,4,1,0,0,1,85);
+ const jumped=P.smudgeBrush(source.slice(),4,1,0,0,1,85);
  const across=P.smudgeBrush(jumped.pixels,4,1,3,0,1,85,null,jumped.state);
- let stepped=jumped;for(let x=1;x<=3;x++)stepped=P.smudgeBrush(stepped.pixels,4,1,x,0,1,85,null,stepped.state);
+ let stepped=P.smudgeBrush(source.slice(),4,1,0,0,1,85);for(let x=1;x<=3;x++)stepped=P.smudgeBrush(stepped.pixels,4,1,x,0,1,85,null,stepped.state);
  assert.deepEqual(across.pixels,stepped.pixels);
 });
 
@@ -55,7 +56,7 @@ test("larger brush samples neighboring colors and respects circular brush shape"
  const source=["#ff0000","#0000ff","#0000ff","#ff0000","#0000ff","#0000ff","#0000ff","#0000ff","#0000ff"];
  const r=P.smudgeBrush(source,3,3,1,1,3,100,null,null,"circle");
  assert.notEqual(r.pixels[4],"#0000ff");
- assert.deepEqual(source,["#ff0000","#0000ff","#0000ff","#ff0000","#0000ff","#0000ff","#0000ff","#0000ff","#0000ff"]);
+ assert.equal(r.pixels,source);
 });
 
 test("zero strength is a no-op and invalid size, strength, selection or coordinates are rejected",()=>{
