@@ -1,11 +1,14 @@
 # Pixel Art Studio — Color-Mixing Brush Change Record
 
 - Date: 2026-11-23
-- Package / work ID: NU-WIP-STUDIO-COLOR-MIXING-BRUSH-20261123
+- Package / work ID: NU-PKG-STUDIO-COLOR-MIXING-AND-MOBILE-WORKSPACE-20261123
 - Parent: Repository Issue #62
 - Canonical requirements: [Separate Fading and Color-Mixing Brush specification](./PIXEL-ART-STUDIO-FADING-AND-COLOR-MIXING-BRUSH-SPEC-2026-11-21.md)
-- Status: IMPLEMENTED / MACHINE-QA-IN-PROGRESS — code and focused unit tests completed; browser CI pending
+- Status: STAGE 1 MACHINE-PASS — all 9 OS/browser matrix combinations and focused unit/regression job passed; aggregate package remains IN-PROGRESS
 - Candidate branch: feat/pixel-art-studio-color-mixing-brush-2026-11-23
+- Tested candidate SHA: cc04f585715bf62f903f6f8a16b52f115f4891f9
+- Exact candidate backup: backup/pre-public-demo-color-mixing-brush-candidate-2026-11-24 (verified identical; 0 ahead / 0 behind)
+- Stage 1 cross-platform matrix: GitHub Actions run 45213517431 — 9/9 OS/browser combinations PASS; focused unit/regression job PASS
 - Baseline SHA: ff00c755378b12eb9c4af035804ab52db5a76908
 - Pre-change backup: backup/pre-color-mixing-brush-2026-11-23 (verified identical; 0 ahead / 0 behind)
 - Demo Pages run: 45183379421 — SUCCESS; Pages build SHA ff00c755378b12eb9c4af035804ab52db5a76908
@@ -94,9 +97,9 @@ After the complete package stage passes machine checks:
 | Baseline backup compare | ff00c755378b12eb9c4af035804ab52db5a76908 | PASS — identical |
 | Local focused smudge algorithm tests | temporary extracted artifact copy | 7/7 PASS |
 | Local browser navigation | current container browser policy | BLOCKED — navigation denied by environment; CI Playwright is the execution route |
-| Candidate unit/browser CI | pending | NOT-TESTED |
-| Candidate backup | pending | NOT-TESTED |
-| Candidate demo deploy/live smoke | pending | NOT-TESTED |
+| Candidate unit/regression + 9-way OS/browser matrix | cc04f585715bf62f903f6f8a16b52f115f4891f9 / 45213517431 | PASS — 9/9 browser/OS jobs plus unit/regression job |
+| Candidate backup | cc04f585715bf62f903f6f8a16b52f115f4891f9 / backup/pre-public-demo-color-mixing-brush-candidate-2026-11-24 | PASS — identical, 0 ahead / 0 behind |
+| Candidate demo deploy/live smoke | pending | NOT-TESTED — intentionally held until full package completion |
 | Human QA | pending | HUMAN-QA-PENDING only after verified demo handoff |
 
 ## 9. Closeout
@@ -121,4 +124,15 @@ This record is updated only with exact candidate SHA, workflow run IDs, actual r
 - node --check nu-studio-pro-tools.js: PASS.
 - python -m py_compile tests/nu-studio-browser-smoke.py: PASS.
 - node --test tests/nu-studio-color-mix.test.js: 9 tests, 9 passed, 0 failed.
-- The local container browser blocks navigation with ERR_BLOCKED_BY_ADMINISTRATOR; this is not counted as a browser PASS. Playwright Chromium/Firefox/WebKit runs are configured in GitHub Actions and remain pending.
+- The local container browser blocks navigation with ERR_BLOCKED_BY_ADMINISTRATOR; this is not counted as a browser PASS. GitHub Actions run 45213517431 passed Chromium, Firefox and WebKit on Ubuntu 24.04, Windows 2022 and macOS 15 (9/9), including desktop/mobile interaction checks.
+
+
+## 11. Stage 1 machine gate closeout — 2026-11-24
+
+- Exact tested head: `cc04f585715bf62f903f6f8a16b52f115f4891f9`.
+- Workflow run: [45213517431](https://github.com/mobinabinshun-beep/mobinabinshun-beep/actions/runs/45213517431).
+- Unit/regression job: PASS.
+- Browser matrix: Ubuntu 24.04 × Chromium/Firefox/WebKit PASS; Windows 2022 × Chromium/Firefox/WebKit PASS; macOS 15 × Chromium/Firefox/WebKit PASS (9/9).
+- Exact backup branch: `backup/pre-public-demo-color-mixing-brush-candidate-2026-11-24`; compare against tested SHA returned `identical`, `ahead_by=0`, `behind_by=0`, no changed files.
+- Physical Android/iOS hardware: NOT TESTED. Emulated mobile browser checks are not represented as device QA.
+- Stage 1 is closed for machine verification. Stage 2 mobile workspace implementation may now begin serially; full package is not MACHINE-PASS, not deployed, not frozen and not in HUMAN-QA-PENDING.
