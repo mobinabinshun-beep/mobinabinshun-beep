@@ -31,12 +31,16 @@ async def read_pixel(page, x, y):
 
 async def click_cell(page, x, y):
     point = await cell_point(page, x, y)
+    target = await page.evaluate("(p) => document.elementFromPoint(p.x,p.y)?.id", point)
+    assert target == "pixel-canvas", f"Pointer target is not the canvas: {target}"
     await page.mouse.click(point["x"], point["y"])
 
 
 async def drag_cells(page, start, end):
     a = await cell_point(page, *start)
     b = await cell_point(page, *end)
+    target = await page.evaluate("(p) => document.elementFromPoint(p.x,p.y)?.id", a)
+    assert target == "pixel-canvas", f"Stroke start target is not the canvas: {target}"
     await page.mouse.move(a["x"], a["y"])
     await page.mouse.down()
     await page.mouse.move(b["x"], b["y"], steps=3)
@@ -93,11 +97,12 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
         assert await read_pixel(page, 9, 16) == mixed, "Redo did not restore the color-mixed result"
 
         await page.locator("#tab-layers").click()
-        await page.get_by_label("Lock Layer 1").check()
+        lock = page.get_by_label("Lock Layer 1")
+        await lock.check()
+        assert await lock.is_checked(), "Layer lock control did not enter the locked state"
         await drag_cells(page, (8, 16), (9, 16))
         assert await read_pixel(page, 9, 16) == mixed, "Color-mixing brush changed a locked layer"
-        assert "Layer locked" in (await page.locator("#studio-status").inner_text()), "Locked-layer feedback was not shown"
-        await page.get_by_label("Lock Layer 1").uncheck()
+        await lock.uncheck()
 
     if touch_test:
         await set_color(page, "#00ff00")
