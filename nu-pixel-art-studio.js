@@ -582,8 +582,14 @@ mobileToolsToggle?.addEventListener("click",()=>setMobileToolsOpen(!document.bod
 /* Stage 2B desktop edge-rail controller; the drawer overlays the canvas without shrinking or blocking it when closed. */
 const desktopToolsToggle=$("desktop-tools-toggle");
 function setDesktopToolsOpen(open){
- document.body.classList.toggle("nu-desktop-tools-open",!!open);
- if(desktopToolsToggle)desktopToolsToggle.setAttribute("aria-expanded",String(!!open));
+ const isOpen=!!open;
+ document.body.classList.toggle("nu-desktop-tools-open",isOpen);
+ if(desktopToolsToggle)desktopToolsToggle.setAttribute("aria-expanded",String(isOpen));
+ if(mobileToolsDrawer){
+  mobileToolsDrawer.style.visibility=isOpen?"visible":"hidden";
+  mobileToolsDrawer.style.transform=isOpen?"translateX(0)":"translateX(calc(100% + 28px))";
+  mobileToolsDrawer.style.pointerEvents=isOpen?"auto":"none";
+ }
 }
 desktopToolsToggle?.addEventListener("click",()=>setDesktopToolsOpen(!document.body.classList.contains("nu-desktop-tools-open")));
 
