@@ -118,9 +118,15 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
         assert await page.locator("#studio-tools-drawer").is_visible(), "Desktop tools drawer did not open"
         canvas_box = await page.locator("#pixel-canvas").bounding_box()
         assert canvas_box, "Canvas has no bounds while desktop drawer is open"
-        canvas_center = {"x": canvas_box["x"] + canvas_box["width"] / 2, "y": canvas_box["y"] + canvas_box["height"] / 2}
-        center_target = await page.evaluate("(p) => document.elementFromPoint(p.x,p.y)?.id", canvas_center)
-        assert center_target == "pixel-canvas", f"Desktop drawer blocks the canvas center: {center_target}"
+        probe = await page.evaluate("""(r) => {
+          const x0=Math.max(1,r.x), y0=Math.max(1,r.y);
+          const x1=Math.min(window.innerWidth-1,r.x+r.width), y1=Math.min(window.innerHeight-1,r.y+r.height);
+          if(x1<=x0||y1<=y0)return null;
+          const x=(x0+x1)/2,y=(y0+y1)/2,el=document.elementFromPoint(x,y);
+          return {x,y,id:el?.id||null,tag:el?.tagName||null};
+        }""", canvas_box)
+        assert probe, "Canvas has no visible area in the desktop viewport"
+        assert probe["id"] == "pixel-canvas", f"Desktop drawer blocks visible canvas area: {probe}"
         await toggle.click()
         assert await toggle.get_attribute("aria-expanded") == "false", "Desktop tools drawer did not close"
     if viewport["width"] <= 600:
