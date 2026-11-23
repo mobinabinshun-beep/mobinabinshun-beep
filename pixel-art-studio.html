@@ -58,7 +58,8 @@
  .layout>aside{position:fixed;z-index:2100;left:8px;right:8px;bottom:calc(68px + env(safe-area-inset-bottom));top:auto;max-height:min(72vh,calc(var(--nu-visual-height,100dvh) - 110px));overflow:auto;padding:0 0 8px;transform:translateY(calc(100% + 24px));transition:transform .2s ease;visibility:hidden;overscroll-behavior:contain}
  body.nu-mobile-tools-open .layout>aside{transform:translateY(0);visibility:visible}
  .layout>aside .panel{margin:0 0 8px!important}
- #mobile-workspace-dock{display:grid;position:fixed;z-index:2200;left:8px;right:8px;bottom:calc(6px + env(safe-area-inset-bottom));min-height:52px;grid-template-columns:auto auto auto minmax(70px,1fr) auto;align-items:center;gap:5px;padding:6px;border:1px solid var(--line);border-radius:13px;background:rgba(5,15,25,.96);box-shadow:0 8px 28px #0009;backdrop-filter:blur(12px)}
+ #mobile-workspace-dock{pointer-events:none;display:grid;position:fixed;z-index:2200;left:8px;right:8px;bottom:calc(6px + env(safe-area-inset-bottom));min-height:52px;grid-template-columns:auto auto auto minmax(70px,1fr) auto;align-items:center;gap:5px;padding:6px;border:1px solid var(--line);border-radius:13px;background:rgba(5,15,25,.96);box-shadow:0 8px 28px #0009;backdrop-filter:blur(12px)}
+ #mobile-workspace-dock button,#mobile-workspace-dock input{pointer-events:auto}
  #mobile-workspace-dock button{min-height:38px;padding:5px 8px;font-size:10px;border:1px solid var(--line);border-radius:8px;background:#102638;color:#eaf6ff}
  #mobile-workspace-dock label{font-size:9px;color:var(--muted);display:grid;gap:1px}
  #mobile-view-rotation{width:100%;min-width:0;accent-color:var(--gold)}
