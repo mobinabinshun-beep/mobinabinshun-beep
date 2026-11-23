@@ -8,6 +8,7 @@ from playwright.async_api import async_playwright
 
 
 async def cell_point(page, x, y):
+    await page.locator("#pixel-canvas").evaluate("el => el.scrollIntoView({block: 'center', inline: 'center', behavior: 'instant'})")
     await page.locator("#pixel-canvas").scroll_into_view_if_needed()
     return await page.locator("#pixel-canvas").evaluate(
         "(canvas, p) => { const r=canvas.getBoundingClientRect(); return {x:r.left+(p.x+.5)*r.width/canvas.width,y:r.top+(p.y+.5)*r.height/canvas.height}; }",
