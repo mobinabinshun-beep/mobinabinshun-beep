@@ -70,9 +70,14 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
         assert await page.locator('#mix-brush-strength[aria-label="Color mixing strength"]').count() == 1, "Independent mixing-strength control is missing"
 
         await set_color(page, "#ff0000")
+        assert await page.locator("#studio-quick-tools [data-tool=\"pencil\"]").get_attribute("aria-pressed") == "true", "Foreground color change did not restore Pencil"
         await click_cell(page, 8, 16)
+        red_pixel = await read_pixel(page, 8, 16)
+        assert red_pixel == [255, 0, 0], f"Pointer drawing did not place the first red pigment: {red_pixel}"
         await set_color(page, "#0000ff")
         await click_cell(page, 9, 16)
+        blue_pixel = await read_pixel(page, 9, 16)
+        assert blue_pixel == [0, 0, 255], f"Pointer drawing did not place the second blue pigment: {blue_pixel}"
         await set_color(page, "#00ff00")  # foreground color must not drive smudging
         await page.locator("#mix-brush-strength").evaluate("el => { el.value='100'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
         await page.locator('#studio-quick-tools [data-tool="color-mix-brush"]').click()
