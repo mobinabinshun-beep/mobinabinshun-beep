@@ -121,9 +121,12 @@ async def check_touch(browser, base_url):
     assert response and response.status == 200, "Touch context could not load the Studio page"
     await page.locator("#pixel-canvas").wait_for(state="visible", timeout=30000)
     await set_color(page, "#00ff00")
+    await page.evaluate("() => { const stage=document.querySelector(\".stage\"); const top=window.scrollY+stage.getBoundingClientRect().top-72; window.scrollTo(0,Math.max(0,top)); }")
+    await page.locator("#pixel-canvas").scroll_into_view_if_needed()
     await page.evaluate("() => { window.__nuTouchProbe={pointer:0,touch:0}; const c=document.querySelector(\"#pixel-canvas\"); c.addEventListener(\"pointerdown\",()=>window.__nuTouchProbe.pointer++); c.addEventListener(\"touchstart\",()=>window.__nuTouchProbe.touch++); }")
     box = await page.locator("#pixel-canvas").bounding_box()
     assert box and box["width"] > 0 and box["height"] > 0, "Touch canvas has no measurable bounds"
+    assert 0 <= box["y"] < 844 and box["y"] + box["height"] <= 844, f"Touch canvas is not inside the mobile viewport: {box}"
     await page.locator("#pixel-canvas").tap(position={"x": 20.5 * box["width"] / 32, "y": 20.5 * box["height"] / 32})
     probe = await page.evaluate("() => ({...window.__nuTouchProbe,tool:document.querySelector(\"#studio-quick-tools [data-tool=\\\"pencil\\\"]\")?.getAttribute(\"aria-pressed\"),status:document.querySelector(\"#studio-status\")?.textContent})")
     pixel = await read_pixel(page, 20, 20)
