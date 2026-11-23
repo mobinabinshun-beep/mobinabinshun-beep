@@ -110,6 +110,7 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     assert frame and canvas and frame["width"] > 0 and canvas["width"] > 0, "Responsive workspace or canvas has no measurable size"
     if viewport["width"] <= 600:
         assert canvas["width"] <= frame["width"] + 1, "Canvas exceeds the mobile workspace frame"
+        assert canvas["x"] >= 0 and canvas["x"] + canvas["width"] <= viewport["width"] + 1, f"Canvas exceeds mobile viewport width: {canvas}"
     assert not page_errors, f"Uncaught browser errors: {page_errors}"
     await context.close()
 
@@ -126,6 +127,7 @@ async def check_touch(browser, base_url):
     await page.evaluate("() => { window.__nuTouchProbe={pointer:0,touch:0}; const c=document.querySelector(\"#pixel-canvas\"); c.addEventListener(\"pointerdown\",()=>window.__nuTouchProbe.pointer++); c.addEventListener(\"touchstart\",()=>window.__nuTouchProbe.touch++); }")
     box = await page.locator("#pixel-canvas").bounding_box()
     assert box and box["width"] > 0 and box["height"] > 0, "Touch canvas has no measurable bounds"
+    assert 0 <= box["x"] and box["x"] + box["width"] <= 390, f"Touch canvas exceeds mobile viewport width: {box}"
     assert 0 <= box["y"] < 844 and box["y"] + box["height"] <= 844, f"Touch canvas is not inside the mobile viewport: {box}"
     await page.locator("#pixel-canvas").tap(position={"x": 20.5 * box["width"] / 32, "y": 20.5 * box["height"] / 32})
     probe = await page.evaluate("() => ({...window.__nuTouchProbe,tool:document.querySelector(\"#studio-quick-tools [data-tool=\\\"pencil\\\"]\")?.getAttribute(\"aria-pressed\"),status:document.querySelector(\"#studio-status\")?.textContent})")
