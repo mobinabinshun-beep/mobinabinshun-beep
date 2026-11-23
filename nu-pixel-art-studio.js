@@ -441,7 +441,7 @@ function chromaAdv(){if(adv.layers[adv.active].locked)return announce("Layer loc
 function textAdv(){if(adv.layers[adv.active].locked)return announce("Layer locked");const before=histAdv(),c=document.createElement("canvas");c.width=width;c.height=height;const x=c.getContext("2d");x.fillStyle=color;x.font="bold "+clamp(+$("adv-textsize").value,6,96)+"px monospace";x.textBaseline="top";x.fillText($("adv-text").value,0,0,width);const d=x.getImageData(0,0,width,height).data;for(let i=0;i<pixels.length;i++)if(d[i*4+3]>128&&(!adv.selection||adv.selection[i]))pixels[i]=color;adv.layers[adv.active].pixels=pixels.slice();commitHistory(before);render();}
 const paintAdv=paintBrush;paintBrush=function(x,y,v){
  if(adv.layers[adv.active].locked)return;
- if(tool==="color-mix-brush"){const result=window.NUStudioProTools.smudgeBrush(pixels,width,height,x,y,brushSize,mixBrushStrength,adv.selection,mixBrushState,adv.brushShape);mixBrushState=result.state;pixels=result.pixels;adv.layers[adv.active].pixels=pixels.slice();return;}
+ if(tool==="color-mix-brush"){const result=window.NUStudioProTools.smudgeBrush(pixels,width,height,x,y,brushSize,mixBrushStrength,adv.selection,mixBrushState,adv.brushShape);mixBrushState=result.state;pixels=result.pixels;adv.layers[adv.active].pixels=pixels;return;}
  const alpha=+$("adv-alpha")?.value||100,points=[[x,y]];
  if(adv.symmetry==="horizontal"||adv.symmetry==="both")points.push([width-1-x,y]);if(adv.symmetry==="vertical"||adv.symmetry==="both")points.push([x,height-1-y]);if(adv.symmetry==="both")points.push([width-1-x,height-1-y]);
  const seen=new Set(),texture=adv.texture==="none"&&tool==="texture"?"grain":adv.texture;
