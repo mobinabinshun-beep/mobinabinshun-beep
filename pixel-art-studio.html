@@ -24,6 +24,57 @@
 @media(max-width:700px){.stage{height:58vh;min-height:280px}.view-toolbar{grid-template-columns:auto 1fr}.view-toolbar label{grid-column:1}.view-toolbar input{grid-column:2}.tools{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(prefers-reduced-motion:reduce){#pixel-canvas{scroll-behavior:auto}}
 .panel-summary{display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer;list-style:none;margin-bottom:14px}.panel-summary::-webkit-details-marker{display:none}.panel-summary strong{font-size:13px;letter-spacing:.12em;color:var(--gold)}.panel-summary span{font-size:9px;letter-spacing:.08em;color:var(--muted)}.tool-group{margin-bottom:12px}.tool-group>small{display:block;margin-bottom:7px;color:var(--muted);font-size:9px;letter-spacing:.14em}.tool-group .tools{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.tool-group .tool{min-height:42px;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:5px}.tool:focus-visible{outline:2px solid var(--gold);outline-offset:2px}.tool kbd{font:700 9px ui-monospace,monospace;color:var(--muted);border:1px solid #ffffff26;border-radius:4px;padding:1px 3px}.tool:hover{border-color:var(--cyan);background:#17364b}.source-preview{display:flex;align-items:center;gap:12px;padding:10px;border:1px solid #65dcff33;border-radius:10px;background:#071522;margin:0 0 12px}.source-preview[hidden]{display:none}.source-preview img{display:block;max-width:112px;max-height:84px;object-fit:contain;image-rendering:auto;border:1px solid #ffffff30;border-radius:6px;background:#0a1420}.source-preview strong{display:block;color:var(--gold);font-size:11px}.source-preview span{display:block;color:var(--muted);font-size:11px}.import-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}.import-options .field{margin:6px 0}.tool-shortcut{opacity:.6;font-size:9px}
+
+/* Stage 2A — compact mobile workspace, safe-area and visual viewport adaptation. */
+#mobile-workspace-dock{display:none}
+@media(max-width:700px){
+ html,body{height:100%;overscroll-behavior:none}
+ body.nu-mobile-workspace{overflow:hidden}
+ .shell{width:100%;height:calc(var(--nu-visual-height,100dvh) - 34px - env(safe-area-inset-top));min-height:0;margin:0;padding:calc(6px + env(safe-area-inset-top)) 7px 0;display:flex;flex-direction:column;gap:6px}
+ .top{flex:0 0 38px;min-height:38px;margin:0;align-items:center}
+ .top .brand{font-size:12px}.top .brand small{font-size:7px}
+ .top .row{gap:5px}.top .btn{font-size:9px;padding:6px 7px}
+ .shell>.title,.shell>.subtitle{display:none}
+ .layout{display:block;flex:1;min-height:0}
+ .layout>main.panel{height:100%;min-height:0;padding:7px;border-radius:10px;display:flex;flex-direction:column;gap:6px;overflow:hidden}
+ .layout>main .toolbar{flex:0 0 auto;gap:5px;margin:0}
+ .layout>main .toolbar .btn{font-size:10px;padding:6px 8px}
+ .source-preview{flex:0 0 auto;margin:0;padding:5px}
+ .source-preview img{max-width:52px;max-height:42px}
+ .view-tools{flex:0 0 auto;margin:0!important;padding:6px}
+ .view-tools .adaptive-head{margin:0 0 4px}
+ .view-tools .quality-chip{font-size:9px}
+ .view-tools .hint{display:none}
+ .view-toolbar{grid-template-columns:auto minmax(0,1fr);gap:5px}
+ .view-toolbar .btn{font-size:9px;padding:5px 7px}
+ .view-toolbar label{font-size:9px;grid-column:1}
+ .view-toolbar input{grid-column:2}
+ .stage{height:auto;min-height:0;flex:1;padding:4px;border-radius:8px}
+ .workspace-wrap,.workspace-frame{height:100%;min-height:0}
+ .workspace-frame{padding:4px;border:0}
+ .layout>main>.row{flex:0 0 auto;margin:0!important;gap:5px}
+ .layout>main>.row .counter{font-size:9px}
+ .layout>main>p.hint{display:none}
+ .layout>aside{position:fixed;z-index:2100;left:8px;right:8px;bottom:calc(68px + env(safe-area-inset-bottom));top:auto;max-height:min(72vh,calc(var(--nu-visual-height,100dvh) - 110px));overflow:auto;padding:0 0 8px;transform:translateY(calc(100% + 24px));transition:transform .2s ease;visibility:hidden;overscroll-behavior:contain}
+ body.nu-mobile-tools-open .layout>aside{transform:translateY(0);visibility:visible}
+ .layout>aside .panel{margin:0 0 8px!important}
+ #mobile-workspace-dock{display:grid;position:fixed;z-index:2200;left:8px;right:8px;bottom:calc(6px + env(safe-area-inset-bottom));min-height:52px;grid-template-columns:auto auto auto minmax(70px,1fr) auto;align-items:center;gap:5px;padding:6px;border:1px solid var(--line);border-radius:13px;background:rgba(5,15,25,.96);box-shadow:0 8px 28px #0009;backdrop-filter:blur(12px)}
+ #mobile-workspace-dock button{min-height:38px;padding:5px 8px;font-size:10px;border:1px solid var(--line);border-radius:8px;background:#102638;color:#eaf6ff}
+ #mobile-workspace-dock label{font-size:9px;color:var(--muted);display:grid;gap:1px}
+ #mobile-view-rotation{width:100%;min-width:0;accent-color:var(--gold)}
+ body.nu-mobile-tools-open #mobile-workspace-dock{opacity:.55}
+}
+@media(max-width:700px) and (orientation:landscape){
+ .shell{padding-left:calc(7px + env(safe-area-inset-left));padding-right:calc(7px + env(safe-area-inset-right))}
+ #mobile-workspace-dock{left:calc(6px + env(safe-area-inset-left));right:calc(6px + env(safe-area-inset-right))}
+}
+@media(max-width:700px) and (orientation:landscape){
+ html[data-nu-orientation="landscape-left"] #mobile-workspace-dock{left:auto;right:calc(6px + env(safe-area-inset-right));top:50%;bottom:auto;width:58px;transform:translateY(-50%);grid-template-columns:1fr;grid-template-rows:repeat(5,auto)}
+ html[data-nu-orientation="landscape-right"] #mobile-workspace-dock{right:auto;left:calc(6px + env(safe-area-inset-left));top:50%;bottom:auto;width:58px;transform:translateY(-50%);grid-template-columns:1fr;grid-template-rows:repeat(5,auto)}
+ html[data-nu-orientation^="landscape"] #mobile-workspace-dock label{min-width:0}
+}
+@media(prefers-reduced-motion:reduce){.layout>aside{transition:none}}
+
 </style>
 <link rel="stylesheet" href="./nu-hex-gateway.css?v=20261118-directional-r2">
 </head>
@@ -47,6 +98,13 @@
 <div class="field"><label>Palette</label><div class="palette" id="palette"></div></div>
 <div class="row"><button class="btn" id="extract-palette">EXTRACT FROM IMAGE</button><button class="btn" id="clear-canvas">CLEAR</button></div>
 </details><details class="panel side" style="margin-top:14px" open><summary class="panel-summary"><strong>VECTOR ENGINE</strong><span>COLLAPSE / EXPAND</span></summary><div class="field"><label for="vector-mode">SVG geometry</label><select id="vector-mode"><option value="contours" selected>Contour paths · compact shapes</option><option value="runs">Pixel runs · crisp blocks</option></select></div><div class="field"><label for="palette-limit">Maximum import colors · <span id="palette-limit-value">32</span></label><input id="palette-limit" type="range" min="2" max="32" step="1" value="32"></div><div class="field"><label for="alpha-cutoff">Transparency cutoff · <span id="alpha-cutoff-value">24</span>/255</label><input id="alpha-cutoff" type="range" min="0" max="160" step="1" value="24"></div><p class="hint">Contour mode merges adjacent same-color pixels into closed SVG paths, preserving transparent holes. Pixel-run mode is a fast, sharp-edged alternative.</p></details><details class="panel side" style="margin-top:14px" open><summary class="panel-summary"><strong>EXPORT</strong><span>COLLAPSE / EXPAND</span></summary><div class="field"><label for="export-name">File name</label><input id="export-name" value="nu-pixel-art" maxlength="48"></div><div class="field"><label for="export-scale">PNG output size</label><select id="export-scale"><option value="1">1× · original pixels</option><option value="2">2× · crisp</option><option value="4" selected>4× · high resolution</option><option value="8">8× · large</option><option value="16">16× · maximum detail</option></select><p class="hint">Large outputs are checked against safe browser canvas and memory limits.</p></div><div class="actions"><button class="btn" id="export-svg">DOWNLOAD SVG</button><button class="btn" id="export-png">DOWNLOAD PNG</button><button class="btn" id="export-ico">DOWNLOAD ICO · WINDOWS ICON</button><button class="btn" id="export-ir">EXPORT GRAPHIC IR</button><button class="btn primary" id="export-svg-copy">COPY SVG CODE</button></div><div id="export-download-fallback" class="field" hidden aria-live="polite"><strong>File ready · اگر دانلود خودکار شروع نشد، لینک زیر را لمس کنید.</strong></div><div id="analysis-summary" class="analysis-summary" aria-live="polite">Image analysis is ready when you import or edit artwork.</div><div class="status" id="studio-status" role="status" aria-live="polite">Ready · N.U Pixel Art Studio</div><div class="divider"></div><p class="hint">SVG contains editable vector paths, not an embedded bitmap. Graphic IR exports palette indices, pixel runs, tiles, edge maps, connected regions and render instructions. It is structured graphics data, not proprietary GPU machine code.</p><span class="badge">N.U · NIROO UNIVERSE</span></details></aside>
+<nav id="mobile-workspace-dock" aria-label="Mobile workspace controls">
+<button id="mobile-tools-toggle" type="button" aria-expanded="false" aria-controls="studio-tools-drawer">TOOLS</button>
+<button id="mobile-zoom-out" type="button" aria-label="Zoom out">−</button>
+<button id="mobile-zoom-in" type="button" aria-label="Zoom in">+</button>
+<label for="mobile-view-rotation">VIEW ROTATION <output id="mobile-view-rotation-value">0°</output><input id="mobile-view-rotation" type="range" min="-180" max="180" step="1" value="0" aria-label="Viewport rotation angle"></label>
+<button id="mobile-view-reset" type="button" aria-label="Reset viewport">RESET</button>
+</nav>
 </div>
 </div>
 <script src="./nu-engine.js"></script>
