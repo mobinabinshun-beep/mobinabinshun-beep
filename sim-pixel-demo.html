@@ -15,12 +15,14 @@
 <section class="panel"><h2>Task processing</h2><div class="queue"><div class="queue-item phase">① Execution · operation layer</div><div class="queue-item phase">② Route analysis</div><div class="queue-item phase">③ Target-time analysis</div><div class="queue-item phase">④ Decision</div><div class="queue-item">Manual player commands · queue engine pending</div><div class="queue-item scheduled">Scheduled Auto-Pilot · daily / weekly / seasonal / annual</div></div><p class="tiny">Four blue/white stages are internal processing, not player-selectable modes. Purple marks scheduled work; neutral marks player commands.</p></section>
 <section class="panel"><h2>Human test record</h2><label class="tiny"><input type="checkbox" data-check="launch"> Module opens from N.U demo</label><label class="tiny"><input type="checkbox" data-check="movement"> Continuous movement and four speeds</label><label class="tiny"><input type="checkbox" data-check="diagonal"> Diagonal axis speed</label><label class="tiny"><input type="checkbox" data-check="zoom"> Ten zoom levels and follow camera</label><label class="tiny"><input type="checkbox" data-check="responsive"> Layout on this device</label><label class="tiny" for="observations">Tester observations</label><textarea id="observations" rows="3" style="width:100%;background:#08141c;color:var(--text);border:1px solid var(--line);border-radius:7px;padding:8px"></textarea><button class="control" id="report">Download human test JSON</button><p id="report-status" class="tiny" aria-live="polite">Generated locally; nothing is uploaded.</p></section></aside></div>
 <footer>SIM PIXEL spec-alignment prototype · isolated from N.U shared runtime and data · local test report only.</footer></main>
+<script src="./sim-pixel-engine.js"></script>
 <script>
 (()=>{"use strict";
+const Engine=window.SimPixelEngine;
 const canvas=document.getElementById("world"),ctx=canvas.getContext("2d"),$=id=>document.getElementById(id);
 const COLORS={blue:"#3478df",green:"#38a85a",yellow:"#f0cf35",orange:"#f08a24",red:"#df4545",purple:"#9b62d8"},ORDER=["blue","green","yellow","orange","red","purple"],W=48,H=30;
-const modes={Chill:2,Normal:1,Hurry:5,Escape:25};
-const s={started:false,first:"",lastName:"",color:"blue",mode:"Normal",zoom:5,follow:false,player:{x:24,y:15},target:null,keys:new Set(),last:0,interaction:null,encounters:new Set(),tutorialStep:0};
+const modes=Engine.SPEED;
+const s={started:false,first:"",lastName:"",color:"blue",mode:"Normal",zoom:5,follow:false,player:{x:24,y:15},target:null,keys:new Set(),last:0,tutorialStep:0};
 let npcs=[],camera={x:24,y:15};
 function scale(){return 6+s.zoom*2}
 function screen(x,y){const k=scale(),cx=s.follow?s.player.x:camera.x,cy=s.follow?s.player.y:camera.y;return{x:canvas.width/2+(x-cx)*k,y:canvas.height/2+(y-cy)*k,k}}
@@ -38,20 +40,16 @@ function draw(){
  const c=screen(s.player.x,s.player.y);ctx.save();ctx.setLineDash([5,5]);ctx.strokeStyle="#79e0c077";ctx.lineWidth=2;ctx.beginPath();ctx.arc(c.x,c.y,20*k,0,Math.PI*2);ctx.stroke();ctx.restore();
  if(s.target){const p=screen(s.target.x,s.target.y);ctx.strokeStyle="#f2c879";ctx.lineWidth=2;ctx.strokeRect(p.x-k/2,p.y-k/2,k,k)}
  npcs.forEach(n=>pixel(n));pixel({...s.player,color:s.color},true);
- if(s.interaction){const p=screen(s.player.x,s.player.y);const icons=["👋","😊","✦","👋"];ctx.font=Math.max(14,Math.min(24,p.k*.8))+"px system-ui";icons.forEach((v,i)=>ctx.fillText(v,p.x-42+i*25,p.y-p.k))}
 }
 function setMode(m){s.mode=m;document.querySelectorAll("[data-mode]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.mode===m)));$("mode-value").textContent=m;$("pace-value").textContent=modes[m]+" m/s"}
-function update(){const p=s.player;$("coords").textContent="Position: "+p.x.toFixed(2)+", "+p.y.toFixed(2);$("movement").textContent=s.interaction?"Movement: social interaction":s.target?"Movement: moving":"Movement: idle";$("camera-value").textContent=s.follow?"Following":"Manual";$("zoom-level").textContent="Zoom "+s.zoom+" / 10";draw()}
+function update(){const p=s.player;$("coords").textContent="Position: "+p.x.toFixed(2)+", "+p.y.toFixed(2);$("movement").textContent=s.target?"Movement: moving":"Movement: idle";$("camera-value").textContent=s.follow?"Following":"Manual";$("zoom-level").textContent="Zoom "+s.zoom+" / 10";draw()}
 function target(x,y){s.target={x:Math.max(1,Math.min(W-1,x)),y:Math.max(8,Math.min(H-1,y))};$("destination").textContent="Destination: "+s.target.x.toFixed(1)+", "+s.target.y.toFixed(1);update()}
-function encounters(){for(const n of npcs){const d=Math.hypot(s.player.x-n.x,s.player.y-n.y),id="player-"+n.id;if(d<1&&!s.encounters.has(id)&&!s.interaction){s.encounters.add(id);s.target=null;s.interaction={until:performance.now()+1000,npc:n.id}}if(d>=2)s.encounters.delete(id)}}
 function tick(t){if(!s.started)return;if(!s.last)s.last=t;const dt=Math.min((t-s.last)/1000,.05);s.last=t;
  // Tutorial freezes the world and all movement.
  if(!$("tutorial").classList.contains("hidden")){s.last=t;s.raf=requestAnimationFrame(tick);return}
- if(s.interaction){if(t>=s.interaction.until)s.interaction=null}
- else{let dx=0,dy=0;if(s.keys.has("ArrowLeft")||s.keys.has("a"))dx--;if(s.keys.has("ArrowRight")||s.keys.has("d"))dx++;if(s.keys.has("ArrowUp")||s.keys.has("w"))dy--;if(s.keys.has("ArrowDown")||s.keys.has("s"))dy++;
-  if(dx||dy){s.target=null;s.player.x=Math.max(0,Math.min(W,s.player.x+dx*modes[s.mode]*dt));s.player.y=Math.max(0,Math.min(H,s.player.y+dy*modes[s.mode]*dt))}
-  else if(s.target){const ax=s.target.x-s.player.x,ay=s.target.y-s.player.y,v=modes[s.mode]*dt;s.player.x+=Math.sign(ax)*Math.min(Math.abs(ax),v);s.player.y+=Math.sign(ay)*Math.min(Math.abs(ay),v);if(Math.abs(ax)<.02&&Math.abs(ay)<.02)s.target=null}
-  encounters()}
+ let dx=0,dy=0;if(s.keys.has("ArrowLeft")||s.keys.has("a"))dx--;if(s.keys.has("ArrowRight")||s.keys.has("d"))dx++;if(s.keys.has("ArrowUp")||s.keys.has("w"))dy--;if(s.keys.has("ArrowDown")||s.keys.has("s"))dy++;
+ if(dx||dy){s.target=null;s.player=Engine.moveDirect(s.player,{x:dx,y:dy},s.mode,dt,{minX:0,maxX:W,minY:0,maxY:H})}
+ else if(s.target){s.player=Engine.moveToward(s.player,s.target,s.mode,dt);if(Engine.distance(s.player,s.target)<.02)s.target=null}
  if(s.follow){camera.x=s.player.x;camera.y=s.player.y}update();s.raf=requestAnimationFrame(tick)}
 function tutorialEnd(){$("tutorial").classList.add("hidden");s.last=0}
 function begin(withTutorial){s.first=$("first-name").value.trim();s.lastName=$("last-name").value.trim();s.color=$("pixel-color").value;if(!s.first||!s.lastName){alert("Enter first and last name to begin.");return}people();$("player-name").textContent=s.first+" "+s.lastName;$("start-screen").classList.add("hidden");$("game").classList.remove("hidden");s.started=true;if(withTutorial)$("tutorial").classList.remove("hidden");s.last=0;s.raf=requestAnimationFrame(tick);update();canvas.focus()}
@@ -61,7 +59,7 @@ canvas.addEventListener("pointerdown",e=>{const r=canvas.getBoundingClientRect()
 window.addEventListener("keydown",e=>{if(["ArrowLeft","ArrowRight","ArrowUp","ArrowDown","w","a","s","d"].includes(e.key)){e.preventDefault();s.keys.add(e.key)}});window.addEventListener("keyup",e=>s.keys.delete(e.key));window.addEventListener("blur",()=>s.keys.clear());
 document.querySelectorAll("[data-mode]").forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));$("stop").addEventListener("click",()=>{s.target=null;s.keys.clear();$("destination").textContent="Destination: none";update()});
 $("zoom-in").addEventListener("click",()=>{s.zoom=Math.min(10,s.zoom+1);update()});$("zoom-out").addEventListener("click",()=>{s.zoom=Math.max(1,s.zoom-1);update()});$("camera-follow").addEventListener("click",()=>{s.follow=!s.follow;$("camera-follow").setAttribute("aria-pressed",String(s.follow));update()});
-$("report").addEventListener("click",()=>{const report={project:"SIM PIXEL",build:"spec-alignment-prototype-0.2",generatedAt:new Date().toISOString(),device:{userAgent:navigator.userAgent,language:navigator.language},checks:Object.fromEntries([...document.querySelectorAll("[data-check]")].map(x=>[x.dataset.check,x.checked])),observations:$("observations").value,player:{firstName:s.first,lastName:s.lastName,color:s.color,position:s.player,mode:s.mode},camera:{zoom:s.zoom,follow:s.follow},scope:"Isolated prototype; not a full life-simulator acceptance report."};const blob=new Blob([JSON.stringify(report,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="sim-pixel-human-test-report.json";a.click();URL.revokeObjectURL(url);$("report-status").textContent="JSON generated locally. Review it before sending to the project owner."});
+$("report").addEventListener("click",()=>{const report={project:"SIM PIXEL",build:"spec-alignment-prototype-0.3",generatedAt:new Date().toISOString(),device:{userAgent:navigator.userAgent,language:navigator.language},checks:Object.fromEntries([...document.querySelectorAll("[data-check]")].map(x=>[x.dataset.check,x.checked])),observations:$("observations").value,player:{firstName:s.first,lastName:s.lastName,color:s.color,position:s.player,mode:s.mode},camera:{zoom:s.zoom,follow:s.follow},scope:"Isolated prototype; not a full life-simulator acceptance report."};const blob=new Blob([JSON.stringify(report,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="sim-pixel-human-test-report.json";a.click();URL.revokeObjectURL(url);$("report-status").textContent="JSON generated locally. Review it before sending to the project owner."});
 $("legend").innerHTML=ORDER.map(c=>'<div class="person"><i class="swatch" style="background:'+COLORS[c]+'"></i>Pixel color: '+c+'</div>').join("");setMode("Normal");update();
 })();
 </script></body></html>
