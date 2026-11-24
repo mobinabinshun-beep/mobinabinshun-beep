@@ -47,6 +47,8 @@ jobs:
         run: node --test tests/sim-pixel-navigation-core.test.js
       - name: Test SIM PIXEL time-slot movement reservations
         run: node --test tests/sim-pixel-reservations.test.js
+      - name: Test SIM PIXEL multi-agent movement simulation
+        run: node --test tests/sim-pixel-multi-agent.test.js
       - name: Test hex gateway navigation and interaction contract
         run: node --test tests/nu-hex-gateway.test.js
       - name: Test launcher 10-level Reduced Motion controls
