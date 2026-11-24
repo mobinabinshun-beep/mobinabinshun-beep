@@ -168,7 +168,7 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
 
     await page.locator('#studio-quick-tools ').locator('[data-tool="bezier"]').click()
     assert await page.locator("#pro-curve").is_visible(), "Bezier must expose curve tension"
-    await page.locator("#pro-curve").fill("14")
+    await page.locator("#pro-curve").evaluate("(el) => { el.value='14'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
     await page.locator('#studio-quick-tools ').locator('[data-tool="pencil"]').click()
     await page.locator('#studio-quick-tools ').locator('[data-tool="bezier"]').click()
     assert await page.locator("#pro-curve").input_value() == "14", "Bezier tension must persist when switching tools"
