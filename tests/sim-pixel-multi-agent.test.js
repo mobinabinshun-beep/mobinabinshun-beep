@@ -11,11 +11,11 @@ test("moves an explicitly commanded agent along its reserved route", () => {
 });
 
 test("rejects a second route that conflicts with an existing time-slot reservation", () => {
-  const sim=createMultiAgentSimulation({width:5,height:3,agents:[
-    {id:"A",position:{x:0,y:1}},{id:"B",position:{x:2,y:0}}
+  const sim=createMultiAgentSimulation({width:3,height:2,agents:[
+    {id:"A",position:{x:0,y:0}},{id:"B",position:{x:1,y:1}}
   ]});
-  assert.equal(sim.plan("A",{x:2,y:1}),true);
-  assert.equal(sim.plan("B",{x:2,y:2}),false);
+  assert.equal(sim.plan("A",{x:2,y:0}),true);
+  assert.equal(sim.plan("B",{x:1,y:0}),false);
   assert.equal(sim.snapshot().agents.find(a=>a.id==="B").path.length,0);
 });
 
