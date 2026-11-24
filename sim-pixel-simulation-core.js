@@ -107,7 +107,50 @@
     return Object.freeze({canReserve,reservePath,release});
   }
 
-  const api={findPath,createReservationTable};
+
+  // Deterministic, explicit-goal multi-agent movement. One grid edge is one simulation tick.
+  // Real-time speed integration and NPC schedules remain separate, documented follow-up work.
+  function createMultiAgentSimulation(options) {
+    options=options||{};
+    const width=options.width||20,height=options.height||12;
+    const blocked=(options.blocked||[]).map(p=>({x:p.x,y:p.y}));
+    const agents=new Map(),routes=new Map(),reservations=createReservationTable();
+    let tick=0;
+    const validPoint=p=>p&&Number.isInteger(p.x)&&Number.isInteger(p.y)&&p.x>=0&&p.y>=0&&p.x<width&&p.y<height;
+    for(const input of (options.agents||[])){
+      if(!input||typeof input.id!=="string"||!input.id||!validPoint(input.position)||agents.has(input.id)||blocked.some(p=>p.x===input.position.x&&p.y===input.position.y))throw new TypeError("Invalid or duplicate agent");
+      agents.set(input.id,{id:input.id,x:input.position.x,y:input.position.y});
+      routes.set(input.id,{goal:null,path:[]});
+    }
+    function snapshot(){
+      return {tick,agents:[...agents.values()].map(a=>({id:a.id,x:a.x,y:a.y,goal:routes.get(a.id).goal?{...routes.get(a.id).goal}:null,path:routes.get(a.id).path.map(p=>({...p}))}))};
+    }
+    function plan(agentId,goal){
+      const agent=agents.get(agentId);
+      if(!agent||!validPoint(goal)||blocked.some(p=>p.x===goal.x&&p.y===goal.y))return false;
+      const occupied=[...agents.values()].filter(a=>a.id!==agentId).map(a=>({x:a.x,y:a.y}));
+      const path=findPath(agent,goal,{width,height,blocked,occupied});
+      if(path===null)return false;
+      if(!reservations.reservePath(agentId,{x:agent.x,y:agent.y},path,{startTick:tick}))return false;
+      routes.set(agentId,{goal:{x:goal.x,y:goal.y},path:path.map(p=>({...p}))});
+      return true;
+    }
+    function step(){
+      tick++;
+      for(const [id,route] of routes){
+        if(!route.path.length)continue;
+        const next=route.path[0];
+        const agent=agents.get(id);
+        agent.x=next.x;agent.y=next.y;
+        route.path.shift();
+        if(!route.path.length)route.goal=null;
+      }
+      return snapshot();
+    }
+    return Object.freeze({plan,step,snapshot});
+  }
+
+  const api={findPath,createReservationTable,createMultiAgentSimulation};
   if(typeof module!=="undefined"&&module.exports)module.exports=api;
   if(root)root.SIMPIXEL=api;
 })(typeof globalThis!=="undefined"?globalThis:this);
