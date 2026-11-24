@@ -27,6 +27,11 @@ test("rejects blocked destinations and unreachable maps", () => {
   assert.equal(findPath({x:0,y:5},{x:4,y:5},{blocked:wall}),null);
 });
 
+test("uses shortest diagonal route on an unobstructed grid", () => {
+  const path=findPath({x:0,y:0},{x:3,y:3},{width:8,height:8});
+  assert.deepEqual(path,[{x:1,y:1},{x:2,y:2},{x:3,y:3}]);
+});
+
 test("prevents diagonal corner cutting", () => {
   const path=findPath({x:0,y:0},{x:1,y:1},{blocked:[{x:1,y:0},{x:0,y:1}]});
   assert.equal(path,null);
