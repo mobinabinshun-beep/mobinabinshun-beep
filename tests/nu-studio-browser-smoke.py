@@ -93,7 +93,7 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     await fill_toggle.click()
     await page.locator("#studio-dock").wait_for(state="visible", timeout=5000)
     body_text = await page.locator("body").inner_text()
-    assert not re.search(r"[\\u0600-\\u06FF]", body_text), "Studio visible UI contains non-English Persian copy"
+    assert not re.search(r"[\u0600-\u06FF]", body_text), "Studio visible UI contains non-English Persian copy"
     quick_tools = page.locator("#studio-quick-tools [data-tool]")
     assert await quick_tools.count() >= 15, "The full quick-tool set is missing"
     for tool_index in range(await quick_tools.count()):
