@@ -41,7 +41,73 @@
     }
     return null;
   }
-  const api={findPath};
+
+  function createReservationTable() {
+    const vertices=new Map(), edges=new Map(), diagonals=new Map();
+    const cell=(p)=>key(p.x,p.y);
+    const edge=(from,to)=>cell(from)+">"+cell(to);
+    const diagonal=(from,to)=>{
+      if(from.x===to.x||from.y===to.y)return null;
+      return Math.min(from.x,to.x)+","+Math.min(from.y,to.y);
+    };
+    const validPoint=p=>p&&Number.isInteger(p.x)&&Number.isInteger(p.y);
+    function canReserve(agentId,start,path,options) {
+      options=options||{};
+      const startTick=options.startTick??0;
+      if(typeof agentId!=="string"||!agentId||!validPoint(start)||!Array.isArray(path)||!Number.isInteger(startTick)||startTick<0)return false;
+      let previous=start;
+      const points=[start,...path];
+      for(let i=0;i<points.length;i++){
+        const current=points[i],tick=startTick+i;
+        if(!validPoint(current))return false;
+        const vertexOwner=vertices.get(tick+"|"+cell(current));
+        if(vertexOwner&&vertexOwner!==agentId)return false;
+        if(i===0)continue;
+        const previousPoint=points[i-1],forward=edge(previousPoint,current),reverse=edge(current,previousPoint);
+        const edgeOwner=edges.get(tick+"|"+forward),reverseOwner=edges.get(tick+"|"+reverse);
+        if((edgeOwner&&edgeOwner!==agentId)||(reverseOwner&&reverseOwner!==agentId))return false;
+        const square=diagonal(previousPoint,current);
+        if(square){
+          const orientation=(current.x-previousPoint.x)===(current.y-previousPoint.y)?"\\\\":"/";
+          const diagonalOwner=diagonals.get(tick+"|"+square);
+          if(diagonalOwner&&diagonalOwner.agentId!==agentId&&diagonalOwner.orientation!==orientation)return false;
+        }
+        previous=current;
+      }
+      return true;
+    }
+    function release(agentId,fromTick) {
+      fromTick=fromTick??0;
+      let removed=0;
+      for(const [k,v] of vertices)if(v===agentId&&Number(k.split("|",1)[0])>=fromTick){vertices.delete(k);removed++;}
+      for(const [k,v] of edges)if(v===agentId&&Number(k.split("|",1)[0])>=fromTick){edges.delete(k);removed++;}
+      for(const [k,v] of diagonals)if(v.agentId===agentId&&Number(k.split("|",1)[0])>=fromTick){diagonals.delete(k);removed++;}
+      return removed;
+    }
+    function reservePath(agentId,start,path,options) {
+      options=options||{};
+      const startTick=options.startTick??0;
+      if(!canReserve(agentId,start,path,options))return false;
+      release(agentId,startTick);
+      const points=[start,...path];
+      for(let i=0;i<points.length;i++){
+        const current=points[i],tick=startTick+i;
+        vertices.set(tick+"|"+cell(current),agentId);
+        if(i===0)continue;
+        const previous=points[i-1];
+        edges.set(tick+"|"+edge(previous,current),agentId);
+        const square=diagonal(previous,current);
+        if(square){
+          const orientation=(current.x-previous.x)===(current.y-previous.y)?"\\\\":"/";
+          diagonals.set(tick+"|"+square,{agentId,orientation});
+        }
+      }
+      return true;
+    }
+    return Object.freeze({canReserve,reservePath,release});
+  }
+
+  const api={findPath,createReservationTable};
   if(typeof module!=="undefined"&&module.exports)module.exports=api;
   if(root)root.SIMPIXEL=api;
 })(typeof globalThis!=="undefined"?globalThis:this);
