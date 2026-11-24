@@ -78,6 +78,7 @@ footer{margin-top:18px;color:var(--muted);font-size:11px}
 </div>
 <footer>SIM PIXEL demo slice · isolated page · no changes to N.U Runtime, Manifest, Launcher, shared save, or wallet.</footer>
 </main>
+<script src="./sim-pixel-simulation-core.js"></script>
 <script>
 (()=>{"use strict";
 const canvas=document.getElementById("world"),ctx=canvas.getContext("2d");
@@ -97,7 +98,7 @@ function draw(){
  npcs.forEach((p,i)=>pixel(p,colors[i+1]));pixel(player,colors[0],true);
 }
 function pixel(p,color,isPlayer=false){ctx.fillStyle="#071018";ctx.fillRect(p.x*S-10,p.y*S-10,20,20);ctx.fillStyle=color;ctx.fillRect(p.x*S-8,p.y*S-8,16,16);ctx.fillStyle="#071018";ctx.fillRect(p.x*S-4,p.y*S-4,3,3);ctx.fillRect(p.x*S+2,p.y*S-4,3,3);if(isPlayer){ctx.strokeStyle="#fff";ctx.lineWidth=2;ctx.strokeRect(p.x*S-11,p.y*S-11,22,22)}}
-function routeTo(tx,ty){tx=Math.max(0,Math.min(W-1,tx));ty=Math.max(0,Math.min(H-1,ty));const sx=Math.floor(player.x),sy=Math.floor(player.y);path=[];let x=sx,y=sy;while(x!==tx||y!==ty){if(x!==tx)x+=Math.sign(tx-x);else if(y!==ty)y+=Math.sign(ty-y);path.push({x,y})}target={x:tx,y:ty};$("destination").textContent=tx+", "+ty;updateStatus();draw()}
+function routeTo(tx,ty){tx=Math.max(0,Math.min(W-1,tx));ty=Math.max(0,Math.min(H-1,ty));const blocked=[];[[1,1,5,3],[13,1,5,3],[1,8,5,3],[14,9,4,2]].forEach(([x,y,w,h])=>{for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++)blocked.push({x:xx,y:yy})});const next=SIMPIXEL.findPath(player,{x:tx,y:ty},{width:W,height:H,blocked,occupied:npcs});if(next===null){$("movement").textContent="Movement: destination unavailable";return}path=next;target={x:tx,y:ty};$("destination").textContent=tx+", "+ty;updateStatus();draw()}
 function updateStatus(){$("movement").textContent=path.length?"Movement: moving":"Movement: idle";$("coords").textContent="Position: "+player.x.toFixed(1)+", "+player.y.toFixed(1);$("mode-value").textContent=mode;$("pace-value").textContent=modes[mode];$("pace-fill").style.width=(modes[mode]/25*100)+"%"}
 function tick(t){if(!last)last=t;const dt=Math.min((t-last)/1000,.05);last=t;if(path.length){acc+=dt*modes[mode];while(acc>=1&&path.length){const p=path.shift();player.x=p.x+.5;player.y=p.y+.5;acc-=1}if(!path.length)acc=0;updateStatus();draw()}raf=requestAnimationFrame(tick)}
 canvas.addEventListener("pointerdown",e=>{const r=canvas.getBoundingClientRect();routeTo(Math.floor((e.clientX-r.left)/r.width*W),Math.floor((e.clientY-r.top)/r.height*H));canvas.focus()});
