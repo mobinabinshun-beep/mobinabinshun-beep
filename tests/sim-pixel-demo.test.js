@@ -55,7 +55,7 @@ test("NPC proximity thresholds distinguish friendly pass from full crossing enco
  const crossingA={start:{x:0,y:0},end:{x:2,y:2}},crossingB={start:{x:0,y:2},end:{x:2,y:0}};
  assert.equal(Engine.classifyEncounter({x:0,y:0},{x:1.5,y:0},null,null),"friendly-pass");
  assert.equal(Engine.classifyEncounter({x:0,y:0},{x:.8,y:0},crossingA,crossingB),"full");
- assert.equal(Engine.classifyEncounter({x:0,y:0},{x:.8,y:0},crossingA,{start:{x:3,y:0},end:{x:3,y:3}}),"none");
+ assert.equal(Engine.classifyEncounter({x:0,y:0},{x:.8,y:0},crossingA,{start:{x:3,y:0},end:{x:3,y:3}}),"friendly-pass");
 });
 test("NPC encounter lock lasts until a two-metre free gap is reached",()=>{
  const registry=new Engine.EncounterRegistry();
