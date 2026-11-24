@@ -124,6 +124,45 @@
   return {pixels:out,state:{lastX:targetX,lastY:targetY,pickup}};
  }
 
+ function bucketFill(pixels,w,h,x,y,next,mode="contiguous",tolerance=0,selection=null,mask=null){
+  if(!validSize(w,h)||!pixels||pixels.length!==w*h)throw new TypeError("Fill pixels do not match the canvas.");
+  if(!Number.isSafeInteger(x)||!Number.isSafeInteger(y)||x<0||y<0||x>=w||y>=h)throw new RangeError("Fill coordinates are outside the canvas.");
+  if(next!==null&&(typeof next!=="string"||!/^#[0-9a-f]{6}$/i.test(next)))throw new TypeError("Fill color must be a hexadecimal color or transparent.");
+  if(!["contiguous","similar","global"].includes(mode))throw new RangeError("Unknown fill mode.");
+  if(!Number.isFinite(tolerance)||tolerance<0||tolerance>441.673)throw new RangeError("Fill tolerance must be between 0 and 441.673.");
+  if(selection&&selection.length!==w*h)throw new TypeError("Fill selection does not match the canvas.");
+  if(mask&&mask.length!==w*h)throw new TypeError("Fill layer mask does not match the canvas.");
+  const startIndex=idx(x,y,w),start=pixels[startIndex],out=pixels.slice();
+  if(selection&&!selection[startIndex])return {pixels:out,changed:0,reason:"outside-selection",source:start};
+  if(mask&&!mask[startIndex])return {pixels:out,changed:0,reason:"outside-mask",source:start};
+  if(start===next)return {pixels:out,changed:0,reason:"same-color",source:start};
+  const distance=(a,b)=>{
+   if(a===b)return 0;
+   if(a===null||b===null)return Infinity;
+   const ca=rgb(a),cb=rgb(b);if(!ca||!cb)return Infinity;
+   return Math.sqrt(ca.reduce((sum,v,k)=>sum+(v-cb[k])**2,0));
+  };
+  const matches=c=>mode==="similar"?distance(c,start)<=tolerance:c===start;
+  let changed=0;
+  const allowed=i=>(!selection||!!selection[i])&&(!mask||!!mask[i]);
+  if(mode==="global"){
+   for(let i=0;i<out.length;i++)if(allowed(i)&&matches(out[i])){out[i]=next;changed++;}
+   return {pixels:out,changed,reason:changed?"filled":"no-match",source:start};
+  }
+  const seen=new Uint8Array(w*h),queue=new Int32Array(w*h);let head=0,tail=0;
+  const push=i=>{
+   if(i<0||i>=out.length||seen[i]||!allowed(i)||!matches(out[i]))return;
+   seen[i]=1;queue[tail++]=i;
+  };
+  push(startIndex);
+  while(head<tail){
+   const i=queue[head++];if(out[i]!==next){out[i]=next;changed++;}
+   const px=i%w,py=Math.floor(i/w);
+   if(px>0)push(i-1);if(px<w-1)push(i+1);if(py>0)push(i-w);if(py<h-1)push(i+w);
+  }
+  return {pixels:out,changed,reason:changed?"filled":"no-match",source:start};
+ }
+
  function invertSelection(selection){
   if(!selection||typeof selection.length!=="number")throw new TypeError("Selection mask is required.");
   return Uint8Array.from(selection,v=>v?0:1);
@@ -150,5 +189,5 @@
   const r=angle*Math.PI/180,c=Math.cos(r),s=Math.sin(r),x=point.x-center.x,y=point.y-center.y;
   return {x:center.x+x*c-y*s,y:center.y+x*s+y*c};
  }
- return {rectSelection,lassoSelection,gradient,moveSelection,scaleSelection,bezier,brushCells,blendPixel,applyMask,fadePixel,smudgeBrush,invertSelection,rotatePixels,rotatePoint};
+ return {rectSelection,lassoSelection,gradient,moveSelection,scaleSelection,bezier,brushCells,blendPixel,applyMask,fadePixel,smudgeBrush,bucketFill,invertSelection,rotatePixels,rotatePoint};
 });
