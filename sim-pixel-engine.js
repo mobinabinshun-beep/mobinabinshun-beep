@@ -25,6 +25,7 @@ class GroupEncounter{
  memberLeaves(npc){if(this.closed||!this.active.includes(npc))return{state:"not-member"};if(this.waiting.length){const index=this.active.indexOf(npc),incoming=this.waiting.shift();this.active[index]=incoming;return{state:"replaced",outgoing:npc,incoming,active:[...this.active],waiting:[...this.waiting]}}this.closed=true;const remaining=this.active.filter(x=>x!==npc);this.active=[];return{state:"ended",outgoing:npc,resume:remaining}}
  joinOnOverlap(npc,pathsInterfere){if(!pathsInterfere)return{state:"friendly-wave",npc};if(!this.waiting.includes(npc))return{state:"not-waiting"};return{state:"join-required",npc}}
 }
+// Prototype-only timing: four equal visual phases fit inside the confirmed 1-second pause; per-phase timing remains a design detail awaiting QA.
 function interactionPhase(elapsedMs){if(elapsedMs<0)throw new RangeError("elapsedMs must be non-negative");return Math.min(3,Math.floor(Math.min(elapsedMs,ENCOUNTER.interactionMs-1)/(ENCOUNTER.interactionMs/ENCOUNTER.phaseCount)))}
 return Object.freeze({SPEED,ENCOUNTER,axisStep,moveDirect,moveToward,distance,segmentsIntersect,classifyEncounter,freeGap,EncounterRegistry,GroupEncounter,interactionPhase});
 });
