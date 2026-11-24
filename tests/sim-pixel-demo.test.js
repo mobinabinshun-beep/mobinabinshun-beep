@@ -91,3 +91,38 @@ test("human test report is generated locally and explicitly not uploaded",()=>{
  assert.ok(page.includes("sim-pixel-human-test-report.json"));
  assert.ok(page.includes("nothing is uploaded"));
 });
+
+
+test("need thresholds are evaluated independently, with strict below-30 and below-10 rules",()=>{
+ assert.deepEqual(Engine.evaluateNeeds({hunger:30,energy:65}),{survivalPressure:false,escapeForced:false,affectedNeeds:[],criticalNeeds:[]});
+ assert.deepEqual(Engine.evaluateNeeds({hunger:29,energy:80}),{survivalPressure:true,escapeForced:false,affectedNeeds:["hunger"],criticalNeeds:[]});
+ assert.deepEqual(Engine.evaluateNeeds({hunger:65,energy:9}),{survivalPressure:true,escapeForced:true,affectedNeeds:["energy"],criticalNeeds:["energy"]});
+});
+test("confirmed operation priority includes survival, hourly, daily, weekly, seasonal and annual",()=>{
+ assert.deepEqual(Engine.PRIORITY,["survival","hourly","daily","weekly","seasonal","annual"]);
+});
+test("survival interruption respects the confirmed halfway rule; non-survival tasks remain player-interruptible",()=>{
+ assert.deepEqual(Engine.playerCommandPolicy("survival",.49),{playerCommandFirst:true,finishCurrentSurvival:false,deferAutoPilot:true});
+ assert.deepEqual(Engine.playerCommandPolicy("survival",.5),{playerCommandFirst:false,finishCurrentSurvival:true,deferAutoPilot:false});
+ assert.deepEqual(Engine.playerCommandPolicy("daily",.99),{playerCommandFirst:true,finishCurrentSurvival:false,deferAutoPilot:false});
+});
+test("retry spacing follows the confirmed daily, weekly and seasonal slot counts",()=>{
+ assert.equal(Engine.retryDelaySlots("daily"),1);
+ assert.equal(Engine.retryDelaySlots("weekly"),3);
+ assert.equal(Engine.retryDelaySlots("seasonal"),5);
+ assert.equal(Engine.retryDelaySlots("annual"),null);
+});
+test("detailed NPC rendering is limited to the confirmed 20m player-centred radius",()=>{
+ assert.equal(Engine.inDisplayZone({x:0,y:0},{x:20,y:0}),true);
+ assert.equal(Engine.inDisplayZone({x:0,y:0},{x:20.01,y:0}),false);
+});
+test("late NPCs only enter Escape in the final five metres of the 20m zone crossing",()=>{
+ assert.equal(Engine.npcScheduledExitMode(true,5),"Escape");
+ assert.equal(Engine.npcScheduledExitMode(true,5.01),"Normal");
+ assert.equal(Engine.npcScheduledExitMode(false,1),"Normal");
+});
+test("the confirmed street section totals ten metres in the required garden-sidewalk-road-sidewalk-garden order",()=>{
+ const section=Engine.streetCrossSection();
+ assert.deepEqual(section.map(x=>[x.kind,x.meters]),[["garden",2],["sidewalk",1],["road",4],["sidewalk",1],["garden",2]]);
+ assert.equal(section.reduce((sum,x)=>sum+x.meters,0),10);
+});
