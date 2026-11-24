@@ -66,6 +66,24 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     assert response and response.status == 200, f"Studio page did not return HTTP 200: {response.status if response else 'no response'}"
     await page.locator("#pixel-canvas").wait_for(state="visible", timeout=30000)
     await page.wait_for_function("() => !!document.querySelector('#studio-quick-tools [data-tool=\"fading-brush\"]')", timeout=30000)
+    drawer = page.locator("#studio-tools-drawer")
+    assert await drawer.locator("#studio-dock").count() == 1, "Advanced dock must live inside the collapsible tools drawer"
+    assert await drawer.locator("#studio-properties-panel").count() == 1, "Properties / Settings panel is missing from the drawer"
+    assert await drawer.locator("#studio-properties-panel #vector-mode").count() == 1, "Vector settings were not moved into Properties"
+    assert await drawer.locator("#studio-properties-panel #import-resolution").count() == 1, "Import settings were not moved into Properties"
+    assert await drawer.locator("#studio-properties-panel #image-width").count() == 1, "Canvas dimension controls were not moved into Properties"
+    assert await drawer.locator("#studio-dock #palette").count() == 1, "Palette controls must remain in the dock"
+    assert await drawer.locator("#studio-dock #adv-layers").count() == 1, "Layer controls must remain in the dock"
+    assert await drawer.locator("#export-svg").count() == 1, "Legacy export controls must be preserved"
+    tabs = page.locator("#studio-tabs [role=tab]")
+    assert await tabs.count() == 8, "All eight advanced tool tabs must be preserved"
+    for tab_index in range(await tabs.count()):
+        tab = tabs.nth(tab_index)
+        panel_id = await tab.get_attribute("aria-controls")
+        assert panel_id, f"Advanced tab {tab_index} has no aria-controls relationship"
+        await tab.click()
+        assert await page.locator("#" + panel_id).is_visible(), f"Advanced panel {panel_id} did not become visible"
+    await page.locator("#tab-palette").click()
     await page.wait_for_function("() => { const c=document.querySelector('#pixel-canvas'); return c && c.width>0 && c.height>0 && c.getBoundingClientRect().width>0; }", timeout=30000)
     assert await page.locator('#studio-quick-tools [data-tool="fading-brush"]').count() == 1, "Fading must remain a separate tool"
     await page.locator("#show-grid").evaluate("el => { el.checked=false; }")
