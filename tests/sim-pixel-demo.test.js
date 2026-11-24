@@ -1,30 +1,10 @@
-const test = require("node:test");
-const assert = require("node:assert/strict");
-const fs = require("node:fs");
-
-const home = fs.readFileSync("index.html", "utf8");
-const page = fs.readFileSync("sim-pixel-demo.html", "utf8");
-
-test("SIM PIXEL is listed immediately after Painting in the public demo menu", () => {
-  const painting = '<a class="menu-item" href="./pixel-art-studio.html"><span>PAINTING</span><kbd>A</kbd></a>';
-  const simPixel = '<a class="menu-item" href="./sim-pixel-demo.html"><span>SIM PIXEL</span><kbd>SP</kbd></a>';
-  assert.ok(home.includes(painting + "\n     " + simPixel));
-});
-
-test("SIM PIXEL movement slice exposes six Pixels and four movement modes", () => {
-  for (const marker of ['id="world"', "Player Pixel", "NPC 05", 'data-mode="Chill"', 'data-mode="Normal"', 'data-mode="Hurry"', 'data-mode="Escape"']) {
-    assert.ok(page.includes(marker), "missing " + marker);
-  }
-});
-
-test("SIM PIXEL provides a local human-test report and declares prototype limits", () => {
-  assert.ok(page.includes('id="report"'));
-  assert.ok(page.includes("sim-pixel-human-test-report.json"));
-  assert.ok(page.includes("collision avoidance"));
-  assert.ok(page.includes("Nothing is uploaded"));
-});
-
-test("SIM PIXEL remains isolated from N.U runtime and shared data systems", () => {
-  assert.ok(page.includes("no changes to N.U Runtime, Manifest, Launcher, shared save, or wallet"));
-  assert.doesNotMatch(page, /nu-engine\.js|NUWallet|localStorage|sessionStorage/);
-});
+const test=require("node:test"),assert=require("node:assert/strict"),fs=require("node:fs");
+const home=fs.readFileSync("index.html","utf8"),page=fs.readFileSync("sim-pixel-demo.html","utf8");
+test("SIM PIXEL remains immediately after Painting in the Games menu",()=>{const a='<a class="menu-item" href="./pixel-art-studio.html"><span>PAINTING</span><kbd>A</kbd></a>',b='<a class="menu-item" href="./sim-pixel-demo.html"><span>SIM PIXEL</span><kbd>SP</kbd></a>';assert.ok(home.includes(a+"\n     "+b));});
+test("six solid Pixel colors and one player plus five NPCs are represented",()=>{for(const c of ["blue","green","yellow","orange","red","purple"])assert.ok(page.includes(c));assert.ok(page.includes("npcs=[{id:\"npc1\""));assert.ok(page.includes("npc5"));assert.ok(page.includes("fillRect(q.x-q.k/2,q.y-q.k/2,q.k,q.k)"));});
+test("movement speeds, continuous interpolation and unnormalized diagonal axes are declared",()=>{for(const m of ["Chill:2","Normal:1","Hurry:5","Escape:25"])assert.ok(page.includes(m));assert.ok(page.includes("s.player.x+dx*modes[s.mode]*dt"));assert.ok(page.includes("s.player.y+dy*modes[s.mode]*dt"));assert.ok(page.includes("Math.min(Math.abs(ax),v)"));});
+test("camera is top-down with ten zoom levels and a player-centred 40m display zone",()=>{assert.ok(page.includes("Zoom \"+s.zoom+\" / 10"));assert.ok(page.includes("Math.min(10,s.zoom+1)"));assert.ok(page.includes("Math.max(1,s.zoom-1)"));assert.ok(page.includes("ctx.arc(c.x,c.y,20*k"));});
+test("start flow and tutorial pause are present",()=>{for(const x of ["first-name","last-name","pixel-color","start-free","start-tutorial","tutorial-next","tutorial-skip"])assert.ok(page.includes(x));assert.ok(page.includes("Tutorial freezes the world and all movement."));});
+test("encounter contract uses under-one-metre activation, one-second pause and two-metre release",()=>{assert.ok(page.includes("d<1"));assert.ok(page.includes("performance.now()+1000"));assert.ok(page.includes("d>=2"));});
+test("queue visualization distinguishes four processing layers and scheduled work",()=>{for(const x of ["Execution","Route analysis","Target-time analysis","Decision","queue-item phase","queue-item scheduled"])assert.ok(page.includes(x));});
+test("human test report is local and module remains isolated from shared runtime",()=>{assert.ok(page.includes("sim-pixel-human-test-report.json"));assert.ok(page.includes("nothing is uploaded"));assert.ok(page.includes("isolated from N.U Runtime, Manifest, Launcher, shared save and Wallet"));assert.doesNotMatch(page,/nu-engine\.js|NUWallet|localStorage|sessionStorage/);});
