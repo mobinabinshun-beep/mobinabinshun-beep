@@ -14,7 +14,9 @@
     const gx=Math.floor(goal.x), gy=Math.floor(goal.y);
     const inside=(x,y)=>x>=0&&y>=0&&x<width&&y<height;
     if(!inside(sx,sy)||!inside(gx,gy)||blocked.has(key(gx,gy))||occupied.has(key(gx,gy))) return null;
-    const open=[{x:sx,y:sy,g:0,f:Math.abs(gx-sx)+Math.abs(gy-sy)}];
+    const initialDx=Math.abs(gx-sx), initialDy=Math.abs(gy-sy);
+    const initialH=Math.max(initialDx,initialDy)+(Math.SQRT2-1)*Math.min(initialDx,initialDy);
+    const open=[{x:sx,y:sy,g:0,f:initialH}];
     const best=new Map([[key(sx,sy),0]]), parent=new Map(), closed=new Set();
     while(open.length){
       open.sort((a,b)=>a.f-b.f||a.g-b.g);
