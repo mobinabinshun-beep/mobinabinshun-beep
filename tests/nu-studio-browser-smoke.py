@@ -96,6 +96,8 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
 
         await set_color(page, "#ff0000")
         assert await page.locator("#studio-quick-tools [data-tool=\"pencil\"]").get_attribute("aria-pressed") == "true", "Foreground color change did not restore Pencil"
+        await mix_drawer_toggle.click()
+        await page.wait_for_function("() => getComputedStyle(document.querySelector('#studio-tools-drawer')).visibility === 'hidden'", timeout=3000)
         await click_cell(page, 8, 16)
         red_pixel = await read_pixel(page, 8, 16)
         assert red_pixel == [255, 0, 0], f"Pointer drawing did not place the first red pigment: {red_pixel}"
@@ -109,6 +111,10 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
         await set_color(page, "#00ff00")  # foreground color must not drive smudging
         await page.locator("#mix-brush-strength").evaluate("el => { el.value='100'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
         await page.locator('#studio-quick-tools [data-tool="color-mix-brush"]').click()
+        await mix_drawer_toggle.click()
+        await page.wait_for_function("() => getComputedStyle(document.querySelector('#studio-tools-drawer')).visibility === 'hidden'", timeout=3000)
+        await mix_drawer_toggle.click()
+        await page.wait_for_function("() => getComputedStyle(document.querySelector('#studio-tools-drawer')).visibility === 'hidden'", timeout=3000)
         await drag_cells(page, (8, 16), (9, 16))
         mixed = await read_pixel(page, 9, 16)
         assert mixed[0] > 20 and mixed[2] > 20 and mixed[1] < 20, f"Brush did not mix the canvas pigments independently of foreground color: {mixed}"
