@@ -84,7 +84,7 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
         assert await page.locator("#" + panel_id).count() == 1, f"Advanced panel {panel_id} is missing"
     await page.wait_for_function("() => { const c=document.querySelector('#pixel-canvas'); return c && c.width>0 && c.height>0 && c.getBoundingClientRect().width>0; }", timeout=30000)
     assert await page.locator('#studio-quick-tools [data-tool="fading-brush"]').count() == 1, "Fading must remain a separate tool"
-    await page.locator("#show-grid").evaluate("el => { el.checked=false; }")
+    await page.locator("#show-grid").evaluate("el => { el.checked=false; el.dispatchEvent(new Event('change',{bubbles:true})); }")
 
     # Fill must paint a completely transparent canvas, preserve undo/redo, and explain no-op/locked states.
     await set_color(page, "#00ff00")
@@ -105,7 +105,8 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     status = await page.locator("#studio-status").text_content()
     assert "already uses the selected color" in (status or ""), f"Same-color Fill did not explain its no-op: {status}"
     await page.locator("#undo").click()
-    assert await read_pixel(page, 0, 0) == before_fill, "One Undo did not restore the pre-Fill transparent canvas"
+    after_undo = await read_pixel(page, 0, 0)
+    assert after_undo == before_fill, f"One Undo did not restore the pre-Fill transparent canvas: before={before_fill}, after={after_undo}"
     await page.locator("#redo").click()
     assert await read_pixel(page, 31, 31) == [0, 255, 0], "Redo did not restore the full-canvas Fill"
 
