@@ -44,7 +44,7 @@ test("global mode replaces disconnected exact matches but not merely similar col
 });
 
 test("selection and layer mask jointly clip fill writes",()=>{
- const source=Array(6).fill(null),selection=Uint8Array.from([1,1,0,1,1,1]),mask=Uint8Array.from([1,0,1,1,1,1]);
+ const source=Array(6).fill(null),selection=Uint8Array.from([1,1,0,1,1,1]),mask=Uint8Array.from([1,0,1,0,1,1]);
  const result=P.bucketFill(source,3,2,0,0,"#123456","contiguous",0,selection,mask);
  assert.equal(result.changed,1);
  assert.equal(result.pixels[0],"#123456");
