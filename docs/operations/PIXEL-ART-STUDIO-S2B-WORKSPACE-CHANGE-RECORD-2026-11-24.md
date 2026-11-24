@@ -93,3 +93,11 @@ This is a test synchronization/debug correction, not a claim that the complete s
 - Do not begin S3A or any later feature stage until S2B is fully PASS.
 - Physical Android/iOS hardware remains NOT-TESTED; browser emulation does not replace physical-device QA.
 - Demo deployment, final package backup/freeze, HUMAN-QA-PENDING and owner acceptance remain deferred until the entire package passes its machine gates.
+
+
+## Follow-up documentation checkpoint
+
+- Documentation-only commit: `6fa315454b234ffbfff42b2a0ce2bf80160e8c48` added this record after the tested source/test commit `836d69acf1100f2cd9efebf77e32a2d32ff2cb9e`.
+- Runtime and browser-test files were unchanged by that documentation commit.
+- Because machine approval is bound to an exact SHA, the new branch head must be revalidated by the Studio workflow; the in-progress run `45301469452` remains evidence for SHA `836d69acf1100f2cd9efebf77e32a2d32ff2cb9e` only.
+- S2B remains PENDING until the complete matrix and four regressions pass on the final branch head.
