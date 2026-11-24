@@ -107,8 +107,8 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
         actual_label = (await page.locator("#studio-tabs [role=tab]").nth(tab_index).inner_text()).strip()
         assert actual_label.endswith(expected_label), f"Tab {tab_index} label mismatch: {actual_label}"
 
-    context = page.locator("#studio-brush")
-    assert await context.is_visible(), "Active-tool options panel is missing"
+    tool_context_panel = page.locator("#studio-brush")
+    assert await tool_context_panel.is_visible(), "Active-tool options panel is missing"
     assert await page.locator("#studio-context-title").inner_text() == "Pencil"
     assert await page.locator("#brush-size").is_visible(), "Pencil must expose brush size"
     assert await page.locator("#adv-symmetry").is_visible(), "Paint tools must expose symmetry"
