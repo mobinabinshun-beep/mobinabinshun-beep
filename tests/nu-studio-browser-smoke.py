@@ -96,6 +96,11 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     await click_cell(page, 0, 0)
     assert await read_pixel(page, 0, 0) == [0, 255, 0], "Fill did not color the clicked transparent pixel"
     assert await read_pixel(page, 31, 31) == [0, 255, 0], "Fill did not cover the connected transparent canvas"
+    await fill_toggle.click()
+    fill_button = page.locator('#studio-quick-tools [data-tool="fill"]')
+    assert await fill_button.get_attribute("aria-pressed") == "true", "Fill tool lost its active state after the first fill"
+    await fill_button.click()  # Explicitly reselect before verifying same-color no-op behavior.
+    await fill_toggle.click()
     await click_cell(page, 31, 31)
     status = await page.locator("#studio-status").text_content()
     assert "already uses the selected color" in (status or ""), f"Same-color Fill did not explain its no-op: {status}"
@@ -107,6 +112,7 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     # A locked active layer must not be modified by Fill.
     await page.locator("#undo").click()
     await fill_toggle.click()
+    await page.locator('#studio-quick-tools [data-tool="fill"]').click()
     await page.locator("#tab-layers").click()
     lock = page.get_by_label("Lock Layer 1")
     await lock.check()
