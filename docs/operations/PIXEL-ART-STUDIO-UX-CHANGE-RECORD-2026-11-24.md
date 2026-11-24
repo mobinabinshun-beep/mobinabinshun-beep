@@ -5,9 +5,10 @@
 - Related correction/package: `NU-FIX-STUDIO-FILL-BEHAVIOR-20261124`
 - Parent record: Repository Issue #68
 - Date: 2026-11-25
-- Status: `IN-PROGRESS`
+- Status: `MACHINE-PASS`
 - Stage 1 Fill candidate: `bc4108790d2a84d773fa21524964719d40238e17` — MACHINE-PASS
 - Stage 2 starting baseline: candidate branch `fix/studio-fill-ux-successor-20261124`, SHA `bc4108790d2a84d773fa21524964719d40238e17`
+- Stage 2 tested source/workflow SHA: `676b08306d2e46e394b7b3e653029820d5228fe5`
 - Recovery baseline: `backup/pre-studio-fill-ux-successor-2026-11-24`, verified identical to original implementation baseline `ef57a6ec40feea195359dcb9581a5746d63bbd2b`
 - Current default branch HEAD at stage entry: `8e23c76e4dab7c1cb23ef68b3b964e51a2f314c7`; three commits ahead of original baseline, all confined to unrelated simulation demo/core/tests and its workflow. The Studio candidate is intentionally kept on its authorized isolated successor branch; no unrelated default-branch changes are imported.
 
@@ -44,5 +45,21 @@
 - Record workflow run IDs, exact SHA, pass/fail, and any NOT-TESTED coverage.
 - Preserve Stage 1 Fill regression evidence and ensure it remains passing.
 
+## Stage 2 machine verification — PASS
+
+Exact tested SHA: `676b08306d2e46e394b7b3e653029820d5228fe5`
+
+- Studio machine workflow run `45512323771`: SUCCESS.
+- Focused Studio unit tests: 77/77 PASS, including `nu-studio-ux.test.js` and `nu-studio-compact-ux.test.js`.
+- Browser matrix: 9/9 PASS — Ubuntu 24.04 (Chromium, Firefox, WebKit); Windows 2022 (Chromium, Firefox, WebKit); macOS 15 (Chromium, Firefox, WebKit).
+- Static validation: PASS.
+- Studio Export regression: PASS.
+- Graphics Preview smoke: PASS.
+- Arcane Shield/Mana regression: PASS.
+- Gateway regression: PASS.
+- Earlier assertion-only failure was traced to two legacy expectations in `nu-studio-compact-ux.test.js`; after updating those directly coupled assertions and adding both UX suites to the workflow command, the exact SHA above passed all checks.
+- Read-back confirms zero Persian-script characters in `pixel-art-studio.html` and `nu-pixel-art-studio.js`.
+- Stage 1 Fill implementation and regression coverage remain in the candidate; Stage 1 PASS evidence remains separately recorded at SHA `bc4108790d2a84d773fa21524964719d40238e17`.
+
 ## Handoff
-After Stage 2 MACHINE-PASS, proceed serially to Stage 3 only. The whole package is not yet MACHINE-PASS; no candidate backup for final delivery, demo deployment, human QA handoff or owner acceptance is claimed at this stage.
+Stage 2 is MACHINE-PASS. Proceed serially to Stage 3 only. The aggregate package is not yet MACHINE-PASS; no final candidate backup, demo deployment, human QA handoff or owner acceptance is claimed.
