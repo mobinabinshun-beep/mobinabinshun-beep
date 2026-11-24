@@ -115,39 +115,39 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     assert await page.locator("#adv-bucket").is_hidden(), "Fill settings must stay hidden for Pencil"
     assert await page.locator("#mix-brush-strength").is_hidden(), "Mixing strength must stay hidden for Pencil"
 
-    await quick_tools.locator('[data-tool="fill"]').click()
+    await page.locator('#studio-quick-tools ').locator('[data-tool="fill"]').click()
     assert await page.locator("#studio-context-title").inner_text() == "Fill"
     assert await page.locator("#adv-bucket").is_visible() and await page.locator("#adv-tol").is_visible(), "Fill must expose mode and tolerance"
     assert await page.locator("#brush-size").is_hidden(), "Fill must not show brush-only settings"
 
-    await quick_tools.locator('[data-tool="fading-brush"]').click()
+    await page.locator('#studio-quick-tools ').locator('[data-tool="fading-brush"]').click()
     assert await page.locator("#studio-context-title").inner_text() == "Fading brush"
     assert await page.get_by_label("Fading brush intensity").is_visible(), "Fading Brush must expose intensity"
     assert await page.locator("#mix-brush-strength").is_hidden(), "Fading Brush must hide mixing strength"
 
-    await quick_tools.locator('[data-tool="color-mix-brush"]').click()
+    await page.locator('#studio-quick-tools ').locator('[data-tool="color-mix-brush"]').click()
     assert await page.locator("#mix-brush-strength").is_visible(), "Color-Mixing Brush must expose strength"
     assert await page.get_by_label("Fading brush intensity").is_hidden(), "Color-Mixing Brush must hide fading intensity"
 
-    await quick_tools.locator('[data-tool="texture"]').click()
+    await page.locator('#studio-quick-tools ').locator('[data-tool="texture"]').click()
     assert await page.locator("#pro-texture").is_visible() and await page.locator("#pro-texture-density").is_visible(), "Texture Brush must expose texture type and density"
     assert await page.locator("#pro-brush-shape").is_visible(), "Texture Brush must expose brush shape"
 
-    await quick_tools.locator('[data-tool="gradient"]').click()
+    await page.locator('#studio-quick-tools ').locator('[data-tool="gradient"]').click()
     assert await page.locator("#pro-gradient-mode").is_visible() and await page.locator("#pro-gradient-color").is_visible(), "Gradient must expose mode and end color"
     assert await page.locator("#adv-bucket").is_hidden(), "Gradient must not show Fill settings"
 
-    await quick_tools.locator('[data-tool="select-rect"]').click()
+    await page.locator('#studio-quick-tools ').locator('[data-tool="select-rect"]').click()
     assert await page.locator("#pro-select-all").is_visible() and await page.locator("#pro-scale-x").is_visible(), "Selection tools must expose selection actions and scale"
 
-    await quick_tools.locator('[data-tool="bezier"]').click()
+    await page.locator('#studio-quick-tools ').locator('[data-tool="bezier"]').click()
     assert await page.locator("#pro-curve").is_visible(), "Bezier must expose curve tension"
 
-    await quick_tools.locator('[data-tool="picker"]').click()
+    await page.locator('#studio-quick-tools ').locator('[data-tool="picker"]').click()
     assert await page.locator("#studio-context-title").inner_text() == "Eyedropper"
     assert await page.locator("#brush-size").is_hidden(), "Eyedropper must not show unrelated brush controls"
 
-    await quick_tools.locator('[data-tool="fill"]').click()
+    await page.locator('#studio-quick-tools ').locator('[data-tool="fill"]').click()
     assert await page.locator("#adv-bucket").is_visible(), "Fill settings must return when Fill is reselected"
     await fill_toggle.click()
     before_fill = await read_pixel(page, 0, 0)
