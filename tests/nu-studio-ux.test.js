@@ -34,9 +34,10 @@ test("Dynamic dock tabs, layer controls and guidance use English labels",()=>{
  for(const label of ["Quick tools","Canvas tools","Color","Layers","Fill","Transform","Adjust","Compose","Advanced","Export","Select all","Invert selection","Non-destructive layer mask","Layer group management","Assign layer to group"]){
   assert.ok(runtime.includes(label),label);
  }
- assert.match(runtime,/aria-label",\"Show \"\+l\.name/);
- assert.match(runtime,/aria-label",\"Lock \"\+l\.name/);
+ assert.match(runtime,/vis\.setAttribute\("aria-label","Show "\+l\.name\)/);
+ assert.match(runtime,/lock\.setAttribute\("aria-label","Lock "\+l\.name\)/);
  assert.match(runtime,/Opacity · /);
+ assert.match(runtime,/pick\.setAttribute\("aria-label","Select Layer "\+\(i\+1\)\)/);
 });
 
 test("English download and Fill feedback remains wired",()=>{
