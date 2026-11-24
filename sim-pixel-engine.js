@@ -27,5 +27,12 @@ class GroupEncounter{
 }
 // Prototype-only timing: four equal visual phases fit inside the confirmed 1-second pause; per-phase timing remains a design detail awaiting QA.
 function interactionPhase(elapsedMs){if(elapsedMs<0)throw new RangeError("elapsedMs must be non-negative");return Math.min(3,Math.floor(Math.min(elapsedMs,ENCOUNTER.interactionMs-1)/(ENCOUNTER.interactionMs/ENCOUNTER.phaseCount)))}
-return Object.freeze({SPEED,ENCOUNTER,axisStep,moveDirect,moveToward,distance,segmentsIntersect,classifyEncounter,freeGap,EncounterRegistry,GroupEncounter,interactionPhase});
+const PRIORITY=Object.freeze(["survival","hourly","daily","weekly","seasonal","annual"]);
+function evaluateNeeds(needs){if(!needs||typeof needs!=="object"||Array.isArray(needs))throw new TypeError("needs must be a keyed object");const entries=Object.entries(needs);for(const[,v]of entries)if(!Number.isFinite(v)||v<0||v>100)throw new RangeError("need values must be between 0 and 100");const critical=entries.filter(([,v])=>v<10).map(([k])=>k),survival=entries.filter(([,v])=>v<30).map(([k])=>k);return{survivalPressure:survival.length>0,escapeForced:critical.length>0,affectedNeeds:survival,criticalNeeds:critical}}
+function playerCommandPolicy(operationType,progress){if(!Number.isFinite(progress)||progress<0||progress>1)throw new RangeError("progress must be 0..1");if(operationType!=="survival")return{playerCommandFirst:true,finishCurrentSurvival:false,deferAutoPilot:false};if(progress>=.5)return{playerCommandFirst:false,finishCurrentSurvival:true,deferAutoPilot:false};return{playerCommandFirst:true,finishCurrentSurvival:false,deferAutoPilot:true}}
+function retryDelaySlots(type){return({daily:1,weekly:3,seasonal:5})[type]??null}
+function inDisplayZone(player,npc,radius=20){return distance(player,npc)<=radius}
+function npcScheduledExitMode(isLate,remainingPathMeters){if(!Number.isFinite(remainingPathMeters)||remainingPathMeters<0)throw new RangeError("remaining path must be non-negative");return isLate&&remainingPathMeters<=5?"Escape":"Normal"}
+function streetCrossSection(){return Object.freeze([{kind:"garden",meters:2},{kind:"sidewalk",meters:1},{kind:"road",meters:4},{kind:"sidewalk",meters:1},{kind:"garden",meters:2}])}
+return Object.freeze({SPEED,ENCOUNTER,axisStep,moveDirect,moveToward,distance,segmentsIntersect,classifyEncounter,freeGap,EncounterRegistry,GroupEncounter,interactionPhase,PRIORITY,evaluateNeeds,playerCommandPolicy,retryDelaySlots,inDisplayZone,npcScheduledExitMode,streetCrossSection});
 });
