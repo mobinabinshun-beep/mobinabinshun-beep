@@ -61,5 +61,40 @@ Exact tested SHA: `676b08306d2e46e394b7b3e653029820d5228fe5`
 - Read-back confirms zero Persian-script characters in `pixel-art-studio.html` and `nu-pixel-art-studio.js`.
 - Stage 1 Fill implementation and regression coverage remain in the candidate; Stage 1 PASS evidence remains separately recorded at SHA `bc4108790d2a84d773fa21524964719d40238e17`.
 
+## Stage 3 — Progressive disclosure, tool ownership and context-sensitive options
+
+- Status: `IN-PROGRESS`
+- Stage 3 baseline: successor branch `fix/studio-fill-ux-successor-20261124`, SHA `3a79a25a36c0f217eb0d44fcd8a3d7a8ad55ab89`
+- Stage 2 MACHINE-PASS evidence remains bound to SHA `676b08306d2e46e394b7b3e653029820d5228fe5`.
+
+### Authorized paths
+1. `nu-pixel-art-studio.js` — create a compact tool-options context panel in the existing dock; move/reuse existing settings nodes without duplicating IDs or dropping controls; show only settings owned by the active tool/family; keep current tabs and operations.
+2. `tests/nu-studio-ux.test.js` — assert tool-to-setting ownership and no duplicate controls.
+3. `tests/nu-studio-browser-smoke.py` — verify actual visible options change when switching between Pencil, Fill, Fading Brush, Color-Mixing Brush, Texture, Gradient and selection tools on desktop/mobile.
+4. `tests/nu-studio-compact-ux.test.js` — preserve compact drawer/tab and tool grouping invariants while asserting context-panel integration.
+5. This change record.
+
+### Context ownership contract
+- Paint family (Pencil, Eraser, Line, Rectangle, Ellipse, filled shapes): brush size and shared brush-shape/symmetry options.
+- Fading Brush: paint-family options plus fading intensity only.
+- Color-Mixing Brush: paint-family options plus mixing strength only.
+- Texture Brush: paint-family options plus texture type/density only.
+- Fill: bucket mode and color tolerance only; do not expose brush-only controls.
+- Gradient: gradient mode and end color only.
+- Selection/Move: selection operations and scale controls only.
+- Eyedropper and tools without configurable options: no unrelated settings; show a concise tool-specific description.
+- Existing settings retain their IDs, event handlers, values and behavior. Existing tabs remain available; no feature is deleted.
+
+### Acceptance criteria
+- Selecting a tool updates the context panel immediately and identifies the active tool.
+- Irrelevant settings are hidden, not deleted; switching back restores their values.
+- No duplicate IDs or detached/unreachable controls; all settings remain keyboard/screen-reader accessible.
+- Existing progressive disclosure (drawer collapsed by default; one tab panel active) is preserved and the context panel stays compact.
+- Browser tests prove the setting visibility matrix and value persistence on desktop/mobile.
+- Fill Stage 1 and all Stage 2 English/accessibility regressions remain green.
+
+### Out of scope
+No new tools, redesign of the eight tabs, Blueprint/Compass, viewport/zoom/Magnifier, project portability, Perspective/Depth, Demo/local parity, clean-demo banner, Issue #67, export changes, or changes to HTML/CSS/global styles/Gateway/HUD/Wallet/Library/other games.
+
 ## Handoff
-Stage 2 is MACHINE-PASS. Proceed serially to Stage 3 only. The aggregate package is not yet MACHINE-PASS; no final candidate backup, demo deployment, human QA handoff or owner acceptance is claimed.
+Stage 2 is MACHINE-PASS. Stage 3 is now open under the scope above. The aggregate package is not yet MACHINE-PASS; no final candidate backup, demo deployment, human QA handoff or owner acceptance is claimed.
