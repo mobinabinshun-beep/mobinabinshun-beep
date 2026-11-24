@@ -1,4 +1,7 @@
 name: Pixel Art Studio machine checks
+concurrency:
+  group: studio-machine-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
 on:
   push:
     branches:
