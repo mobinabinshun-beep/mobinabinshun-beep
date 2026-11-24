@@ -43,6 +43,8 @@ jobs:
           done
       - name: Test SIM PIXEL public demo placement and isolation contract
         run: node --test tests/sim-pixel-demo.test.js
+      - name: Test SIM PIXEL obstacle-aware navigation core
+        run: node --test tests/sim-pixel-navigation-core.test.js
       - name: Test hex gateway navigation and interaction contract
         run: node --test tests/nu-hex-gateway.test.js
       - name: Test launcher 10-level Reduced Motion controls
