@@ -113,8 +113,6 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
         await page.locator('#studio-quick-tools [data-tool="color-mix-brush"]').click()
         await mix_drawer_toggle.click()
         await page.wait_for_function("() => getComputedStyle(document.querySelector('#studio-tools-drawer')).visibility === 'hidden'", timeout=3000)
-        await mix_drawer_toggle.click()
-        await page.wait_for_function("() => getComputedStyle(document.querySelector('#studio-tools-drawer')).visibility === 'hidden'", timeout=3000)
         await drag_cells(page, (8, 16), (9, 16))
         mixed = await read_pixel(page, 9, 16)
         assert mixed[0] > 20 and mixed[2] > 20 and mixed[1] < 20, f"Brush did not mix the canvas pigments independently of foreground color: {mixed}"
@@ -131,6 +129,8 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
         lock = page.get_by_label("Lock Layer 1")
         await lock.check()
         assert await lock.is_checked(), "Layer lock control did not enter the locked state"
+        await mix_drawer_toggle.click()
+        await page.wait_for_function("() => getComputedStyle(document.querySelector('#studio-tools-drawer')).visibility === 'hidden'", timeout=3000)
         await drag_cells(page, (8, 16), (9, 16))
         assert await read_pixel(page, 9, 16) == mixed, "Color-mixing brush changed a locked layer"
         await mix_drawer_toggle.click()
