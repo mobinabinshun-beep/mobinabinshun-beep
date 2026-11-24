@@ -230,3 +230,8 @@ Domain queues:
 - [Shared Gateway](https://github.com/mobinabinshun-beep/Repository/blob/main/Deferred-Work/domains/GATEWAY-fa.md)
 
 Read the registry before resuming work. Re-fetch current refs, locks, runtime baseline, backups, CI and deployment identity; historical notes do not prove current state. Backlog registration is not implementation approval. Demo-only QA and the separate explicit owner release instruction remain mandatory.
+
+
+## S2B workspace repair traceability — 2026-11-24
+
+The active S2B drawer visibility repair, scope lock, browser-matrix evidence and exact SHA/run checkpoints are maintained in the [S2B Workspace Change Record](./PIXEL-ART-STUDIO-S2B-WORKSPACE-CHANGE-RECORD-2026-11-24.md). Do not start S3A until the complete nine-combination matrix, unit suite and required Gateway, Studio Export, Arcane Shield/Mana and Graphics Preview regressions pass on the exact current candidate SHA.
