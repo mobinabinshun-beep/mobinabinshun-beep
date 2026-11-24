@@ -119,29 +119,59 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     assert await page.locator("#studio-context-title").inner_text() == "Fill"
     assert await page.locator("#adv-bucket").is_visible() and await page.locator("#adv-tol").is_visible(), "Fill must expose mode and tolerance"
     assert await page.locator("#brush-size").is_hidden(), "Fill must not show brush-only settings"
+    await page.locator("#adv-tol").evaluate("(el) => { el.value='31'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
+    await page.locator('#studio-quick-tools ').locator('[data-tool="pencil"]').click()
+    await page.locator('#studio-quick-tools ').locator('[data-tool="fill"]').click()
+    assert await page.locator("#adv-tol").input_value() == "31", "Fill tolerance must persist when switching tools"
 
     await page.locator('#studio-quick-tools ').locator('[data-tool="fading-brush"]').click()
     assert await page.locator("#studio-context-title").inner_text() == "Fading brush"
     assert await page.get_by_label("Fading brush intensity").is_visible(), "Fading Brush must expose intensity"
     assert await page.locator("#mix-brush-strength").is_hidden(), "Fading Brush must hide mixing strength"
+    fade_control = page.get_by_label("Fading brush intensity")
+    await fade_control.evaluate("(el) => { el.value='73'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
+    await page.locator('#studio-quick-tools ').locator('[data-tool="pencil"]').click()
+    await page.locator('#studio-quick-tools ').locator('[data-tool="fading-brush"]').click()
+    assert await page.get_by_label("Fading brush intensity").input_value() == "73", "Fading intensity must persist when switching tools"
 
     await page.locator('#studio-quick-tools ').locator('[data-tool="color-mix-brush"]').click()
     assert await page.locator("#mix-brush-strength").is_visible(), "Color-Mixing Brush must expose strength"
     assert await page.get_by_label("Fading brush intensity").is_hidden(), "Color-Mixing Brush must hide fading intensity"
+    await page.locator("#mix-brush-strength").evaluate("(el) => { el.value='84'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
+    await page.locator('#studio-quick-tools ').locator('[data-tool="pencil"]').click()
+    await page.locator('#studio-quick-tools ').locator('[data-tool="color-mix-brush"]').click()
+    assert await page.locator("#mix-brush-strength").input_value() == "84", "Mixing strength must persist when switching tools"
 
     await page.locator('#studio-quick-tools ').locator('[data-tool="texture"]').click()
     assert await page.locator("#pro-texture").is_visible() and await page.locator("#pro-texture-density").is_visible(), "Texture Brush must expose texture type and density"
     assert await page.locator("#pro-brush-shape").is_visible(), "Texture Brush must expose brush shape"
+    await page.locator("#pro-texture").select_option("diagonal")
+    await page.locator("#pro-texture-density").evaluate("(el) => { el.value='47'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
+    await page.locator('#studio-quick-tools ').locator('[data-tool="pencil"]').click()
+    await page.locator('#studio-quick-tools ').locator('[data-tool="texture"]').click()
+    assert await page.locator("#pro-texture").input_value() == "diagonal" and await page.locator("#pro-texture-density").input_value() == "47", "Texture settings must persist when switching tools"
 
     await page.locator('#studio-quick-tools ').locator('[data-tool="gradient"]').click()
     assert await page.locator("#pro-gradient-mode").is_visible() and await page.locator("#pro-gradient-color").is_visible(), "Gradient must expose mode and end color"
     assert await page.locator("#adv-bucket").is_hidden(), "Gradient must not show Fill settings"
+    await page.locator("#pro-gradient-mode").select_option("radial")
+    await page.locator('#studio-quick-tools ').locator('[data-tool="pencil"]').click()
+    await page.locator('#studio-quick-tools ').locator('[data-tool="gradient"]').click()
+    assert await page.locator("#pro-gradient-mode").input_value() == "radial", "Gradient settings must persist when switching tools"
 
     await page.locator('#studio-quick-tools ').locator('[data-tool="select-rect"]').click()
     assert await page.locator("#pro-select-all").is_visible() and await page.locator("#pro-scale-x").is_visible(), "Selection tools must expose selection actions and scale"
+    await page.locator("#pro-scale-x").fill("3")
+    await page.locator('#studio-quick-tools ').locator('[data-tool="pencil"]').click()
+    await page.locator('#studio-quick-tools ').locator('[data-tool="select-rect"]').click()
+    assert await page.locator("#pro-scale-x").input_value() == "3", "Selection scale must persist when switching tools"
 
     await page.locator('#studio-quick-tools ').locator('[data-tool="bezier"]').click()
     assert await page.locator("#pro-curve").is_visible(), "Bezier must expose curve tension"
+    await page.locator("#pro-curve").fill("14")
+    await page.locator('#studio-quick-tools ').locator('[data-tool="pencil"]').click()
+    await page.locator('#studio-quick-tools ').locator('[data-tool="bezier"]').click()
+    assert await page.locator("#pro-curve").input_value() == "14", "Bezier tension must persist when switching tools"
 
     await page.locator('#studio-quick-tools ').locator('[data-tool="picker"]').click()
     assert await page.locator("#studio-context-title").inner_text() == "Eyedropper"
