@@ -126,3 +126,12 @@ test("the confirmed street section totals ten metres in the required garden-side
  assert.deepEqual(section.map(x=>[x.kind,x.meters]),[["garden",2],["sidewalk",1],["road",4],["sidewalk",1],["garden",2]]);
  assert.equal(section.reduce((sum,x)=>sum+x.meters,0),10);
 });
+
+test("human QA panel covers all ten canonical HQA scenarios and four result states",()=>{
+ for(const id of ["HQA-01","HQA-02","HQA-03","HQA-04","HQA-05","HQA-06","HQA-07","HQA-08","HQA-09","HQA-10"])assert.ok(page.includes('data-status="'+id+'"'));
+ for(const state of ["NOT-TESTED","PASS","FAIL","BLOCKED"])assert.ok(page.includes("<option>"+state+"</option>"));
+});
+test("human report records build, URL, timezone, device, viewport and scenario outcomes without player name",()=>{
+ for(const field of ['meta name="sim-pixel-build"','generatedAt','url:location.href','timezone:Intl.DateTimeFormat()','timezoneOffsetMinutes','viewport:{width:innerWidth,height:innerHeight}','screen:{width:screen.width,height:screen.height}','scenarios:Object.fromEntries'])assert.ok(page.includes(field));
+ assert.doesNotMatch(page,/firstName:s\.first|lastName:s\.lastName/);
+});
