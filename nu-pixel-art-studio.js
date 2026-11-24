@@ -92,10 +92,10 @@ function drawShape(start,end){
   for(let y=top;y<=bottom;y++)for(let x=left;x<=right;x++){const d=((x-cx)*(x-cx))/(rx*rx)+((y-cy)*(y-cy))/(ry*ry);if(tool==="ellipse-fill"?d<=1:Math.abs(d-1)<=tolerance)paintBrush(x,y,value);}
  }
 }
-function paintAt(e){const p=coords(e),i=p.y*width+p.x;if(tool==="picker"){if(pixels[i]){color=pixels[i];$("custom-color").value=color;renderPalette();}return;}if(tool==="fill"){flood(p.x,p.y,color);render();return;}paintBrush(p.x,p.y,tool==="eraser"?null:color);render();}
+function paintAt(e){const p=coords(e),i=p.y*width+p.x;if(tool==="picker"){if(pixels[i]){color=pixels[i];$("custom-color").value=color;renderPalette();}return 0;}if(tool==="fill"){const changed=flood(p.x,p.y,color);render();return changed;}paintBrush(p.x,p.y,tool==="eraser"?null:color);render();return 1;}
 canvas.addEventListener("pointerdown",e=>{
  e.preventDefault();if(tool==="color-mix-brush"&&adv.layers[adv.active].locked){announce("Layer locked · رنگ‌ها ترکیب نشدند.");return;}if(tool==="color-mix-brush"&&adv.maskEdit){announce("برای ترکیب رنگ، ویرایش ماسک را خاموش کنید.");return;}mixBrushState=null;canvas.setPointerCapture(e.pointerId);drawing=true;strokeSnapshot=snapshot();strokeStart=coords(e);
- if(tool==="fill"||tool==="picker"){paintAt(e);if(tool==="fill")commitHistory(strokeSnapshot);drawing=false;strokeSnapshot=null;strokeStart=null;return;}
+ if(tool==="fill"||tool==="picker"){const changed=paintAt(e);if(tool==="fill"&&changed>0)commitHistory(strokeSnapshot);drawing=false;strokeSnapshot=null;strokeStart=null;return;}
  if(tool==="line"||tool==="rect"||tool==="ellipse"||tool==="rect-fill"||tool==="ellipse-fill"){drawShape(strokeStart,strokeStart);render();}else paintAt(e);
 });
 canvas.addEventListener("pointermove",e=>{
@@ -479,13 +479,19 @@ const paintAdv=paintBrush;paintBrush=function(x,y,v){
  }
 };
 const floodAdv=flood;flood=function(x,y,next){
- if(adv.layers[adv.active].locked)return;
- if(adv.selection){
-  const start=pixels[y*width+x],match=c=>adv.bucket==="global"?c===start:adv.bucket==="similar"?dist(c,start)<=adv.tol:c===start;
-  if(adv.bucket==="global"){pixels=pixels.map((c,i)=>adv.selection[i]&&match(c)?next:c);return;}
-  const q=[y*width+x],seen=new Uint8Array(width*height);while(q.length){const i=q.pop();if(i<0||i>=pixels.length||seen[i]||!adv.selection[i]||!match(pixels[i]))continue;seen[i]=1;pixels[i]=next;const xx=i%width,yy=Math.floor(i/width);if(xx)q.push(i-1);if(xx<width-1)q.push(i+1);if(yy)q.push(i-width);if(yy<height-1)q.push(i+width);}return;
+ const layer=adv.layers[adv.active];
+ if(layer.locked){announce("Layer is locked. Unlock it to use Fill.");return 0;}
+ if(adv.maskEdit){announce("Turn off mask editing before using Fill.");return 0;}
+ const result=window.NUStudioProTools.bucketFill(pixels,width,height,x,y,next,adv.bucket,adv.tol,adv.selection,layer.mask);
+ if(result.changed===0){
+  const messages={"same-color":"This area already uses the selected color.","outside-selection":"The Fill point is outside the active selection.","outside-mask":"The Fill point is hidden by the active layer mask.","no-match":"No matching pixels were found to fill."};
+  announce(messages[result.reason]||"Nothing changed. Check the active layer and selection.");
+  return 0;
  }
- const start=pixels[y*width+x];if(adv.bucket==="global"){pixels=pixels.map(c=>c===start?next:c);return;}if(adv.bucket==="similar"){const q=[y*width+x],seen=new Uint8Array(width*height);while(q.length){const i=q.pop();if(i<0||i>=pixels.length||seen[i]||dist(pixels[i],start)>adv.tol)continue;seen[i]=1;pixels[i]=next;const xx=i%width,yy=Math.floor(i/width);if(xx)q.push(i-1);if(xx<width-1)q.push(i+1);if(yy)q.push(i-width);if(yy<height-1)q.push(i+width);}return;}floodAdv(x,y,next);
+ pixels=result.pixels;
+ layer.pixels=pixels.slice();
+ announce("Filled "+result.changed.toLocaleString()+" pixels on "+layer.name+".");
+ return result.changed;
 };
 
 const resizeArtworkBase=resizeArtwork;
