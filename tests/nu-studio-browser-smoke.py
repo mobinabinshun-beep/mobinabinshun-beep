@@ -103,6 +103,9 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
         await click_cell(page, 9, 16)
         blue_pixel = await read_pixel(page, 9, 16)
         assert blue_pixel == [0, 0, 255], f"Pointer drawing did not place the second blue pigment: {blue_pixel}"
+        # Canvas interaction intentionally dismisses the drawer; reopen it before changing dock controls.
+        await mix_drawer_toggle.click()
+        await page.locator("#studio-dock").wait_for(state="visible", timeout=5000)
         await set_color(page, "#00ff00")  # foreground color must not drive smudging
         await page.locator("#mix-brush-strength").evaluate("el => { el.value='100'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
         await page.locator('#studio-quick-tools [data-tool="color-mix-brush"]').click()
@@ -116,12 +119,16 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
         await page.locator("#redo").click()
         assert await read_pixel(page, 9, 16) == mixed, "Redo did not restore the color-mixed result"
 
+        await mix_drawer_toggle.click()
+        await page.locator("#studio-dock").wait_for(state="visible", timeout=5000)
         await page.locator("#tab-layers").click()
         lock = page.get_by_label("Lock Layer 1")
         await lock.check()
         assert await lock.is_checked(), "Layer lock control did not enter the locked state"
         await drag_cells(page, (8, 16), (9, 16))
         assert await read_pixel(page, 9, 16) == mixed, "Color-mixing brush changed a locked layer"
+        await mix_drawer_toggle.click()
+        await page.locator("#studio-dock").wait_for(state="visible", timeout=5000)
         await lock.uncheck()
         await mix_drawer_toggle.click()
         await page.wait_for_function("() => getComputedStyle(document.querySelector('#studio-tools-drawer')).visibility === 'hidden'", timeout=3000)
