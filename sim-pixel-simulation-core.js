@@ -120,7 +120,7 @@
     for(const input of (options.agents||[])){
       if(!input||typeof input.id!=="string"||!input.id||!validPoint(input.position)||agents.has(input.id)||blocked.some(p=>p.x===input.position.x&&p.y===input.position.y))throw new TypeError("Invalid or duplicate agent");
       agents.set(input.id,{id:input.id,x:input.position.x,y:input.position.y});
-      routes.set(input.id,[]);
+      routes.set(input.id,{goal:null,path:[]});
     }
     function snapshot(){
       return {tick,agents:[...agents.values()].map(a=>({id:a.id,x:a.x,y:a.y,goal:routes.get(a.id).goal?{...routes.get(a.id).goal}:null,path:routes.get(a.id).path.map(p=>({...p}))}))};
