@@ -125,7 +125,8 @@
  }
 
  function bucketFill(pixels,w,h,x,y,next,mode="contiguous",tolerance=0,selection=null,mask=null){
-  if(!validSize(w,h)||!pixels||pixels.length!==w*h)throw new TypeError("Fill pixels do not match the canvas.");
+  if(!Number.isSafeInteger(w)||!Number.isSafeInteger(h)||w<1||h<1||!Number.isSafeInteger(w*h))throw new RangeError("Invalid fill dimensions.");
+  if(!pixels||pixels.length!==w*h)throw new TypeError("Fill pixels do not match the canvas.");
   if(!Number.isSafeInteger(x)||!Number.isSafeInteger(y)||x<0||y<0||x>=w||y>=h)throw new RangeError("Fill coordinates are outside the canvas.");
   if(next!==null&&(typeof next!=="string"||!/^#[0-9a-f]{6}$/i.test(next)))throw new TypeError("Fill color must be a hexadecimal color or transparent.");
   if(!["contiguous","similar","global"].includes(mode))throw new RangeError("Unknown fill mode.");
