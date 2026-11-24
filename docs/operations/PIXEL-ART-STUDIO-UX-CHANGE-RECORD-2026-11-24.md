@@ -63,8 +63,10 @@ Exact tested SHA: `676b08306d2e46e394b7b3e653029820d5228fe5`
 
 ## Stage 3 — Progressive disclosure, tool ownership and context-sensitive options
 
-- Status: `IN-PROGRESS`
+- Status: `MACHINE-PASS`
 - Stage 3 baseline: successor branch `fix/studio-fill-ux-successor-20261124`, SHA `3a79a25a36c0f217eb0d44fcd8a3d7a8ad55ab89`
+- Stage 3 tested source/workflow SHA: `ec81c2ea5ab0d574d7c770eb49fddbc12c0419e4`
+- Stage 3 machine workflow run: `45514014255` (SUCCESS)
 - Stage 2 MACHINE-PASS evidence remains bound to SHA `676b08306d2e46e394b7b3e653029820d5228fe5`.
 
 ### Authorized paths
@@ -96,5 +98,67 @@ Exact tested SHA: `676b08306d2e46e394b7b3e653029820d5228fe5`
 ### Out of scope
 No new tools, redesign of the eight tabs, Blueprint/Compass, viewport/zoom/Magnifier, project portability, Perspective/Depth, Demo/local parity, clean-demo banner, Issue #67, export changes, or changes to HTML/CSS/global styles/Gateway/HUD/Wallet/Library/other games.
 
+### Stage 3 machine verification — PASS
+
+Exact tested SHA: `ec81c2ea5ab0d574d7c770eb49fddbc12c0419e4`
+
+- Studio machine workflow push run `45514014255`: SUCCESS.
+- Focused Studio unit tests: 78/78 PASS.
+- Browser matrix: 9/9 PASS — Ubuntu 24.04, Windows 2022 and macOS 15, each with Chromium, Firefox and WebKit.
+- Browser smoke verified the active-tool settings visibility contract for Pencil, Fill, Fading Brush, Color-Mixing Brush, Texture Brush, Gradient, Selection, Bezier and Eyedropper.
+- Browser smoke changed Fill tolerance, fading intensity, mixing strength, texture type/density, gradient mode, selection scale and Bezier tension; each value persisted after switching away and back.
+- Static validation, Studio Export, Graphics Preview, Gateway and Arcane Shield/Mana regression checks: PASS on the exact candidate SHA.
+- Pre-Stage 3 checkpoint branch `backup/pre-studio-stage3-context-2026-11-25` verified identical to its starting SHA `c3f137bbfb41603b9814ea5d412677177e165e01`.
+
+## Stage 4 — Blueprint guide contrast and Compass circle tool
+
+- Status: `IN-PROGRESS`
+- Stage 4 code baseline: `ec81c2ea5ab0d574d7c770eb49fddbc12c0419e4` (Stage 3 MACHINE-PASS; next checkpoint branch will be recorded before runtime writes).
+
+### Authorized paths
+1. `pixel-art-studio.html` — add one accessible Compass drawing-tool entry to the existing shape/tool list; preserve existing IDs and tool controls.
+2. `nu-pixel-art-studio.js` — implement adaptive high-contrast guide strokes, screen-space guide thickness, optional high-contrast toggle, Compass center/radius preview and circle commit/cancel lifecycle. Preview center/radius are render-only overlays and must never enter pixel data or exports.
+3. `tests/nu-studio-ux.test.js` — assert Compass wiring and guide rendering/overlay separation.
+4. `tests/nu-studio-browser-smoke.py` — verify guide visibility and Compass interaction on desktop/mobile, including preview vs committed output, cancellation and undo.
+5. `tests/nu-studio-compact-ux.test.js` — preserve tool grouping and accessible Compass name.
+6. This change record.
+
+### Acceptance criteria
+- Blueprint, ruler, divisions, axes and depth guides remain distinguishable on dark/light/checkerboard/colored/image/negative artwork using a contrast halo plus a crisp accent stroke.
+- Guide line width is computed from displayed canvas scale so lines remain legible at zoom levels without overwhelming pixel art.
+- High-contrast mode defaults on and can be toggled without changing artwork data.
+- Compass supports center selection → radius drag → circle preview → commit/cancel; the preview shows the circle plus temporary center point and radius line.
+- On commit, only the circle is written to pixel data; center/radius guides disappear immediately and are absent from PNG/SVG/project exports.
+- Cancel restores the exact pre-operation image; commit is one undo step and redo restores the circle.
+- Existing guide toggles, tool IDs, keyboard behavior, Fill, context options and Stage 1–3 tests remain intact.
+
+### Out of scope
+No viewport/Magnifier, project portability, Perspective/Depth, export redesign, HTML/CSS layer export (Issue #67), demo parity/clean banner, Gateway/HUD/Wallet/Library/games, global styles, or other tool additions.
+
+## Stage 4 — Blueprint guide contrast and Compass circle tool
+
+- Status: `IN-PROGRESS`
+- Stage 4 code baseline: `ec81c2ea5ab0d574d7c770eb49fddbc12c0419e4` (Stage 3 MACHINE-PASS; next checkpoint branch will be recorded before runtime writes).
+
+### Authorized paths
+1. `pixel-art-studio.html` — add one accessible Compass drawing-tool entry to the existing shape/tool list; preserve existing IDs and tool controls.
+2. `nu-pixel-art-studio.js` — implement adaptive high-contrast guide strokes, screen-space guide thickness, optional high-contrast toggle, Compass center/radius preview and circle commit/cancel lifecycle. Preview center/radius are render-only overlays and must never enter pixel data or exports.
+3. `tests/nu-studio-ux.test.js` — assert Compass wiring and guide rendering/overlay separation.
+4. `tests/nu-studio-browser-smoke.py` — verify guide visibility and Compass interaction on desktop/mobile, including preview vs committed output, cancellation and undo.
+5. `tests/nu-studio-compact-ux.test.js` — preserve tool grouping and accessible Compass name.
+6. This change record.
+
+### Acceptance criteria
+- Blueprint, ruler, divisions, axes and depth guides remain distinguishable on dark/light/checkerboard/colored/image/negative artwork using a contrast halo plus a crisp accent stroke.
+- Guide line width is computed from displayed canvas scale so lines remain legible at zoom levels without overwhelming pixel art.
+- High-contrast mode defaults on and can be toggled without changing artwork data.
+- Compass supports center selection → radius drag → circle preview → commit/cancel; the preview shows the circle plus temporary center point and radius line.
+- On commit, only the circle is written to pixel data; center/radius guides disappear immediately and are absent from PNG/SVG/project exports.
+- Cancel restores the exact pre-operation image; commit is one undo step and redo restores the circle.
+- Existing guide toggles, tool IDs, keyboard behavior, Fill, context options and Stage 1–3 tests remain intact.
+
+### Out of scope
+No viewport/Magnifier, project portability, Perspective/Depth, export redesign, HTML/CSS layer export (Issue #67), demo parity/clean banner, Gateway/HUD/Wallet/Library/games, global styles, or other tool additions.
+
 ## Handoff
-Stage 2 is MACHINE-PASS. Stage 3 is now open under the scope above. The aggregate package is not yet MACHINE-PASS; no final candidate backup, demo deployment, human QA handoff or owner acceptance is claimed.
+Stage 2 and Stage 3 are MACHINE-PASS. Stage 4 is now open under the scope above. The aggregate package is not yet MACHINE-PASS; no final candidate backup, demo deployment, human QA handoff or owner acceptance is claimed.
