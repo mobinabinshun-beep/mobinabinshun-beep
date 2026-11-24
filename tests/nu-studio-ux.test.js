@@ -40,6 +40,25 @@ test("Dynamic dock tabs, layer controls and guidance use English labels",()=>{
  assert.match(runtime,/pick\.setAttribute\("aria-label","Select Layer "\+\(i\+1\)\)/);
 });
 
+
+test("active-tool context panel owns and reveals only relevant existing settings",()=>{
+ assert.match(runtime,/id="studio-context-title"/);
+ assert.match(runtime,/toolContextRefresh=\(\)=>/);
+ for(const contract of [
+  'moveContextField("adv-symmetry","paint")',
+  'moveContextField("adv-bucket","fill")',
+  'moveContextField("adv-tol","fill")',
+  'moveContextField("pro-gradient-color","gradient")',
+  'moveContextField("pro-gradient-mode","gradient")',
+  'moveContextField("pro-texture","texture")',
+  'moveContextField("pro-texture-density","texture")',
+  'moveContextField("pro-curve","bezier")'
+ ]) assert.ok(runtime.includes(contract),contract);
+ assert.match(runtime,/contextOwners=\{[\s\S]*?fill:\["fill"\]/);
+ assert.match(runtime,/node\.hidden=!owners\.includes\(node\.dataset\.contextOwner\)/);
+ assert.match(runtime,/contextPanel\.dataset\.activeTool=tool/);
+});
+
 test("English download and Fill feedback remains wired",()=>{
  for(const phrase of ["The file is ready.","PNG ready · ","SVG ready · ","SVG source code is ready to download.","Layer is locked. Unlock it to use Fill.","This area already uses the selected color."]){
   assert.ok(runtime.includes(phrase),phrase);
