@@ -41,6 +41,8 @@ jobs:
           for file in nu-engine.js nu-pixel-world.js nu-graphics-core.js nu-background-engine.js nu-dynamic-layers.js nu-game-render-adapter.js nu-graphics-runtime.js nu-games.js nu-svg-vectorizer.js nu-graphics-analysis.js nu-studio-layout.js nu-raster-import.js nu-pixel-art-studio.js nu-wallet.js nu-market-sim.js nu-exchange.js nu-materials.js nu-player-ui.js nu-casino.js nu-hex-gateway.js nu-launcher.js nu-motion.js nu-controller-pointer.js nu-interaction-core.js; do
             node --check "$file"
           done
+      - name: Test SIM PIXEL public demo placement and isolation contract
+        run: node --test tests/sim-pixel-demo.test.js
       - name: Test hex gateway navigation and interaction contract
         run: node --test tests/nu-hex-gateway.test.js
       - name: Test launcher 10-level Reduced Motion controls
