@@ -130,6 +130,7 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
                     && drawer.dataset.workspaceDrawerState === "open"
                     && style.display !== "none"
                     && style.visibility === "visible"
+                    && style.pointerEvents === "auto"
                     && rect.width > 0 && rect.height > 0
                     && rect.left >= 0 && rect.right <= window.innerWidth
                     && Math.abs(transform.m41) < 1;
@@ -152,6 +153,7 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
                 };
             }"""
         )
+        print(f"Desktop drawer open computed metrics: {drawer_metrics}")
         assert await page.locator("#studio-tools-drawer").is_visible(), (
             f"Desktop tools drawer did not render visibly: {drawer_metrics}"
         )
@@ -168,6 +170,23 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
         assert probe["id"] == "pixel-canvas", f"Desktop drawer blocks visible canvas area: {probe}"
         await toggle.click()
         assert await toggle.get_attribute("aria-expanded") == "false", "Desktop tools drawer did not close"
+        await page.wait_for_function(
+            """() => {
+                const drawer = document.querySelector("#studio-tools-drawer");
+                if (!drawer) return false;
+                const style = getComputedStyle(drawer);
+                const rect = drawer.getBoundingClientRect();
+                const transform = new DOMMatrixReadOnly(style.transform);
+                return !document.body.classList.contains("nu-desktop-tools-open")
+                    && drawer.dataset.workspaceDrawerState === "closed"
+                    && style.display !== "none"
+                    && style.visibility === "hidden"
+                    && style.pointerEvents === "none"
+                    && rect.width > 0 && rect.height > 0
+                    && transform.m41 > rect.width;
+            }""",
+            timeout=3000,
+        )
     if viewport["width"] <= 600:
         assert canvas["width"] <= frame["width"] + 1, "Canvas exceeds the mobile workspace frame"
         assert canvas["x"] >= 0 and canvas["x"] + canvas["width"] <= viewport["width"] + 1, f"Canvas exceeds mobile viewport width: {canvas}"
