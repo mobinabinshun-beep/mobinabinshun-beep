@@ -152,3 +152,11 @@
 - Owner human acceptance locks only the exact accepted scope. Preserve raw human findings and frozen prior candidates; implement fixes on a successor candidate and rerun the complete relevant machine cycle.
 - Categorize findings as correction, upgrade, debug, incorrect/missing behavior, re-engineering or optimization. Re-engineer existing code in line with project goals and specifications; preserve baseline behavior and do not rewrite from zero.
 - This workflow supplements all local AGENTS instructions, protected contracts, additive-development rules and two-stage correction locks; it does not open any protected scope.
+
+
+## Owner-mandated Demo/product parity and clean public UI principle (2026-11-24)
+- Canonical rule: https://github.com/mobinabinshun-beep/Repository/blob/main/Governance/NU-DEMO-PRODUCT-PARITY-AND-CLEAN-UI-PRINCIPLE-2026-11-24-fa.md
+- Demo must provide the same product experience as the downloadable/local version wherever the environment supports the same behavior.
+- Do not render infrastructure/development/QA labels, build SHA, CI, backup or deployment metadata in public product UI. The only permitted public-demo introductory text is `Welcome to N.U — Public Test Demo`.
+- Keep candidate identity, SHA, test status, limitations and handoff evidence in repository documentation/technical metadata. Necessary functional, data-loss and security confirmations remain allowed.
+- This newer direct owner principle supersedes older visible TEST CANDIDATE / NOT HUMAN-APPROVED or build-identifier UI requirements; technical QA, backup, deployment verification and human acceptance gates remain mandatory.
