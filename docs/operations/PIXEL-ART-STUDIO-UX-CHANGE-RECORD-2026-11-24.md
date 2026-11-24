@@ -18,7 +18,8 @@
 2. `nu-pixel-art-studio.js` — replace Persian user-facing runtime messages and dynamic dock/tab/layer/tool labels with English; provide stable English `aria-label` and `title` values for generated tool buttons; mark decorative glyphs as hidden from assistive technology.
 3. `tests/nu-studio-ux.test.js` — new focused assertions for English-only Studio UI copy and accessible names/labels.
 4. `tests/nu-studio-browser-smoke.py` — add browser assertions for generated quick-tool accessible names and English dock labels.
-5. This Stage 2 change record.
+5. `tests/nu-studio-compact-ux.test.js` — update two directly coupled legacy source-copy assertions from Persian to the new English labels/accessibility contract. This dependency was discovered by the first full regression run; the failures were assertion drift, not runtime failures.
+6. This Stage 2 change record.
 
 ### Explicitly out of scope
 - No changes to Fill behavior or its Stage 1 implementation/tests.
