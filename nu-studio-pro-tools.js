@@ -93,6 +93,37 @@
   return hex(a.map((v,i)=>v+(b[i]-v)*intensity/100));
  }
 
+ function smudgeBrush(pixels,w,h,x,y,size=1,strength=50,selection=null,state=null,shape="square"){
+  if(!validSize(w,h)||!pixels||pixels.length!==w*h)throw new TypeError("Mixing brush pixels do not match the canvas.");
+  if(selection&&selection.length!==w*h)throw new TypeError("Mixing brush selection does not match the canvas.");
+  if(!Number.isFinite(x)||!Number.isFinite(y))throw new TypeError("Mixing brush coordinates must be finite.");
+  if(!Number.isSafeInteger(size)||size<1||size>64)throw new RangeError("Mixing brush size must be between 1 and 64.");
+  if(!Number.isFinite(strength)||strength<0||strength>100)throw new RangeError("Mixing strength must be between 0 and 100.");
+  const out=pixels,targetX=Math.round(x),targetY=Math.round(y);
+  let pickup=state&&typeof state.pickup==="string"&&/^#[0-9a-f]{6}$/i.test(state.pickup)?state.pickup.toLowerCase():null;
+  const hasLast=state&&Number.isFinite(state.lastX)&&Number.isFinite(state.lastY);
+  const dx=hasLast?targetX-state.lastX:0,dy=hasLast?targetY-state.lastY:0,steps=hasLast?Math.max(Math.abs(dx),Math.abs(dy)):0;
+  const points=[];
+  if(steps===0)points.push([targetX,targetY]);
+  else for(let n=1;n<=steps;n++)points.push([Math.round(state.lastX+dx*n/steps),Math.round(state.lastY+dy*n/steps)]);
+  const rate=strength/100,pickupRate=rate*.35;
+  for(const [cx,cy] of points){
+   const cells=brushCells(cx,cy,size,shape,"none",100).filter(([px,py])=>px>=0&&py>=0&&px<w&&py<h&&(!selection||selection[idx(px,py,w)]));
+   if(!cells.length)continue;
+   let count=0,red=0,green=0,blue=0;
+   for(const [px,py] of cells){const c=out[idx(px,py,w)],v=rgb(c);if(!v)continue;red+=v[0];green+=v[1];blue+=v[2];count++;}
+   if(count){const sample=hex([red/count,green/count,blue/count]);pickup=pickup?hex(rgb(pickup).map((v,k)=>v+(rgb(sample)[k]-v)*pickupRate)):sample;}
+   if(!pickup||rate===0)continue;
+   const carried=rgb(pickup);
+   for(const [px,py] of cells){const i=idx(px,py,w),current=rgb(out[i]);
+    // Transparent cells stay transparent; they neither inject a false background color nor receive opaque paint.
+    if(!current)continue;
+    out[i]=hex(current.map((v,k)=>v+(carried[k]-v)*rate));
+   }
+  }
+  return {pixels:out,state:{lastX:targetX,lastY:targetY,pickup}};
+ }
+
  function invertSelection(selection){
   if(!selection||typeof selection.length!=="number")throw new TypeError("Selection mask is required.");
   return Uint8Array.from(selection,v=>v?0:1);
@@ -119,5 +150,5 @@
   const r=angle*Math.PI/180,c=Math.cos(r),s=Math.sin(r),x=point.x-center.x,y=point.y-center.y;
   return {x:center.x+x*c-y*s,y:center.y+x*s+y*c};
  }
- return {rectSelection,lassoSelection,gradient,moveSelection,scaleSelection,bezier,brushCells,blendPixel,applyMask,fadePixel,invertSelection,rotatePixels,rotatePoint};
+ return {rectSelection,lassoSelection,gradient,moveSelection,scaleSelection,bezier,brushCells,blendPixel,applyMask,fadePixel,smudgeBrush,invertSelection,rotatePixels,rotatePoint};
 });

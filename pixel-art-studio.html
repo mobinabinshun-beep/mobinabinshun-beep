@@ -24,11 +24,79 @@
 @media(max-width:700px){.stage{height:58vh;min-height:280px}.view-toolbar{grid-template-columns:auto 1fr}.view-toolbar label{grid-column:1}.view-toolbar input{grid-column:2}.tools{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(prefers-reduced-motion:reduce){#pixel-canvas{scroll-behavior:auto}}
 .panel-summary{display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer;list-style:none;margin-bottom:14px}.panel-summary::-webkit-details-marker{display:none}.panel-summary strong{font-size:13px;letter-spacing:.12em;color:var(--gold)}.panel-summary span{font-size:9px;letter-spacing:.08em;color:var(--muted)}.tool-group{margin-bottom:12px}.tool-group>small{display:block;margin-bottom:7px;color:var(--muted);font-size:9px;letter-spacing:.14em}.tool-group .tools{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.tool-group .tool{min-height:42px;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:5px}.tool:focus-visible{outline:2px solid var(--gold);outline-offset:2px}.tool kbd{font:700 9px ui-monospace,monospace;color:var(--muted);border:1px solid #ffffff26;border-radius:4px;padding:1px 3px}.tool:hover{border-color:var(--cyan);background:#17364b}.source-preview{display:flex;align-items:center;gap:12px;padding:10px;border:1px solid #65dcff33;border-radius:10px;background:#071522;margin:0 0 12px}.source-preview[hidden]{display:none}.source-preview img{display:block;max-width:112px;max-height:84px;object-fit:contain;image-rendering:auto;border:1px solid #ffffff30;border-radius:6px;background:#0a1420}.source-preview strong{display:block;color:var(--gold);font-size:11px}.source-preview span{display:block;color:var(--muted);font-size:11px}.import-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}.import-options .field{margin:6px 0}.tool-shortcut{opacity:.6;font-size:9px}
+
+/* Stage 2A — compact mobile workspace, safe-area and visual viewport adaptation. */
+#mobile-workspace-dock{display:none}
+@media(max-width:700px){
+ html,body{height:100%;overscroll-behavior:none}
+ body.nu-mobile-workspace{overflow:hidden}
+ .shell{width:100%;height:calc(var(--nu-visual-height,100dvh) - 34px - env(safe-area-inset-top));min-height:0;margin:0;padding:calc(6px + env(safe-area-inset-top)) 7px 0;display:flex;flex-direction:column;gap:6px}
+ .top{flex:0 0 38px;min-height:38px;margin:0;align-items:center}
+ .top .brand{font-size:12px}.top .brand small{font-size:7px}
+ .top .row{gap:5px}.top .btn{font-size:9px;padding:6px 7px}
+ .shell>.title,.shell>.subtitle{display:none}
+ .layout{display:block;flex:1;min-height:0}
+ .layout>main.panel{height:100%;min-height:0;padding:7px;border-radius:10px;display:flex;flex-direction:column;gap:6px;overflow:hidden}
+ .layout>main .toolbar{flex:0 0 auto;gap:5px;margin:0}
+ .layout>main .toolbar .btn{font-size:10px;padding:6px 8px}
+ .source-preview{flex:0 0 auto;margin:0;padding:5px}
+ .source-preview img{max-width:52px;max-height:42px}
+ .view-tools{flex:0 0 auto;margin:0!important;padding:6px}
+ .view-tools .adaptive-head{margin:0 0 4px}
+ .view-tools .quality-chip{font-size:9px}
+ .view-tools .hint{display:none}
+ .view-toolbar{grid-template-columns:auto minmax(0,1fr);gap:5px}
+ .view-toolbar .btn{font-size:9px;padding:5px 7px}
+ .view-toolbar label{font-size:9px;grid-column:1}
+ .view-toolbar input{grid-column:2}
+ .stage{height:auto;min-height:0;flex:1;padding:4px;border-radius:8px}
+ .workspace-wrap,.workspace-frame{height:100%;min-height:0}
+ .workspace-frame{padding:4px;border:0}
+ .layout>main>.row{flex:0 0 auto;margin:0!important;gap:5px}
+ .layout>main>.row .counter{font-size:9px}
+ .layout>main>p.hint{display:none}
+ .layout>aside{position:fixed;z-index:2100;left:8px;right:8px;bottom:calc(68px + env(safe-area-inset-bottom));top:auto;max-height:min(72vh,calc(var(--nu-visual-height,100dvh) - 110px));overflow:auto;padding:0 0 8px;transform:translateY(calc(100% + 24px));transition:transform .2s ease;visibility:hidden;overscroll-behavior:contain}
+ body.nu-mobile-tools-open .layout>aside{transform:translateY(0);visibility:visible}
+ .layout>aside .panel{margin:0 0 8px!important}
+ #mobile-workspace-dock{pointer-events:none;display:grid;position:fixed;z-index:2200;left:8px;right:8px;bottom:calc(6px + env(safe-area-inset-bottom));min-height:52px;grid-template-columns:auto auto auto minmax(70px,1fr) auto;align-items:center;gap:5px;padding:6px;border:1px solid var(--line);border-radius:13px;background:rgba(5,15,25,.96);box-shadow:0 8px 28px #0009;backdrop-filter:blur(12px)}
+ #mobile-workspace-dock button,#mobile-workspace-dock input{pointer-events:auto}
+ #mobile-workspace-dock button{min-height:38px;padding:5px 8px;font-size:10px;border:1px solid var(--line);border-radius:8px;background:#102638;color:#eaf6ff}
+ #mobile-workspace-dock label{font-size:9px;color:var(--muted);display:grid;gap:1px}
+ #mobile-view-rotation{width:100%;min-width:0;accent-color:var(--gold)}
+ body.nu-mobile-tools-open #mobile-workspace-dock{opacity:.55}
+}
+@media(max-width:700px) and (orientation:landscape){
+ .shell{padding-left:calc(7px + env(safe-area-inset-left));padding-right:calc(7px + env(safe-area-inset-right))}
+ #mobile-workspace-dock{left:calc(6px + env(safe-area-inset-left));right:calc(6px + env(safe-area-inset-right))}
+}
+@media(max-width:700px) and (orientation:landscape){
+ html[data-nu-orientation="landscape-left"] #mobile-workspace-dock{left:auto;right:calc(6px + env(safe-area-inset-right));top:50%;bottom:auto;width:58px;transform:translateY(-50%);grid-template-columns:1fr;grid-template-rows:repeat(5,auto)}
+ html[data-nu-orientation="landscape-right"] #mobile-workspace-dock{right:auto;left:calc(6px + env(safe-area-inset-left));top:50%;bottom:auto;width:58px;transform:translateY(-50%);grid-template-columns:1fr;grid-template-rows:repeat(5,auto)}
+ html[data-nu-orientation^="landscape"] #mobile-workspace-dock label{min-width:0}
+}
+@media(prefers-reduced-motion:reduce){.layout>aside{transition:none}}
+
+
+/* Stage 2B — canvas-first desktop workspace with a persistent edge rail and collapsible tool drawer. */
+@media(min-width:701px){
+ .shell{width:100%;max-width:none;padding:12px 72px 18px 12px}
+ .layout{grid-template-columns:minmax(0,1fr);gap:0}
+ .layout>main.panel{min-width:0}
+ .stage{height:calc(100dvh - 245px);min-height:360px}
+ .layout>aside{position:fixed;z-index:2100;top:12px;right:72px;bottom:12px;width:min(370px,calc(100vw - 104px));max-height:calc(100dvh - 24px);overflow:auto;transform:translateX(calc(100% + 28px));visibility:hidden;transition:transform .2s ease,visibility .2s}
+ body.nu-desktop-tools-open .layout>aside{transform:translateX(0);visibility:visible}
+ #desktop-workspace-rail{display:grid;position:fixed;z-index:2200;right:10px;top:50%;transform:translateY(-50%);gap:8px;width:52px}
+ #desktop-workspace-rail button{min-height:48px;padding:6px 4px;border:1px solid var(--line);border-radius:10px;background:#102638;color:#eaf6ff;font-size:10px;writing-mode:vertical-rl;transform:rotate(180deg)}
+ #desktop-tools-toggle[aria-expanded=true]{border-color:var(--gold);color:#ffe6a5}
+}
+@media(max-width:700px){#desktop-workspace-rail{display:none}}
+@media(prefers-reduced-motion:reduce){.layout>aside{transition:none}}
+
 </style>
 <link rel="stylesheet" href="./nu-hex-gateway.css?v=20261118-directional-r2">
 </head>
 <body>
-<div id="nu-studio-test-candidate" role="status" aria-label="Human QA test candidate" style="position:relative;z-index:1000;padding:9px 12px;text-align:center;background:#4a2c14;color:#fff1d6;border-bottom:1px solid #f0b35a;font:700 11px/1.5 system-ui,sans-serif;letter-spacing:.06em">TEST CANDIDATE — NOT HUMAN-APPROVED · DEMO QA ONLY · PR #238 · LOGIC SHA 9afab37c373091482d2010350a219856e46728d2</div>
+<div id="nu-studio-test-candidate" role="status" aria-label="Human QA test candidate" style="position:relative;z-index:1000;padding:9px 12px;text-align:center;background:#4a2c14;color:#fff1d6;border-bottom:1px solid #f0b35a;font:700 11px/1.5 system-ui,sans-serif;letter-spacing:.06em">TEST CANDIDATE — NOT HUMAN-APPROVED · DEMO QA ONLY · FADING + COLOR-MIXING BRUSH</div>
 <div class="shell">
 <header class="top"><div class="brand">N.U <small>NIROO UNIVERSE · CREATIVE TOOLS · GEN 01</small></div><div class="row"><a class="btn" href="./index.html#library-section">← GAME LIBRARY</a><a class="btn" href="https://github.com/mobinabinshun-beep/mobinabinshun-beep/issues/new?template=studio-human-test.yml" target="_blank" rel="noopener">REPORT STUDIO TEST</a></div></header>
 <h1 class="title">N.U Creative Studio</h1>
@@ -40,13 +108,21 @@
 <div class="row" style="margin-top:12px"><span class="counter" id="canvas-size">32 × 32 px grid</span><span class="counter" id="pixel-count">0 painted pixels</span><span class="counter" id="zoom-note">Pixel-perfect preview</span></div>
 <p class="hint">The workspace frame and artwork dimensions are independent. The complete image is fitted to the viewport first. Zoom and scroll stay inside the canvas frame; resize the image only when you want to change its actual pixel dimensions.</p>
 </main>
-<aside>
+<aside id="studio-tools-drawer">
 <details class="panel side" open><summary class="panel-summary"><strong>TOOLS</strong><span>COLLAPSE / EXPAND</span></summary><div class="tool-group"><small>DRAW &amp; COLOR</small><div class="tools"><button class="tool" data-tool="pencil" aria-pressed="true" title="Pencil (B)">✎ Pencil <kbd>B</kbd></button><button class="tool" data-tool="eraser" aria-pressed="false" title="Eraser (E)">⌫ Eraser <kbd>E</kbd></button><button class="tool" data-tool="fill" aria-pressed="false" title="Fill (G)">▧ Fill <kbd>G</kbd></button><button class="tool" data-tool="picker" aria-pressed="false" title="Eyedropper (I)">⌖ Eyedropper <kbd>I</kbd></button></div></div><div class="tool-group"><small>SHAPES</small><div class="tools"><button class="tool" data-tool="line" aria-pressed="false" title="Line (L)">／ Line <kbd>L</kbd></button><button class="tool" data-tool="rect" aria-pressed="false" title="Rectangle (R)">▱ Rectangle <kbd>R</kbd></button><button class="tool" data-tool="ellipse" aria-pressed="false" title="Ellipse (O)">◯ Ellipse <kbd>O</kbd></button><button class="tool" data-tool="rect-fill" aria-pressed="false" title="Filled rectangle">▰ Filled rectangle</button><button class="tool" data-tool="ellipse-fill" aria-pressed="false" title="Filled ellipse">● Filled ellipse</button><button class="tool" data-tool="select-rect" aria-pressed="false" title="Rectangular selection">▣ Select</button><button class="tool" data-tool="select-lasso" aria-pressed="false" title="Freehand lasso selection">〰 Lasso</button><button class="tool" data-tool="move-selection" aria-pressed="false" title="Move selection">✥ Move</button><button class="tool" data-tool="gradient" aria-pressed="false" title="Gradient fill">◩ Gradient</button><button class="tool" data-tool="texture" aria-pressed="false" title="Texture brush">▦ Texture</button><button class="tool" data-tool="bezier" aria-pressed="false" title="Bezier curve">⌁ Curve</button></div></div>
 <div class="field"><label for="brush-size">Brush size · <span id="brush-size-value">1 px</span></label><input id="brush-size" type="range" min="1" max="16" step="1" value="1"></div><div class="field"><label><input type="checkbox" id="show-grid" checked> Show pixel grid</label></div><div class="field"><label for="grid-size">New canvas preset</label><select id="grid-size"><option value="16">16 × 16</option><option value="24">24 × 24</option><option value="32" selected>32 × 32</option><option value="48">48 × 48</option><option value="64">64 × 64</option></select></div><div class="field"><label for="import-resolution">Import size · اندازهٔ ورود</label><select id="import-resolution"><option value="original" selected>Original file size · ابعاد اصلی فایل</option><option value="64">64 px · lightweight</option><option value="96">96 px</option><option value="128">128 px · balanced</option><option value="192">192 px · detailed</option><option value="256">256 px · compact</option></select><p class="hint">Original size is selected by default. The source file stays unchanged; a smaller working copy is created only when you explicitly choose a reduced detail. The Studio attempts the original dimensions. If the browser or device cannot allocate or process them, import fails without replacing your current artwork.</p><div class="import-options"><div class="field"><label for="import-resampling">Resampling</label><select id="import-resampling"><option value="smooth" selected>Smooth · photos</option><option value="nearest">Nearest · pixel art</option></select></div><div class="field"><label><input id="dither-image" type="checkbox"> Floyd–Steinberg dither</label><p class="hint">Optional gradient detail.</p></div></div></div><div class="field"><label>Artwork dimensions · pixels</label><div class="row"><input id="image-width" type="number" min="1"  value="32" aria-label="Image width"><input id="image-height" type="number" min="1" max="16384" value="32" aria-label="Image height"></div><label><input type="checkbox" id="image-lock" checked> Lock aspect ratio</label><button class="btn" id="apply-image-size" type="button">APPLY IMAGE SIZE</button><p class="hint">Nearest-neighbor resizing preserves hard pixel edges. Canvas dimensions are limited by actual browser and device capabilities.</p></div>
 <div class="field"><label for="custom-color">Selected color</label><input class="custom-color" type="color" id="custom-color" value="#e8b94f"></div>
 <div class="field"><label>Palette</label><div class="palette" id="palette"></div></div>
 <div class="row"><button class="btn" id="extract-palette">EXTRACT FROM IMAGE</button><button class="btn" id="clear-canvas">CLEAR</button></div>
 </details><details class="panel side" style="margin-top:14px" open><summary class="panel-summary"><strong>VECTOR ENGINE</strong><span>COLLAPSE / EXPAND</span></summary><div class="field"><label for="vector-mode">SVG geometry</label><select id="vector-mode"><option value="contours" selected>Contour paths · compact shapes</option><option value="runs">Pixel runs · crisp blocks</option></select></div><div class="field"><label for="palette-limit">Maximum import colors · <span id="palette-limit-value">32</span></label><input id="palette-limit" type="range" min="2" max="32" step="1" value="32"></div><div class="field"><label for="alpha-cutoff">Transparency cutoff · <span id="alpha-cutoff-value">24</span>/255</label><input id="alpha-cutoff" type="range" min="0" max="160" step="1" value="24"></div><p class="hint">Contour mode merges adjacent same-color pixels into closed SVG paths, preserving transparent holes. Pixel-run mode is a fast, sharp-edged alternative.</p></details><details class="panel side" style="margin-top:14px" open><summary class="panel-summary"><strong>EXPORT</strong><span>COLLAPSE / EXPAND</span></summary><div class="field"><label for="export-name">File name</label><input id="export-name" value="nu-pixel-art" maxlength="48"></div><div class="field"><label for="export-scale">PNG output size</label><select id="export-scale"><option value="1">1× · original pixels</option><option value="2">2× · crisp</option><option value="4" selected>4× · high resolution</option><option value="8">8× · large</option><option value="16">16× · maximum detail</option></select><p class="hint">Large outputs are checked against safe browser canvas and memory limits.</p></div><div class="actions"><button class="btn" id="export-svg">DOWNLOAD SVG</button><button class="btn" id="export-png">DOWNLOAD PNG</button><button class="btn" id="export-ico">DOWNLOAD ICO · WINDOWS ICON</button><button class="btn" id="export-ir">EXPORT GRAPHIC IR</button><button class="btn primary" id="export-svg-copy">COPY SVG CODE</button></div><div id="export-download-fallback" class="field" hidden aria-live="polite"><strong>File ready · اگر دانلود خودکار شروع نشد، لینک زیر را لمس کنید.</strong></div><div id="analysis-summary" class="analysis-summary" aria-live="polite">Image analysis is ready when you import or edit artwork.</div><div class="status" id="studio-status" role="status" aria-live="polite">Ready · N.U Pixel Art Studio</div><div class="divider"></div><p class="hint">SVG contains editable vector paths, not an embedded bitmap. Graphic IR exports palette indices, pixel runs, tiles, edge maps, connected regions and render instructions. It is structured graphics data, not proprietary GPU machine code.</p><span class="badge">N.U · NIROO UNIVERSE</span></details></aside>
+<nav id="desktop-workspace-rail" aria-label="Workspace edge rail"><button id="desktop-tools-toggle" type="button" aria-expanded="false" aria-controls="studio-tools-drawer" title="Open tools drawer">TOOLS</button></nav>
+<nav id="mobile-workspace-dock" aria-label="Mobile workspace controls">
+<button id="mobile-tools-toggle" type="button" aria-expanded="false" aria-controls="studio-tools-drawer">TOOLS</button>
+<button id="mobile-zoom-out" type="button" aria-label="Zoom out">−</button>
+<button id="mobile-zoom-in" type="button" aria-label="Zoom in">+</button>
+<label for="mobile-view-rotation">VIEW ROTATION <output id="mobile-view-rotation-value">0°</output><input id="mobile-view-rotation" type="range" min="-180" max="180" step="1" value="0" aria-label="Viewport rotation angle"></label>
+<button id="mobile-view-reset" type="button" aria-label="Reset viewport">RESET</button>
+</nav>
 </div>
 </div>
 <script src="./nu-engine.js"></script>

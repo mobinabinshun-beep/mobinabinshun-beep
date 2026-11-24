@@ -6,7 +6,7 @@ const canvas=$("pixel-canvas"),ctx=canvas.getContext("2d",{willReadFrequently:tr
 const defaults=["#111827","#243447","#3e596b","#78909c","#d8e2e8","#ffffff","#a63c50","#e45b63","#f29c67","#e8b94f","#f8dc86","#76a86c","#3f795e","#4b9cba","#5577b8","#8a6bb5"];
 let width=32,height=32,pixels=Array(width*height).fill(null),palette=defaults.slice(),color="#e8b94f",tool="pencil",drawing=false,strokeSnapshot=null,undoStack=[],redoStack=[],imageImported=false,qualityProfile=null,workspace={zoom:100},resizeLock=true,lastDimension="width",brushSize=1,strokeStart=null,sourcePreviewUrl=null,originalImportFile=null;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-let fadeIntensity=50,viewRotation=0,guideState={blueprint:false,ruler:false,divisions:false,axes:false,depth:false};
+let fadeIntensity=50,mixBrushStrength=60,mixBrushState=null,viewRotation=0,guideState={blueprint:false,ruler:false,divisions:false,axes:false,depth:false};
 function announce(msg){$("studio-status").textContent=msg;}
 function snapshot(){return {width,height,pixels:pixels.slice()};}
 function historyLimitFor(state){return Math.max(1,Math.min(60,Math.floor(2000000/Math.max(1,state.pixels.length))));}
@@ -61,7 +61,7 @@ observeWorkspace();
 $("image-lock").addEventListener("change",e=>{resizeLock=e.target.checked;});
 $("image-width").addEventListener("input",()=>{lastDimension="width";});$("image-height").addEventListener("input",()=>{lastDimension="height";});$("apply-image-size").addEventListener("click",()=>{let w=clamp(Number($("image-width").value)||width,1,2048),h=clamp(Number($("image-height").value)||height,1,2048);if(resizeLock){const ratio=width/height;if(lastDimension==="width")h=Math.max(1,Math.round(w/ratio));else w=Math.max(1,Math.round(h*ratio));}$("image-width").value=w;$("image-height").value=h;resizeArtwork(w,h,"nearest-neighbor");});
 function renderPalette(){const root=$("palette");root.innerHTML="";palette.forEach((c,i)=>{const b=document.createElement("button");b.type="button";b.className="swatch";b.style.background=c;b.title=c;b.setAttribute("aria-label","Palette color "+c);b.setAttribute("aria-pressed",String(c.toLowerCase()===color.toLowerCase()));b.addEventListener("click",()=>{color=c;$("custom-color").value=c;renderPalette();});root.appendChild(b);});const transparent=document.createElement("button");transparent.type="button";transparent.className="swatch";transparent.setAttribute("aria-label","Transparent");transparent.title="Transparent / eraser";transparent.addEventListener("click",()=>setTool("eraser"));root.appendChild(transparent);}
-function setTool(next){tool=next;document.querySelectorAll("[data-tool]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tool===tool)));canvas.style.cursor=tool==="picker"?"copy":tool==="eraser"?"cell":tool==="fill"?"copy":"crosshair";}
+function setTool(next){tool=next;mixBrushState=null;document.querySelectorAll("[data-tool]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tool===tool)));canvas.style.cursor=tool==="picker"?"copy":tool==="eraser"?"cell":tool==="fill"?"copy":"crosshair";}
 function coords(e){
  const r=canvas.getBoundingClientRect();
  if(!viewRotation)return window.NUStudioLayout.pixelAt(e.clientX,e.clientY,r,width,height);
@@ -94,7 +94,7 @@ function drawShape(start,end){
 }
 function paintAt(e){const p=coords(e),i=p.y*width+p.x;if(tool==="picker"){if(pixels[i]){color=pixels[i];$("custom-color").value=color;renderPalette();}return;}if(tool==="fill"){flood(p.x,p.y,color);render();return;}paintBrush(p.x,p.y,tool==="eraser"?null:color);render();}
 canvas.addEventListener("pointerdown",e=>{
- e.preventDefault();canvas.setPointerCapture(e.pointerId);drawing=true;strokeSnapshot=snapshot();strokeStart=coords(e);
+ e.preventDefault();if(tool==="color-mix-brush"&&adv.layers[adv.active].locked){announce("Layer locked · رنگ‌ها ترکیب نشدند.");return;}if(tool==="color-mix-brush"&&adv.maskEdit){announce("برای ترکیب رنگ، ویرایش ماسک را خاموش کنید.");return;}mixBrushState=null;canvas.setPointerCapture(e.pointerId);drawing=true;strokeSnapshot=snapshot();strokeStart=coords(e);
  if(tool==="fill"||tool==="picker"){paintAt(e);if(tool==="fill")commitHistory(strokeSnapshot);drawing=false;strokeSnapshot=null;strokeStart=null;return;}
  if(tool==="line"||tool==="rect"||tool==="ellipse"||tool==="rect-fill"||tool==="ellipse-fill"){drawShape(strokeStart,strokeStart);render();}else paintAt(e);
 });
@@ -103,8 +103,8 @@ canvas.addEventListener("pointermove",e=>{
  if(tool==="line"||tool==="rect"||tool==="ellipse"||tool==="rect-fill"||tool==="ellipse-fill"){pixels=strokeSnapshot.pixels.slice();drawShape(strokeStart,coords(e));render();}
  else paintAt(e);
 });
-function endStroke(){if(!drawing)return;drawing=false;commitHistory(strokeSnapshot);strokeSnapshot=null;strokeStart=null;}
-function cancelStroke(){if(!drawing)return;pixels=strokeSnapshot.pixels.slice();drawing=false;strokeSnapshot=null;strokeStart=null;render();}
+function endStroke(){if(!drawing)return;drawing=false;commitHistory(strokeSnapshot);strokeSnapshot=null;strokeStart=null;mixBrushState=null;}
+function cancelStroke(){if(!drawing)return;if(tool==="color-mix-brush"&&strokeSnapshot&&strokeSnapshot.layers)restore(strokeSnapshot);else pixels=strokeSnapshot.pixels.slice();drawing=false;strokeSnapshot=null;strokeStart=null;mixBrushState=null;render();}
 canvas.addEventListener("pointerup",endStroke);canvas.addEventListener("pointercancel",cancelStroke);canvas.addEventListener("lostpointercapture",cancelStroke);
 document.querySelectorAll("[data-tool]").forEach(b=>b.addEventListener("click",()=>setTool(b.dataset.tool)));
 $("custom-color").addEventListener("input",e=>{color=e.target.value.toLowerCase();renderPalette();setTool("pencil");});
@@ -380,16 +380,45 @@ function layerUI(){
 function advPanel(){
  const existingColorField=$("custom-color").closest(".field"),existingPaletteField=$("palette").closest(".field"),existingExtract=$("extract-palette"),existingBrushField=$("brush-size").closest(".field");
  const st=document.createElement("style");
- st.textContent="#studio-dock{margin-top:12px;border:1px solid #65dcff55;border-radius:13px;background:#081522;overflow:hidden}#studio-dock .dock-head{display:flex;justify-content:space-between;gap:8px;padding:9px 12px;border-bottom:1px solid #ffffff18}#studio-dock .dock-head strong{font-size:12px;color:#ffc86b}#studio-quick-tools{display:flex;gap:6px;padding:9px;overflow-x:auto}#studio-quick-tools .tool{flex:0 0 auto;min-width:82px;min-height:48px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px}#studio-quick-tools .tool .tool-icon{font-size:18px}#studio-quick-tools .tool[aria-pressed=true]{border-color:#ffc86b;background:#3a2a16;color:#ffe6a5}#studio-brush{display:flex;align-items:center;gap:10px;padding:0 12px 10px}#studio-brush label{font-size:11px;color:#b8c9d6}#studio-brush input{width:100%;accent-color:#65dcff}#studio-tabs{display:flex;gap:5px;padding:8px;overflow-x:auto;border-block:1px solid #ffffff18}#studio-tabs button{flex:1 0 auto;min-width:80px;border:1px solid #65dcff44;border-radius:8px;background:#102536;color:#d9eaf4;padding:9px 7px;font-size:11px}#studio-tabs button[aria-selected=true]{background:#23445a;border-color:#ffc86b;color:#fff0c8}#studio-tabpanels{padding:10px 12px}#studio-tabpanels [role=tabpanel][hidden]{display:none}#studio-tabpanels .adv-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:8px 0}#studio-tabpanels button{border:1px solid #65dcff55;background:#102a3b;color:#eaf6ff;border-radius:8px;padding:9px;font-size:12px;min-height:38px}#studio-tabpanels input,#studio-tabpanels select{max-width:100%;min-width:0;background:#071018;color:#eaf6ff;border:1px solid #65dcff44;border-radius:7px;padding:7px}#studio-tabpanels input[type=range]{width:100%;accent-color:#65dcff}#studio-tabpanels .adv-layer{display:grid;grid-template-columns:minmax(90px,1fr) auto auto;gap:8px;align-items:center;margin:8px 0}#studio-tabpanels .adv-layer .layer-toggle{font-size:10px;color:#c8d7e2;white-space:nowrap}#studio-tabpanels .adv-layer .layer-opacity{grid-column:1/-1;display:grid;gap:4px;font-size:10px;color:#9bb1c3}#studio-tabpanels .adv-layer .layer-opacity input{width:100%}#studio-tabpanels .adv-layer .layer-opacity select{width:100%}#studio-tabpanels .dock-field{display:grid;gap:5px;margin:9px 0;color:#b8c9d6;font-size:11px}#studio-tabpanels .dock-note{font-size:11px;color:#9bb1c3;line-height:1.6}#studio-tabpanels .dock-palette{display:grid;grid-template-columns:140px 1fr;gap:12px}#studio-tabpanels #palette{grid-template-columns:repeat(auto-fill,minmax(28px,1fr))}#studio-tabpanels .swatch{height:30px}#studio-tabpanels .dock-actions{display:flex;gap:7px;flex-wrap:wrap}#studio-tabpanels .dock-actions button{flex:1 1 130px}@media(max-width:600px){#studio-tabpanels .dock-palette{grid-template-columns:1fr}#studio-quick-tools .tool{min-width:74px}}";
+ st.textContent="#studio-dock{margin-top:12px;border:1px solid #65dcff55;border-radius:13px;background:#081522;overflow:hidden}#studio-dock .dock-head{display:flex;justify-content:space-between;gap:8px;padding:9px 12px;border-bottom:1px solid #ffffff18}#studio-dock .dock-head strong{font-size:12px;color:#ffc86b}#studio-quick-tools{display:flex;gap:6px;padding:9px;overflow-x:auto}#studio-quick-tools .tool{flex:0 0 auto;min-width:82px;min-height:48px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px}#studio-quick-tools .tool .tool-icon{font-size:18px}#studio-quick-tools .tool[aria-pressed=true]{border-color:#ffc86b;background:#3a2a16;color:#ffe6a5}#studio-brush{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:0 12px 10px}#studio-brush label{font-size:11px;color:#b8c9d6}#studio-brush input{width:100%;accent-color:#65dcff}#studio-brush .dock-field{display:grid;gap:5px;flex:1 1 180px;min-width:130px;margin:9px 0;color:#b8c9d6;font-size:11px}#studio-brush .dock-note{font-size:10px;color:#9bb1c3;line-height:1.45}#studio-tabs{display:flex;gap:5px;padding:8px;overflow-x:auto;border-block:1px solid #ffffff18}#studio-tabs button{flex:1 0 auto;min-width:80px;border:1px solid #65dcff44;border-radius:8px;background:#102536;color:#d9eaf4;padding:9px 7px;font-size:11px}#studio-tabs button[aria-selected=true]{background:#23445a;border-color:#ffc86b;color:#fff0c8}#studio-tabpanels{padding:10px 12px}#studio-tabpanels [role=tabpanel][hidden]{display:none}#studio-tabpanels .adv-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:8px 0}#studio-tabpanels button{border:1px solid #65dcff55;background:#102a3b;color:#eaf6ff;border-radius:8px;padding:9px;font-size:12px;min-height:38px}#studio-tabpanels input,#studio-tabpanels select{max-width:100%;min-width:0;background:#071018;color:#eaf6ff;border:1px solid #65dcff44;border-radius:7px;padding:7px}#studio-tabpanels input[type=range]{width:100%;accent-color:#65dcff}#studio-tabpanels .adv-layer{display:grid;grid-template-columns:minmax(90px,1fr) auto auto;gap:8px;align-items:center;margin:8px 0}#studio-tabpanels .adv-layer .layer-toggle{font-size:10px;color:#c8d7e2;white-space:nowrap}#studio-tabpanels .adv-layer .layer-opacity{grid-column:1/-1;display:grid;gap:4px;font-size:10px;color:#9bb1c3}#studio-tabpanels .adv-layer .layer-opacity input{width:100%}#studio-tabpanels .adv-layer .layer-opacity select{width:100%}#studio-tabpanels .dock-field{display:grid;gap:5px;margin:9px 0;color:#b8c9d6;font-size:11px}#studio-tabpanels .dock-note{font-size:11px;color:#9bb1c3;line-height:1.6}#studio-tabpanels .dock-palette{display:grid;grid-template-columns:140px 1fr;gap:12px}#studio-tabpanels #palette{grid-template-columns:repeat(auto-fill,minmax(28px,1fr))}#studio-tabpanels .swatch{height:30px}#studio-tabpanels .dock-actions{display:flex;gap:7px;flex-wrap:wrap}#studio-tabpanels .dock-actions button{flex:1 1 130px}@media(max-width:600px){#studio-tabpanels .dock-palette{grid-template-columns:1fr}#studio-quick-tools .tool{min-width:74px}}@media(max-width:600px){.shell{width:calc(100% - 12px);padding-top:8px}.layout{grid-template-columns:minmax(0,1fr);min-width:0}.layout>main{min-width:0}.stage{width:100%;height:68vh;min-height:320px;max-height:calc(100dvh - 220px);padding:6px;box-sizing:border-box}.workspace-wrap{width:100%;height:100%;min-width:0;overflow:hidden}.workspace-frame{width:100%;height:100%;min-width:0;max-width:100%;box-sizing:border-box;padding:6px;overflow:auto}#pixel-canvas{max-width:100%!important;max-height:100%!important;height:auto!important}}";
  document.head.append(st);
  const d=document.createElement("section");d.id="studio-dock";d.setAttribute("aria-label","Creative tools dock");
  d.innerHTML='<div class="dock-head"><strong>ابزارهای سریع</strong><span>کنار بوم طراحی</span></div><nav id="studio-quick-tools" aria-label="Main drawing tools"></nav><div id="studio-brush"></div><div id="studio-tabs" role="tablist" aria-label="Advanced tool categories"><button type="button" role="tab" id="tab-palette" aria-controls="panel-palette" aria-selected="true" data-tab="palette">🎨 رنگ</button><button type="button" role="tab" id="tab-layers" aria-controls="panel-layers" aria-selected="false" data-tab="layers">🧱 لایه‌ها</button><button type="button" role="tab" id="tab-fill" aria-controls="panel-fill" aria-selected="false" data-tab="fill">🪣 سطل رنگ</button><button type="button" role="tab" id="tab-transform" aria-controls="panel-transform" aria-selected="false" data-tab="transform">↔ تبدیل</button><button type="button" role="tab" id="tab-adjust" aria-controls="panel-adjust" aria-selected="false" data-tab="adjust">☀ تنظیم تصویر</button><button type="button" role="tab" id="tab-compose" aria-controls="panel-compose" aria-selected="false" data-tab="compose">🧩 ترکیب</button><button type="button" role="tab" id="tab-pro" aria-controls="panel-pro" aria-selected="false" data-tab="pro">✦ حرفه‌ای</button><button type="button" role="tab" id="tab-export" aria-controls="panel-export" aria-selected="false" data-tab="export">⇩ فایل‌ها</button></div><div id="studio-tabpanels"><section id="panel-palette" role="tabpanel" aria-labelledby="tab-palette"><div class="dock-palette"><div><div id="dock-color-slot"></div><button id="adv-add">＋ Add color</button><button id="adv-replace">Replace selected</button></div><div><p class="dock-note">Choose a swatch, sample a pixel, or create a new color.</p><div id="dock-palette-slot"></div><button id="adv-extract">Extract active layer colors</button></div></div></section><section id="panel-layers" role="tabpanel" aria-labelledby="tab-layers" hidden><p class="dock-note">Select a layer. Eye = show/hide, lock = protect, slider = opacity.</p><div id="adv-layers"></div><button id="adv-clear" type="button">Clear active layer</button></section><section id="panel-fill" role="tabpanel" aria-labelledby="tab-fill" hidden><label class="dock-field">Fill area <select id="adv-bucket"><option value="contiguous">Connected area only</option><option value="similar">Connected similar colors</option><option value="global">Every exact match in layer</option></select></label><label class="dock-field">Color tolerance <input id="adv-tol" type="range" min="0" max="180" value="0"></label><p class="dock-note">Choose a mode, then use the bucket tool on the canvas.</p></section><section id="panel-transform" role="tabpanel" aria-labelledby="tab-transform" hidden><label class="dock-field">Paint symmetry <select id="adv-symmetry"><option value="none">Off</option><option value="horizontal">Horizontal</option><option value="vertical">Vertical</option><option value="both">Horizontal + vertical</option></select></label><div class="adv-grid"><button data-x="h">↔ Mirror horizontal</button><button data-x="v">↕ Mirror vertical</button><button data-x="90">⤾ Rotate 90°</button><button data-x="180">↻ Rotate 180°</button><button data-x="neg">◐ Negative</button><button data-x="crop">▣ Crop</button></div><div class="adv-grid"><label class="dock-field">X <input id="crop-x" type="number" value="0" min="0"></label><label class="dock-field">Y <input id="crop-y" type="number" value="0" min="0"></label><label class="dock-field">Width <input id="crop-w" type="number" value="16" min="1"></label><label class="dock-field">Height <input id="crop-h" type="number" value="16" min="1"></label></div></section><section id="panel-adjust" role="tabpanel" aria-labelledby="tab-adjust" hidden><label class="dock-field">Brightness <input id="adj-b" type="range" min="-100" max="100" value="0"></label><label class="dock-field">Contrast <input id="adj-c" type="range" min="-100" max="100" value="0"></label><label class="dock-field">Saturation <input id="adj-s" type="range" min="-100" max="100" value="0"></label><label class="dock-field">Warm ↔ Cool <input id="adj-w" type="range" min="-100" max="100" value="0"></label><div class="dock-actions"><button id="adj-apply">Apply color settings</button><button id="adj-shine">✨ Shine</button><button id="adj-fade">Fade / soften</button><button id="adj-sharpen">Sharpen edges</button></div><p class="dock-note">RGB channel offsets</p><div class="adv-grid"><label class="dock-field">Red ± <input id="rgb-r" type="number" value="0"></label><label class="dock-field">Green ± <input id="rgb-g" type="number" value="0"></label><label class="dock-field">Blue ± <input id="rgb-b" type="number" value="0"></label><button id="rgb-apply">Apply RGB</button></div></section><section id="panel-compose" role="tabpanel" aria-labelledby="tab-compose" hidden><label class="dock-field">Add image over artwork <input id="adv-overlay" type="file" accept="image/*"></label><label class="dock-field">Key color <input id="adv-key" type="color" value="#00ff00"></label><label class="dock-field">Key tolerance <input id="adv-keytol" type="range" min="0" max="220" value="60"></label><button id="adv-chroma">Remove key color</button><div class="adv-grid"><label class="dock-field">Text <input id="adv-text" value="N.U" maxlength="32"></label><label class="dock-field">Text size <input id="adv-textsize" type="number" min="6" max="96" value="16"></label></div><button id="adv-textadd">Add text to active layer</button><label class="dock-field">Blend over painted pixels <input id="adv-alpha" type="range" min="10" max="100" value="100"></label><p class="dock-note">Text is rasterized at current pixel resolution.</p></section><section id="panel-pro" role="tabpanel" aria-labelledby="tab-pro" hidden><div class="dock-note">ابزارهای انتخاب، انتقال، تغییر اندازه، گرادیان، قلم بافت‌دار، منحنی و ماسک لایه. عملیات روی لایهٔ فعال انجام می‌شود.</div><div class="adv-grid"><button id="pro-select-all" type="button">انتخاب همه</button><button id="pro-deselect" type="button">لغو انتخاب</button><button id="pro-invert-selection" type="button">معکوس انتخاب</button><button id="pro-scale-selection" type="button">تغییر اندازهٔ انتخاب</button></div><div class="adv-grid"><label class="dock-field">مقیاس افقی × <input id="pro-scale-x" type="number" min="0.1" max="16" step="0.1" value="2"></label><label class="dock-field">مقیاس عمودی × <input id="pro-scale-y" type="number" min="0.1" max="16" step="0.1" value="2"></label></div><div class="adv-grid"><label class="dock-field">رنگ دوم گرادیان <input id="pro-gradient-color" type="color" value="#65dcff"></label><label class="dock-field">نوع گرادیان <select id="pro-gradient-mode"><option value="linear">خطی</option><option value="radial">شعاعی</option></select></label></div><div class="adv-grid"><label class="dock-field">شکل قلم <select id="pro-brush-shape"><option value="square">مربعی</option><option value="circle">گرد</option><option value="diamond">لوزی</option></select></label><label class="dock-field">بافت قلم <select id="pro-texture"><option value="none">بدون بافت</option><option value="dots">نقطه‌ای</option><option value="diagonal">مورب</option><option value="grain">دانه‌ای</option></select></label></div><label class="dock-field">تراکم بافت <input id="pro-texture-density" type="range" min="5" max="100" value="60"></label><label class="dock-field">انحنای منحنی بزیه <input id="pro-curve" type="range" min="-64" max="64" value="24"></label><div class="dock-note">ماسک غیرمخرب لایه</div><div class="adv-grid"><button id="pro-mask-add" type="button">افزودن ماسک</button><button id="pro-mask-invert" type="button">معکوس ماسک</button><button id="pro-mask-apply" type="button">اعمال ماسک</button><button id="pro-mask-remove" type="button">حذف ماسک</button></div><label class="dock-field"><input id="pro-mask-edit" type="checkbox"> ویرایش ماسک با قلم (پاک‌کن = پنهان‌سازی)</label><div class="dock-note">مدیریت گروه لایه‌ها</div><div class="adv-grid"><label class="dock-field">گروه فعال <select id="pro-group-target"><option>Ungrouped</option><option>Group A</option><option>Group B</option><option>UI</option><option>Background</option><option>Foreground</option></select></label><label class="dock-field">شفافیت گروه <input id="pro-group-opacity" type="range" min="0" max="100" value="100"></label></div><div class="adv-grid"><button id="pro-group-toggle" type="button">نمایش / پنهان گروه</button><button id="pro-group-assign" type="button">قرار دادن لایه در گروه</button></div><p class="dock-note">برای انتقال انتخاب، ابتدا محدوده را با Select یا Lasso مشخص کنید و سپس Move را انتخاب کنید. مقیاس انتخاب با نمونه‌برداری نزدیک‌ترین همسایه انجام می‌شود.</p></section><section id="panel-export" role="tabpanel" aria-labelledby="tab-export" hidden><div class="dock-actions"><button id="adv-original">⇩ Original source</button><button id="adv-png">⇩ PNG image</button><button id="adv-svg">⇩ SVG artwork</button><button id="adv-ico">⇩ Windows ICO</button><button id="adv-svg-code">⇩ SVG machine code</button><button id="adv-ir">⇩ Graphic IR / machine data</button></div><div id="adv-export-downloads" class="dock-note" aria-live="polite" style="margin-top:12px"></div><p class="dock-note">هر خروجی مستقل ساخته می‌شود. دادهٔ گرافیک IR با کدگذاری فشردهٔ ردیفی تولید می‌شود و به تحلیل سنگین وابسته نیست. SVG در ابعاد بسیار بزرگ، برای حفظ تصویر از نسخهٔ SVG با تصویر جاسازی‌شده استفاده می‌کند.</p></section></div>';
- const main=$("pixel-canvas").closest(".panel"),stage=main.querySelector(".stage");stage.insertAdjacentElement("afterend",d);
- const quick=$("studio-quick-tools"),names={pencil:["✏️","Pencil","قلم"],eraser:["🧽","Eraser","پاک‌کن"],fill:["🪣","Fill","سطل رنگ"],picker:["🎯","Pick color","نمونه‌رنگ"],line:["／","Line","خط"],rect:["▭","Rectangle","مستطیل"],ellipse:["◯","Ellipse","بیضی"],"rect-fill":["▰","Filled rectangle","مستطیل توپر"],"ellipse-fill":["●","Filled ellipse","بیضی توپر"],"select-rect":["▣","Rect selection","انتخاب"],"select-lasso":["〰","Lasso selection","انتخاب آزاد"],"move-selection":["✥","Move selection","جابجایی"],gradient:["◩","Gradient","گرادیان"],texture:["▦","Texture brush","قلم بافت"],bezier:["⌁","Bezier curve","منحنی"],"fading-brush":["🌫️","Fading brush","قلم محوشونده"]};
+ const drawer=$("studio-tools-drawer");
+ const legacyPanels=[...drawer.querySelectorAll(":scope > details.panel")];
+ const toolsPanel=legacyPanels[0],vectorPanel=legacyPanels[1],exportPanel=legacyPanels[2];
+ const propertiesPanel=document.createElement("details");
+ propertiesPanel.id="studio-properties-panel";
+ propertiesPanel.className="panel side";
+ const propertiesSummary=document.createElement("summary");
+ propertiesSummary.className="panel-summary";
+ propertiesSummary.innerHTML="<strong>PROPERTIES / SETTINGS</strong><span>CANVAS · IMPORT · VECTOR</span>";
+ propertiesPanel.append(propertiesSummary);
+ const propertiesContent=document.createElement("div");
+ propertiesContent.id="studio-properties-content";
+ const canvasSettingsTitle=document.createElement("p");
+ canvasSettingsTitle.className="dock-note";
+ canvasSettingsTitle.textContent="CANVAS & IMPORT SETTINGS";
+ propertiesContent.append(canvasSettingsTitle);
+ [...toolsPanel.children].forEach(node=>{
+  if(node.matches(".field,.row")&&node!==existingColorField&&node!==existingPaletteField&&node!==existingBrushField)propertiesContent.append(node);
+ });
+ const vectorSettingsTitle=document.createElement("p");
+ vectorSettingsTitle.className="dock-note";
+ vectorSettingsTitle.textContent="VECTOR ENGINE SETTINGS";
+ propertiesContent.append(vectorSettingsTitle);
+ [...vectorPanel.children].forEach(node=>{if(node.tagName!=="SUMMARY")propertiesContent.append(node);});
+ propertiesPanel.append(propertiesContent);
+ vectorPanel.remove();
+ drawer.insertBefore(propertiesPanel,exportPanel);
+ drawer.append(d);
+ const quick=$("studio-quick-tools"),names={pencil:["✏️","Pencil","قلم"],eraser:["🧽","Eraser","پاک‌کن"],fill:["🪣","Fill","سطل رنگ"],picker:["🎯","Pick color","نمونه‌رنگ"],line:["／","Line","خط"],rect:["▭","Rectangle","مستطیل"],ellipse:["◯","Ellipse","بیضی"],"rect-fill":["▰","Filled rectangle","مستطیل توپر"],"ellipse-fill":["●","Filled ellipse","بیضی توپر"],"select-rect":["▣","Rect selection","انتخاب"],"select-lasso":["〰","Lasso selection","انتخاب آزاد"],"move-selection":["✥","Move selection","جابجایی"],gradient:["◩","Gradient","گرادیان"],texture:["▦","Texture brush","قلم بافت"],bezier:["⌁","Bezier curve","منحنی"],"fading-brush":["🌫️","Fading brush","قلم محوشونده"],"color-mix-brush":["🖌️","Color-mixing brush","قلم ترکیب رنگ"]};
  document.querySelectorAll("[data-tool]").forEach(b=>{const n=names[b.dataset.tool];if(!n)return;b.innerHTML='<span class="tool-icon" aria-hidden="true">'+n[0]+'</span><span>'+n[2]+'</span>';b.title=n[1]+' · '+n[2];b.setAttribute('aria-label',n[1]+' · '+n[2]);quick.append(b);});
  $("studio-brush").append(existingBrushField);
  const fadeField=document.createElement("label");fadeField.className="dock-field";fadeField.textContent="Fading brush intensity · شدت محوشدن";const fadeRange=document.createElement("input");fadeRange.type="range";fadeRange.min="1";fadeRange.max="100";fadeRange.value=String(fadeIntensity);fadeRange.setAttribute("aria-label","Fading brush intensity");fadeRange.oninput=()=>{fadeIntensity=+fadeRange.value;};fadeField.append(fadeRange);$("studio-brush").append(fadeField);
  const fadeButton=document.createElement("button");fadeButton.type="button";fadeButton.className="tool";fadeButton.dataset.tool="fading-brush";fadeButton.setAttribute("aria-pressed","false");fadeButton.textContent="🌫️ قلم محوشونده";fadeButton.addEventListener("click",()=>setTool("fading-brush"));quick.append(fadeButton);
+ const mixField=document.createElement("label");mixField.className="dock-field";mixField.textContent="Color mixing strength · قدرت ترکیب رنگ";const mixRange=document.createElement("input");mixRange.type="range";mixRange.min="1";mixRange.max="100";mixRange.step="1";mixRange.value=String(mixBrushStrength);mixRange.id="mix-brush-strength";mixRange.setAttribute("aria-label","Color mixing strength");mixRange.oninput=()=>{mixBrushStrength=+mixRange.value;};mixField.append(mixRange);const mixHint=document.createElement("small");mixHint.className="dock-note";mixHint.textContent="رنگ موجود روی بوم را برمی‌دارد و در مسیر حرکت با رنگ‌های مجاور ترکیب می‌کند؛ ناحیهٔ شفاف را رنگ‌آمیزی نمی‌کند.";mixField.append(mixHint);$("studio-brush").append(mixField);
+ const mixButton=document.createElement("button");mixButton.type="button";mixButton.className="tool";mixButton.dataset.tool="color-mix-brush";mixButton.setAttribute("aria-pressed","false");mixButton.innerHTML="<span class=\"tool-icon\" aria-hidden=\"true\">🖌️</span><span>قلم ترکیب رنگ</span>";mixButton.title="Color-mixing brush · قلم ترکیب رنگ";mixButton.setAttribute("aria-label","Color-mixing brush · قلم ترکیب رنگ");mixButton.addEventListener("click",()=>setTool("color-mix-brush"));quick.append(mixButton);
  $("dock-color-slot").append(existingColorField);
  $("dock-palette-slot").append(existingPaletteField);
  $("panel-palette").querySelector(".dock-palette>div:last-child").append(existingExtract);
@@ -438,7 +467,9 @@ async function overlayAdv(e){const f=e.target.files&&e.target.files[0];if(!f)ret
 function chromaAdv(){if(adv.layers[adv.active].locked)return announce("Layer locked");const before=histAdv(),key=$("adv-key").value,t=+$("adv-keytol").value;pixels=pixels.map((c,i)=>(!adv.selection||adv.selection[i])&&dist(c,key)<=t?null:c);adv.layers[adv.active].pixels=pixels.slice();commitHistory(before);render();}
 function textAdv(){if(adv.layers[adv.active].locked)return announce("Layer locked");const before=histAdv(),c=document.createElement("canvas");c.width=width;c.height=height;const x=c.getContext("2d");x.fillStyle=color;x.font="bold "+clamp(+$("adv-textsize").value,6,96)+"px monospace";x.textBaseline="top";x.fillText($("adv-text").value,0,0,width);const d=x.getImageData(0,0,width,height).data;for(let i=0;i<pixels.length;i++)if(d[i*4+3]>128&&(!adv.selection||adv.selection[i]))pixels[i]=color;adv.layers[adv.active].pixels=pixels.slice();commitHistory(before);render();}
 const paintAdv=paintBrush;paintBrush=function(x,y,v){
- if(adv.layers[adv.active].locked)return;const alpha=+$("adv-alpha")?.value||100,points=[[x,y]];
+ if(adv.layers[adv.active].locked)return;
+ if(tool==="color-mix-brush"){const result=window.NUStudioProTools.smudgeBrush(pixels,width,height,x,y,brushSize,mixBrushStrength,adv.selection,mixBrushState,adv.brushShape);mixBrushState=result.state;pixels=result.pixels;adv.layers[adv.active].pixels=pixels;return;}
+ const alpha=+$("adv-alpha")?.value||100,points=[[x,y]];
  if(adv.symmetry==="horizontal"||adv.symmetry==="both")points.push([width-1-x,y]);if(adv.symmetry==="vertical"||adv.symmetry==="both")points.push([x,height-1-y]);if(adv.symmetry==="both")points.push([width-1-x,height-1-y]);
  const seen=new Set(),texture=adv.texture==="none"&&tool==="texture"?"grain":adv.texture;
  for(const [px,py] of points)for(const [cx,cy] of window.NUStudioProTools.brushCells(px,py,brushSize,adv.brushShape,texture,adv.textureDensity)){
@@ -544,5 +575,77 @@ $("pro-group-toggle").onclick=()=>{const name=$("pro-group-target").value,g=adv.
 $("pro-group-assign").onclick=()=>{const before=histAdv();adv.layers[adv.active].group=$("pro-group-target").value;commitHistory(before);layerUI();render();announce("Active layer assigned to "+adv.layers[adv.active].group);};
 
 
+
+
+/* Stage 2A mobile workspace controller. Does not alter artwork pixels or Gateway. */
+const mobileWorkspaceQuery=window.matchMedia("(max-width: 700px)");
+const mobileToolsDrawer=document.querySelector(".layout > aside");
+const mobileToolsToggle=$("mobile-tools-toggle");
+if(mobileToolsDrawer)mobileToolsDrawer.id="studio-tools-drawer";
+function setMobileToolsOpen(open){
+ document.body.classList.toggle("nu-mobile-tools-open",!!open);
+ if(mobileToolsToggle)mobileToolsToggle.setAttribute("aria-expanded",String(!!open));
+}
+function syncMobileViewport(){
+ const vv=window.visualViewport;
+ const height=Math.max(240,Math.round(vv&&vv.height?vv.height:window.innerHeight));
+ document.documentElement.style.setProperty("--nu-visual-height",height+"px");
+ document.documentElement.style.setProperty("--nu-visual-top",Math.round(vv&&vv.offsetTop?vv.offsetTop:0)+"px");
+ const angle=Number(window.screen&&window.screen.orientation&&Number.isFinite(window.screen.orientation.angle)?window.screen.orientation.angle:(window.orientation||0));
+ let orientation="portrait";
+ if(window.innerWidth>window.innerHeight)orientation=(angle===90||angle===-270)?"landscape-left":(angle===270||angle===-90)?"landscape-right":"landscape-left";
+ document.documentElement.dataset.nuOrientation=orientation;
+}
+function syncMobileMode(){document.body.classList.toggle("nu-mobile-workspace",mobileWorkspaceQuery.matches);syncMobileViewport();}
+mobileWorkspaceQuery.addEventListener?.("change",syncMobileMode);
+window.addEventListener("resize",syncMobileViewport,{passive:true});
+window.addEventListener("orientationchange",syncMobileViewport,{passive:true});
+window.screen?.orientation?.addEventListener?.("change",syncMobileViewport);
+window.visualViewport?.addEventListener("resize",syncMobileViewport,{passive:true});
+window.visualViewport?.addEventListener("scroll",syncMobileViewport,{passive:true});
+syncMobileMode();
+mobileToolsToggle?.addEventListener("click",()=>setMobileToolsOpen(!document.body.classList.contains("nu-mobile-tools-open")));
+
+/* Stage 2B desktop edge-rail controller; the drawer overlays the canvas without shrinking or blocking it when closed. */
+const desktopToolsToggle=$("desktop-tools-toggle");
+function setDesktopToolsOpen(open){
+ const isOpen=!!open;
+ const drawer=document.getElementById("studio-tools-drawer")||mobileToolsDrawer;
+ document.body.classList.toggle("nu-desktop-tools-open",isOpen);
+ if(desktopToolsToggle)desktopToolsToggle.setAttribute("aria-expanded",String(isOpen));
+ if(drawer){
+  drawer.style.setProperty("visibility",isOpen?"visible":"hidden","important");
+  drawer.style.setProperty("transform",isOpen?"translateX(0)":"translateX(calc(100% + 28px))","important");
+  drawer.style.setProperty("pointer-events",isOpen?"auto":"none","important");
+  drawer.dataset.workspaceDrawerState=isOpen?"open":"closed";
+ }
+}
+desktopToolsToggle?.addEventListener("click",()=>setDesktopToolsOpen(!document.body.classList.contains("nu-desktop-tools-open")));
+
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){setMobileToolsOpen(false);setDesktopToolsOpen(false);}});
+document.addEventListener("pointerdown",e=>{
+ if(document.body.classList.contains("nu-mobile-tools-open")&&!mobileToolsDrawer?.contains(e.target)&&!$("mobile-workspace-dock")?.contains(e.target))setMobileToolsOpen(false);
+ if(document.body.classList.contains("nu-desktop-tools-open")&&!mobileToolsDrawer?.contains(e.target)&&!$("desktop-workspace-rail")?.contains(e.target))setDesktopToolsOpen(false);
+});
+function setMobileZoom(next){
+ workspace.zoom=clamp(next,25,800);
+ $("workspace-zoom").value=workspace.zoom;
+ applyZoom();
+}
+$("mobile-zoom-in")?.addEventListener("click",()=>setMobileZoom(workspace.zoom+25));
+$("mobile-zoom-out")?.addEventListener("click",()=>setMobileZoom(workspace.zoom-25));
+$("mobile-view-rotation")?.addEventListener("input",e=>{
+ viewRotation=clamp(Number(e.target.value)||0,-180,180);
+ updateViewportRotation();
+ $("mobile-view-rotation-value").textContent=viewRotation+"°";
+});
+$("mobile-view-reset")?.addEventListener("click",()=>{
+ viewRotation=0;
+ $("mobile-view-rotation").value=0;
+ $("mobile-view-rotation-value").textContent="0°";
+ updateViewportRotation();
+ $("fit-canvas").click();
+ announce("Viewport reset; artwork pixels and undo history are unchanged.");
+});
 
 })();

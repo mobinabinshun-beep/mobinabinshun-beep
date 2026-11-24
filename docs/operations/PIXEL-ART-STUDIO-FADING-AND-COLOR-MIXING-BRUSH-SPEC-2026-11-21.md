@@ -65,3 +65,18 @@ Once the distinct Brush implementation is present on a candidate:
 ## Continuation protocol
 
 For the next session, resume from this document and the linked Human QA Handoff. First inspect current default-branch state, open PRs, candidate SHA and workflow results. Implement the missing color-mixing Brush as a separate feature on an isolated branch; add tests, run the machine gates, update the exact-SHA evidence, then leave the candidate in the human QA queue and continue from written human reports.
+
+
+## Owner-directed implementation contract — Color-Mixing Brush (2026-11-23)
+
+The implementation is a separate stroke-based pickup/smudge tool. It samples existing pigment from the active canvas/layer, carries a blended pickup color along the pointer path, and mixes that pigment into already-painted pixels. It does not use the selected foreground color as the paint source.
+
+- The shared brush-size setting controls the footprint; the Color-Mixing Brush has its own independent 1–100 mixing-strength control.
+- Pointer movement is interpolated across skipped pixel coordinates so fast pointer movement does not leave gaps.
+- The active selection clips both pigment sampling and writes. The active layer lock blocks the stroke. Layer-mask edit mode blocks this tool rather than silently editing the underlying pixels.
+- The tool uses the current brush shape (square, circle or diamond) and keeps pickup state only for the current stroke. Switching tools, ending a stroke or cancelling it resets pickup state.
+- Transparent cells remain transparent. They do not inject the checkerboard/background color into the pickup and do not receive opaque pigment; the carried pigment remains available when the stroke reaches another painted region.
+- Each pointer stroke is one undo/redo operation. Cancelled strokes restore the full layer snapshot.
+- Fading remains its own tool with its own intensity setting. No Fading algorithm or identifier is reused as the Color-Mixing Brush.
+
+Machine verification must prove two-/multi-color pickup, directional smear, continuous interpolation, brush footprint, transparent boundaries, selection clipping, locked-layer protection, independent controls and undo/redo. The browser test additionally verifies that a nonmatching foreground color does not drive the mix result.
