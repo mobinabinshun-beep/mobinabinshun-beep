@@ -97,10 +97,8 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     assert await read_pixel(page, 0, 0) == [0, 255, 0], "Fill did not color the clicked transparent pixel"
     assert await read_pixel(page, 31, 31) == [0, 255, 0], "Fill did not cover the connected transparent canvas"
     await click_cell(page, 31, 31)
-    await fill_toggle.click()  # The status element lives in the collapsible drawer.
-    status = await page.locator("#studio-status").inner_text()
-    assert "already uses the selected color" in status, f"Same-color Fill did not explain its no-op: {status}"
-    await fill_toggle.click()
+    status = await page.locator("#studio-status").text_content()
+    assert "already uses the selected color" in (status or ""), f"Same-color Fill did not explain its no-op: {status}"
     await page.locator("#undo").click()
     assert await read_pixel(page, 0, 0) == before_fill, "One Undo did not restore the pre-Fill transparent canvas"
     await page.locator("#redo").click()
@@ -115,10 +113,10 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     await fill_toggle.click()
     await click_cell(page, 0, 0)
     locked_pixel = await read_pixel(page, 0, 0)
-    await fill_toggle.click()  # Reopen the drawer to inspect its live status message.
-    status = await page.locator("#studio-status").inner_text()
+    status = await page.locator("#studio-status").text_content()
     assert locked_pixel == before_fill, "Fill changed a locked layer"
-    assert "Layer is locked" in status, f"Locked Fill did not explain why it stopped: {status}"
+    assert "Layer is locked" in (status or ""), f"Locked Fill did not explain why it stopped: {status}"
+    await fill_toggle.click()
     await page.locator("#tab-layers").click()
     await lock.uncheck()
     await fill_toggle.click()
