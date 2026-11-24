@@ -86,6 +86,41 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     assert await page.locator('#studio-quick-tools [data-tool="fading-brush"]').count() == 1, "Fading must remain a separate tool"
     await page.locator("#show-grid").evaluate("el => { el.checked=false; }")
 
+    # Fill must paint a completely transparent canvas, preserve undo/redo, and explain no-op/locked states.
+    await set_color(page, "#00ff00")
+    fill_toggle = page.locator("#desktop-tools-toggle" if viewport["width"] > 700 else "#mobile-tools-toggle")
+    await fill_toggle.click()
+    await page.locator('#studio-quick-tools [data-tool="fill"]').click()
+    await fill_toggle.click()
+    before_fill = await read_pixel(page, 0, 0)
+    await click_cell(page, 0, 0)
+    assert await read_pixel(page, 0, 0) == [0, 255, 0], "Fill did not color the clicked transparent pixel"
+    assert await read_pixel(page, 31, 31) == [0, 255, 0], "Fill did not cover the connected transparent canvas"
+    await click_cell(page, 31, 31)
+    status = await page.locator("#studio-status").inner_text()
+    assert "already uses the selected color" in status, f"Same-color Fill did not explain its no-op: {status}"
+    await page.locator("#undo").click()
+    assert await read_pixel(page, 0, 0) == before_fill, "One Undo did not restore the pre-Fill transparent canvas"
+    await page.locator("#redo").click()
+    assert await read_pixel(page, 31, 31) == [0, 255, 0], "Redo did not restore the full-canvas Fill"
+
+    # A locked active layer must not be modified by Fill.
+    await page.locator("#undo").click()
+    await fill_toggle.click()
+    await page.locator("#tab-layers").click()
+    lock = page.get_by_label("Lock Layer 1")
+    await lock.check()
+    await fill_toggle.click()
+    await click_cell(page, 0, 0)
+    locked_pixel = await read_pixel(page, 0, 0)
+    status = await page.locator("#studio-status").inner_text()
+    assert locked_pixel == before_fill, "Fill changed a locked layer"
+    assert "Layer is locked" in status, f"Locked Fill did not explain why it stopped: {status}"
+    await fill_toggle.click()
+    await page.locator("#tab-layers").click()
+    await lock.uncheck()
+    await fill_toggle.click()
+
     if require_mix:
         mix_drawer_toggle = page.locator("#desktop-tools-toggle" if viewport["width"] > 700 else "#mobile-tools-toggle")
         await mix_drawer_toggle.click()
