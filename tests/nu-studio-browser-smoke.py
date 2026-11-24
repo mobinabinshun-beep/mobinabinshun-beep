@@ -87,6 +87,9 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     await page.locator("#show-grid").evaluate("el => { el.checked=false; }")
 
     if require_mix:
+        mix_drawer_toggle = page.locator("#desktop-tools-toggle" if viewport["width"] > 700 else "#mobile-tools-toggle")
+        await mix_drawer_toggle.click()
+        await page.locator("#studio-dock").wait_for(state="visible", timeout=5000)
         assert await page.locator('#studio-quick-tools [data-tool="color-mix-brush"]').count() == 1, "Color-mixing brush tool is missing"
         assert await page.locator('[aria-label="Fading brush intensity"]').count() == 1, "Fading control is missing"
         assert await page.locator('#mix-brush-strength[aria-label="Color mixing strength"]').count() == 1, "Independent mixing-strength control is missing"
@@ -120,6 +123,8 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
         await drag_cells(page, (8, 16), (9, 16))
         assert await read_pixel(page, 9, 16) == mixed, "Color-mixing brush changed a locked layer"
         await lock.uncheck()
+        await mix_drawer_toggle.click()
+        await page.wait_for_function("() => getComputedStyle(document.querySelector('#studio-tools-drawer')).visibility === 'hidden'", timeout=3000)
 
     frame = await page.locator("#workspace-frame").bounding_box()
     canvas = await page.locator("#pixel-canvas").bounding_box()
