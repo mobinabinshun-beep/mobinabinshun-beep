@@ -2,6 +2,7 @@
 """Cross-browser Studio smoke and color-mixing interaction checks for CI."""
 import argparse
 import asyncio
+import re
 from urllib.parse import urljoin
 
 from playwright.async_api import async_playwright
@@ -90,6 +91,21 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     await set_color(page, "#00ff00")
     fill_toggle = page.locator("#desktop-tools-toggle" if viewport["width"] > 700 else "#mobile-tools-toggle")
     await fill_toggle.click()
+    await page.locator("#studio-dock").wait_for(state="visible", timeout=5000)
+    body_text = await page.locator("body").inner_text()
+    assert not re.search(r"[\\u0600-\\u06FF]", body_text), "Studio visible UI contains non-English Persian copy"
+    quick_tools = page.locator("#studio-quick-tools [data-tool]")
+    assert await quick_tools.count() >= 15, "The full quick-tool set is missing"
+    for tool_index in range(await quick_tools.count()):
+        tool_button = quick_tools.nth(tool_index)
+        label = await tool_button.get_attribute("aria-label")
+        title = await tool_button.get_attribute("title")
+        assert label and re.match(r"^[A-Za-z]", label), f"Tool {tool_index} has no descriptive English accessible name: {label}"
+        assert title and re.match(r"^[A-Za-z]", title), f"Tool {tool_index} has no English tooltip: {title}"
+    expected_tabs = ["Color", "Layers", "Fill", "Transform", "Adjust", "Compose", "Advanced", "Export"]
+    for tab_index, expected_label in enumerate(expected_tabs):
+        actual_label = (await page.locator("#studio-tabs [role=tab]").nth(tab_index).inner_text()).strip()
+        assert actual_label.endswith(expected_label), f"Tab {tab_index} label mismatch: {actual_label}"
     await page.locator('#studio-quick-tools [data-tool="fill"]').click()
     await fill_toggle.click()
     before_fill = await read_pixel(page, 0, 0)
