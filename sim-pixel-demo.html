@@ -1,114 +1,67 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#071018">
-<meta name="description" content="SIM PIXEL experimental module inside the N.U public demo.">
-<title>SIM PIXEL — N.U Experimental Module</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#071018"><meta name="description" content="SIM PIXEL isolated prototype aligned with confirmed design decisions."><title>SIM PIXEL — N.U Experimental Module</title>
 <style>
-:root{color-scheme:dark;--bg:#071018;--panel:#101f2a;--line:#294352;--text:#e8f4f8;--muted:#9bb0ba;--accent:#79e0c0;--gold:#f2c879}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -20%,#183443,var(--bg) 65%);color:var(--text);font:15px/1.5 system-ui,sans-serif}
-header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px clamp(14px,4vw,36px);border-bottom:1px solid var(--line);background:#071018dd;position:sticky;top:0;z-index:2}
-a,button{color:inherit}a{color:var(--accent)}.brand{font-weight:800;letter-spacing:.12em}.brand small{display:block;color:var(--muted);font-size:10px;font-weight:600}
-main{max-width:1200px;margin:auto;padding:24px clamp(12px,3vw,28px) 48px}.eyebrow{color:var(--accent);font-size:11px;letter-spacing:.16em;font-weight:800}h1{font-size:clamp(26px,5vw,44px);line-height:1.05;margin:7px 0 10px}h2{font-size:17px;margin:0 0 10px}.intro{color:var(--muted);max-width:760px}
-.layout{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:14px;margin-top:20px}.panel{background:linear-gradient(150deg,#122431,#0b1720);border:1px solid var(--line);border-radius:14px;padding:14px;min-width:0}.world-wrap{position:relative}.world-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px}.world-head span,.muted{color:var(--muted);font-size:12px}
-canvas{display:block;width:100%;height:auto;aspect-ratio:16/10;border-radius:9px;border:1px solid #365262;background:#0a151d;image-rendering:pixelated;touch-action:manipulation}
-.controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.control{border:1px solid #365262;background:#122632;padding:8px 11px;border-radius:8px;cursor:pointer;font:inherit;font-size:13px}.control[aria-pressed=true]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);color:var(--accent)}.control:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
-.statusline{display:flex;justify-content:space-between;gap:8px;margin-top:10px;color:var(--muted);font-size:12px}.legend{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.person{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:12px}.swatch{width:12px;height:12px;border-radius:2px;display:inline-block;flex:none}
-.metrics{display:grid;gap:8px}.metric{display:grid;grid-template-columns:76px 1fr 35px;gap:8px;align-items:center;font-size:12px;color:var(--muted)}.track{height:7px;background:#263b47;border-radius:8px;overflow:hidden}.fill{height:100%;width:100%;background:var(--accent)}
-.qa{margin-top:14px}.qa label{display:block;margin:9px 0;color:var(--muted);font-size:13px}.qa input{margin-right:8px;accent-color:var(--accent)}textarea{width:100%;min-height:90px;resize:vertical;background:#08141c;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:9px;font:13px/1.5 system-ui}
-.notice{border-left:3px solid var(--gold);padding:9px 11px;background:#2a2418;color:#e8d7b5;border-radius:4px;font-size:12px;margin-top:14px}
-footer{margin-top:18px;color:var(--muted);font-size:11px}
-@media(max-width:820px){.layout{grid-template-columns:1fr}.side{display:grid;grid-template-columns:1fr 1fr;gap:12px}.side .panel{margin:0}.qa{grid-column:1/-1}}
-@media(max-width:520px){.side{grid-template-columns:1fr}.world-head{align-items:flex-start;flex-direction:column}}
-</style>
-</head>
-<body>
-<header><div class="brand">N.U <small>SIM PIXEL · EXPERIMENTAL MODULE</small></div><a href="./index.html">← Back to N.U demo</a></header>
-<main>
-<div class="eyebrow">PUBLIC DEMO · PHASE 01</div>
-<h1>SIM PIXEL</h1>
-<p class="intro">A first playable movement slice for the SIM PIXEL life-simulation concept. Move the player Pixel through a small city block, inspect five NPC Pixels, and record human test observations. This module is isolated from the Generation 1 runtime and its save/wallet systems.</p>
-<div class="layout">
-<section class="panel world-wrap">
-<div class="world-head"><h2>City test zone</h2><span>1 tile = 1 m² · 6 Pixels</span></div>
-<canvas id="world" width="800" height="500" tabindex="0" role="application" aria-label="SIM PIXEL city test zone. Click a tile to set a destination. Use arrow keys or WASD to move."></canvas>
-<div class="controls" aria-label="Movement mode">
-<button class="control" data-mode="Chill" aria-pressed="false">Chill · 2 m/s</button>
-<button class="control" data-mode="Normal" aria-pressed="true">Normal · 1 m/s</button>
-<button class="control" data-mode="Hurry" aria-pressed="false">Hurry · 5 m/s</button>
-<button class="control" data-mode="Escape" aria-pressed="false">Escape · 25 m/s</button>
-<button class="control" id="stop">Stop</button>
-</div>
-<div class="statusline"><span id="movement">Movement: idle</span><span id="coords">Position: 10, 10</span></div>
-<div class="legend">
-<div class="person"><i class="swatch" style="background:#79e0c0"></i>Player Pixel</div>
-<div class="person"><i class="swatch" style="background:#f2c879"></i>NPC 01</div>
-<div class="person"><i class="swatch" style="background:#83aaff"></i>NPC 02</div>
-<div class="person"><i class="swatch" style="background:#f28b9a"></i>NPC 03</div>
-<div class="person"><i class="swatch" style="background:#c59cff"></i>NPC 04</div>
-<div class="person"><i class="swatch" style="background:#a9d47a"></i>NPC 05</div>
-</div>
-<div class="notice">Prototype boundary: collision avoidance, full route analysis, NPC schedules, needs, survival logic, Mental System, buildings/interiors, and persistent saves are not implemented in this first slice. The city geometry is test scenery, not a finalized map.</div>
-</section>
-<aside class="side">
-<section class="panel">
-<h2>Player state</h2>
-<div class="metrics">
-<div class="metric"><span>Movement</span><div class="track"><div class="fill" id="pace-fill"></div></div><b id="pace-value">1</b></div>
-<div class="metric"><span>Destination</span><span id="destination" style="grid-column:span 2">None</span></div>
-<div class="metric"><span>Mode</span><span id="mode-value" style="grid-column:span 2">Normal</span></div>
-</div>
-<p class="muted">Keyboard: Arrow keys / WASD. Pointer or touch: tap a destination tile. The selected mode controls movement speed.</p>
-</section>
-<section class="panel qa">
-<h2>Human test record</h2>
-<label><input type="checkbox" data-check="launch">Module opens from the N.U public demo</label>
-<label><input type="checkbox" data-check="pointer">Pointer/touch destination works</label>
-<label><input type="checkbox" data-check="keyboard">Keyboard movement works</label>
-<label><input type="checkbox" data-check="pace">All four movement modes behave distinctly</label>
-<label><input type="checkbox" data-check="responsive">Layout works on this device</label>
-<label for="observations">Tester observations / issues</label>
-<textarea id="observations" placeholder="Describe what you observed, device/browser, and steps to reproduce any issue."></textarea>
-<button class="control" id="report">Download human test report</button>
-<p class="muted" id="report-status" aria-live="polite">Report is generated locally in this browser. Nothing is uploaded.</p>
-</section>
-</aside>
-</div>
-<footer>SIM PIXEL demo slice · isolated page · no changes to N.U Runtime, Manifest, Launcher, shared save, or wallet.</footer>
-</main>
+:root{color-scheme:dark;--bg:#071018;--panel:#101f2a;--line:#294352;--text:#e8f4f8;--muted:#9bb0ba;--accent:#79e0c0;--gold:#f2c879;--blue:#8ecbff;--purple:#c59cff}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -20%,#183443,var(--bg) 65%);color:var(--text);font:14px/1.5 system-ui,sans-serif}header{display:flex;justify-content:space-between;align-items:center;padding:12px clamp(12px,3vw,28px);border-bottom:1px solid var(--line);background:#071018ed;position:sticky;top:0;z-index:5}a{color:var(--accent)}.brand{font-weight:800;letter-spacing:.12em}.brand small{display:block;color:var(--muted);font-size:10px}main{max-width:1400px;margin:auto;padding:20px clamp(10px,2vw,22px) 40px}.eyebrow{color:var(--accent);font-size:11px;letter-spacing:.16em;font-weight:800}h1{font-size:clamp(25px,4vw,40px);line-height:1.05;margin:6px 0 8px}h2{font-size:16px;margin:0 0 10px}.muted,.intro{color:var(--muted)}.intro{max-width:850px}.layout{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:12px;margin-top:16px}.panel{background:linear-gradient(150deg,#122431,#0b1720);border:1px solid var(--line);border-radius:12px;padding:12px;min-width:0}.world-head,.row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.tiny,.world-head span{color:var(--muted);font-size:11px}canvas{display:block;width:100%;height:auto;aspect-ratio:16/10;border:1px solid #365262;border-radius:8px;background:#0a151d;image-rendering:pixelated;touch-action:manipulation}.controls{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.control{border:1px solid #365262;background:#122632;color:var(--text);padding:7px 9px;border-radius:7px;cursor:pointer;font:inherit;font-size:12px}.control[aria-pressed=true]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);color:var(--accent)}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:3px}.status{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:8px;color:var(--muted);font-size:11px}.legend{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:8px}.person{display:flex;gap:7px;align-items:center;color:var(--muted);font-size:11px}.swatch{width:12px;height:12px;display:inline-block;flex:none}.side{display:grid;gap:10px;align-content:start}.metric{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid #29435280;font-size:12px}.metric span{color:var(--muted)}.notice{border-left:3px solid var(--gold);padding:8px 10px;background:#2a2418;color:#e8d7b5;border-radius:4px;font-size:11px;margin-top:10px}.start{max-width:500px;margin:28px auto}.start label{display:block;color:var(--muted);font-size:12px;margin:8px 0 4px}.start input,.start select{width:100%;background:#08141c;color:var(--text);border:1px solid var(--line);border-radius:7px;padding:9px;font:inherit}.overlay{position:absolute;inset:0;background:#071018e8;display:grid;place-items:center;padding:20px;border-radius:8px;z-index:3}.overlay-card{max-width:420px;text-align:center;background:#10222e;border:1px solid var(--accent);padding:18px;border-radius:12px}.world-wrap{position:relative}.hidden{display:none!important}.queue{display:grid;gap:6px}.queue-item{border:1px solid #60727a;padding:7px;border-radius:6px;font-size:11px}.queue-item.phase{border:2px solid #fff;background:#16354a}.queue-item.scheduled{border:2px solid var(--purple)}footer{margin-top:14px;color:var(--muted);font-size:10px}@media(max-width:900px){.layout{grid-template-columns:1fr}.side{grid-template-columns:1fr 1fr}.side .panel:last-child{grid-column:1/-1}}@media(max-width:560px){.side{grid-template-columns:1fr}.legend{grid-template-columns:repeat(2,1fr)}}
+</style></head><body>
+<header><div class="brand">N.U <small>SIM PIXEL · ISOLATED EXPERIMENTAL MODULE</small></div><a href="./index.html">← Back to N.U demo</a></header><main>
+<div class="eyebrow">PUBLIC DEMO · SPEC ALIGNMENT BUILD</div><h1>SIM PIXEL</h1><p class="intro">A choice-driven open-world life-simulation prototype. This build aligns the playable movement and camera slice with confirmed design decisions while keeping undecided systems out of scope. It remains isolated from N.U Runtime, Manifest, Launcher, shared save and Wallet.</p>
+<section id="start-screen" class="panel start"><h2>Begin your Pixel's day</h2><p class="muted">Choose a name and one of the six confirmed Pixel colors.</p><label for="first-name">First name</label><input id="first-name" maxlength="24" autocomplete="given-name"><label for="last-name">Last name</label><input id="last-name" maxlength="24" autocomplete="family-name"><label for="pixel-color">Pixel color</label><select id="pixel-color"><option value="blue">Blue</option><option value="green">Green</option><option value="yellow">Yellow</option><option value="orange">Orange</option><option value="red">Red</option><option value="purple">Purple</option></select><div class="controls"><button class="control" id="start-free">Start freely</button><button class="control" id="start-tutorial">Start tutorial</button></div></section>
+<div id="game" class="layout hidden"><section class="panel world-wrap"><div class="world-head"><h2>Open city · Top-down</h2><span>1 map unit = 1 m · 1 Pixel = 1 m² · 6 Pixels</span></div><canvas id="world" width="960" height="600" tabindex="0" role="application" aria-label="Top-down city. Select a destination with pointer or touch; use arrows or WASD for direct movement."></canvas>
+<div id="tutorial" class="overlay hidden"><div class="overlay-card"><div style="font-size:34px">⬇️ ➜</div><h2 id="tutorial-title">Choose where to go</h2><p id="tutorial-copy" class="muted">Tap or click an open place in the city to set a destination. The world is paused while this guide is open.</p><button class="control" id="tutorial-next">Continue</button><button class="control" id="tutorial-skip">Finish tutorial</button></div></div>
+<div class="controls" aria-label="Movement mode"><button class="control" data-mode="Chill" aria-pressed="false">Chill · 2 m/s</button><button class="control" data-mode="Normal" aria-pressed="true">Normal · 1 m/s</button><button class="control" data-mode="Hurry" aria-pressed="false">Hurry · 5 m/s</button><button class="control" data-mode="Escape" aria-pressed="false">Escape · 25 m/s</button><button class="control" id="stop">Stop</button></div>
+<div class="controls"><button class="control" id="zoom-out" aria-label="Zoom out">− Zoom</button><span id="zoom-level" class="tiny">Zoom 5 / 10</span><button class="control" id="zoom-in" aria-label="Zoom in">+ Zoom</button><button class="control" id="camera-follow" aria-pressed="false">◎ Follow Pixel</button></div><div class="status"><span id="movement">Movement: idle</span><span id="coords">Position: —</span><span id="destination">Destination: none</span></div><div class="legend" id="legend"></div>
+<div class="notice">Not yet implemented: obstacle-aware route finding, exact building doors and interior options, autonomous NPC schedules, complete group-encounter state machine, needs catalogue and decay rates, economy, jobs, relationships, calendar durations, persistent module save and home-purchase catalogue. No unapproved values are simulated.</div></section>
+<aside class="side"><section class="panel"><h2>Pixel state</h2><div class="metric"><span>Player</span><b id="player-name">—</b></div><div class="metric"><span>Movement mode</span><b id="mode-value">Normal</b></div><div class="metric"><span>Axis speed</span><b id="pace-value">1 m/s</b></div><div class="metric"><span>Camera</span><b id="camera-value">Manual</b></div><div class="metric"><span>Display zone</span><b>40 m diameter · 20 m radius</b></div><p class="tiny">Keyboard: arrows / WASD. Pointer or touch: choose destination. Diagonal movement preserves each axis speed; vector speed is not normalized.</p></section>
+<section class="panel"><h2>Task processing</h2><div class="queue"><div class="queue-item phase">① Execution · operation layer</div><div class="queue-item phase">② Route analysis</div><div class="queue-item phase">③ Target-time analysis</div><div class="queue-item phase">④ Decision</div><div class="queue-item">Manual player commands · queue engine pending</div><div class="queue-item scheduled">Scheduled Auto-Pilot · daily / weekly / seasonal / annual</div></div><p class="tiny">Four blue/white stages are internal processing, not player-selectable modes. Purple marks scheduled work; neutral marks player commands.</p></section>
+<section class="panel"><h2>Human test record</h2><label class="tiny"><input type="checkbox" data-check="launch"> Module opens from N.U demo</label><label class="tiny"><input type="checkbox" data-check="movement"> Continuous movement and four speeds</label><label class="tiny"><input type="checkbox" data-check="diagonal"> Diagonal axis speed</label><label class="tiny"><input type="checkbox" data-check="zoom"> Ten zoom levels and follow camera</label><label class="tiny"><input type="checkbox" data-check="responsive"> Layout on this device</label><label class="tiny" for="observations">Tester observations</label><textarea id="observations" rows="3" style="width:100%;background:#08141c;color:var(--text);border:1px solid var(--line);border-radius:7px;padding:8px"></textarea><button class="control" id="report">Download human test JSON</button><p id="report-status" class="tiny" aria-live="polite">Generated locally; nothing is uploaded.</p></section></aside></div>
+<footer>SIM PIXEL spec-alignment prototype · isolated from N.U shared runtime and data · local test report only.</footer></main>
 <script>
 (()=>{"use strict";
-const canvas=document.getElementById("world"),ctx=canvas.getContext("2d");
-const W=20,H=12,S=40,colors=["#79e0c0","#f2c879","#83aaff","#f28b9a","#c59cff","#a9d47a"];
-const player={x:10.5,y:9.5},npcs=[{x:4.5,y:4.5},{x:7.5,y:7.5},{x:14.5,y:3.5},{x:16.5,y:8.5},{x:11.5,y:5.5}];
-const modes={Chill:2,Normal:1,Hurry:5,Escape:25};let mode="Normal",path=[],target=null,last=0,acc=0,raf=0;
-const $=id=>document.getElementById(id);
+const canvas=document.getElementById("world"),ctx=canvas.getContext("2d"),$=id=>document.getElementById(id);
+const COLORS={blue:"#3478df",green:"#38a85a",yellow:"#f0cf35",orange:"#f08a24",red:"#df4545",purple:"#9b62d8"},ORDER=["blue","green","yellow","orange","red","purple"],W=48,H=30;
+const modes={Chill:2,Normal:1,Hurry:5,Escape:25};
+const s={started:false,first:"",lastName:"",color:"blue",mode:"Normal",zoom:5,follow:false,player:{x:24,y:15},target:null,keys:new Set(),last:0,interaction:null,encounters:new Set(),tutorialStep:0};
+let npcs=[],camera={x:24,y:15};
+function scale(){return 6+s.zoom*2}
+function screen(x,y){const k=scale(),cx=s.follow?s.player.x:camera.x,cy=s.follow?s.player.y:camera.y;return{x:canvas.width/2+(x-cx)*k,y:canvas.height/2+(y-cy)*k,k}}
+function people(){const rest=ORDER.filter(c=>c!==s.color);npcs=[{id:"npc1",x:9,y:9,color:rest[0]},{id:"npc2",x:17,y:22,color:rest[1]},{id:"npc3",x:32,y:9,color:rest[2]},{id:"npc4",x:38,y:22,color:rest[3]},{id:"npc5",x:25,y:25,color:rest[4]}]}
+function pixel(p,player=false){const q=screen(p.x,p.y);ctx.fillStyle=COLORS[p.color];ctx.fillRect(q.x-q.k/2,q.y-q.k/2,q.k,q.k);if(player){ctx.strokeStyle="#fff";ctx.lineWidth=2;ctx.strokeRect(q.x-q.k/2-2,q.y-q.k/2-2,q.k+4,q.k+4)}}
 function draw(){
- ctx.clearRect(0,0,800,500);ctx.fillStyle="#152b32";ctx.fillRect(0,0,800,500);
- for(let y=0;y<H;y++)for(let x=0;x<W;x++){const road=(x>=8&&x<=11)||(y>=5&&y<=7);ctx.fillStyle=road?"#31434a":"#203b36";ctx.fillRect(x*S,y*S,S-1,S-1);
- if(!road&&((x*7+y*11)%17===0)){ctx.fillStyle="#35564b";ctx.fillRect(x*S+5,y*S+5,30,30)}
- }
- // Neutral city blocks and building footprints; illustrative only.
- [[1,1,5,3],[13,1,5,3],[1,8,5,3],[14,9,4,2]].forEach(([x,y,w,h],i)=>{ctx.fillStyle=["#52636a","#465b66","#4b6258","#58616b"][i];ctx.fillRect(x*S+3,y*S+3,w*S-6,h*S-6);ctx.strokeStyle="#82949a";ctx.strokeRect(x*S+3,y*S+3,w*S-6,h*S-6);ctx.fillStyle="#d6c18d";for(let yy=y*S+12;yy<(y+h)*S-8;yy+=22)for(let xx=x*S+12;xx<(x+w)*S-8;xx+=24)ctx.fillRect(xx,yy,8,8)});
- if(target){ctx.strokeStyle="#f2c879";ctx.lineWidth=2;ctx.strokeRect(target.x*S+5,target.y*S+5,S-10,S-10)}
- if(path.length){ctx.strokeStyle="#79e0c080";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(player.x*S,player.y*S);path.forEach(p=>ctx.lineTo((p.x+.5)*S,(p.y+.5)*S));ctx.stroke()}
- npcs.forEach((p,i)=>pixel(p,colors[i+1]));pixel(player,colors[0],true);
+ ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle="#29483e";ctx.fillRect(0,0,canvas.width,canvas.height);
+ const k=scale(),cx=s.follow?s.player.x:camera.x,cy=s.follow?s.player.y:camera.y,left=Math.floor(cx-canvas.width/k/2)-2,top=Math.floor(cy-canvas.height/k/2)-2;
+ for(let y=top;y<top+canvas.height/k+4;y++)for(let x=left;x<left+canvas.width/k+4;x++){const p=screen(x,y);ctx.fillStyle="#29483e";ctx.fillRect(p.x,p.y,k-1,k-1)}
+ // Reference 10m street cross-section: 2m garden + 1m sidewalk + 4m road + 1m sidewalk + 2m garden.
+ for(let y=8;y<18;y++){const p=screen(0,y);ctx.fillStyle=(y<=9||y>=16)?"#7b8860":(y===10||y===15)?"#a1a6a3":"#45545c";ctx.fillRect(p.x,p.y,canvas.width,k-1)}
+ // Building fronts border the gardens; exact door positions are intentionally not invented.
+ for(const [y,h] of [[0,8],[18,12]]){const a=screen(0,y),b=screen(W,y+h);ctx.fillStyle="#58666c";ctx.fillRect(a.x,a.y,b.x-a.x,b.y-a.y);ctx.strokeStyle="#9aa9ac";ctx.strokeRect(a.x,a.y,b.x-a.x,b.y-a.y)}
+ // Active display zone: 40m diameter, player-centred.
+ const c=screen(s.player.x,s.player.y);ctx.save();ctx.setLineDash([5,5]);ctx.strokeStyle="#79e0c077";ctx.lineWidth=2;ctx.beginPath();ctx.arc(c.x,c.y,20*k,0,Math.PI*2);ctx.stroke();ctx.restore();
+ if(s.target){const p=screen(s.target.x,s.target.y);ctx.strokeStyle="#f2c879";ctx.lineWidth=2;ctx.strokeRect(p.x-k/2,p.y-k/2,k,k)}
+ npcs.forEach(n=>pixel(n));pixel({...s.player,color:s.color},true);
+ if(s.interaction){const p=screen(s.player.x,s.player.y);const icons=["👋","😊","✦","👋"];ctx.font=Math.max(14,Math.min(24,p.k*.8))+"px system-ui";icons.forEach((v,i)=>ctx.fillText(v,p.x-42+i*25,p.y-p.k))}
 }
-function pixel(p,color,isPlayer=false){ctx.fillStyle="#071018";ctx.fillRect(p.x*S-10,p.y*S-10,20,20);ctx.fillStyle=color;ctx.fillRect(p.x*S-8,p.y*S-8,16,16);ctx.fillStyle="#071018";ctx.fillRect(p.x*S-4,p.y*S-4,3,3);ctx.fillRect(p.x*S+2,p.y*S-4,3,3);if(isPlayer){ctx.strokeStyle="#fff";ctx.lineWidth=2;ctx.strokeRect(p.x*S-11,p.y*S-11,22,22)}}
-function routeTo(tx,ty){tx=Math.max(0,Math.min(W-1,tx));ty=Math.max(0,Math.min(H-1,ty));const sx=Math.floor(player.x),sy=Math.floor(player.y);path=[];let x=sx,y=sy;while(x!==tx||y!==ty){if(x!==tx)x+=Math.sign(tx-x);else if(y!==ty)y+=Math.sign(ty-y);path.push({x,y})}target={x:tx,y:ty};$("destination").textContent=tx+", "+ty;updateStatus();draw()}
-function updateStatus(){$("movement").textContent=path.length?"Movement: moving":"Movement: idle";$("coords").textContent="Position: "+player.x.toFixed(1)+", "+player.y.toFixed(1);$("mode-value").textContent=mode;$("pace-value").textContent=modes[mode];$("pace-fill").style.width=(modes[mode]/25*100)+"%"}
-function tick(t){if(!last)last=t;const dt=Math.min((t-last)/1000,.05);last=t;if(path.length){acc+=dt*modes[mode];while(acc>=1&&path.length){const p=path.shift();player.x=p.x+.5;player.y=p.y+.5;acc-=1}if(!path.length)acc=0;updateStatus();draw()}raf=requestAnimationFrame(tick)}
-canvas.addEventListener("pointerdown",e=>{const r=canvas.getBoundingClientRect();routeTo(Math.floor((e.clientX-r.left)/r.width*W),Math.floor((e.clientY-r.top)/r.height*H));canvas.focus()});
-function key(e){const map={ArrowUp:[0,-1],w:[0,-1],ArrowDown:[0,1],s:[0,1],ArrowLeft:[-1,0],a:[-1,0],ArrowRight:[1,0],d:[1,0]};const v=map[e.key];if(v){e.preventDefault();routeTo(Math.floor(player.x)+v[0],Math.floor(player.y)+v[1])}}
-window.addEventListener("keydown",key);
-document.querySelectorAll("[data-mode]").forEach(b=>b.addEventListener("click",()=>{mode=b.dataset.mode;document.querySelectorAll("[data-mode]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));updateStatus()}));
-$("stop").addEventListener("click",()=>{path=[];target=null;acc=0;$("destination").textContent="None";updateStatus();draw()});
-document.addEventListener("visibilitychange",()=>{last=0});
-$("report").addEventListener("click",()=>{const report={project:"SIM PIXEL",moduleVersion:"demo-slice-0.1",generatedAt:new Date().toISOString(),device:{userAgent:navigator.userAgent,language:navigator.language},checks:Object.fromEntries([...document.querySelectorAll("[data-check]")].map(x=>[x.dataset.check,x.checked])),observations:$("observations").value,playerPosition:{x:player.x,y:player.y},movementMode:mode,scope:"Isolated movement demo. Not a runtime acceptance report."};const blob=new Blob([JSON.stringify(report,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="sim-pixel-human-test-report.json";a.click();URL.revokeObjectURL(url);$("report-status").textContent="Report generated locally. Please review the downloaded JSON before sharing."});
-draw();updateStatus();raf=requestAnimationFrame(tick);
+function setMode(m){s.mode=m;document.querySelectorAll("[data-mode]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.mode===m)));$("mode-value").textContent=m;$("pace-value").textContent=modes[m]+" m/s"}
+function update(){const p=s.player;$("coords").textContent="Position: "+p.x.toFixed(2)+", "+p.y.toFixed(2);$("movement").textContent=s.interaction?"Movement: social interaction":s.target?"Movement: moving":"Movement: idle";$("camera-value").textContent=s.follow?"Following":"Manual";$("zoom-level").textContent="Zoom "+s.zoom+" / 10";draw()}
+function target(x,y){s.target={x:Math.max(1,Math.min(W-1,x)),y:Math.max(8,Math.min(H-1,y))};$("destination").textContent="Destination: "+s.target.x.toFixed(1)+", "+s.target.y.toFixed(1);update()}
+function encounters(){for(const n of npcs){const d=Math.hypot(s.player.x-n.x,s.player.y-n.y),id="player-"+n.id;if(d<1&&!s.encounters.has(id)&&!s.interaction){s.encounters.add(id);s.target=null;s.interaction={until:performance.now()+1000,npc:n.id}}if(d>=2)s.encounters.delete(id)}}
+function tick(t){if(!s.started)return;if(!s.last)s.last=t;const dt=Math.min((t-s.last)/1000,.05);s.last=t;
+ // Tutorial freezes the world and all movement.
+ if(!$("tutorial").classList.contains("hidden")){s.last=t;s.raf=requestAnimationFrame(tick);return}
+ if(s.interaction){if(t>=s.interaction.until)s.interaction=null}
+ else{let dx=0,dy=0;if(s.keys.has("ArrowLeft")||s.keys.has("a"))dx--;if(s.keys.has("ArrowRight")||s.keys.has("d"))dx++;if(s.keys.has("ArrowUp")||s.keys.has("w"))dy--;if(s.keys.has("ArrowDown")||s.keys.has("s"))dy++;
+  if(dx||dy){s.target=null;s.player.x=Math.max(0,Math.min(W,s.player.x+dx*modes[s.mode]*dt));s.player.y=Math.max(0,Math.min(H,s.player.y+dy*modes[s.mode]*dt))}
+  else if(s.target){const ax=s.target.x-s.player.x,ay=s.target.y-s.player.y,v=modes[s.mode]*dt;s.player.x+=Math.sign(ax)*Math.min(Math.abs(ax),v);s.player.y+=Math.sign(ay)*Math.min(Math.abs(ay),v);if(Math.abs(ax)<.02&&Math.abs(ay)<.02)s.target=null}
+  encounters()}
+ if(s.follow){camera.x=s.player.x;camera.y=s.player.y}update();s.raf=requestAnimationFrame(tick)}
+function tutorialEnd(){$("tutorial").classList.add("hidden");s.last=0}
+function begin(withTutorial){s.first=$("first-name").value.trim();s.lastName=$("last-name").value.trim();s.color=$("pixel-color").value;if(!s.first||!s.lastName){alert("Enter first and last name to begin.");return}people();$("player-name").textContent=s.first+" "+s.lastName;$("start-screen").classList.add("hidden");$("game").classList.remove("hidden");s.started=true;if(withTutorial)$("tutorial").classList.remove("hidden");s.last=0;s.raf=requestAnimationFrame(tick);update();canvas.focus()}
+$("start-free").addEventListener("click",()=>begin(false));$("start-tutorial").addEventListener("click",()=>begin(true));
+$("tutorial-next").addEventListener("click",()=>{s.tutorialStep++;if(s.tutorialStep>1){tutorialEnd();return}$("tutorial-title").textContent="Choose a movement mode";$("tutorial-copy").textContent="Select Chill, Normal, Hurry or Escape. The world stays paused while this guide is open."});$("tutorial-skip").addEventListener("click",tutorialEnd);
+canvas.addEventListener("pointerdown",e=>{const r=canvas.getBoundingClientRect(),k=scale(),cx=s.follow?s.player.x:camera.x,cy=s.follow?s.player.y:camera.y;const x=cx+(e.clientX-r.left)/r.width*canvas.width/k-canvas.width/k/2,y=cy+(e.clientY-r.top)/r.height*canvas.height/k-canvas.height/k/2;target(x,y);canvas.focus()});
+window.addEventListener("keydown",e=>{if(["ArrowLeft","ArrowRight","ArrowUp","ArrowDown","w","a","s","d"].includes(e.key)){e.preventDefault();s.keys.add(e.key)}});window.addEventListener("keyup",e=>s.keys.delete(e.key));window.addEventListener("blur",()=>s.keys.clear());
+document.querySelectorAll("[data-mode]").forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));$("stop").addEventListener("click",()=>{s.target=null;s.keys.clear();$("destination").textContent="Destination: none";update()});
+$("zoom-in").addEventListener("click",()=>{s.zoom=Math.min(10,s.zoom+1);update()});$("zoom-out").addEventListener("click",()=>{s.zoom=Math.max(1,s.zoom-1);update()});$("camera-follow").addEventListener("click",()=>{s.follow=!s.follow;$("camera-follow").setAttribute("aria-pressed",String(s.follow));update()});
+$("report").addEventListener("click",()=>{const report={project:"SIM PIXEL",build:"spec-alignment-prototype-0.2",generatedAt:new Date().toISOString(),device:{userAgent:navigator.userAgent,language:navigator.language},checks:Object.fromEntries([...document.querySelectorAll("[data-check]")].map(x=>[x.dataset.check,x.checked])),observations:$("observations").value,player:{firstName:s.first,lastName:s.lastName,color:s.color,position:s.player,mode:s.mode},camera:{zoom:s.zoom,follow:s.follow},scope:"Isolated prototype; not a full life-simulator acceptance report."};const blob=new Blob([JSON.stringify(report,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="sim-pixel-human-test-report.json";a.click();URL.revokeObjectURL(url);$("report-status").textContent="JSON generated locally. Review it before sending to the project owner."});
+$("legend").innerHTML=ORDER.map(c=>'<div class="person"><i class="swatch" style="background:'+COLORS[c]+'"></i>Pixel color: '+c+'</div>').join("");setMode("Normal");update();
 })();
-</script>
-</body>
-</html>
+</script></body></html>
