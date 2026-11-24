@@ -116,7 +116,45 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
         await toggle.click()
         assert await toggle.get_attribute("aria-expanded") == "true", "Desktop tools drawer did not open accessibly"
         assert await page.locator("#studio-tools-drawer").get_attribute("data-workspace-drawer-state") == "open", "Desktop drawer controller did not set its open state"
-        assert await page.locator("#studio-tools-drawer").is_visible(), "Desktop tools drawer did not open"
+        # The drawer intentionally transitions visibility/transform over 200 ms.
+        # Poll the rendered state instead of sampling visibility in the same task
+        # as the click; also prove the drawer has real dimensions and is on-screen.
+        await page.wait_for_function(
+            """() => {
+                const drawer = document.querySelector("#studio-tools-drawer");
+                if (!drawer) return false;
+                const style = getComputedStyle(drawer);
+                const rect = drawer.getBoundingClientRect();
+                const transform = new DOMMatrixReadOnly(style.transform);
+                return document.body.classList.contains("nu-desktop-tools-open")
+                    && drawer.dataset.workspaceDrawerState === "open"
+                    && style.display !== "none"
+                    && style.visibility === "visible"
+                    && rect.width > 0 && rect.height > 0
+                    && rect.left >= 0 && rect.right <= window.innerWidth
+                    && Math.abs(transform.m41) < 1;
+            }""",
+            timeout=3000,
+        )
+        drawer_metrics = await page.locator("#studio-tools-drawer").evaluate(
+            """el => {
+                const style = getComputedStyle(el);
+                const rect = el.getBoundingClientRect();
+                return {
+                    display: style.display,
+                    visibility: style.visibility,
+                    transform: style.transform,
+                    width: rect.width,
+                    height: rect.height,
+                    left: rect.left,
+                    right: rect.right,
+                    state: el.dataset.workspaceDrawerState
+                };
+            }"""
+        )
+        assert await page.locator("#studio-tools-drawer").is_visible(), (
+            f"Desktop tools drawer did not render visibly: {drawer_metrics}"
+        )
         canvas_box = await page.locator("#pixel-canvas").bounding_box()
         assert canvas_box, "Canvas has no bounds while desktop drawer is open"
         probe = await page.evaluate("""(r) => {
