@@ -81,9 +81,7 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
         tab = tabs.nth(tab_index)
         panel_id = await tab.get_attribute("aria-controls")
         assert panel_id, f"Advanced tab {tab_index} has no aria-controls relationship"
-        await tab.click()
-        assert await page.locator("#" + panel_id).is_visible(), f"Advanced panel {panel_id} did not become visible"
-    await page.locator("#tab-palette").click()
+        assert await page.locator("#" + panel_id).count() == 1, f"Advanced panel {panel_id} is missing"
     await page.wait_for_function("() => { const c=document.querySelector('#pixel-canvas'); return c && c.width>0 && c.height>0 && c.getBoundingClientRect().width>0; }", timeout=30000)
     assert await page.locator('#studio-quick-tools [data-tool="fading-brush"]').count() == 1, "Fading must remain a separate tool"
     await page.locator("#show-grid").evaluate("el => { el.checked=false; }")
@@ -171,6 +169,13 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
                 };
             }"""
         )
+        tabs = page.locator("#studio-tabs [role=tab]")
+        for tab_index in range(await tabs.count()):
+            tab = tabs.nth(tab_index)
+            panel_id = await tab.get_attribute("aria-controls")
+            await tab.click()
+            assert await page.locator("#" + panel_id).is_visible(), f"Advanced panel {panel_id} did not become visible"
+        await page.locator("#tab-palette").click()
         print(f"Desktop drawer open computed metrics: {drawer_metrics}")
         assert await page.locator("#studio-tools-drawer").is_visible(), (
             f"Desktop tools drawer did not render visibly: {drawer_metrics}"
