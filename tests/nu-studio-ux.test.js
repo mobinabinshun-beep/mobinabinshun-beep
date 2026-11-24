@@ -42,7 +42,7 @@ test("Dynamic dock tabs, layer controls and guidance use English labels",()=>{
 
 
 test("active-tool context panel owns and reveals only relevant existing settings",()=>{
- assert.match(runtime,/id="studio-context-title"/);
+ assert.match(runtime,/contextTitle\.id="studio-context-title"/);
  assert.match(runtime,/toolContextRefresh=\(\)=>/);
  for(const contract of [
   'moveContextField("adv-symmetry","paint")',
