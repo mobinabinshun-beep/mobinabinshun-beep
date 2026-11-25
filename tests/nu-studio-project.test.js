@@ -28,9 +28,11 @@ function fixture() {
       settings: {
         zoom: 175, brushSize: 4, fadeIntensity: 35, mixBrushStrength: 65, viewRotation: 15,
         guideState: { blueprint: true, ruler: false, divisions: true, axes: false, depth: true },
-        guideHighContrast: true, magnifierFactor: 6, magnifierSize: 180,
+        guideHighContrast: true, showGrid: false, magnifierFactor: 6, magnifierSize: 180,
         bucket: "similar", tolerance: 18, symmetry: "horizontal",
-        brushShape: "circle", texture: "dots", textureDensity: 72
+        brushShape: "circle", texture: "dots", textureDensity: 72,
+        gradientColor: "#65dcff", gradientMode: "radial", curveTension: 14, alpha: 85,
+        selectionScaleX: 3, selectionScaleY: 2
       }
     }
   };
