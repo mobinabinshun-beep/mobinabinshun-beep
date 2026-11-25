@@ -428,7 +428,7 @@ function advPanel(){
  propertiesPanel.append(propertiesContent);
  vectorPanel.remove();
  drawer.insertBefore(propertiesPanel,exportPanel);
- drawer.append(d);
+ drawer.prepend(d);
  const quick=$("studio-quick-tools"),names={pencil:{icon:"✏️",label:"Pencil",shortcut:"B"},eraser:{icon:"🧽",label:"Eraser",shortcut:"E"},fill:{icon:"🪣",label:"Fill",shortcut:"G"},picker:{icon:"🎯",label:"Eyedropper",shortcut:"I"},line:{icon:"／",label:"Line",shortcut:"L"},rect:{icon:"▭",label:"Rectangle",shortcut:"R"},ellipse:{icon:"◯",label:"Ellipse",shortcut:"O"},"rect-fill":{icon:"▰",label:"Filled rectangle"},"ellipse-fill":{icon:"●",label:"Filled ellipse"},"select-rect":{icon:"▣",label:"Rectangular selection"},"select-lasso":{icon:"〰",label:"Lasso selection"},"move-selection":{icon:"✥",label:"Move selection"},gradient:{icon:"◩",label:"Gradient"},texture:{icon:"▦",label:"Texture brush"},bezier:{icon:"⌁",label:"Bezier curve"},"fading-brush":{icon:"🌫️",label:"Fading brush"},"color-mix-brush":{icon:"🖌️",label:"Color-mixing brush"},compass:{icon:"🧭",label:"Compass"}};
  document.querySelectorAll("[data-tool]").forEach(b=>{const n=names[b.dataset.tool];if(!n)return;b.innerHTML='<span class="tool-icon" aria-hidden="true">'+n.icon+'</span><span>'+n.label+'</span>';b.title=n.shortcut?n.label+' ('+n.shortcut+')':n.label;b.setAttribute("aria-label",n.label+(n.shortcut?", "+n.shortcut+" shortcut":""));quick.append(b);});
  const contextPanel=$("studio-brush");contextPanel.setAttribute("role","region");contextPanel.setAttribute("aria-label","Active tool options");
