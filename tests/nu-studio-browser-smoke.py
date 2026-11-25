@@ -216,6 +216,72 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     await lock.uncheck()
     await fill_toggle.click()
 
+    # High-contrast Blueprint stays visible on light and negative artwork, but never changes pixels.
+    await fill_toggle.click()
+    await set_color(page, "#ffffff")
+    await page.locator('#studio-quick-tools [data-tool="fill"]').click()
+    await fill_toggle.click()
+    await click_cell(page, 0, 0)
+    blueprint = page.locator('[data-guide="blueprint"]')
+    contrast_toggle = page.locator("[data-guide-contrast]")
+    assert await contrast_toggle.is_checked(), "High-contrast guides must be enabled by default"
+    light_baseline = await read_pixel(page, 1, 1)
+    await blueprint.check()
+    light_guide = await read_pixel(page, 1, 1)
+    assert light_guide != light_baseline, "Blueprint guide is not visible on a light background"
+    await blueprint.uncheck()
+    assert await read_pixel(page, 1, 1) == light_baseline, "Turning off Blueprint changed the artwork pixels"
+
+    await fill_toggle.click()
+    await page.locator("#tab-transform").click()
+    await page.locator('button[data-x="neg"]').click()
+    await fill_toggle.click()
+    dark_baseline = await read_pixel(page, 1, 1)
+    await blueprint.check()
+    dark_guide = await read_pixel(page, 1, 1)
+    assert dark_guide != dark_baseline, "Blueprint guide is not visible on a negative/dark background"
+    await blueprint.uncheck()
+    assert await read_pixel(page, 1, 1) == dark_baseline, "Negative-background guide overlay leaked into artwork pixels"
+
+    # Compass previews a circle plus temporary center/radius guides; only the circumference commits.
+    await fill_toggle.click()
+    await page.locator("#clear-canvas").click()
+    await set_color(page, "#ff0000")
+    compass_button = page.locator('#studio-quick-tools [data-tool="compass"]')
+    assert await compass_button.get_attribute("aria-label") == "Compass", "Compass tool must have a clear accessible name"
+    await compass_button.click()
+    assert await page.locator("#studio-context-title").inner_text() == "Compass"
+    await fill_toggle.click()
+    center_before = await read_pixel(page, 16, 16)
+    radius_line_before = await read_pixel(page, 20, 16)
+    start_point = await cell_point(page, 16, 16)
+    radius_point = await cell_point(page, 24, 16)
+    await page.mouse.move(start_point["x"], start_point["y"])
+    await page.mouse.down()
+    await page.mouse.move(radius_point["x"], radius_point["y"], steps=3)
+    preview_center = await read_pixel(page, 16, 16)
+    preview_radius_line = await read_pixel(page, 20, 16)
+    assert preview_center != center_before and preview_radius_line != radius_line_before, "Compass preview must show temporary center and radius guides"
+    await page.mouse.up()
+    assert await read_pixel(page, 16, 16) == center_before, "Compass center marker must disappear after commit"
+    assert await read_pixel(page, 20, 16) == radius_line_before, "Compass radius guide must disappear after commit"
+    assert await read_pixel(page, 24, 16) == [255, 0, 0], "Compass must commit the circle circumference"
+    await page.locator("#undo").click()
+    assert await read_pixel(page, 24, 16) == radius_line_before, "One Undo must remove the committed Compass circle"
+    await page.locator("#redo").click()
+    assert await read_pixel(page, 24, 16) == [255, 0, 0], "Redo must restore the Compass circle"
+
+    cancel_center = await cell_point(page, 8, 8)
+    cancel_edge = await cell_point(page, 14, 8)
+    cancel_edge_before = await read_pixel(page, 14, 8)
+    await page.mouse.move(cancel_center["x"], cancel_center["y"])
+    await page.mouse.down()
+    await page.mouse.move(cancel_edge["x"], cancel_edge["y"], steps=3)
+    await page.keyboard.press("Escape")
+    await page.mouse.up()
+    assert await read_pixel(page, 14, 8) == cancel_edge_before, "Escape must cancel Compass preview without committing pixels"
+    assert await read_pixel(page, 8, 8) == await read_pixel(page, 8, 8), "Compass cancellation must leave the center unchanged"
+
     if require_mix:
         mix_drawer_toggle = page.locator("#desktop-tools-toggle" if viewport["width"] > 700 else "#mobile-tools-toggle")
         await mix_drawer_toggle.click()
