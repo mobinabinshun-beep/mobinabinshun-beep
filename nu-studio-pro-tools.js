@@ -272,7 +272,7 @@
    if(outMask)outMask[di]=mask[si]?1:0;
   }
   const same=(a,b)=>{if(!a&&!b)return true;if(!a||!b||a.length!==b.length)return false;for(let i=0;i<a.length;i++)if(a[i]!==b[i])return false;return true;};
-  const changed=!same(source,out)||(selection&&!same(selection,outSelection))||(mask&&!same(mask,outMask));
+  const changed=!!(!same(source,out)||(selection&&!same(selection,outSelection))||(mask&&!same(mask,outMask)));
   return {pixels:out,selection:outSelection,mask:outMask,sourceRect:rect,changed,reason:changed?"transformed":"no-op"};
  }
  function validateStudioProject(input,options={}){
