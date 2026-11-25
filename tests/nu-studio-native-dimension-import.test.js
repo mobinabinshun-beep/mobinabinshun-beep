@@ -9,13 +9,18 @@ test("image import defaults to exact source dimensions and offers explicit reduc
  assert.match(html,/value="256">256 px · compact/);
  assert.match(js,/Explicit reduced-detail working copy created/);
 });
-test("import has no product-defined file, MIME, dimension, or pixel-count ceiling",()=>{
+test("raster import has no product-defined file, MIME, dimension, or pixel-count ceiling while project files are bounded",()=>{
+ const importStart=js.indexOf('$("image-file").addEventListener("change"');
+ const importEnd=js.indexOf('window.addEventListener("pagehide"',importStart);
+ assert.ok(importStart>=0&&importEnd>importStart,"raster import handler boundaries must be present");
+ const imageImport=js.slice(importStart,importEnd);
  assert.match(html,/accept="\*\/\*"/);
- assert.match(js,/isSupportedImageFile\(file\)/);
- assert.doesNotMatch(js,/file\.size\s*>/);
- assert.doesNotMatch(js,/requestedCells\s*>\s*safeCells/);
- assert.doesNotMatch(js,/safe browser canvas dimension/);
- assert.match(js,/if\(!Number\.isSafeInteger\(requestedCells\)\)/);
+ assert.match(imageImport,/isSupportedImageFile\(file\)/);
+ assert.doesNotMatch(imageImport,/file\.size\s*>/);
+ assert.doesNotMatch(imageImport,/requestedCells\s*>\s*safeCells/);
+ assert.doesNotMatch(imageImport,/safe browser canvas dimension/);
+ assert.match(imageImport,/if\(!Number\.isSafeInteger\(requestedCells\)\)/);
+ assert.match(js,/file\.size>STUDIO_PROJECT_MAX_BYTES/,"only the portable project file has an explicit serialized-size bound");
 });
 test("picker uses an explicit user-gesture button and source stays separate",()=>{
  assert.match(html,/<button class="btn primary" id="import-image" type="button">IMPORT IMAGE<\/button>/);
