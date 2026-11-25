@@ -191,6 +191,90 @@
   return {x:center.x+x*c-y*s,y:center.y+x*s+y*c};
  }
 
+
+ function validatePerspectiveQuad(quad,options={}){
+  if(!Array.isArray(quad)||quad.length!==4)throw new TypeError("Perspective transform requires four ordered corner points.");
+  const points=quad.map((point,index)=>{
+   if(!point||!Number.isFinite(point.x)||!Number.isFinite(point.y))throw new TypeError("Perspective corner "+index+" must contain finite coordinates.");
+   const limit=Number.isFinite(options.maxCoordinate)?options.maxCoordinate:1000000;
+   if(Math.abs(point.x)>limit||Math.abs(point.y)>limit)throw new RangeError("Perspective corner coordinates exceed the supported range.");
+   return {x:point.x,y:point.y};
+  });
+  const cross=(a,b,c)=>(b.x-a.x)*(c.y-b.y)-(b.y-a.y)*(c.x-b.x);
+  const turns=points.map((p,i)=>cross(p,points[(i+1)%4],points[(i+2)%4]));
+  if(turns.some(v=>Math.abs(v)<1e-8)||!turns.every(v=>Math.sign(v)===Math.sign(turns[0])))throw new RangeError("Perspective corners must form a non-degenerate convex quadrilateral in TL, TR, BR, BL order.");
+  const area=Math.abs(points.reduce((sum,p,i)=>sum+p.x*points[(i+1)%4].y-points[(i+1)%4].x*p.y,0))/2;
+  const minArea=Number.isFinite(options.minArea)?Math.max(0,options.minArea):1;
+  if(!Number.isFinite(area)||area<minArea)throw new RangeError("Perspective quadrilateral area is too small.");
+  return points;
+ }
+ function perspectiveQuadFromDepthAngle(rect,depth=0,angle=0){
+  if(!rect||![rect.x,rect.y,rect.width,rect.height].every(Number.isFinite)||rect.width<1||rect.height<1)throw new TypeError("Perspective source rectangle is invalid.");
+  if(!Number.isFinite(depth)||depth<0||depth>100)throw new RangeError("Perspective depth must be between 0 and 100.");
+  if(!Number.isFinite(angle)||angle< -60||angle>60)throw new RangeError("Perspective angle must be between -60 and 60 degrees.");
+  const maxInset=Math.max(0,(rect.width-1)/2),inset=Math.min(rect.width*.3,maxInset)*depth/100;
+  const skew=Math.tan(angle*Math.PI/180)*rect.height*.2;
+  const topShift=skew*.5,x=rect.x,y=rect.y,w=rect.width,h=rect.height;
+  return [
+   {x:x+inset+topShift,y},
+   {x:x+w-inset+topShift,y},
+   {x:x+w+skew,y:y+h},
+   {x:x+skew,y:y+h}
+  ];
+ }
+ function perspectiveHomography(quad){
+  const [p0,p1,p2,p3]=quad,dx1=p1.x-p2.x,dx2=p3.x-p2.x,dx3=p0.x-p1.x+p2.x-p3.x;
+  const dy1=p1.y-p2.y,dy2=p3.y-p2.y,dy3=p0.y-p1.y+p2.y-p3.y;
+  let g=0,h=0;
+  if(Math.abs(dx3)>1e-10||Math.abs(dy3)>1e-10){
+   const denominator=dx1*dy2-dx2*dy1;
+   if(Math.abs(denominator)<1e-10)throw new RangeError("Perspective quadrilateral cannot be mapped safely.");
+   g=(dx3*dy2-dx2*dy3)/denominator;
+   h=(dx1*dy3-dx3*dy1)/denominator;
+  }
+  const a=p1.x-p0.x+g*p1.x,b=p3.x-p0.x+h*p3.x,c=p0.x;
+  const d=p1.y-p0.y+g*p1.y,e=p3.y-p0.y+h*p3.y,f=p0.y;
+  const m=[a,b,c,d,e,f,g,h,1];
+  const A=e-f*h,B=c*h-b,C=b*f-c*e,D=f*g-d,E=a-c*g,F=c*d-a*f,G=d*h-e*g,H=b*g-a*h,I=a*e-b*d;
+  const determinant=a*A+b*D+c*G;
+  if(!Number.isFinite(determinant)||Math.abs(determinant)<1e-10)throw new RangeError("Perspective quadrilateral has no stable inverse mapping.");
+  return [A/determinant,B/determinant,C/determinant,D/determinant,E/determinant,F/determinant,G/determinant,H/determinant,I/determinant];
+ }
+ function perspectiveTransformPixels(pixels,w,h,quad,selection=null,mask=null){
+  if(!validSize(w,h)||!pixels||pixels.length!==w*h)throw new TypeError("Perspective pixels do not match the canvas.");
+  const cells=w*h;
+  if(selection&&selection.length!==cells)throw new TypeError("Perspective selection does not match the canvas.");
+  if(mask&&mask.length!==cells)throw new TypeError("Perspective layer mask does not match the canvas.");
+  const points=validatePerspectiveQuad(quad,{maxCoordinate:Math.max(w,h)*4+1});
+  let rect={x:0,y:0,width:w,height:h};
+  if(selection){
+   let left=w,top=h,right=-1,bottom=-1;
+   for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(selection[idx(x,y,w)]){left=Math.min(left,x);top=Math.min(top,y);right=Math.max(right,x);bottom=Math.max(bottom,y);}
+   if(right<left)return {pixels:pixels.slice(),selection:selection.slice(),mask:mask?mask.slice():null,sourceRect:null,changed:false,reason:"empty-selection"};
+   rect={x:left,y:top,width:right-left+1,height:bottom-top+1};
+  }
+  const inverse=perspectiveHomography(points),source=pixels.slice(),out=source.slice();
+  const outSelection=selection?new Uint8Array(cells):null,outMask=mask?mask.slice():null;
+  if(selection){for(let i=0;i<cells;i++)if(selection[i])out[i]=null;}
+  else out.fill(null);
+  if(outMask){if(selection){for(let i=0;i<cells;i++)if(selection[i])outMask[i]=0;}else outMask.fill(0);}
+  const minX=Math.max(0,Math.floor(Math.min(...points.map(p=>p.x)))),maxX=Math.min(w-1,Math.ceil(Math.max(...points.map(p=>p.x)))-1);
+  const minY=Math.max(0,Math.floor(Math.min(...points.map(p=>p.y)))),maxY=Math.min(h-1,Math.ceil(Math.max(...points.map(p=>p.y)))-1);
+  for(let y=minY;y<=maxY;y++)for(let x=minX;x<=maxX;x++){
+   const px=x+.5,py=y+.5,den=inverse[6]*px+inverse[7]*py+inverse[8];
+   if(!Number.isFinite(den)||Math.abs(den)<1e-10)continue;
+   const u=(inverse[0]*px+inverse[1]*py+inverse[2])/den,v=(inverse[3]*px+inverse[4]*py+inverse[5])/den;
+   if(!Number.isFinite(u)||!Number.isFinite(v)||u<0||v<0||u>=1||v>=1)continue;
+   const sx=rect.x+Math.min(rect.width-1,Math.floor(u*rect.width)),sy=rect.y+Math.min(rect.height-1,Math.floor(v*rect.height)),si=idx(sx,sy,w),di=idx(x,y,w);
+   if(selection&&!selection[si])continue;
+   out[di]=source[si];
+   if(outSelection)outSelection[di]=1;
+   if(outMask)outMask[di]=mask[si]?1:0;
+  }
+  const same=(a,b)=>{if(!a&&!b)return true;if(!a||!b||a.length!==b.length)return false;for(let i=0;i<a.length;i++)if(a[i]!==b[i])return false;return true;};
+  const changed=!same(source,out)||(selection&&!same(selection,outSelection))||(mask&&!same(mask,outMask));
+  return {pixels:out,selection:outSelection,mask:outMask,sourceRect:rect,changed,reason:changed?"transformed":"no-op"};
+ }
  function validateStudioProject(input,options={}){
   const fail=message=>{throw new TypeError("Invalid Studio project: "+message);};
   const record=value=>value!==null&&typeof value==="object"&&!Array.isArray(value);
@@ -231,7 +315,7 @@
   }
   if(!Array.isArray(p.palette)||p.palette.length<1||p.palette.length>256||p.palette.some(c=>typeof c!=="string"||!/^#[0-9a-f]{6}$/i.test(c)))fail("palette is invalid.");
   if(typeof p.color!=="string"||!/^#[0-9a-f]{6}$/i.test(p.color))fail("selected color is invalid.");
-  if(!["pencil","eraser","fill","picker","line","rect","ellipse","rect-fill","ellipse-fill","select-rect","select-lasso","move-selection","gradient","texture","bezier","compass","magnifier","fading-brush","color-mix-brush"].includes(p.tool))fail("selected tool is invalid.");
+  if(!["pencil","eraser","fill","picker","line","rect","ellipse","rect-fill","ellipse-fill","select-rect","select-lasso","move-selection","gradient","texture","bezier","compass","magnifier","fading-brush","color-mix-brush","perspective"].includes(p.tool))fail("selected tool is invalid.");
   if(typeof p.imageImported!=="boolean"||typeof p.sourceInfo!=="string"||p.sourceInfo.length>512)fail("source metadata is invalid.");
   const s=p.settings;
   if(!record(s))fail("project settings are missing.");
@@ -265,5 +349,5 @@
    }
   };
  }
- return {rectSelection,lassoSelection,gradient,moveSelection,scaleSelection,bezier,brushCells,blendPixel,applyMask,fadePixel,smudgeBrush,bucketFill,invertSelection,rotatePixels,rotatePoint,validateStudioProject};
+ return {rectSelection,lassoSelection,gradient,moveSelection,scaleSelection,bezier,brushCells,blendPixel,applyMask,fadePixel,smudgeBrush,bucketFill,invertSelection,rotatePixels,rotatePoint,validatePerspectiveQuad,perspectiveQuadFromDepthAngle,perspectiveTransformPixels,validateStudioProject};
 });
