@@ -350,6 +350,71 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
         await mix_drawer_toggle.click()
         await page.wait_for_function("() => getComputedStyle(document.querySelector('#studio-tools-drawer')).visibility === 'hidden'", timeout=3000)
 
+    # Zoom controls share one state and preserve pointer focus when the frame can scroll.
+    await page.locator("#fit-canvas").click()
+    if viewport["width"] > 700:
+        await page.locator("#zoom-in").click()
+        assert await page.locator("#workspace-zoom").input_value() == "125", "Desktop zoom-in did not update shared zoom state"
+        await page.locator("#zoom-out").click()
+        assert await page.locator("#workspace-zoom").input_value() == "100", "Desktop zoom-out did not update shared zoom state"
+    else:
+        await page.locator("#mobile-zoom-in").click()
+        assert await page.locator("#workspace-zoom").input_value() == "125", "Mobile zoom-in did not update shared zoom state"
+        await page.locator("#mobile-zoom-out").click()
+        assert await page.locator("#workspace-zoom").input_value() == "100", "Mobile zoom-out did not update shared zoom state"
+    await page.locator("#workspace-zoom").evaluate("el => { el.value='200'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
+    assert await page.locator("#workspace-zoom").input_value() == "200", "Zoom slider did not update shared state"
+    zoom_canvas = await page.locator("#pixel-canvas").bounding_box()
+    assert zoom_canvas, "Canvas is missing before pointer-anchored zoom"
+    anchor = {"x": zoom_canvas["x"] + zoom_canvas["width"] * 0.38, "y": zoom_canvas["y"] + zoom_canvas["height"] * 0.42}
+    before_anchor_pixel = await page.evaluate(
+        """({x,y}) => { const c=document.querySelector('#pixel-canvas'); return NUStudioLayout.pixelAt(x,y,c.getBoundingClientRect(),c.width,c.height); }""",
+        anchor,
+    )
+    await page.locator("#pixel-canvas").dispatch_event("wheel", {"deltaY": -120, "ctrlKey": True, "clientX": anchor["x"], "clientY": anchor["y"]})
+    assert await page.locator("#workspace-zoom").input_value() == "210", "Ctrl+wheel did not zoom at the pointer"
+    after_anchor_pixel = await page.evaluate(
+        """({x,y}) => { const c=document.querySelector('#pixel-canvas'); return NUStudioLayout.pixelAt(x,y,c.getBoundingClientRect(),c.width,c.height); }""",
+        anchor,
+    )
+    assert after_anchor_pixel == before_anchor_pixel, f"Pointer-anchored zoom shifted the source pixel: before={before_anchor_pixel}, after={after_anchor_pixel}"
+    await page.locator("#fit-canvas").click()
+
+    # Magnifier is view-only: it exposes controls only when selected and never changes artwork/history.
+    view_toggle = page.locator("#desktop-tools-toggle" if viewport["width"] > 700 else "#mobile-tools-toggle")
+    view_open_class = "nu-desktop-tools-open" if viewport["width"] > 700 else "nu-mobile-tools-open"
+    is_view_drawer_open = await page.locator("body").evaluate("(el, className) => el.classList.contains(className)", view_open_class)
+    if not is_view_drawer_open:
+        await view_toggle.click()
+        await page.wait_for_function("(className) => document.body.classList.contains(className)", arg=view_open_class, timeout=5000)
+    await page.locator("#studio-dock").wait_for(state="visible", timeout=5000)
+    magnifier_button = page.locator('#studio-quick-tools [data-tool="magnifier"]')
+    assert await magnifier_button.count() == 1, "Magnifier quick tool is missing"
+    assert await page.locator("#magnifier-strength").is_hidden(), "Magnifier strength leaked into another tool"
+    pixel_before_magnifier = await read_pixel(page, 4, 4)
+    undo_before_magnifier = await page.locator("#undo").is_enabled()
+    await magnifier_button.click()
+    assert await page.locator("#studio-context-title").inner_text() == "Magnifier", "Magnifier context title is missing"
+    assert await page.locator("#magnifier-strength").is_visible(), "Magnifier strength control did not appear"
+    assert await page.locator("#magnifier-size").is_visible(), "Magnifier size control did not appear"
+    await page.locator("#magnifier-strength").select_option("6")
+    await page.locator("#magnifier-size").evaluate("el => { el.value='180'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
+    mag_canvas = await page.locator("#pixel-canvas").bounding_box()
+    assert mag_canvas, "Canvas is missing for Magnifier smoke"
+    await page.mouse.move(mag_canvas["x"] + mag_canvas["width"] * 0.5, mag_canvas["y"] + mag_canvas["height"] * 0.5)
+    await page.locator("#studio-magnifier").wait_for(state="visible", timeout=3000)
+    assert "6×" in await page.locator("#studio-magnifier-label").inner_text(), "Magnifier strength label did not update"
+    assert await page.locator("#studio-magnifier").evaluate("el => el.style.width") == "180px", "Magnifier size control did not update the lens"
+    assert await read_pixel(page, 4, 4) == pixel_before_magnifier, "Magnifier modified artwork pixels"
+    assert await page.locator("#undo").is_enabled() == undo_before_magnifier, "Magnifier created an undo history entry"
+    await page.keyboard.press("Escape")
+    await page.locator("#studio-magnifier").wait_for(state="hidden", timeout=3000)
+    await page.locator("#studio-dock").wait_for(state="hidden", timeout=3000)
+    await view_toggle.click()
+    await page.locator("#studio-dock").wait_for(state="visible", timeout=5000)
+    await view_toggle.click()
+    await page.locator("#studio-dock").wait_for(state="hidden", timeout=5000)
+
     frame = await page.locator("#workspace-frame").bounding_box()
     canvas = await page.locator("#pixel-canvas").bounding_box()
     assert frame and canvas and frame["width"] > 0 and canvas["width"] > 0, "Responsive workspace or canvas has no measurable size"

@@ -22,5 +22,11 @@
     const x=Math.floor((clientX-rect.left)/rect.width*width),y=Math.floor((clientY-rect.top)/rect.height*height);
     return {x:Math.max(0,Math.min(width-1,x)),y:Math.max(0,Math.min(height-1,y))};
   }
-  return {fit,pixelAt};
+  function anchorScrollDelta(beforeRect,afterRect,anchorX,anchorY){
+    if(!beforeRect||!afterRect||!Number.isFinite(anchorX)||!Number.isFinite(anchorY)||beforeRect.width<=0||beforeRect.height<=0||afterRect.width<=0||afterRect.height<=0)return {x:0,y:0};
+    const rx=Math.max(0,Math.min(1,(anchorX-beforeRect.left)/beforeRect.width));
+    const ry=Math.max(0,Math.min(1,(anchorY-beforeRect.top)/beforeRect.height));
+    return {x:afterRect.left+rx*afterRect.width-anchorX,y:afterRect.top+ry*afterRect.height-anchorY};
+  }
+  return {fit,pixelAt,anchorScrollDelta};
 });

@@ -60,6 +60,27 @@ test("active-tool context panel owns and reveals only relevant existing settings
 });
 
 
+test("Magnifier is an accessible view-only tool with context-owned strength and size",()=>{
+ assert.match(html,/data-tool="magnifier"[^>]*aria-label="Magnifier"/);
+ assert.match(runtime,/magnifier:\{icon:"🔍",label:"Magnifier"\}/);
+ assert.match(runtime,/magnifier:\["magnifier"\]/);
+ assert.match(runtime,/magnifierField\.dataset\.contextOwner="magnifier"/);
+ assert.match(runtime,/id="magnifier-strength"/);
+ assert.match(runtime,/id="magnifier-size"/);
+ assert.match(runtime,/lensCtx\.imageSmoothingEnabled=false/);
+ assert.match(runtime,/function updateMagnifier\(e\)/);
+ assert.match(runtime,/if\(tool==="magnifier"\)\{updateMagnifier\(e\);return;\}/);
+ assert.match(runtime,/function hideMagnifier\(\)/);
+});
+test("Desktop zoom buttons, slider and wheel share one anchored zoom state",()=>{
+ assert.match(html,/id="zoom-in"/);
+ assert.match(html,/id="zoom-out"/);
+ assert.match(runtime,/function setZoom\(next,anchor,behavior="auto"\)/);
+ assert.match(runtime,/anchorScrollDelta\(before,after,anchorX,anchorY\)/);
+ assert.match(runtime,/canvas\.addEventListener\("wheel",e=>\{if\(!e\.ctrlKey\)return/);
+ assert.match(runtime,/setZoom\(workspace\.zoom\+25,null,"smooth"\)/);
+});
+
 test("Compass is an accessible tool with a cancellable center-radius lifecycle",()=>{
  assert.match(html,/data-tool="compass"[^>]*aria-label="Compass"/);
  assert.match(runtime,/compass:\{icon:"🧭",label:"Compass"\}/);

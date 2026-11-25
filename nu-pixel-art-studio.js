@@ -6,7 +6,7 @@ const canvas=$("pixel-canvas"),ctx=canvas.getContext("2d",{willReadFrequently:tr
 const defaults=["#111827","#243447","#3e596b","#78909c","#d8e2e8","#ffffff","#a63c50","#e45b63","#f29c67","#e8b94f","#f8dc86","#76a86c","#3f795e","#4b9cba","#5577b8","#8a6bb5"];
 let width=32,height=32,pixels=Array(width*height).fill(null),palette=defaults.slice(),color="#e8b94f",tool="pencil",drawing=false,strokeSnapshot=null,undoStack=[],redoStack=[],imageImported=false,qualityProfile=null,workspace={zoom:100},resizeLock=true,lastDimension="width",brushSize=1,strokeStart=null,sourcePreviewUrl=null,originalImportFile=null;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-let fadeIntensity=50,mixBrushStrength=60,mixBrushState=null,viewRotation=0,guideState={blueprint:false,ruler:false,divisions:false,axes:false,depth:false},guideHighContrast=true,compassState=null,toolContextRefresh=()=>{};
+let fadeIntensity=50,mixBrushStrength=60,mixBrushState=null,viewRotation=0,guideState={blueprint:false,ruler:false,divisions:false,axes:false,depth:false},guideHighContrast=true,compassState=null,magnifierFactor=4,magnifierSize=160,lastMagnifierPoint=null,toolContextRefresh=()=>{};
 function announce(msg){$("studio-status").textContent=msg;}
 function snapshot(){return {width,height,pixels:pixels.slice()};}
 function historyLimitFor(state){return Math.max(1,Math.min(60,Math.floor(2000000/Math.max(1,state.pixels.length))));}
@@ -22,8 +22,8 @@ function updateCanvasDisplay(){
  if(!window.NUStudioLayout){announce("Workspace geometry module is unavailable. Refresh the Studio.");return;}
  const fitted=window.NUStudioLayout.fit(width,height,frame.clientWidth,frame.clientHeight,workspace.zoom,28);
  canvas.style.width=fitted.width+"px";canvas.style.height=fitted.height+"px";
- frame.style.alignItems=workspace.zoom>100?"flex-start":"center";
- frame.style.justifyContent=workspace.zoom>100?"flex-start":"center";
+ frame.style.alignItems=fitted.overflowY?"flex-start":"center";
+ frame.style.justifyContent=fitted.overflowX?"flex-start":"center";
  $("workspace-zoom").value=workspace.zoom;$("workspace-zoom-value").textContent=workspace.zoom+"%";
 }
 const renderColorCache=new Map();
@@ -45,9 +45,26 @@ function render(){
 }
 function resizeArtwork(nextW,nextH,method="nearest"){nextW=clamp(Math.round(nextW),1,16384);nextH=clamp(Math.round(nextH),1,16384);if(nextW*nextH>cellLimit()){announce("This device profile allows up to "+cellLimit().toLocaleString()+" editable pixels. Reduce the dimensions or choose a lighter workspace.");return false;}const before=snapshot(),next=Array(nextW*nextH).fill(null);for(let y=0;y<nextH;y++)for(let x=0;x<nextW;x++){const sx=Math.min(width-1,Math.floor((x+.5)*width/nextW)),sy=Math.min(height-1,Math.floor((y+.5)*height/nextH));next[y*nextW+x]=pixels[sy*width+sx];}width=nextW;height=nextH;pixels=next;commitHistory(before);$("image-width").value=width;$("image-height").value=height;updateCanvasDisplay();render();announce("Artwork resized to "+width+" × "+height+" px using "+method+" sampling. Original import remains unchanged outside the working copy.");return true;}
 function initAdaptive(){const fallback=()=>{qualityProfile={tier:"balanced",level:3,budget:{maxCanvasPixels:520000,dpr:1},reducedMotion:false};$("quality-profile").textContent="Balanced · fallback";};if(!window.NUGraphicsCore){fallback();return;}window.NUGraphicsCore.start().then(p=>{qualityProfile=p;$("quality-profile").textContent=p.tier+" · level "+p.level;$("quality-detail").textContent="Editable pixel budget: "+cellLimit().toLocaleString()+" cells";updateCounters();}).catch(fallback);}
-function applyZoom(){workspace.zoom=clamp(Number($("workspace-zoom").value)||100,25,800);updateCanvasDisplay();updateCounters();}
+function setZoom(next,anchor,behavior="auto"){
+ const frame=$("workspace-frame"),before=canvas.getBoundingClientRect(),frameRect=frame.getBoundingClientRect();
+ const anchorX=anchor&&Number.isFinite(anchor.x)?anchor.x:frameRect.left+frame.clientWidth/2;
+ const anchorY=anchor&&Number.isFinite(anchor.y)?anchor.y:frameRect.top+frame.clientHeight/2;
+ workspace.zoom=clamp(Math.round(Number(next)||100),25,800);
+ $("workspace-zoom").value=workspace.zoom;
+ updateCanvasDisplay();
+ const after=canvas.getBoundingClientRect(),delta=window.NUStudioLayout.anchorScrollDelta(before,after,anchorX,anchorY);
+ const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+ const left=clamp(frame.scrollLeft+delta.x,0,Math.max(0,frame.scrollWidth-frame.clientWidth));
+ const top=clamp(frame.scrollTop+delta.y,0,Math.max(0,frame.scrollHeight-frame.clientHeight));
+ frame.scrollTo({left,top,behavior:reduced?"auto":behavior});
+ updateCounters();
+}
+function applyZoom(){setZoom(Number($("workspace-zoom").value)||100,null,"auto");}
 $("workspace-zoom").addEventListener("input",applyZoom);
-$("fit-canvas").addEventListener("click",()=>{workspace.zoom=100;applyZoom();$("workspace-frame").scrollTo(0,0);});
+$("zoom-in")?.addEventListener("click",()=>setZoom(workspace.zoom+25,null,"smooth"));
+$("zoom-out")?.addEventListener("click",()=>setZoom(workspace.zoom-25,null,"smooth"));
+$("fit-canvas").addEventListener("click",()=>{workspace.zoom=100;$("workspace-zoom").value=100;updateCanvasDisplay();$("workspace-frame").scrollTo({left:0,top:0,behavior:"auto"});updateCounters();});
+canvas.addEventListener("wheel",e=>{if(!e.ctrlKey)return;e.preventDefault();setZoom(workspace.zoom+(e.deltaY<0?10:-10),{x:e.clientX,y:e.clientY},"auto");},{passive:false});
 let workspaceObserver=null;
 function observeWorkspace(){
  const stage=document.querySelector(".stage"),frame=$("workspace-frame");
@@ -61,13 +78,26 @@ observeWorkspace();
 $("image-lock").addEventListener("change",e=>{resizeLock=e.target.checked;});
 $("image-width").addEventListener("input",()=>{lastDimension="width";});$("image-height").addEventListener("input",()=>{lastDimension="height";});$("apply-image-size").addEventListener("click",()=>{let w=clamp(Number($("image-width").value)||width,1,2048),h=clamp(Number($("image-height").value)||height,1,2048);if(resizeLock){const ratio=width/height;if(lastDimension==="width")h=Math.max(1,Math.round(w/ratio));else w=Math.max(1,Math.round(h*ratio));}$("image-width").value=w;$("image-height").value=h;resizeArtwork(w,h,"nearest-neighbor");});
 function renderPalette(){const root=$("palette");root.innerHTML="";palette.forEach((c,i)=>{const b=document.createElement("button");b.type="button";b.className="swatch";b.style.background=c;b.title=c;b.setAttribute("aria-label","Palette color "+c);b.setAttribute("aria-pressed",String(c.toLowerCase()===color.toLowerCase()));b.addEventListener("click",()=>{color=c;$("custom-color").value=c;renderPalette();});root.appendChild(b);});const transparent=document.createElement("button");transparent.type="button";transparent.className="swatch";transparent.setAttribute("aria-label","Transparent");transparent.title="Transparent / eraser";transparent.addEventListener("click",()=>setTool("eraser"));root.appendChild(transparent);}
-function setTool(next){tool=next;mixBrushState=null;compassState=null;document.querySelectorAll("[data-tool]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tool===tool)));canvas.style.cursor=tool==="picker"?"copy":tool==="eraser"?"cell":tool==="fill"?"copy":"crosshair";toolContextRefresh();}
+function setTool(next){if(next!=="magnifier")hideMagnifier();tool=next;mixBrushState=null;compassState=null;document.querySelectorAll("[data-tool]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tool===tool)));canvas.style.cursor=tool==="magnifier"?"zoom-in":tool==="picker"?"copy":tool==="eraser"?"cell":tool==="fill"?"copy":"crosshair";toolContextRefresh();}
 function coords(e){
  const r=canvas.getBoundingClientRect();
  if(!viewRotation)return window.NUStudioLayout.pixelAt(e.clientX,e.clientY,r,width,height);
  const cx=r.left+r.width/2,cy=r.top+r.height/2,a=-viewRotation*Math.PI/180,dx=e.clientX-cx,dy=e.clientY-cy;
  const ux=dx*Math.cos(a)-dy*Math.sin(a)+cx,uy=dx*Math.sin(a)+dy*Math.cos(a)+cy,w=canvas.offsetWidth,h=canvas.offsetHeight;
  return {x:clamp(Math.floor((ux-(cx-w/2))/w*width),0,width-1),y:clamp(Math.floor((uy-(cy-h/2))/h*height),0,height-1)};
+}
+function hideMagnifier(){const lens=$("studio-magnifier");if(!lens)return;lens.hidden=true;lens.setAttribute("aria-hidden","true");lastMagnifierPoint=null;}
+function updateMagnifier(e){
+ const lens=$("studio-magnifier"),lensCanvas=$("studio-magnifier-canvas"),stage=document.querySelector(".stage");
+ if(tool!=="magnifier"||!e||!lens||!lensCanvas||!stage){hideMagnifier();return;}
+ const p=coords(e),lensCtx=lensCanvas.getContext("2d"),sourceWidth=Math.max(1,Math.min(width,Math.floor(lensCanvas.width/magnifierFactor))),sourceHeight=Math.max(1,Math.min(height,Math.floor(lensCanvas.height/magnifierFactor)));
+ const sx=clamp(p.x-Math.floor(sourceWidth/2),0,Math.max(0,width-sourceWidth)),sy=clamp(p.y-Math.floor(sourceHeight/2),0,Math.max(0,height-sourceHeight));
+ lensCtx.clearRect(0,0,lensCanvas.width,lensCanvas.height);lensCtx.imageSmoothingEnabled=false;lensCtx.drawImage(canvas,sx,sy,sourceWidth,sourceHeight,0,0,lensCanvas.width,lensCanvas.height);
+ const crossX=(p.x-sx+.5)/sourceWidth*lensCanvas.width,crossY=(p.y-sy+.5)/sourceHeight*lensCanvas.height;
+ lensCtx.strokeStyle="rgba(255,255,255,.9)";lensCtx.lineWidth=1.5;lensCtx.beginPath();lensCtx.moveTo(crossX-10,crossY);lensCtx.lineTo(crossX+10,crossY);lensCtx.moveTo(crossX,crossY-10);lensCtx.lineTo(crossX,crossY+10);lensCtx.stroke();
+ $("studio-magnifier-label").textContent=magnifierFactor+"× · "+(p.x+1)+", "+(p.y+1);
+ const size=magnifierSize,stageRect=stage.getBoundingClientRect(),left=clamp(e.clientX-stageRect.left+18,8,Math.max(8,stage.clientWidth-size-8)),top=clamp(e.clientY-stageRect.top+18,8,Math.max(8,stage.clientHeight-size-8));
+ lens.style.width=size+"px";lens.style.height=size+"px";lens.style.left=left+"px";lens.style.top=top+"px";lens.hidden=false;lens.setAttribute("aria-hidden","false");lastMagnifierPoint={clientX:e.clientX,clientY:e.clientY};
 }
 function put(x,y,value){pixels[y*width+x]=value;}
 function flood(x,y,next){const start=pixels[y*width+x];if(start===next)return;const stack=[[x,y]],seen=new Uint8Array(width*height);while(stack.length){const [cx,cy]=stack.pop(),i=cy*width+cx;if(cx<0||cy<0||cx>=width||cy>=height||seen[i]||pixels[i]!==start)continue;seen[i]=1;pixels[i]=next;stack.push([cx+1,cy],[cx-1,cy],[cx,cy+1],[cx,cy-1]);}}
@@ -94,19 +124,20 @@ function drawShape(start,end){
 }
 function paintAt(e){const p=coords(e),i=p.y*width+p.x;if(tool==="picker"){if(pixels[i]){color=pixels[i];$("custom-color").value=color;renderPalette();}return 0;}if(tool==="fill"){const changed=flood(p.x,p.y,color);render();return changed;}paintBrush(p.x,p.y,tool==="eraser"?null:color);render();return 1;}
 canvas.addEventListener("pointerdown",e=>{
- e.preventDefault();if(tool==="color-mix-brush"&&adv.layers[adv.active].locked){announce("Layer locked. The color-mixing brush cannot paint on a locked layer.");return;}if(tool==="color-mix-brush"&&adv.maskEdit){announce("Turn off mask editing to use the color-mixing brush.");return;}mixBrushState=null;canvas.setPointerCapture(e.pointerId);drawing=true;strokeSnapshot=snapshot();strokeStart=coords(e);
+ e.preventDefault();if(tool==="magnifier"){if(e.pointerType==="touch")canvas.setPointerCapture(e.pointerId);updateMagnifier(e);return;}if(tool==="color-mix-brush"&&adv.layers[adv.active].locked){announce("Layer locked. The color-mixing brush cannot paint on a locked layer.");return;}if(tool==="color-mix-brush"&&adv.maskEdit){announce("Turn off mask editing to use the color-mixing brush.");return;}mixBrushState=null;canvas.setPointerCapture(e.pointerId);drawing=true;strokeSnapshot=snapshot();strokeStart=coords(e);
  if(tool==="fill"||tool==="picker"){const changed=paintAt(e);if(tool==="fill"&&changed>0)commitHistory(strokeSnapshot);drawing=false;strokeSnapshot=null;strokeStart=null;return;}
  if(tool==="line"||tool==="rect"||tool==="ellipse"||tool==="rect-fill"||tool==="ellipse-fill"||tool==="compass"){if(tool==="compass")compassState={center:{...strokeStart},edge:{...strokeStart},active:true};drawShape(strokeStart,strokeStart);render();}else paintAt(e);
 });
 canvas.addEventListener("pointermove",e=>{
+ if(tool==="magnifier"){updateMagnifier(e);return;}
  if(!drawing||!(e.buttons||e.pointerType==="touch"))return;
  if(tool==="line"||tool==="rect"||tool==="ellipse"||tool==="rect-fill"||tool==="ellipse-fill"||tool==="compass"){pixels=strokeSnapshot.pixels.slice();const edge=coords(e);if(tool==="compass"&&compassState)compassState.edge={...edge};drawShape(strokeStart,edge);render();}
  else paintAt(e);
 });
 function endStroke(){if(!drawing)return;drawing=false;commitHistory(strokeSnapshot);strokeSnapshot=null;strokeStart=null;mixBrushState=null;if(tool==="compass"){compassState=null;render();}}
 function cancelStroke(){if(!drawing)return;if(tool==="color-mix-brush"&&strokeSnapshot&&strokeSnapshot.layers)restore(strokeSnapshot);else pixels=strokeSnapshot.pixels.slice();drawing=false;strokeSnapshot=null;strokeStart=null;mixBrushState=null;compassState=null;render();}
-canvas.addEventListener("pointerup",endStroke);canvas.addEventListener("pointercancel",cancelStroke);canvas.addEventListener("lostpointercapture",cancelStroke);
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&drawing&&tool==="compass"){e.preventDefault();cancelStroke();}});
+canvas.addEventListener("pointerup",e=>{endStroke();if(tool==="magnifier"&&e.pointerType==="touch")hideMagnifier();});canvas.addEventListener("pointercancel",e=>{cancelStroke();hideMagnifier();});canvas.addEventListener("lostpointercapture",cancelStroke);canvas.addEventListener("pointerleave",()=>{if(tool==="magnifier")hideMagnifier();});
+document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(tool==="magnifier")hideMagnifier();if(drawing&&tool==="compass"){e.preventDefault();cancelStroke();}});
 document.querySelectorAll("[data-tool]").forEach(b=>b.addEventListener("click",()=>setTool(b.dataset.tool)));
 $("custom-color").addEventListener("input",e=>{color=e.target.value.toLowerCase();renderPalette();setTool("pencil");});
 $("brush-size").addEventListener("input",e=>{brushSize=clamp(Number(e.target.value)||1,1,16);$("brush-size-value").textContent=brushSize+" px";});
@@ -429,7 +460,7 @@ function advPanel(){
  vectorPanel.remove();
  drawer.insertBefore(propertiesPanel,exportPanel);
  drawer.prepend(d);
- const quick=$("studio-quick-tools"),names={pencil:{icon:"✏️",label:"Pencil",shortcut:"B"},eraser:{icon:"🧽",label:"Eraser",shortcut:"E"},fill:{icon:"🪣",label:"Fill",shortcut:"G"},picker:{icon:"🎯",label:"Eyedropper",shortcut:"I"},line:{icon:"／",label:"Line",shortcut:"L"},rect:{icon:"▭",label:"Rectangle",shortcut:"R"},ellipse:{icon:"◯",label:"Ellipse",shortcut:"O"},"rect-fill":{icon:"▰",label:"Filled rectangle"},"ellipse-fill":{icon:"●",label:"Filled ellipse"},"select-rect":{icon:"▣",label:"Rectangular selection"},"select-lasso":{icon:"〰",label:"Lasso selection"},"move-selection":{icon:"✥",label:"Move selection"},gradient:{icon:"◩",label:"Gradient"},texture:{icon:"▦",label:"Texture brush"},bezier:{icon:"⌁",label:"Bezier curve"},"fading-brush":{icon:"🌫️",label:"Fading brush"},"color-mix-brush":{icon:"🖌️",label:"Color-mixing brush"},compass:{icon:"🧭",label:"Compass"}};
+ const quick=$("studio-quick-tools"),names={pencil:{icon:"✏️",label:"Pencil",shortcut:"B"},eraser:{icon:"🧽",label:"Eraser",shortcut:"E"},fill:{icon:"🪣",label:"Fill",shortcut:"G"},picker:{icon:"🎯",label:"Eyedropper",shortcut:"I"},line:{icon:"／",label:"Line",shortcut:"L"},rect:{icon:"▭",label:"Rectangle",shortcut:"R"},ellipse:{icon:"◯",label:"Ellipse",shortcut:"O"},"rect-fill":{icon:"▰",label:"Filled rectangle"},"ellipse-fill":{icon:"●",label:"Filled ellipse"},"select-rect":{icon:"▣",label:"Rectangular selection"},"select-lasso":{icon:"〰",label:"Lasso selection"},"move-selection":{icon:"✥",label:"Move selection"},gradient:{icon:"◩",label:"Gradient"},texture:{icon:"▦",label:"Texture brush"},bezier:{icon:"⌁",label:"Bezier curve"},"fading-brush":{icon:"🌫️",label:"Fading brush"},"color-mix-brush":{icon:"🖌️",label:"Color-mixing brush"},compass:{icon:"🧭",label:"Compass"},magnifier:{icon:"🔍",label:"Magnifier"}};
  document.querySelectorAll("[data-tool]").forEach(b=>{const n=names[b.dataset.tool];if(!n)return;b.innerHTML='<span class="tool-icon" aria-hidden="true">'+n.icon+'</span><span>'+n.label+'</span>';b.title=n.shortcut?n.label+' ('+n.shortcut+')':n.label;b.setAttribute("aria-label",n.label+(n.shortcut?", "+n.shortcut+" shortcut":""));quick.append(b);});
  const contextPanel=$("studio-brush");contextPanel.setAttribute("role","region");contextPanel.setAttribute("aria-label","Active tool options");
  const contextHead=document.createElement("div");contextHead.className="tool-context-head";const contextTitle=document.createElement("strong");contextTitle.id="studio-context-title";const contextTag=document.createElement("span");contextTag.textContent="Tool options";contextHead.append(contextTitle,contextTag);
@@ -443,10 +474,19 @@ function advPanel(){
  const selectionActions=$("pro-select-all").parentElement;selectionActions.dataset.contextOwner="selection";contextPanel.append(selectionActions);
  const selectionScale=$("pro-scale-x").closest(".adv-grid");selectionScale.dataset.contextOwner="selection";contextPanel.append(selectionScale);
  document.querySelectorAll("#studio-tabpanels .adv-grid").forEach(group=>{if(!group.children.length)group.remove();});
- const contextLabels={pencil:"Pencil",eraser:"Eraser",fill:"Fill",picker:"Eyedropper",line:"Line",rect:"Rectangle",ellipse:"Ellipse","rect-fill":"Filled rectangle","ellipse-fill":"Filled ellipse","select-rect":"Rectangular selection","select-lasso":"Lasso selection","move-selection":"Move selection",gradient:"Gradient",texture:"Texture brush",bezier:"Bezier curve",compass:"Compass","fading-brush":"Fading brush","color-mix-brush":"Color-mixing brush"};
- const contextHints={pencil:"Draw with the selected color on the active layer.",eraser:"Erase pixels on the active layer.",fill:"Choose a fill mode and tolerance, then select a canvas area.",picker:"Sample a color from the canvas.",line:"Draw a straight line with the current brush settings.",rect:"Draw a rectangle with the current brush settings.",ellipse:"Draw an ellipse with the current brush settings.","rect-fill":"Draw a filled rectangle.","ellipse-fill":"Draw a filled ellipse.","select-rect":"Create a rectangular selection, then refine or scale it.","select-lasso":"Draw a freehand selection, then refine or scale it.","move-selection":"Move or scale the active selection.",gradient:"Choose a gradient mode and end color before drawing.",texture:"Choose a brush shape and texture density for textured strokes.","fading-brush":"Adjust how quickly pigment fades along a stroke.","color-mix-brush":"Adjust how strongly existing canvas colors blend.","bezier":"Adjust the curve tension before placing control points.",compass:"Choose a center point, drag to set the radius, then release to commit the circle."};
- const contextOwners={pencil:["paint"],eraser:["paint"],line:["paint"],rect:["paint"],ellipse:["paint"],"rect-fill":["paint"],"ellipse-fill":["paint"],"fading-brush":["paint","fading"],"color-mix-brush":["paint","mix"],texture:["paint","texture"],fill:["fill"],gradient:["gradient"],"select-rect":["selection"],"select-lasso":["selection"],"move-selection":["selection"],bezier:["bezier"]};
+ const contextLabels={pencil:"Pencil",eraser:"Eraser",fill:"Fill",picker:"Eyedropper",line:"Line",rect:"Rectangle",ellipse:"Ellipse","rect-fill":"Filled rectangle","ellipse-fill":"Filled ellipse","select-rect":"Rectangular selection","select-lasso":"Lasso selection","move-selection":"Move selection",gradient:"Gradient",texture:"Texture brush",bezier:"Bezier curve",compass:"Compass","fading-brush":"Fading brush","color-mix-brush":"Color-mixing brush",magnifier:"Magnifier"};
+ const contextHints={pencil:"Draw with the selected color on the active layer.",eraser:"Erase pixels on the active layer.",fill:"Choose a fill mode and tolerance, then select a canvas area.",picker:"Sample a color from the canvas.",line:"Draw a straight line with the current brush settings.",rect:"Draw a rectangle with the current brush settings.",ellipse:"Draw an ellipse with the current brush settings.","rect-fill":"Draw a filled rectangle.","ellipse-fill":"Draw a filled ellipse.","select-rect":"Create a rectangular selection, then refine or scale it.","select-lasso":"Draw a freehand selection, then refine or scale it.","move-selection":"Move or scale the active selection.",gradient:"Choose a gradient mode and end color before drawing.",texture:"Choose a brush shape and texture density for textured strokes.","fading-brush":"Adjust how quickly pigment fades along a stroke.","color-mix-brush":"Adjust how strongly existing canvas colors blend.","bezier":"Adjust the curve tension before placing control points.",compass:"Choose a center point, drag to set the radius, then release to commit the circle.",magnifier:"Move over the canvas to inspect pixels in a live, view-only loupe."};
+ const contextOwners={pencil:["paint"],eraser:["paint"],line:["paint"],rect:["paint"],ellipse:["paint"],"rect-fill":["paint"],"ellipse-fill":["paint"],"fading-brush":["paint","fading"],"color-mix-brush":["paint","mix"],texture:["paint","texture"],fill:["fill"],gradient:["gradient"],"select-rect":["selection"],"select-lasso":["selection"],"move-selection":["selection"],bezier:["bezier"],magnifier:["magnifier"]};
  toolContextRefresh=()=>{const owners=contextOwners[tool]||[];contextTitle.textContent=contextLabels[tool]||"Tool options";contextHint.textContent=contextHints[tool]||"No additional settings for this tool.";contextPanel.dataset.activeTool=tool;contextPanel.querySelectorAll("[data-context-owner]").forEach(node=>{node.hidden=!owners.includes(node.dataset.contextOwner);});};
+ const magnifierField=document.createElement("div");magnifierField.className="dock-field";magnifierField.dataset.contextOwner="magnifier";
+ const magnifierStrengthLabel=document.createElement("label");magnifierStrengthLabel.htmlFor="magnifier-strength";magnifierStrengthLabel.textContent="Magnification";
+ const magnifierStrength=document.createElement("select");magnifierStrength.id="magnifier-strength";magnifierStrength.setAttribute("aria-label","Magnifier strength");
+ for(const factor of [2,3,4,6,8]){const option=document.createElement("option");option.value=String(factor);option.textContent=factor+"×";magnifierStrength.append(option);}
+ magnifierStrength.value=String(magnifierFactor);magnifierStrength.addEventListener("change",()=>{magnifierFactor=Number(magnifierStrength.value)||4;if(lastMagnifierPoint)updateMagnifier(lastMagnifierPoint);});
+ const magnifierSizeLabel=document.createElement("label");magnifierSizeLabel.htmlFor="magnifier-size";magnifierSizeLabel.textContent="Lens size";
+ const magnifierSizeControl=document.createElement("input");magnifierSizeControl.type="range";magnifierSizeControl.id="magnifier-size";magnifierSizeControl.min="120";magnifierSizeControl.max="220";magnifierSizeControl.step="10";magnifierSizeControl.value=String(magnifierSize);magnifierSizeControl.setAttribute("aria-label","Magnifier lens size");
+ magnifierSizeControl.addEventListener("input",()=>{magnifierSize=Number(magnifierSizeControl.value)||160;const lens=$("studio-magnifier");lens.style.width=magnifierSize+"px";lens.style.height=magnifierSize+"px";if(lastMagnifierPoint)updateMagnifier(lastMagnifierPoint);});
+ magnifierField.append(magnifierStrengthLabel,magnifierStrength,magnifierSizeLabel,magnifierSizeControl);contextPanel.append(magnifierField);
  toolContextRefresh();
  const fadeField=document.createElement("label");fadeField.className="dock-field";fadeField.dataset.contextOwner="fading";fadeField.textContent="Fading brush intensity";const fadeRange=document.createElement("input");fadeRange.type="range";fadeRange.min="1";fadeRange.max="100";fadeRange.value=String(fadeIntensity);fadeRange.setAttribute("aria-label","Fading brush intensity");fadeRange.oninput=()=>{fadeIntensity=+fadeRange.value;};fadeField.append(fadeRange);$("studio-brush").append(fadeField);
  const fadeButton=document.createElement("button");fadeButton.type="button";fadeButton.className="tool";fadeButton.dataset.tool="fading-brush";fadeButton.setAttribute("aria-pressed","false");fadeButton.innerHTML='<span class="tool-icon" aria-hidden="true">🌫️</span><span>Fading brush</span>';fadeButton.title="Fading brush";fadeButton.setAttribute("aria-label","Fading brush");fadeButton.addEventListener("click",()=>setTool("fading-brush"));quick.append(fadeButton);
@@ -673,11 +713,7 @@ document.addEventListener("pointerdown",e=>{
  if(document.body.classList.contains("nu-mobile-tools-open")&&!mobileToolsDrawer?.contains(e.target)&&!$("mobile-workspace-dock")?.contains(e.target))setMobileToolsOpen(false);
  if(document.body.classList.contains("nu-desktop-tools-open")&&!mobileToolsDrawer?.contains(e.target)&&!$("desktop-workspace-rail")?.contains(e.target))setDesktopToolsOpen(false);
 });
-function setMobileZoom(next){
- workspace.zoom=clamp(next,25,800);
- $("workspace-zoom").value=workspace.zoom;
- applyZoom();
-}
+function setMobileZoom(next){setZoom(next,null,"smooth");}
 $("mobile-zoom-in")?.addEventListener("click",()=>setMobileZoom(workspace.zoom+25));
 $("mobile-zoom-out")?.addEventListener("click",()=>setMobileZoom(workspace.zoom-25));
 $("mobile-view-rotation")?.addEventListener("input",e=>{

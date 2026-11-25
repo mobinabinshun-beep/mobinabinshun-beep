@@ -1,7 +1,7 @@
 "use strict";
 const test=require("node:test");
 const assert=require("node:assert/strict");
-const {fit,pixelAt}=require("../nu-studio-layout.js");
+const {fit,pixelAt,anchorScrollDelta}=require("../nu-studio-layout.js");
 
 test("fit keeps the complete landscape image inside the frame",()=>{
  const r=fit(1600,900,800,600,100);
@@ -30,4 +30,16 @@ test("pixel mapping maps all four canvas corners to valid pixels",()=>{
 });
 test("pixel mapping rejects a collapsed canvas",()=>{
  assert.throws(()=>pixelAt(0,0,{left:0,top:0,width:0,height:10},2,2),/positive size/);
+});
+
+test("zoom anchoring computes the scroll delta that preserves the pointer pixel",()=>{
+ const before={left:100,top:80,width:200,height:100};
+ const after={left:80,top:60,width:300,height:150};
+ const delta=anchorScrollDelta(before,after,150,105);
+ assert.ok(Math.abs(delta.x-5)<1e-9);
+ assert.ok(Math.abs(delta.y+7.5)<1e-9);
+});
+test("zoom anchoring safely ignores collapsed or invalid bounds",()=>{
+ assert.deepEqual(anchorScrollDelta({left:0,top:0,width:0,height:10},{left:0,top:0,width:20,height:20},1,1),{x:0,y:0});
+ assert.deepEqual(anchorScrollDelta(null,null,1,1),{x:0,y:0});
 });
