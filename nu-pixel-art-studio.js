@@ -737,6 +737,7 @@ document.addEventListener("keydown",e=>{
  if(document.body.classList.contains("nu-desktop-tools-open"))setDesktopToolsOpen(false);
 });
 document.addEventListener("pointerdown",e=>{
+ if(e.target?.closest?.("#studio-project-confirm"))return;
  if(document.body.classList.contains("nu-mobile-tools-open")&&!mobileToolsDrawer?.contains(e.target)&&!$("mobile-workspace-dock")?.contains(e.target))setMobileToolsOpen(false);
  if(document.body.classList.contains("nu-desktop-tools-open")&&!mobileToolsDrawer?.contains(e.target)&&!$("desktop-workspace-rail")?.contains(e.target))setDesktopToolsOpen(false);
 });
