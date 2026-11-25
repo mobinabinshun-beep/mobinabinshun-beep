@@ -62,7 +62,7 @@ test("active-tool context panel owns and reveals only relevant existing settings
 
 test("Magnifier is an accessible view-only tool with context-owned strength and size",()=>{
  assert.match(html,/data-tool="magnifier"[^>]*aria-label="Magnifier"/);
- assert.match(runtime,/magnifier:\\{icon:"🔍",label:"Magnifier",category:"view"\\}/);
+ assert.match(runtime,/magnifier:\{icon:"🔍",label:"Magnifier",category:"view"\}/);
  assert.match(runtime,/magnifier:\["magnifier"\]/);
  assert.match(runtime,/magnifierField\.dataset\.contextOwner="magnifier"/);
  assert.match(runtime,/id="magnifier-strength"/);
@@ -89,7 +89,7 @@ test("Desktop zoom buttons, slider and wheel share one anchored zoom state",()=>
 
 test("Compass is an accessible tool with a cancellable center-radius lifecycle",()=>{
  assert.match(html,/data-tool="compass"[^>]*aria-label="Compass"/);
- assert.match(runtime,/compass:\\{icon:"🧭",label:"Compass",category:"shapes"\\}/);
+ assert.match(runtime,/compass:\{icon:"🧭",label:"Compass",category:"shapes"\}/);
  assert.match(runtime,/compassState=\{center:\{\.\.\.strokeStart\},edge:\{\.\.\.strokeStart\},active:true\}/);
  assert.match(runtime,/if\(tool==="compass"\)\{compassState=null;render\(\);\}/);
  assert.match(runtime,/if\(drawing&&tool==="compass"\)\{e\.preventDefault\(\);cancelStroke\(\);\}/);
