@@ -646,10 +646,15 @@ async def check_project_portability(browser, base_url, viewport):
 
     drawer = page.locator("#studio-tools-drawer")
     async def open_tab(tab_id):
-        if await drawer.get_attribute("data-state") != "open":
-            toggle_id = "#mobile-tools-toggle" if viewport["width"] <= 700 else "#desktop-tools-toggle"
-            await page.locator(toggle_id).click()
-        await page.wait_for_function("() => document.querySelector('#studio-tools-drawer')?.dataset.state === 'open'")
+        if viewport["width"] <= 700:
+            mobile_open = await page.locator("body").evaluate("el => el.classList.contains('nu-mobile-tools-open')")
+            if not mobile_open:
+                await page.locator("#mobile-tools-toggle").click()
+            await page.wait_for_function("() => document.body.classList.contains('nu-mobile-tools-open')")
+        else:
+            if await drawer.get_attribute("data-workspace-drawer-state") != "open":
+                await page.locator("#desktop-tools-toggle").click()
+            await page.wait_for_function("() => document.querySelector('#studio-tools-drawer')?.dataset.workspaceDrawerState === 'open'")
         await page.wait_for_timeout(350)
         await page.locator("#studio-properties-panel").evaluate("el => { el.open = true; }")
         await page.locator("#" + tab_id).wait_for(state="visible")
