@@ -6,7 +6,7 @@ const canvas=$("pixel-canvas"),ctx=canvas.getContext("2d",{willReadFrequently:tr
 const defaults=["#111827","#243447","#3e596b","#78909c","#d8e2e8","#ffffff","#a63c50","#e45b63","#f29c67","#e8b94f","#f8dc86","#76a86c","#3f795e","#4b9cba","#5577b8","#8a6bb5"];
 let width=32,height=32,pixels=Array(width*height).fill(null),palette=defaults.slice(),color="#e8b94f",tool="pencil",drawing=false,strokeSnapshot=null,undoStack=[],redoStack=[],imageImported=false,qualityProfile=null,workspace={zoom:100},resizeLock=true,lastDimension="width",brushSize=1,strokeStart=null,sourcePreviewUrl=null,originalImportFile=null;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-let fadeIntensity=50,mixBrushStrength=60,mixBrushState=null,viewRotation=0,guideState={blueprint:false,ruler:false,divisions:false,axes:false,depth:false},toolContextRefresh=()=>{};
+let fadeIntensity=50,mixBrushStrength=60,mixBrushState=null,viewRotation=0,guideState={blueprint:false,ruler:false,divisions:false,axes:false,depth:false},guideHighContrast=true,compassState=null,toolContextRefresh=()=>{};
 function announce(msg){$("studio-status").textContent=msg;}
 function snapshot(){return {width,height,pixels:pixels.slice()};}
 function historyLimitFor(state){return Math.max(1,Math.min(60,Math.floor(2000000/Math.max(1,state.pixels.length))));}
@@ -61,7 +61,7 @@ observeWorkspace();
 $("image-lock").addEventListener("change",e=>{resizeLock=e.target.checked;});
 $("image-width").addEventListener("input",()=>{lastDimension="width";});$("image-height").addEventListener("input",()=>{lastDimension="height";});$("apply-image-size").addEventListener("click",()=>{let w=clamp(Number($("image-width").value)||width,1,2048),h=clamp(Number($("image-height").value)||height,1,2048);if(resizeLock){const ratio=width/height;if(lastDimension==="width")h=Math.max(1,Math.round(w/ratio));else w=Math.max(1,Math.round(h*ratio));}$("image-width").value=w;$("image-height").value=h;resizeArtwork(w,h,"nearest-neighbor");});
 function renderPalette(){const root=$("palette");root.innerHTML="";palette.forEach((c,i)=>{const b=document.createElement("button");b.type="button";b.className="swatch";b.style.background=c;b.title=c;b.setAttribute("aria-label","Palette color "+c);b.setAttribute("aria-pressed",String(c.toLowerCase()===color.toLowerCase()));b.addEventListener("click",()=>{color=c;$("custom-color").value=c;renderPalette();});root.appendChild(b);});const transparent=document.createElement("button");transparent.type="button";transparent.className="swatch";transparent.setAttribute("aria-label","Transparent");transparent.title="Transparent / eraser";transparent.addEventListener("click",()=>setTool("eraser"));root.appendChild(transparent);}
-function setTool(next){tool=next;mixBrushState=null;document.querySelectorAll("[data-tool]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tool===tool)));canvas.style.cursor=tool==="picker"?"copy":tool==="eraser"?"cell":tool==="fill"?"copy":"crosshair";toolContextRefresh();}
+function setTool(next){tool=next;mixBrushState=null;compassState=null;document.querySelectorAll("[data-tool]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tool===tool)));canvas.style.cursor=tool==="picker"?"copy":tool==="eraser"?"cell":tool==="fill"?"copy":"crosshair";toolContextRefresh();}
 function coords(e){
  const r=canvas.getBoundingClientRect();
  if(!viewRotation)return window.NUStudioLayout.pixelAt(e.clientX,e.clientY,r,width,height);
@@ -86,8 +86,8 @@ function drawShape(start,end){
   const left=Math.min(x0,x1),right=Math.max(x0,x1),top=Math.min(y0,y1),bottom=Math.max(y0,y1);
   if(tool==="rect-fill"){for(let y=top;y<=bottom;y++)for(let x=left;x<=right;x++)paintBrush(x,y,value);}
   else{for(let x=left;x<=right;x++){paintBrush(x,top,value);paintBrush(x,bottom,value);}for(let y=top;y<=bottom;y++){paintBrush(left,y,value);paintBrush(right,y,value);}}
- }else if(tool==="ellipse"||tool==="ellipse-fill"){
-  const rx=Math.max(.5,Math.abs(x1-x0)/2),ry=Math.max(.5,Math.abs(y1-y0)/2),cx=(x0+x1)/2,cy=(y0+y1)/2;
+ }else if(tool==="ellipse"||tool==="ellipse-fill"||tool==="compass"){
+  const compassRadius=Math.max(.5,Math.round(Math.hypot(x1-x0,y1-y0))),rx=tool==="compass"?compassRadius:Math.max(.5,Math.abs(x1-x0)/2),ry=tool==="compass"?compassRadius:Math.max(.5,Math.abs(y1-y0)/2),cx=tool==="compass"?x0:(x0+x1)/2,cy=tool==="compass"?y0:(y0+y1)/2;
   const left=Math.floor(cx-rx-1),right=Math.ceil(cx+rx+1),top=Math.floor(cy-ry-1),bottom=Math.ceil(cy+ry+1),tolerance=Math.max(1/rx,1/ry)*1.4;
   for(let y=top;y<=bottom;y++)for(let x=left;x<=right;x++){const d=((x-cx)*(x-cx))/(rx*rx)+((y-cy)*(y-cy))/(ry*ry);if(tool==="ellipse-fill"?d<=1:Math.abs(d-1)<=tolerance)paintBrush(x,y,value);}
  }
@@ -96,16 +96,17 @@ function paintAt(e){const p=coords(e),i=p.y*width+p.x;if(tool==="picker"){if(pix
 canvas.addEventListener("pointerdown",e=>{
  e.preventDefault();if(tool==="color-mix-brush"&&adv.layers[adv.active].locked){announce("Layer locked. The color-mixing brush cannot paint on a locked layer.");return;}if(tool==="color-mix-brush"&&adv.maskEdit){announce("Turn off mask editing to use the color-mixing brush.");return;}mixBrushState=null;canvas.setPointerCapture(e.pointerId);drawing=true;strokeSnapshot=snapshot();strokeStart=coords(e);
  if(tool==="fill"||tool==="picker"){const changed=paintAt(e);if(tool==="fill"&&changed>0)commitHistory(strokeSnapshot);drawing=false;strokeSnapshot=null;strokeStart=null;return;}
- if(tool==="line"||tool==="rect"||tool==="ellipse"||tool==="rect-fill"||tool==="ellipse-fill"){drawShape(strokeStart,strokeStart);render();}else paintAt(e);
+ if(tool==="line"||tool==="rect"||tool==="ellipse"||tool==="rect-fill"||tool==="ellipse-fill"||tool==="compass"){if(tool==="compass")compassState={center:{...strokeStart},edge:{...strokeStart},active:true};drawShape(strokeStart,strokeStart);render();}else paintAt(e);
 });
 canvas.addEventListener("pointermove",e=>{
  if(!drawing||!(e.buttons||e.pointerType==="touch"))return;
- if(tool==="line"||tool==="rect"||tool==="ellipse"||tool==="rect-fill"||tool==="ellipse-fill"){pixels=strokeSnapshot.pixels.slice();drawShape(strokeStart,coords(e));render();}
+ if(tool==="line"||tool==="rect"||tool==="ellipse"||tool==="rect-fill"||tool==="ellipse-fill"||tool==="compass"){pixels=strokeSnapshot.pixels.slice();const edge=coords(e);if(tool==="compass"&&compassState)compassState.edge={...edge};drawShape(strokeStart,edge);render();}
  else paintAt(e);
 });
-function endStroke(){if(!drawing)return;drawing=false;commitHistory(strokeSnapshot);strokeSnapshot=null;strokeStart=null;mixBrushState=null;}
-function cancelStroke(){if(!drawing)return;if(tool==="color-mix-brush"&&strokeSnapshot&&strokeSnapshot.layers)restore(strokeSnapshot);else pixels=strokeSnapshot.pixels.slice();drawing=false;strokeSnapshot=null;strokeStart=null;mixBrushState=null;render();}
+function endStroke(){if(!drawing)return;drawing=false;commitHistory(strokeSnapshot);strokeSnapshot=null;strokeStart=null;mixBrushState=null;if(tool==="compass"){compassState=null;render();}}
+function cancelStroke(){if(!drawing)return;if(tool==="color-mix-brush"&&strokeSnapshot&&strokeSnapshot.layers)restore(strokeSnapshot);else pixels=strokeSnapshot.pixels.slice();drawing=false;strokeSnapshot=null;strokeStart=null;mixBrushState=null;compassState=null;render();}
 canvas.addEventListener("pointerup",endStroke);canvas.addEventListener("pointercancel",cancelStroke);canvas.addEventListener("lostpointercapture",cancelStroke);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&drawing&&tool==="compass"){e.preventDefault();cancelStroke();}});
 document.querySelectorAll("[data-tool]").forEach(b=>b.addEventListener("click",()=>setTool(b.dataset.tool)));
 $("custom-color").addEventListener("input",e=>{color=e.target.value.toLowerCase();renderPalette();setTool("pencil");});
 $("brush-size").addEventListener("input",e=>{brushSize=clamp(Number(e.target.value)||1,1,16);$("brush-size-value").textContent=brushSize+" px";});
@@ -351,14 +352,30 @@ render=function(){
  adv.layers[adv.active].pixels=pixels.slice();const active=pixels;pixels=composite();renderBase();
  if(adv.selection){ctx.save();ctx.strokeStyle="#ffffff";ctx.lineWidth=Math.max(.12,Math.min(width,height)*.001);ctx.setLineDash([1,1]);ctx.beginPath();for(let y=0;y<height;y++)for(let x=0;x<width;x++){const i=y*width+x;if(!adv.selection[i])continue;if(y===0||!adv.selection[i-width]){ctx.moveTo(x,y);ctx.lineTo(x+1,y);}if(y===height-1||!adv.selection[i+width]){ctx.moveTo(x,y+1);ctx.lineTo(x+1,y+1);}if(x===0||!adv.selection[i-1]){ctx.moveTo(x,y);ctx.lineTo(x,y+1);}if(x===width-1||!adv.selection[i+1]){ctx.moveTo(x+1,y);ctx.lineTo(x+1,y+1);}}ctx.stroke();ctx.restore();}
  pixels=active;
- if(Object.values(guideState).some(Boolean)){
-  ctx.save();ctx.lineWidth=Math.max(.12,Math.min(width,height)*.002);
-  if(guideState.blueprint){ctx.strokeStyle="rgba(65,190,255,.65)";ctx.setLineDash([2,2]);ctx.strokeRect(1,1,width-2,height-2);}
-  if(guideState.divisions){ctx.strokeStyle="rgba(255,200,100,.55)";ctx.setLineDash([1,2]);ctx.beginPath();for(let x=width/4;x<width;x+=width/4){ctx.moveTo(x,0);ctx.lineTo(x,height);}for(let y=height/4;y<height;y+=height/4){ctx.moveTo(0,y);ctx.lineTo(width,y);}ctx.stroke();}
-  if(guideState.axes){ctx.strokeStyle="rgba(255,120,120,.8)";ctx.setLineDash([]);ctx.beginPath();ctx.moveTo(0,height/2);ctx.lineTo(width,height/2);ctx.moveTo(width/2,0);ctx.lineTo(width/2,height);ctx.moveTo(0,0);ctx.lineTo(width,height);ctx.moveTo(width,0);ctx.lineTo(0,height);ctx.stroke();}
-  if(guideState.depth){ctx.strokeStyle="rgba(120,255,190,.8)";ctx.beginPath();ctx.moveTo(0,height);ctx.lineTo(width,0);ctx.stroke();}
-  if(guideState.ruler){ctx.fillStyle="rgba(255,220,150,.9)";ctx.strokeStyle="rgba(255,220,150,.8)";ctx.font="2px monospace";ctx.beginPath();const step=Math.max(1,Math.floor(Math.max(width,height)/8));for(let x=0;x<width;x+=step){ctx.moveTo(x+.5,0);ctx.lineTo(x+.5,Math.min(2,height));ctx.fillText(String(x),x+.5,Math.min(3,height));}for(let y=0;y<height;y+=step){ctx.moveTo(0,y+.5);ctx.lineTo(Math.min(2,width),y+.5);ctx.fillText(String(y),Math.min(2,width-1),y+.5);}ctx.stroke();}
-  ctx.restore();
+ if(Object.values(guideState).some(Boolean)||compassState?.active){
+  let luminance=0,samples=0;const stride=Math.max(1,Math.floor(pixels.length/256));
+  for(let i=0;i<pixels.length;i+=stride){const c=pixels[i];if(!c){luminance+=22;samples++;continue;}const r=parseInt(c.slice(1,3),16),g=parseInt(c.slice(3,5),16),b=parseInt(c.slice(5,7),16);luminance+=.2126*r+.7152*g+.0722*b;samples++;}
+  const lightBackground=luminance/Math.max(1,samples)>145,haloColor=guideHighContrast?(lightBackground?"rgba(0,0,0,.98)":"rgba(255,255,255,.98)"):"rgba(0,0,0,.22)";
+  const accents=lightBackground?{blue:"rgba(0,82,165,.98)",gold:"rgba(155,82,0,.98)",red:"rgba(165,24,42,.98)",green:"rgba(0,112,68,.98)",ruler:"rgba(92,62,0,.98)",compass:"rgba(165,72,0,.99)"}:{blue:"rgba(90,220,255,.99)",gold:"rgba(255,194,64,.99)",red:"rgba(255,112,132,.99)",green:"rgba(90,255,190,.99)",ruler:"rgba(255,236,165,.99)",compass:"rgba(255,224,112,.99)"};
+  const screenScale=Math.max(.01,canvas.getBoundingClientRect().width/Math.max(1,width)),guideWidth=clamp(1.7/screenScale,.05,2.5);
+  const strokeGuide=(path,accent,dash=[])=>{ctx.save();ctx.lineCap="round";ctx.lineJoin="round";ctx.setLineDash(dash.map(v=>v/screenScale));ctx.beginPath();path();ctx.strokeStyle=haloColor;ctx.lineWidth=guideHighContrast?guideWidth*2.7:guideWidth*1.15;ctx.stroke();ctx.beginPath();path();ctx.strokeStyle=accent;ctx.lineWidth=guideWidth;ctx.stroke();ctx.restore();};
+  if(guideState.blueprint)strokeGuide(()=>ctx.rect(1,1,width-2,height-2),accents.blue,[2,2]);
+  if(guideState.divisions)strokeGuide(()=>{for(let x=width/4;x<width;x+=width/4){ctx.moveTo(x,0);ctx.lineTo(x,height);}for(let y=height/4;y<height;y+=height/4){ctx.moveTo(0,y);ctx.lineTo(width,y);}},accents.gold,[1,2]);
+  if(guideState.axes)strokeGuide(()=>{ctx.moveTo(0,height/2);ctx.lineTo(width,height/2);ctx.moveTo(width/2,0);ctx.lineTo(width/2,height);ctx.moveTo(0,0);ctx.lineTo(width,height);ctx.moveTo(width,0);ctx.lineTo(0,height);},accents.red);
+  if(guideState.depth)strokeGuide(()=>{ctx.moveTo(0,height);ctx.lineTo(width,0);},accents.green);
+  if(guideState.ruler){
+   const step=Math.max(1,Math.floor(Math.max(width,height)/8));
+   strokeGuide(()=>{for(let x=0;x<width;x+=step){ctx.moveTo(x+.5,0);ctx.lineTo(x+.5,Math.min(2,height));}for(let y=0;y<height;y+=step){ctx.moveTo(0,y+.5);ctx.lineTo(Math.min(2,width),y+.5);}},accents.ruler);
+   ctx.save();ctx.font=Math.max(.35,9/screenScale)+"px monospace";ctx.fillStyle=accents.ruler;ctx.shadowColor=haloColor;ctx.shadowBlur=guideHighContrast?2/screenScale:0;
+   for(let x=0;x<width;x+=step)ctx.fillText(String(x),x+.5,Math.min(3,height-.2));
+   for(let y=0;y<height;y+=step)ctx.fillText(String(y),Math.min(2,width-1),y+.5);
+   ctx.restore();
+  }
+  if(compassState?.active){
+   const cx=compassState.center.x+.5,cy=compassState.center.y+.5,ex=compassState.edge.x+.5,ey=compassState.edge.y+.5,dotRadius=Math.max(.3,2.6/screenScale);
+   strokeGuide(()=>{ctx.moveTo(cx,cy);ctx.lineTo(ex,ey);},accents.compass,[2,1]);
+   ctx.save();ctx.beginPath();ctx.arc(cx,cy,dotRadius,0,Math.PI*2);ctx.fillStyle=haloColor;ctx.fill();ctx.beginPath();ctx.arc(cx,cy,dotRadius*.55,0,Math.PI*2);ctx.fillStyle=accents.compass;ctx.fill();ctx.restore();
+  }
  }
 };
 svgSource=function(){const active=pixels;adv.layers[adv.active].pixels=active.slice();const visible=composite();try{pixels=visible;return svgSourceBase();}finally{pixels=active;}};
@@ -412,7 +429,7 @@ function advPanel(){
  vectorPanel.remove();
  drawer.insertBefore(propertiesPanel,exportPanel);
  drawer.append(d);
- const quick=$("studio-quick-tools"),names={pencil:{icon:"✏️",label:"Pencil",shortcut:"B"},eraser:{icon:"🧽",label:"Eraser",shortcut:"E"},fill:{icon:"🪣",label:"Fill",shortcut:"G"},picker:{icon:"🎯",label:"Eyedropper",shortcut:"I"},line:{icon:"／",label:"Line",shortcut:"L"},rect:{icon:"▭",label:"Rectangle",shortcut:"R"},ellipse:{icon:"◯",label:"Ellipse",shortcut:"O"},"rect-fill":{icon:"▰",label:"Filled rectangle"},"ellipse-fill":{icon:"●",label:"Filled ellipse"},"select-rect":{icon:"▣",label:"Rectangular selection"},"select-lasso":{icon:"〰",label:"Lasso selection"},"move-selection":{icon:"✥",label:"Move selection"},gradient:{icon:"◩",label:"Gradient"},texture:{icon:"▦",label:"Texture brush"},bezier:{icon:"⌁",label:"Bezier curve"},"fading-brush":{icon:"🌫️",label:"Fading brush"},"color-mix-brush":{icon:"🖌️",label:"Color-mixing brush"}};
+ const quick=$("studio-quick-tools"),names={pencil:{icon:"✏️",label:"Pencil",shortcut:"B"},eraser:{icon:"🧽",label:"Eraser",shortcut:"E"},fill:{icon:"🪣",label:"Fill",shortcut:"G"},picker:{icon:"🎯",label:"Eyedropper",shortcut:"I"},line:{icon:"／",label:"Line",shortcut:"L"},rect:{icon:"▭",label:"Rectangle",shortcut:"R"},ellipse:{icon:"◯",label:"Ellipse",shortcut:"O"},"rect-fill":{icon:"▰",label:"Filled rectangle"},"ellipse-fill":{icon:"●",label:"Filled ellipse"},"select-rect":{icon:"▣",label:"Rectangular selection"},"select-lasso":{icon:"〰",label:"Lasso selection"},"move-selection":{icon:"✥",label:"Move selection"},gradient:{icon:"◩",label:"Gradient"},texture:{icon:"▦",label:"Texture brush"},bezier:{icon:"⌁",label:"Bezier curve"},"fading-brush":{icon:"🌫️",label:"Fading brush"},"color-mix-brush":{icon:"🖌️",label:"Color-mixing brush"},compass:{icon:"⊙",label:"Compass"}};
  document.querySelectorAll("[data-tool]").forEach(b=>{const n=names[b.dataset.tool];if(!n)return;b.innerHTML='<span class="tool-icon" aria-hidden="true">'+n.icon+'</span><span>'+n.label+'</span>';b.title=n.shortcut?n.label+' ('+n.shortcut+')':n.label;b.setAttribute("aria-label",n.label+(n.shortcut?", "+n.shortcut+" shortcut":""));quick.append(b);});
  const contextPanel=$("studio-brush");contextPanel.setAttribute("role","region");contextPanel.setAttribute("aria-label","Active tool options");
  const contextHead=document.createElement("div");contextHead.className="tool-context-head";const contextTitle=document.createElement("strong");contextTitle.id="studio-context-title";const contextTag=document.createElement("span");contextTag.textContent="Tool options";contextHead.append(contextTitle,contextTag);
@@ -426,8 +443,8 @@ function advPanel(){
  const selectionActions=$("pro-select-all").parentElement;selectionActions.dataset.contextOwner="selection";contextPanel.append(selectionActions);
  const selectionScale=$("pro-scale-x").closest(".adv-grid");selectionScale.dataset.contextOwner="selection";contextPanel.append(selectionScale);
  document.querySelectorAll("#studio-tabpanels .adv-grid").forEach(group=>{if(!group.children.length)group.remove();});
- const contextLabels={pencil:"Pencil",eraser:"Eraser",fill:"Fill",picker:"Eyedropper",line:"Line",rect:"Rectangle",ellipse:"Ellipse","rect-fill":"Filled rectangle","ellipse-fill":"Filled ellipse","select-rect":"Rectangular selection","select-lasso":"Lasso selection","move-selection":"Move selection",gradient:"Gradient",texture:"Texture brush",bezier:"Bezier curve","fading-brush":"Fading brush","color-mix-brush":"Color-mixing brush"};
- const contextHints={pencil:"Draw with the selected color on the active layer.",eraser:"Erase pixels on the active layer.",fill:"Choose a fill mode and tolerance, then select a canvas area.",picker:"Sample a color from the canvas.",line:"Draw a straight line with the current brush settings.",rect:"Draw a rectangle with the current brush settings.",ellipse:"Draw an ellipse with the current brush settings.","rect-fill":"Draw a filled rectangle.","ellipse-fill":"Draw a filled ellipse.","select-rect":"Create a rectangular selection, then refine or scale it.","select-lasso":"Draw a freehand selection, then refine or scale it.","move-selection":"Move or scale the active selection.",gradient:"Choose a gradient mode and end color before drawing.",texture:"Choose a brush shape and texture density for textured strokes.","fading-brush":"Adjust how quickly pigment fades along a stroke.","color-mix-brush":"Adjust how strongly existing canvas colors blend.","bezier":"Adjust the curve tension before placing control points."};
+ const contextLabels={pencil:"Pencil",eraser:"Eraser",fill:"Fill",picker:"Eyedropper",line:"Line",rect:"Rectangle",ellipse:"Ellipse","rect-fill":"Filled rectangle","ellipse-fill":"Filled ellipse","select-rect":"Rectangular selection","select-lasso":"Lasso selection","move-selection":"Move selection",gradient:"Gradient",texture:"Texture brush",bezier:"Bezier curve",compass:"Compass","fading-brush":"Fading brush","color-mix-brush":"Color-mixing brush"};
+ const contextHints={pencil:"Draw with the selected color on the active layer.",eraser:"Erase pixels on the active layer.",fill:"Choose a fill mode and tolerance, then select a canvas area.",picker:"Sample a color from the canvas.",line:"Draw a straight line with the current brush settings.",rect:"Draw a rectangle with the current brush settings.",ellipse:"Draw an ellipse with the current brush settings.","rect-fill":"Draw a filled rectangle.","ellipse-fill":"Draw a filled ellipse.","select-rect":"Create a rectangular selection, then refine or scale it.","select-lasso":"Draw a freehand selection, then refine or scale it.","move-selection":"Move or scale the active selection.",gradient:"Choose a gradient mode and end color before drawing.",texture:"Choose a brush shape and texture density for textured strokes.","fading-brush":"Adjust how quickly pigment fades along a stroke.","color-mix-brush":"Adjust how strongly existing canvas colors blend.","bezier":"Adjust the curve tension before placing control points.",compass:"Choose a center point, drag to set the radius, then release to commit the circle."};
  const contextOwners={pencil:["paint"],eraser:["paint"],line:["paint"],rect:["paint"],ellipse:["paint"],"rect-fill":["paint"],"ellipse-fill":["paint"],"fading-brush":["paint","fading"],"color-mix-brush":["paint","mix"],texture:["paint","texture"],fill:["fill"],gradient:["gradient"],"select-rect":["selection"],"select-lasso":["selection"],"move-selection":["selection"],bezier:["bezier"]};
  toolContextRefresh=()=>{const owners=contextOwners[tool]||[];contextTitle.textContent=contextLabels[tool]||"Tool options";contextHint.textContent=contextHints[tool]||"No additional settings for this tool.";contextPanel.dataset.activeTool=tool;contextPanel.querySelectorAll("[data-context-owner]").forEach(node=>{node.hidden=!owners.includes(node.dataset.contextOwner);});};
  toolContextRefresh();
@@ -538,9 +555,9 @@ function installStudio2DControls(){
  const rotation=document.createElement("div");rotation.className="dock-field";rotation.innerHTML='<strong>Free layer rotation</strong><label>Angle <input id="pro-free-rotation" type="range" min="-180" max="180" value="0"></label><output id="pro-free-rotation-value">0°</output><button id="pro-rotate-layer" type="button">Rotate active layer</button>';panel.append(rotation);
  $("pro-free-rotation").oninput=e=>$("pro-free-rotation-value").textContent=e.target.value+"°";
  $("pro-rotate-layer").onclick=()=>applyFreeLayerRotation(+$("pro-free-rotation").value);
- const guides=document.createElement("section");guides.className="adaptive-control";guides.style.marginTop="12px";guides.innerHTML='<strong>VIEW GUIDES</strong><div class="adv-grid"><label><input type="checkbox" data-guide="blueprint"> Blueprint</label><label><input type="checkbox" data-guide="ruler"> Ruler</label><label><input type="checkbox" data-guide="divisions"> Divisions</label><label><input type="checkbox" data-guide="axes"> Angular axes</label><label><input type="checkbox" data-guide="depth"> Depth axis</label></div><button id="view-rotate-reset" type="button">Reset viewport rotation</button>';
+ const guides=document.createElement("section");guides.className="adaptive-control";guides.style.marginTop="12px";guides.innerHTML='<strong>VIEW GUIDES</strong><div class="adv-grid"><label><input type="checkbox" data-guide="blueprint"> Blueprint</label><label><input type="checkbox" data-guide="ruler"> Ruler</label><label><input type="checkbox" data-guide="divisions"> Divisions</label><label><input type="checkbox" data-guide="axes"> Angular axes</label><label><input type="checkbox" data-guide="depth"> Depth axis</label><label><input type="checkbox" data-guide-contrast checked> High contrast</label></div><button id="view-rotate-reset" type="button">Reset viewport rotation</button>';
  document.querySelector(".view-tools")?.append(guides);
- guides.querySelectorAll("[data-guide]").forEach(input=>input.addEventListener("change",e=>{guideState[e.target.dataset.guide]=e.target.checked;render();}));
+ guides.querySelectorAll("[data-guide]").forEach(input=>input.addEventListener("change",e=>{guideState[e.target.dataset.guide]=e.target.checked;render();}));guides.querySelector("[data-guide-contrast]")?.addEventListener("change",e=>{guideHighContrast=e.target.checked;render();});
  $("view-rotate-reset")?.addEventListener("click",()=>{viewRotation=0;canvas.style.transform="";announce("Viewport rotation reset; artwork unchanged.");});
 }
 installStudio2DControls();
