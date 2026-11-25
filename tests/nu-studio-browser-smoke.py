@@ -289,12 +289,17 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     assert await read_pixel(page, 8, 8) == cancel_center_before, "Compass cancellation must leave the center unchanged"
 
     if require_mix:
-        mix_drawer_toggle = page.locator("#desktop-tools-toggle" if viewport["width"] > 700 else "#mobile-tools-toggle")
-        drawer_is_visible = await page.locator("#studio-tools-drawer").evaluate(
-            "(el) => { const style=getComputedStyle(el); return style.display !== 'none' && style.visibility === 'visible'; }"
+        is_mobile_workspace = viewport["width"] <= 700
+        mix_drawer_toggle = page.locator("#mobile-tools-toggle" if is_mobile_workspace else "#desktop-tools-toggle")
+        drawer_open_class = "nu-mobile-tools-open" if is_mobile_workspace else "nu-desktop-tools-open"
+        drawer_is_open = await page.locator("body").evaluate(
+            "(el, className) => el.classList.contains(className)", drawer_open_class
         )
-        if not drawer_is_visible:
+        if not drawer_is_open:
             await mix_drawer_toggle.click()
+            await page.wait_for_function(
+                "(className) => document.body.classList.contains(className)", drawer_open_class, timeout=5000
+            )
         await page.locator("#studio-dock").wait_for(state="visible", timeout=5000)
         assert await page.locator('#studio-quick-tools [data-tool="color-mix-brush"]').count() == 1, "Color-mixing brush tool is missing"
         assert await page.locator('[aria-label="Fading brush intensity"]').count() == 1, "Fading control is missing"
