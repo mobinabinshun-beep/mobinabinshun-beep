@@ -800,7 +800,7 @@ function buildStudioProjectDocument(){
    bucket:adv.bucket,tolerance:adv.tol,symmetry:adv.symmetry,brushShape:adv.brushShape,
    texture:adv.texture,textureDensity:adv.textureDensity,
    gradientColor:$("pro-gradient-color")?.value||"#65dcff",gradientMode:$("pro-gradient-mode")?.value||"linear",
-   curveTension:Number($("pro-curve")?.value)||24,alpha:Number($("adv-alpha")?.value)||100,
+   curveTension:Number($("pro-curve")?.value??24),alpha:Number($("adv-alpha")?.value??100),
    selectionScaleX:Number($("pro-scale-x")?.value)||2,selectionScaleY:Number($("pro-scale-y")?.value)||2
   }
  };
