@@ -231,17 +231,17 @@ Exact tested implementation/workflow SHA: `ce12b7fba76cc5e575e20c6128a2b094925c7
 - Stage 6 pre-repair recovery branch `backup/pre-studio-stage6-clean-welcome-2026-11-25` remains preserved at its recorded initial implementation SHA.
 
 ### Package status and next serial stage
-- Stage 6 remains MACHINE-PASS on its frozen candidate SHA `ce12b7fba76cc5e575e20c6128a2b094925c7ff6`; its backup ref is unchanged.
-- Stage 7 project portability implementation and both push/PR machine matrices are MACHINE-PASS on `10df67aaf8bcdf1eff2070e8002933e23a4c9743`. Its final documentation/workflow-inclusive SHA is being revalidated before the Stage 7 final recovery backup is created.
+- Product-local Stage 6 (clean welcome/tool categories) remains MACHINE-PASS at `ce12b7fba76cc5e575e20c6128a2b094925c7ff6`; its verified backup is unchanged. This was an early clean-UI hardening slice and does not close the later Demo/local parity gate.
+- Product-local Stage 7 (project portability; Issue #68 serial Stage 6) is MACHINE-PASS on tested SHA `0bfd28472e10faa5dc28f35700c9714296624efb`; its final backup `backup/studio-stage7-project-portability-2026-11-25` is verified at that exact SHA.
 - The aggregate Issue #68 package remains IN-PROGRESS. No package-final backup, public demo deployment, live-build verification, HUMAN-QA-PENDING handoff or owner acceptance is claimed.
-- Per Issue #68's serial order, Stage 8 — Perspective/Depth — is next, but runtime work must wait until the Stage 7 final documentation-inclusive SHA passes its exact-SHA gates and its recovery backup is verified.
+- Next: product-local Stage 8 Perspective/Depth, corresponding to Issue #68 serial Stage 7. The final Demo/local parity and clean-public-UI gate remains Issue #68 serial Stage 8; full final package machine/human QA remains serial Stage 9.
 - Issue #67 HTML/CSS graphics-layer export remains independent and out of scope.
 
 
 ## Stage 7 — Versioned project download/reopen and safe replacement
 
 - Change ID: `NU-UPD-STUDIO-PROJECT-PORTABILITY-20261124`
-- Status: `IMPLEMENTATION-MACHINE-PASS / PR-MIRROR-PASS — FINAL DOC/WORKFLOW SHA REVALIDATION PENDING`
+- Status: `MACHINE-PASS / PR-MIRROR-PASS / FINAL-BACKUP-VERIFIED`
 - Stage 6 MACHINE-PASS implementation SHA: `ce12b7fba76cc5e575e20c6128a2b094925c7ff6`; verified Stage 6 backup: `backup/studio-stage6-clean-welcome-2026-11-25`.
 - Stage 7 source baseline: successor branch `fix/studio-fill-ux-successor-20261124`, exact pre-change SHA `5d72456c57909b64729597e110e8fefd4727ecdf`. Verified recovery ref `backup/pre-studio-stage7-project-portability-2026-11-25` points to this exact SHA. Stage 7 is a successor only; Stage 6 and Stage 5 frozen refs are not to be moved or edited.
 
@@ -296,7 +296,7 @@ No Perspective/Depth implementation (next serial stage); no Demo/local deploymen
 - Same exact SHA passed the cross-project gates: Studio export regression push `45562956833` and PR `45562968574`; graphics preview smoke `45562968573`; Gateway regression `45562968714`; Arcane Shield/Mana regression `45562968568`.
 - Compared with the pre-change checkpoint, the Stage 7 diff is confined to the nine authorized paths: workflow, canonical change record, Studio runtime, existing project helper, Studio HTML, browser smoke, native image-import regression assertion, new project schema tests and UX assertions.
 - The workflow PR path filter now includes this canonical change record so future status/evidence updates trigger the same machine gates.
-- Final docs/workflow-inclusive SHA must complete the same exact-SHA machine and cross-project checks before Stage 7 is frozen. The Stage 7 final backup will then be created/read back; it is distinct from the pre-change recovery ref and the eventual package-final backup. The Runtime Baseline Snapshot remains the public-demo baseline.
+- Final docs/workflow-inclusive SHA `0bfd28472e10faa5dc28f35700c9714296624efb` passed the same exact-SHA machine and cross-project checks. Final backup `backup/studio-stage7-project-portability-2026-11-25` was created and read back at that exact SHA; it is distinct from the pre-change recovery ref and the eventual package-final backup. The Runtime Baseline Snapshot remains the public-demo baseline.
 
 ### Directly coupled test-scope correction
 
@@ -309,3 +309,56 @@ No Perspective/Depth implementation (next serial stage); no Demo/local deploymen
 - A modal/outside-click interaction was corrected so confirming a project operation does not dismiss the tool drawer. The browser smoke suite follows the actual contextual panel ownership and closes the mobile/desktop drawer before canvas or toolbar interactions.
 - The raster-import regression assertion was narrowed to the raster-import handler and separately verifies the `.nuproj` file bound; no image import ceiling was added.
 - This is Stage 7 implementation verification only. The aggregate package remains open; no public deployment, final package backup, live-build parity verification, human QA handoff or owner acceptance has occurred.
+### Stage numbering alignment with Repository #68
+
+- The product-local change record has an additional Stage 6 clean-welcome/tool-category slice completed before project portability. Repository #68's owner-defined serial order calls project portability serial Stage 6 and Perspective/Depth serial Stage 7; the product-local labels therefore map as follows: local Stage 7 = Repository #68 serial Stage 6, and local Stage 8 = Repository #68 serial Stage 7.
+- The early clean-welcome slice does not count the complete Repository #68 serial Stage 8 Demo/local parity, deployment identity and clean-public-UI acceptance gate as complete. The final package gate remains open.
+
+## Stage 8 — Perspective/Depth geometry and transform workflow
+
+- Change ID: `NU-UPD-STUDIO-PERSPECTIVE-DEPTH-20261124`.
+- Governance mapping: product-local Stage 8; Repository #68 serial Stage 7.
+- Status: `SCOPE-RECORDED / PRE-CHANGE-CHECKPOINT-PENDING`.
+- Parent candidate: verified product-local Stage 7 backup SHA `0bfd28472e10faa5dc28f35700c9714296624efb`; no runtime write is permitted until the exact Stage 8 pre-change checkpoint is created and read back.
+
+### Authorized paths
+
+1. `pixel-art-studio.html` — add an icon-first, accessible Perspective tool entry in the existing Effects category and compact contextual controls for depth, angle, corner handles, preview, reset, commit and cancel.
+2. `nu-pixel-art-studio.js` — implement the Perspective interaction lifecycle, render-only quad/handle preview, active-layer/selection/mask integration, safe cancel and one-step commit/undo/redo. Do not modify other tool behavior.
+3. `nu-studio-pro-tools.js` — add pure DOM-independent projective-geometry helpers: quad validation, source-to-quad mapping and inverse nearest-neighbor raster sampling with transparency preservation.
+4. `tests/nu-studio-perspective.test.js` (new) — geometry, identity, skew/depth, degenerate/self-intersecting quad, clipping, alpha/transparency and pixel-sampling tests.
+5. `tests/nu-studio-project.test.js` — add the new `perspective` tool identifier to the versioned project schema whitelist and assert project save/restore preserves it.
+6. `tests/nu-studio-ux.test.js` — assert accessible tool name, contextual ownership, keyboard-operable handles and visible control semantics.
+7. `tests/nu-studio-browser-smoke.py` — desktop/mobile preview, corner drag, depth/angle adjustment, cancel/no-op, commit, undo/redo and layer/selection/mask preservation.
+8. `.github/workflows/pixel-art-studio-machine.yml` — add the new focused perspective unit suite to the existing Studio unit command; preserve the existing 3-OS × 3-browser matrix and permissions.
+9. This change record.
+
+### Geometry and behavior contract
+
+- The transform source is the active layer's pixel rectangle when no selection exists, or the selected region when a selection exists. Pixels outside the selected region remain unchanged; active-layer masks and locks are honored.
+- The quadrilateral uses stable corner order: top-left, top-right, bottom-right, bottom-left. Corner handles may be dragged independently; depth and angle controls provide a deterministic starting perspective and remain adjustable before commit.
+- Preview is render-only: no pixel array, mask, selection, layer metadata, export or history mutation occurs before Commit. Cancel/Escape restores the exact pre-preview state.
+- Commit uses inverse projective mapping and nearest-neighbor sampling appropriate for pixel art; transparent pixels remain transparent, output is clipped to the canvas, and temporary handles/guides never become artwork.
+- Reject non-finite, degenerate, self-intersecting, non-convex or below-minimum-area quads with a clear product message and no partial mutation. Locked layers cannot be transformed.
+- A successful commit is one undo step; undo/redo restores the exact pre/post-transform pixels, masks and selection. No-op transforms do not add history.
+- The tool is stored as `perspective` in the existing versioned project file and restores with its owning Effects category/context. No new project format or storage service is introduced.
+
+### Acceptance criteria
+
+- A rectangular sprite/layer can be transformed into a perspective quadrilateral by dragging each corner and adjusting depth/angle; the preview is accurate and responsive on desktop and mobile.
+- Identity transform reproduces the exact original pixels. Non-identity transforms preserve palette colors and alpha via nearest-neighbor sampling; no blur/interpolation is introduced.
+- With a selection, only selected pixels transform; outside pixels, selection mask, active-layer mask, group, opacity, visibility and blend metadata remain intact.
+- Cancel/Escape leaves pixels, dimensions, masks, selection, history and layer metadata unchanged. Commit creates exactly one undo step and undo/redo round-trips exactly.
+- Invalid or degenerate geometry is rejected without partial mutation. Locked-layer behavior is safe and explicit.
+- Existing Fill, project save/reopen, Compass, Magnifier, exports and all previous stages remain regression-tested.
+- Focused unit tests, Studio regression tests, desktop/mobile browser checks, all 9 OS/browser combinations and cross-project gates pass on one exact SHA.
+
+### Explicit exclusions
+
+No Demo/local parity or deployment work (Repository #68 serial Stage 8); no final package QA/deployment (serial Stage 9); no HTML/CSS graphics-layer export (Repository #67); no Gateway, HUD, Wallet, Library, games, global CSS, shared layout/controller refactor, backend/storage service or unrelated Studio tools. S2B and frozen Stage 5/6 candidates remain immutable.
+
+### Verification and checkpoint
+
+- Before the first Stage 8 runtime write, create `backup/pre-studio-stage8-perspective-depth-2026-11-25` from the exact documentation-inclusive Stage 8 scope head and verify its ref SHA is identical to the candidate head.
+- Focused geometry tests and the complete Studio machine/browser/cross-project gates must pass on one exact Stage 8 candidate SHA before the next serial stage is opened.
+- No Perspective/Depth runtime implementation has started at the time this scope is recorded.
