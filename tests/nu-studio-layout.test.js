@@ -1,7 +1,7 @@
 "use strict";
 const test=require("node:test");
 const assert=require("node:assert/strict");
-const {fit,pixelAt,anchorScrollDelta,pixelAnchorScrollDelta}=require("../nu-studio-layout.js");
+const {fit,pixelAt,anchorScrollDelta,pixelAnchorScrollDelta,pixelAnchorCorrection}=require("../nu-studio-layout.js");
 
 test("fit keeps the complete landscape image inside the frame",()=>{
  const r=fit(1600,900,800,600,100);
@@ -53,4 +53,8 @@ test("pixel-aware zoom preserves the same source pixel and within-pixel focus",(
 });
 test("pixel-aware zoom returns zero for invalid artwork dimensions",()=>{
  assert.deepEqual(pixelAnchorScrollDelta({left:0,top:0,width:10,height:10},{left:0,top:0,width:20,height:20},5,5,0,10),{x:0,y:0});
+});
+
+test("pixel-anchor correction compensates one-cell scroll quantization",()=>{
+ assert.deepEqual(pixelAnchorCorrection({x:12,y:13},{x:12,y:14},{width:320,height:320},32,32),{x:0,y:-10});
 });

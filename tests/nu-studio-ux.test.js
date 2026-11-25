@@ -79,6 +79,8 @@ test("Desktop zoom buttons, slider and wheel share one anchored zoom state",()=>
  assert.match(runtime,/function setZoom\(next,anchor,behavior="auto"\)/);
  assert.match(runtime,/anchorScrollDelta\(before,after,anchorX,anchorY\)/);
  assert.match(runtime,/pixelAnchorScrollDelta\(before,after,anchorX,anchorY,width,height\)/);
+ assert.match(runtime,/pixelAnchorCorrection\(targetPixel,actualPixel,rect,width,height\)/);
+ assert.match(runtime,/for\(let attempt=0;attempt<2;attempt\+\+\)/);
  assert.match(runtime,/function scrollFrame\(frame,left,top,behavior="auto"\)/);
  assert.match(runtime,/requestAnimationFrame\(\(\)=>\{frame\.style\.scrollBehavior=previous;\}\)/);
  assert.match(runtime,/canvas\.addEventListener\("wheel",e=>\{if\(!e\.ctrlKey\)return/);

@@ -52,10 +52,21 @@ function setZoom(next,anchor,behavior="auto"){
  workspace.zoom=clamp(Math.round(Number(next)||100),25,800);
  $("workspace-zoom").value=workspace.zoom;
  updateCanvasDisplay();
- const after=canvas.getBoundingClientRect(),delta=anchor&&!viewRotation?window.NUStudioLayout.pixelAnchorScrollDelta(before,after,anchorX,anchorY,width,height):window.NUStudioLayout.anchorScrollDelta(before,after,anchorX,anchorY);
- const left=clamp(frame.scrollLeft+delta.x,0,Math.max(0,frame.scrollWidth-frame.clientWidth));
- const top=clamp(frame.scrollTop+delta.y,0,Math.max(0,frame.scrollHeight-frame.clientHeight));
+ const targetPixel=anchor&&!viewRotation?window.NUStudioLayout.pixelAt(anchorX,anchorY,before,width,height):null;
+ const after=canvas.getBoundingClientRect(),delta=targetPixel?window.NUStudioLayout.pixelAnchorScrollDelta(before,after,anchorX,anchorY,width,height):window.NUStudioLayout.anchorScrollDelta(before,after,anchorX,anchorY);
+ const maxLeft=Math.max(0,frame.scrollWidth-frame.clientWidth),maxTop=Math.max(0,frame.scrollHeight-frame.clientHeight);
+ const left=clamp(frame.scrollLeft+delta.x,0,maxLeft),top=clamp(frame.scrollTop+delta.y,0,maxTop);
  scrollFrame(frame,left,top,behavior);
+ if(targetPixel){
+  for(let attempt=0;attempt<2;attempt++){
+   const rect=canvas.getBoundingClientRect(),actualPixel=window.NUStudioLayout.pixelAt(anchorX,anchorY,rect,width,height);
+   if(actualPixel.x===targetPixel.x&&actualPixel.y===targetPixel.y)break;
+   const correction=window.NUStudioLayout.pixelAnchorCorrection(targetPixel,actualPixel,rect,width,height);
+   const correctedLeft=clamp(frame.scrollLeft+correction.x,0,maxLeft),correctedTop=clamp(frame.scrollTop+correction.y,0,maxTop);
+   if(correctedLeft===frame.scrollLeft&&correctedTop===frame.scrollTop)break;
+   scrollFrame(frame,correctedLeft,correctedTop,"auto");
+  }
+ }
  updateCounters();
 }
 function scrollFrame(frame,left,top,behavior="auto"){

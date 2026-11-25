@@ -36,5 +36,9 @@
     const desiredCenterX=anchorX-offsetX*newCellWidth,desiredCenterY=anchorY-offsetY*newCellHeight;
     return {x:nextCenterX-desiredCenterX,y:nextCenterY-desiredCenterY};
   }
-  return {fit,pixelAt,anchorScrollDelta,pixelAnchorScrollDelta};
+  function pixelAnchorCorrection(targetPixel,actualPixel,rect,width,height){
+    if(!targetPixel||!actualPixel||!rect||rect.width<=0||rect.height<=0||!Number.isInteger(width)||!Number.isInteger(height)||width<1||height<1)return {x:0,y:0};
+    return {x:(targetPixel.x-actualPixel.x)*rect.width/width,y:(targetPixel.y-actualPixel.y)*rect.height/height};
+  }
+  return {fit,pixelAt,anchorScrollDelta,pixelAnchorScrollDelta,pixelAnchorCorrection};
 });
