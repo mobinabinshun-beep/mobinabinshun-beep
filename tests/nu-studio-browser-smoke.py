@@ -221,7 +221,7 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     await set_color(page, "#ffffff")
     await page.locator('#studio-quick-tools [data-tool="fill"]').click()
     await fill_toggle.click()
-    await click_cell(page, 0, 0)
+    await click_cell(page, 8, 8)
     blueprint = page.locator('[data-guide="blueprint"]')
     contrast_toggle = page.locator("[data-guide-contrast]")
     assert await contrast_toggle.is_checked(), "High-contrast guides must be enabled by default"
@@ -246,7 +246,7 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     # Compass previews a circle plus temporary center/radius guides; only the circumference commits.
     await fill_toggle.click()
     await page.locator("#new-canvas").click()
-    if await fill_toggle.get_attribute("aria-expanded") != "true":
+    if not await page.locator("#studio-dock").is_visible():
         await fill_toggle.click()
     await page.locator("#studio-dock").wait_for(state="visible", timeout=5000)
     await set_color(page, "#ff0000")
