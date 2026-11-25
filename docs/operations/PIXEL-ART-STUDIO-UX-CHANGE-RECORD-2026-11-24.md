@@ -233,3 +233,60 @@ Exact tested implementation/workflow SHA: `ce12b7fba76cc5e575e20c6128a2b094925c7
 - Stage 6 implementation is MACHINE-PASS on the exact SHA above. The aggregate package remains IN-PROGRESS; no package-final backup, public demo deployment, live-build verification, HUMAN-QA-PENDING handoff or owner acceptance is claimed.
 - Per Repository Issue #68's serial order, the next package stage is Stage 7 — versioned project download/reopen with explicit safe-replace confirmation. Do not start runtime implementation until the Stage 7 exact allow-list, acceptance tests and pre-change checkpoint are recorded and verified.
 - Issue #67 HTML/CSS graphics-layer export remains independent and out of scope.
+
+
+## Stage 7 — Versioned project download/reopen and safe replacement
+
+- Change ID: `NU-UPD-STUDIO-PROJECT-PORTABILITY-20261124`
+- Status: `SCOPE-RECORDED / PRE-CHANGE-CHECKPOINT-PENDING`
+- Stage 6 MACHINE-PASS implementation SHA: `ce12b7fba76cc5e575e20c6128a2b094925c7ff6`; verified Stage 6 backup: `backup/studio-stage6-clean-welcome-2026-11-25`.
+- Stage 7 source baseline: successor branch `fix/studio-fill-ux-successor-20261124`, documentation-inclusive head `56261c875e111e520edd090122e7b9bcbf516435`. Stage 7 is a successor only; Stage 6 and Stage 5 frozen refs are not to be moved or edited.
+
+### Discovery — existing reusable implementation
+
+- The Studio already has a browser-local editing model; no server persistence or account storage is required for portability.
+- Existing advanced state already tracks four layers, active layer, layer visibility/lock/opacity/blend/group, optional masks, groups, and selection. The advanced history snapshot/restore path already copies layer pixels, masks, selection and group metadata.
+- Existing import/export paths use browser File/Blob/object-URL APIs and a file input. These are the preferred local/offline primitives to extend.
+- The simple base snapshot only contains width/height/active pixels; the advanced snapshot/restore extension is the reusable state contract for a complete project. Project serialization must explicitly convert typed arrays (masks/selection) to JSON-safe arrays and must not rely on implicit typed-array JSON serialization.
+- Existing destructive entry points include New Canvas/reset, Clear Canvas and raster image import. These currently can replace or clear artwork without a common explicit project-replacement confirmation. Project-open must validate the complete file before prompting and must not mutate the current workspace before confirmation.
+
+### Authorized paths
+
+1. `pixel-art-studio.html` — add compact Project actions (Download Project, Open Project and explicit New Project), a project-file input, and an accessible confirmation surface with separate cancel/replace actions. Preserve existing import/export actions and IDs.
+2. `nu-pixel-art-studio.js` — serialize/restore the full editable project; wire download/open; validate before state mutation; apply project state atomically; synchronize layer UI, context controls, palette, canvas dimensions, history and view after restore; require confirmation before Open Project, New Project, Clear Canvas, grid-reset/New Canvas and raster import replace existing work.
+3. `nu-studio-pro-tools.js` — add pure, DOM-independent project schema validation/normalization helpers to the existing helper module; no new parallel project module.
+4. `tests/nu-studio-project.test.js` (new) — unit tests for schema/version, normalization, limits, pixel/layer/mask/selection validation, invalid values, malformed data and rejection without partial mutation.
+5. `tests/nu-studio-ux.test.js` — assert Project actions, accessible labels and confirmation semantics.
+6. `tests/nu-studio-browser-smoke.py` — desktop/mobile round-trip, cancellation, malformed-file preservation, replacement confirmation, New/Clear/import confirmation and state persistence.
+7. `.github/workflows/pixel-art-studio-machine.yml` — include the new project unit suite in the existing Studio unit gate; do not alter permissions or the 3-OS × 3-browser matrix.
+8. This change record.
+
+### Project data contract
+
+- Use a versioned, self-contained local file with a stable application identifier and explicit schema version (initial version 1); use a recognizable `.nuproj` extension and JSON media type.
+- Preserve canvas dimensions and editable pixels for every layer; layer names/order, active layer, opacity, visibility, lock, blend mode, group assignment, masks, group visibility/opacity and current selection; preserve palette/current color and persistent tool/brush/fill/texture/guide/view settings needed to resume editing.
+- Exclude transient pointer gestures, an in-progress Compass preview, hover/loupe pointer position, undo/redo history, object URLs and browser File handles. Temporary guides remain render-only and are never serialized as artwork pixels.
+- Convert typed arrays to explicit JSON arrays; validate the complete document and all bounds before any live state change. Reject unknown app/schema versions, malformed dimensions, wrong array lengths, invalid colors/enums/ranges, invalid active-layer references and over-limit files/canvases.
+- Restore atomically: parse → validate/normalize → obtain explicit user confirmation → apply the complete state → refresh UI. Any parse/validation/restore error or cancellation must leave the previous project unchanged.
+- Download/open must work locally/offline through browser file APIs; no server upload, remote storage, external dependency, or account service is introduced.
+
+### Acceptance criteria
+
+- A project downloaded from the Studio can be reopened in a fresh page/session and reproduces all editable layers, masks, groups, selection, canvas dimensions, palette and saved editing settings.
+- Layer pixel data and transparency round-trip exactly; project export/import does not flatten the layer stack or turn guides into artwork.
+- Invalid, unsupported, truncated, oversized or malformed project files are rejected with a clear product message and no partial replacement.
+- Opening a valid project prompts before replacing current work. Cancel preserves the exact current state; confirm replaces it with the validated project.
+- New Project, Clear Canvas, New Canvas/grid reset and raster-image import replacement each require an explicit confirmation when existing work would be discarded. Cancel means no data, dimensions, layer, selection, undo state or preview changes.
+- Successful restore clears stale undo/redo history, exits transient mask/pointer/Compass modes safely, updates the active layer and tool context, and leaves the canvas usable.
+- Existing raster import, Fill, layers/masks/groups, Compass, Magnifier, exports and Stage 1–6 regressions remain intact.
+- Desktop/mobile browser tests prove the same file format and confirmation behavior; the configured 3-OS × 3-browser matrix and all relevant cross-project gates pass on one exact SHA.
+
+### Explicit exclusions
+
+No Perspective/Depth implementation (next serial stage); no Demo/local deployment or parity work (later package stage); no HTML/CSS graphics-layer export (Repository Issue #67 remains independent); no Gateway, HUD, Wallet, Library, games, global CSS, unrelated modules or new backend/storage service. No changes to S2B, frozen Stage 5, or frozen Stage 6 candidate refs.
+
+### Verification and checkpoint
+
+- Focused project schema/unit tests, existing Studio unit/regression suites, browser interactions and the complete 3-OS × 3-browser matrix are required on one exact candidate SHA.
+- The Stage 7 pre-change recovery ref must be created from the exact source baseline above and read back/compared before the first runtime write. The already captured Runtime Baseline Snapshot remains the public-demo baseline; it is distinct from this source checkpoint and the eventual final-package backup.
+- No Stage 7 runtime implementation has started at the time this scope was recorded.
