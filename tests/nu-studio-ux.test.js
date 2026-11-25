@@ -69,7 +69,8 @@ test("Magnifier is an accessible view-only tool with context-owned strength and 
  assert.match(runtime,/id="magnifier-size"/);
  assert.match(runtime,/lensCtx\.imageSmoothingEnabled=false/);
  assert.match(runtime,/function updateMagnifier\(e\)/);
- assert.match(runtime,/if\(tool==="magnifier"\)\{updateMagnifier\(e\);return;\}/);
+ assert.match(runtime,/document\.addEventListener\("pointermove",e=>\{\s*if\(tool!=="magnifier"\)return;/);
+ assert.match(runtime,/if\(e\.clientX>=r\.left&&e\.clientX<=r\.right&&e\.clientY>=r\.top&&e\.clientY<=r\.bottom\)updateMagnifier\(e\)/);
  assert.match(runtime,/function hideMagnifier\(\)/);
 });
 test("Desktop zoom buttons, slider and wheel share one anchored zoom state",()=>{

@@ -132,8 +132,12 @@ canvas.addEventListener("pointerdown",e=>{
  if(tool==="fill"||tool==="picker"){const changed=paintAt(e);if(tool==="fill"&&changed>0)commitHistory(strokeSnapshot);drawing=false;strokeSnapshot=null;strokeStart=null;return;}
  if(tool==="line"||tool==="rect"||tool==="ellipse"||tool==="rect-fill"||tool==="ellipse-fill"||tool==="compass"){if(tool==="compass")compassState={center:{...strokeStart},edge:{...strokeStart},active:true};drawShape(strokeStart,strokeStart);render();}else paintAt(e);
 });
+document.addEventListener("pointermove",e=>{
+ if(tool!=="magnifier")return;
+ const r=canvas.getBoundingClientRect();
+ if(e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom)updateMagnifier(e);else hideMagnifier();
+},true);
 canvas.addEventListener("pointermove",e=>{
- if(tool==="magnifier"){updateMagnifier(e);return;}
  if(!drawing||!(e.buttons||e.pointerType==="touch"))return;
  if(tool==="line"||tool==="rect"||tool==="ellipse"||tool==="rect-fill"||tool==="ellipse-fill"||tool==="compass"){pixels=strokeSnapshot.pixels.slice();const edge=coords(e);if(tool==="compass"&&compassState)compassState.edge={...edge};drawShape(strokeStart,edge);render();}
  else paintAt(e);
