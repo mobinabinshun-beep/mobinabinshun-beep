@@ -401,7 +401,28 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     await page.locator("#magnifier-size").evaluate("el => { el.value='180'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
     mag_canvas = await page.locator("#pixel-canvas").bounding_box()
     assert mag_canvas, "Canvas is missing for Magnifier smoke"
-    await page.mouse.move(mag_canvas["x"] + mag_canvas["width"] * 0.5, mag_canvas["y"] + mag_canvas["height"] * 0.5)
+    mag_point = {"x": mag_canvas["x"] + mag_canvas["width"] * 0.5, "y": mag_canvas["y"] + mag_canvas["height"] * 0.5}
+    assert await magnifier_button.get_attribute("aria-pressed") == "true", "Magnifier tool did not become active"
+    await page.mouse.move(mag_point["x"], mag_point["y"])
+    await page.locator("#pixel-canvas").dispatch_event("pointermove", {"clientX": mag_point["x"], "clientY": mag_point["y"], "pointerId": 1, "pointerType": "mouse", "bubbles": True})
+    magnifier_debug = await page.evaluate(
+        """({x,y}) => {
+            const canvas=document.querySelector('#pixel-canvas'), lens=document.querySelector('#studio-magnifier'),
+                  lensCanvas=document.querySelector('#studio-magnifier-canvas'), stage=document.querySelector('.stage'),
+                  target=document.elementFromPoint(x,y);
+            return {
+                toolPressed:document.querySelector('#studio-quick-tools [data-tool="magnifier"]')?.getAttribute('aria-pressed'),
+                title:document.querySelector('#studio-context-title')?.textContent,
+                lensHidden:lens?.hidden, lensAria:lens?.getAttribute('aria-hidden'),
+                lensCanvas:!!lensCanvas, lensContext:!!lensCanvas?.getContext('2d'), stage:!!stage,
+                canvasRect:canvas?.getBoundingClientRect().toJSON(), stageRect:stage?.getBoundingClientRect().toJSON(),
+                target:target?.id || target?.className || target?.tagName,
+                pointerEvents:canvas ? getComputedStyle(canvas).pointerEvents : null
+            };
+        }""",
+        mag_point,
+    )
+    assert not magnifier_debug["lensHidden"], f"Magnifier did not respond to pointer movement: {magnifier_debug}; page_errors={page_errors}"
     await page.locator("#studio-magnifier").wait_for(state="visible", timeout=3000)
     assert "6×" in await page.locator("#studio-magnifier-label").inner_text(), "Magnifier strength label did not update"
     assert await page.locator("#studio-magnifier").evaluate("el => el.style.width") == "180px", "Magnifier size control did not update the lens"
