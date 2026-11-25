@@ -238,7 +238,8 @@
   const number=(key,min,max)=>{if(!Number.isFinite(s[key])||s[key]<min||s[key]>max)fail(key+" is out of range.");return s[key];};
   const oneOf=(key,values)=>{if(!values.includes(s[key]))fail(key+" is unsupported.");return s[key];};
   if(!record(s.guideState)||["blueprint","ruler","divisions","axes","depth"].some(k=>typeof s.guideState[k]!=="boolean"))fail("guide settings are invalid.");
-  if(typeof s.guideHighContrast!=="boolean")fail("guide contrast setting is invalid.");
+  if(typeof s.guideHighContrast!=="boolean"||typeof s.showGrid!=="boolean")fail("guide or grid display settings are invalid.");
+  if(typeof s.gradientColor!=="string"||!/^#[0-9a-f]{6}$/i.test(s.gradientColor))fail("gradient color is invalid.");
   return {
    format:"N.U-Pixel-Art-Studio-Project",version:1,
    project:{
@@ -247,15 +248,19 @@
     imageImported:p.imageImported,sourceInfo:p.sourceInfo,
     settings:{
      zoom:number("zoom",25,800),brushSize:number("brushSize",1,16),
-     fadeIntensity:number("fadeIntensity",0,100),mixBrushStrength:number("mixBrushStrength",0,100),
-     viewRotation:number("viewRotation",-360,360),
+     fadeIntensity:number("fadeIntensity",1,100),mixBrushStrength:number("mixBrushStrength",1,100),
+     viewRotation:number("viewRotation",-180,180),
      guideState:{blueprint:s.guideState.blueprint,ruler:s.guideState.ruler,divisions:s.guideState.divisions,axes:s.guideState.axes,depth:s.guideState.depth},
-     guideHighContrast:s.guideHighContrast,magnifierFactor:oneOf("magnifierFactor",[2,3,4,6,8]),magnifierSize:number("magnifierSize",120,220),
-     bucket:oneOf("bucket",["contiguous","similar","global"]),tolerance:number("tolerance",0,441.673),
+     guideHighContrast:s.guideHighContrast,showGrid:s.showGrid,
+     magnifierFactor:oneOf("magnifierFactor",[2,3,4,6,8]),magnifierSize:number("magnifierSize",120,220),
+     bucket:oneOf("bucket",["contiguous","similar","global"]),tolerance:number("tolerance",0,180),
      symmetry:oneOf("symmetry",["none","horizontal","vertical","both"]),
      brushShape:oneOf("brushShape",["square","circle","diamond"]),
      texture:oneOf("texture",["none","dots","diagonal","grain"]),
-     textureDensity:number("textureDensity",5,100)
+     textureDensity:number("textureDensity",5,100),
+     gradientColor:s.gradientColor.toLowerCase(),gradientMode:oneOf("gradientMode",["linear","radial"]),
+     curveTension:number("curveTension",-64,64),alpha:number("alpha",10,100),
+     selectionScaleX:number("selectionScaleX",0.1,16),selectionScaleY:number("selectionScaleY",0.1,16)
     }
    }
   };
