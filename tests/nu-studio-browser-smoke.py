@@ -700,6 +700,7 @@ async def check_project_portability(browser, base_url, viewport):
     await page.locator("#pro-select-all").click()
     await open_tab("tab-pro")
     await page.locator("#pro-mask-add").click()
+    await close_drawer()
 
     await page.locator("#studio-project-actions").evaluate("el => { el.open = true; }")
     async with page.expect_download() as download_info:
@@ -744,6 +745,7 @@ async def check_project_portability(browser, base_url, viewport):
     assert await restored_row.locator("select").nth(1).input_value() == "Group A", "Layer group was not restored"
     assert "Mask active" in await restored_row.inner_text(), "Layer mask was not restored"
     assert await page.locator("#adv-layers button[aria-label='Select Layer 2']").get_attribute("aria-pressed") == "true", "Active layer was not restored"
+    await close_drawer()
 
     await page.locator("#studio-project-actions").evaluate("el => { el.open = true; }")
     await page.locator("#new-project").click()
@@ -759,6 +761,7 @@ async def check_project_portability(browser, base_url, viewport):
     await page.locator("#studio-project-confirm").wait_for(state="visible", timeout=5000)
     await page.locator("#studio-project-confirm button[value='cancel']").click()
     assert await read_pixel(page, 2, 2) == layer_one_pixel, "Cancelling Clear changed the current project"
+    await close_drawer()
 
     await page.locator("#new-canvas").click()
     await page.locator("#studio-project-confirm").wait_for(state="visible", timeout=5000)
@@ -772,6 +775,7 @@ async def check_project_portability(browser, base_url, viewport):
         "buffer": b"{not valid json"
     })
     await page.wait_for_function("() => document.querySelector('#studio-status')?.textContent.includes('Project could not be opened')")
+    await page.locator("#studio-project-actions").evaluate("el => { el.open = false; }")
     assert await read_pixel(page, 2, 2) == layer_one_pixel, "Malformed project file partially replaced the current project"
     assert not errors, f"Uncaught browser errors during project portability test: {errors}"
     await context.close()
