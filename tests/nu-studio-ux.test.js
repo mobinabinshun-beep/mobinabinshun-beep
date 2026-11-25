@@ -86,7 +86,7 @@ test("Compass is an accessible tool with a cancellable center-radius lifecycle",
  assert.match(runtime,/compass:\{icon:"🧭",label:"Compass"\}/);
  assert.match(runtime,/compassState=\{center:\{\.\.\.strokeStart\},edge:\{\.\.\.strokeStart\},active:true\}/);
  assert.match(runtime,/if\(tool==="compass"\)\{compassState=null;render\(\);\}/);
- assert.match(runtime,/e\.key==="Escape"&&drawing&&tool==="compass"/);
+ assert.match(runtime,/if\(drawing&&tool==="compass"\)\{e\.preventDefault\(\);cancelStroke\(\);\}/);
 });
 
 test("Escape closes only the active workspace drawer controller",()=>{
