@@ -190,5 +190,75 @@
   const r=angle*Math.PI/180,c=Math.cos(r),s=Math.sin(r),x=point.x-center.x,y=point.y-center.y;
   return {x:center.x+x*c-y*s,y:center.y+x*s+y*c};
  }
- return {rectSelection,lassoSelection,gradient,moveSelection,scaleSelection,bezier,brushCells,blendPixel,applyMask,fadePixel,smudgeBrush,bucketFill,invertSelection,rotatePixels,rotatePoint};
+
+ function validateStudioProject(input,options={}){
+  const fail=message=>{throw new TypeError("Invalid Studio project: "+message);};
+  const record=value=>value!==null&&typeof value==="object"&&!Array.isArray(value);
+  if(!record(input)||input.format!=="N.U-Pixel-Art-Studio-Project"||input.version!==1||!record(input.project))fail("unsupported format or version.");
+  const p=input.project,maxPixels=Number.isSafeInteger(options.maxPixels)?options.maxPixels:3000000;
+  if(!validSize(p.width,p.height)||p.width>16384||p.height>16384||p.width*p.height>maxPixels)fail("canvas dimensions exceed supported limits.");
+  const cells=p.width*p.height;
+  const pixels=(value,label)=>{
+   if(!Array.isArray(value)||value.length!==cells)fail(label+" pixel count does not match canvas dimensions.");
+   return value.map((color,index)=>{if(color===null)return null;if(typeof color!=="string"||!/^#[0-9a-f]{6}$/i.test(color))fail(label+" contains an invalid color at cell "+index+".");return color.toLowerCase();});
+  };
+  const mask=(value,label)=>{
+   if(value===null)return null;
+   if(!Array.isArray(value)||value.length!==cells)fail(label+" mask size does not match canvas dimensions.");
+   return value.map((bit,index)=>{if(bit!==0&&bit!==1&&bit!==false&&bit!==true)fail(label+" contains an invalid mask bit at cell "+index+".");return bit?1:0;});
+  };
+  if(!Array.isArray(p.layers)||p.layers.length!==4)fail("exactly four layers are required by this Studio version.");
+  const blends=["normal","multiply","screen","add","darken","lighten"],groupsAllowed=["Ungrouped","Group A","Group B","UI","Background","Foreground"];
+  const layers=p.layers.map((layer,index)=>{
+   if(!record(layer))fail("layer "+index+" is malformed.");
+   if(typeof layer.name!=="string"||!layer.name.trim()||layer.name.length>64)fail("layer "+index+" has an invalid name.");
+   if(!Number.isFinite(layer.opacity)||layer.opacity<0||layer.opacity>100)fail("layer "+index+" opacity is out of range.");
+   if(typeof layer.visible!=="boolean"||typeof layer.locked!=="boolean")fail("layer "+index+" visibility/lock flags are invalid.");
+   if(!blends.includes(layer.blend)||!groupsAllowed.includes(layer.group))fail("layer "+index+" blend/group is unsupported.");
+   return {name:layer.name,pixels:pixels(layer.pixels,"Layer "+(index+1)),opacity:layer.opacity,visible:layer.visible,locked:layer.locked,mask:mask(layer.mask,"Layer "+(index+1)),blend:layer.blend,group:layer.group};
+  });
+  if(!Number.isSafeInteger(p.active)||p.active<0||p.active>=layers.length)fail("active layer index is invalid.");
+  const selection=mask(p.selection,"Selection");
+  if(!record(p.groups))fail("layer groups are malformed.");
+  const groupNames=Object.keys(p.groups);
+  if(groupNames.length>6)fail("too many layer groups.");
+  const normalizedGroups={};
+  for(const name of groupNames){
+   if(!groupsAllowed.includes(name)||name==="__proto__"||name==="constructor"||name==="prototype")fail("unsupported layer group name.");
+   const group=p.groups[name];
+   if(!record(group)||typeof group.visible!=="boolean"||!Number.isFinite(group.opacity)||group.opacity<0||group.opacity>100)fail("layer group metadata is invalid.");
+   normalizedGroups[name]={visible:group.visible,opacity:group.opacity};
+  }
+  if(!Array.isArray(p.palette)||p.palette.length<1||p.palette.length>256||p.palette.some(c=>typeof c!=="string"||!/^#[0-9a-f]{6}$/i.test(c)))fail("palette is invalid.");
+  if(typeof p.color!=="string"||!/^#[0-9a-f]{6}$/i.test(p.color))fail("selected color is invalid.");
+  if(typeof p.tool!=="string"||! /^[a-z][a-z0-9-]{0,39}$/.test(p.tool))fail("selected tool is invalid.");
+  if(typeof p.imageImported!=="boolean"||typeof p.sourceInfo!=="string"||p.sourceInfo.length>512)fail("source metadata is invalid.");
+  const s=p.settings;
+  if(!record(s))fail("project settings are missing.");
+  const number=(key,min,max)=>{if(!Number.isFinite(s[key])||s[key]<min||s[key]>max)fail(key+" is out of range.");return s[key];};
+  const oneOf=(key,values)=>{if(!values.includes(s[key]))fail(key+" is unsupported.");return s[key];};
+  if(!record(s.guideState)||["blueprint","ruler","divisions","axes","depth"].some(k=>typeof s.guideState[k]!=="boolean"))fail("guide settings are invalid.");
+  if(typeof s.guideHighContrast!=="boolean")fail("guide contrast setting is invalid.");
+  return {
+   format:"N.U-Pixel-Art-Studio-Project",version:1,
+   project:{
+    width:p.width,height:p.height,layers,active:p.active,selection,groups:normalizedGroups,
+    palette:p.palette.map(c=>c.toLowerCase()),color:p.color.toLowerCase(),tool:p.tool,
+    imageImported:p.imageImported,sourceInfo:p.sourceInfo,
+    settings:{
+     zoom:number("zoom",25,800),brushSize:number("brushSize",1,16),
+     fadeIntensity:number("fadeIntensity",0,100),mixBrushStrength:number("mixBrushStrength",0,100),
+     viewRotation:number("viewRotation",-360,360),
+     guideState:{blueprint:s.guideState.blueprint,ruler:s.guideState.ruler,divisions:s.guideState.divisions,axes:s.guideState.axes,depth:s.guideState.depth},
+     guideHighContrast:s.guideHighContrast,magnifierFactor:number("magnifierFactor",2,12),magnifierSize:number("magnifierSize",120,220),
+     bucket:oneOf("bucket",["contiguous","similar","global"]),tolerance:number("tolerance",0,441.673),
+     symmetry:oneOf("symmetry",["none","horizontal","vertical","both"]),
+     brushShape:oneOf("brushShape",["square","circle","diamond"]),
+     texture:oneOf("texture",["none","dots","diagonal","grain"]),
+     textureDensity:number("textureDensity",5,100)
+    }
+   }
+  };
+ }
+ return {rectSelection,lassoSelection,gradient,moveSelection,scaleSelection,bezier,brushCells,blendPixel,applyMask,fadePixel,smudgeBrush,bucketFill,invertSelection,rotatePixels,rotatePoint,validateStudioProject};
 });
