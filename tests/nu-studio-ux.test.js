@@ -68,6 +68,12 @@ test("Compass is an accessible tool with a cancellable center-radius lifecycle",
  assert.match(runtime,/e\.key==="Escape"&&drawing&&tool==="compass"/);
 });
 
+test("Escape closes only the active workspace drawer controller",()=>{
+ assert.match(runtime,/if\(mobileWorkspaceQuery\.matches\)\{\s*if\(document\.body\.classList\.contains\("nu-mobile-tools-open"\)\)setMobileToolsOpen\(false\);\s*return;\s*\}/);
+ assert.match(runtime,/if\(document\.body\.classList\.contains\("nu-desktop-tools-open"\)\)setDesktopToolsOpen\(false\)/);
+ assert.doesNotMatch(runtime,/setMobileToolsOpen\(false\);setDesktopToolsOpen\(false\)/);
+});
+
 test("Blueprint and Compass guides use adaptive high-contrast render overlays",()=>{
  assert.match(runtime,/guideHighContrast=true/);
  assert.match(runtime,/const screenScale=Math\.max/);
