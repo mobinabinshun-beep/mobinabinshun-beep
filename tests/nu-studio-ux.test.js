@@ -116,3 +116,15 @@ test("English download and Fill feedback remains wired",()=>{
   assert.ok(runtime.includes(phrase),phrase);
  }
 });
+
+test("Public demo exposes only the approved welcome intro and accessible progressive tool categories",()=>{
+ assert.match(html,/id="studio-welcome"[^>]*>Welcome to N\.U — Public Test Demo</);
+ assert.doesNotMatch(html,/TEST CANDIDATE|NOT HUMAN-APPROVED|DEMO QA ONLY|GEN 01|nu-studio-test-candidate/);
+ assert.match(runtime,/id="studio-tool-categories"/);
+ for(const category of ["draw","shapes","selection","effects","view"])assert.ok(runtime.includes('data-tool-category="'+category+'"'),category);
+ assert.match(runtime,/activeToolCategory="draw"/);
+ assert.match(runtime,/b\.hidden=b\.dataset\.category!==activeToolCategory/);
+ assert.match(runtime,/selectedToolButton\?\.dataset\.category/);
+ assert.match(runtime,/e\.key!=="ArrowRight"&&e\.key!=="ArrowLeft"/);
+ assert.match(runtime,/role="tablist" aria-label="Tool categories"/);
+});

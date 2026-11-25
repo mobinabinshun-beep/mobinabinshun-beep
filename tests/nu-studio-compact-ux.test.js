@@ -7,3 +7,14 @@ test("advanced controls are accessible tabs rather than a long list",()=>{for(co
 test("palette and context-owned tool settings remain grouped in the drawer dock",()=>{assert.match(js,/studio-brush/);assert.match(js,/studio-context-title/);assert.match(js,/contextOwners=/);assert.match(js,/panel-palette/);assert.match(js,/Extract active layer colors/);assert.match(js,/studio-properties-content/);});
 test("browser edition remains local-first",()=>assert.match(html,/Processing stays local in this browser/));
 test("quick tools and layers expose clear English labels and accessible names",()=>{for(const label of ["Pencil","Eraser","Fill","Eyedropper","Layers","Opacity","Visible","Locked"])assert.ok(js.includes(label));assert.match(js,/aria-label/);assert.doesNotMatch(js,/[\u0600-\u06FF]/);});
+
+test("quick tools are progressively disclosed by five accessible categories",()=>{
+ for(const category of ["draw","shapes","selection","effects","view"])assert.ok(js.includes('data-tool-category="'+category+'"'));
+ assert.match(js,/grid-template-columns:repeat\(auto-fit,minmax\(74px,1fr\)\)/);
+ assert.match(js,/toolCategoryRefresh=/);
+ assert.match(js,/b\.hidden=b\.dataset\.category!==activeToolCategory/);
+});
+test("public demo welcome is clean and excludes internal QA/build labels",()=>{
+ assert.match(html,/Welcome to N\.U — Public Test Demo/);
+ assert.doesNotMatch(html,/TEST CANDIDATE|NOT HUMAN-APPROVED|DEMO QA ONLY|GEN 01/);
+});

@@ -38,6 +38,13 @@ async def click_cell(page, x, y):
     await page.mouse.click(point["x"], point["y"])
 
 
+async def select_tool(page, category, tool):
+    category_tab = page.locator(f'#studio-tool-categories [data-tool-category="{category}"]')
+    if await category_tab.get_attribute("aria-selected") != "true":
+        await category_tab.click()
+    await page.locator(f'#studio-quick-tools [data-tool="{tool}"]').click()
+
+
 async def drag_cells(page, start, end):
     a = await cell_point(page, *start)
     b = await cell_point(page, *end)
@@ -94,6 +101,20 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     await page.locator("#studio-dock").wait_for(state="visible", timeout=5000)
     body_text = await page.locator("body").inner_text()
     assert not re.search(r"[\u0600-\u06FF]", body_text), "Studio visible UI contains non-English Persian copy"
+    category_tabs = page.locator("#studio-tool-categories [role=tab]")
+    assert await category_tabs.count() == 5, "Five top-level tool categories must be available"
+    assert await page.locator('#studio-tool-categories [data-tool-category="draw"]').get_attribute("aria-selected") == "true", "Draw must be the initial category"
+    assert await page.locator('#studio-quick-tools [data-tool="pencil"]').is_visible(), "Draw tools must be visible initially"
+    assert await page.locator('#studio-quick-tools [data-tool="magnifier"]').is_hidden(), "View tools must stay hidden until View is selected"
+    await page.locator('#studio-tool-categories [data-tool-category="draw"]').focus()
+    await page.keyboard.press("ArrowRight")
+    assert await page.locator('#studio-tool-categories [data-tool-category="shapes"]').get_attribute("aria-selected") == "true", "ArrowRight must advance the category tab"
+    await page.keyboard.press("ArrowLeft")
+    assert await page.locator('#studio-tool-categories [data-tool-category="draw"]').get_attribute("aria-selected") == "true", "ArrowLeft must return to Draw"
+    await page.locator('#studio-tool-categories [data-tool-category="view"]').click()
+    assert await page.locator('#studio-quick-tools [data-tool="magnifier"]').is_visible(), "View category must reveal Magnifier"
+    assert await page.locator('#studio-quick-tools [data-tool="pencil"]').is_hidden(), "View category must hide Draw tools"
+    await page.locator('#studio-tool-categories [data-tool-category="draw"]').click()
     quick_tools = page.locator("#studio-quick-tools [data-tool]")
     assert await quick_tools.count() >= 15, "The full quick-tool set is missing"
     for tool_index in range(await quick_tools.count()):
@@ -115,69 +136,69 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     assert await page.locator("#adv-bucket").is_hidden(), "Fill settings must stay hidden for Pencil"
     assert await page.locator("#mix-brush-strength").is_hidden(), "Mixing strength must stay hidden for Pencil"
 
-    await page.locator('#studio-quick-tools ').locator('[data-tool="fill"]').click()
+    await select_tool(page, "draw", "fill")
     assert await page.locator("#studio-context-title").inner_text() == "Fill"
     assert await page.locator("#adv-bucket").is_visible() and await page.locator("#adv-tol").is_visible(), "Fill must expose mode and tolerance"
     assert await page.locator("#brush-size").is_hidden(), "Fill must not show brush-only settings"
     await page.locator("#adv-tol").evaluate("(el) => { el.value='31'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
-    await page.locator('#studio-quick-tools ').locator('[data-tool="pencil"]').click()
-    await page.locator('#studio-quick-tools ').locator('[data-tool="fill"]').click()
+    await select_tool(page, "draw", "pencil")
+    await select_tool(page, "draw", "fill")
     assert await page.locator("#adv-tol").input_value() == "31", "Fill tolerance must persist when switching tools"
 
-    await page.locator('#studio-quick-tools ').locator('[data-tool="fading-brush"]').click()
+    await select_tool(page, "effects", "fading-brush")
     assert await page.locator("#studio-context-title").inner_text() == "Fading brush"
     assert await page.get_by_label("Fading brush intensity").is_visible(), "Fading Brush must expose intensity"
     assert await page.locator("#mix-brush-strength").is_hidden(), "Fading Brush must hide mixing strength"
     fade_control = page.get_by_label("Fading brush intensity")
     await fade_control.evaluate("(el) => { el.value='73'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
-    await page.locator('#studio-quick-tools ').locator('[data-tool="pencil"]').click()
-    await page.locator('#studio-quick-tools ').locator('[data-tool="fading-brush"]').click()
+    await select_tool(page, "draw", "pencil")
+    await select_tool(page, "effects", "fading-brush")
     assert await page.get_by_label("Fading brush intensity").input_value() == "73", "Fading intensity must persist when switching tools"
 
-    await page.locator('#studio-quick-tools ').locator('[data-tool="color-mix-brush"]').click()
+    await select_tool(page, "effects", "color-mix-brush")
     assert await page.locator("#mix-brush-strength").is_visible(), "Color-Mixing Brush must expose strength"
     assert await page.get_by_label("Fading brush intensity").is_hidden(), "Color-Mixing Brush must hide fading intensity"
     await page.locator("#mix-brush-strength").evaluate("(el) => { el.value='84'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
-    await page.locator('#studio-quick-tools ').locator('[data-tool="pencil"]').click()
-    await page.locator('#studio-quick-tools ').locator('[data-tool="color-mix-brush"]').click()
+    await select_tool(page, "draw", "pencil")
+    await select_tool(page, "effects", "color-mix-brush")
     assert await page.locator("#mix-brush-strength").input_value() == "84", "Mixing strength must persist when switching tools"
 
-    await page.locator('#studio-quick-tools ').locator('[data-tool="texture"]').click()
+    await select_tool(page, "effects", "texture")
     assert await page.locator("#pro-texture").is_visible() and await page.locator("#pro-texture-density").is_visible(), "Texture Brush must expose texture type and density"
     assert await page.locator("#pro-brush-shape").is_visible(), "Texture Brush must expose brush shape"
     await page.locator("#pro-texture").select_option("diagonal")
     await page.locator("#pro-texture-density").evaluate("(el) => { el.value='47'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
-    await page.locator('#studio-quick-tools ').locator('[data-tool="pencil"]').click()
-    await page.locator('#studio-quick-tools ').locator('[data-tool="texture"]').click()
+    await select_tool(page, "draw", "pencil")
+    await select_tool(page, "effects", "texture")
     assert await page.locator("#pro-texture").input_value() == "diagonal" and await page.locator("#pro-texture-density").input_value() == "47", "Texture settings must persist when switching tools"
 
-    await page.locator('#studio-quick-tools ').locator('[data-tool="gradient"]').click()
+    await select_tool(page, "effects", "gradient")
     assert await page.locator("#pro-gradient-mode").is_visible() and await page.locator("#pro-gradient-color").is_visible(), "Gradient must expose mode and end color"
     assert await page.locator("#adv-bucket").is_hidden(), "Gradient must not show Fill settings"
     await page.locator("#pro-gradient-mode").select_option("radial")
-    await page.locator('#studio-quick-tools ').locator('[data-tool="pencil"]').click()
-    await page.locator('#studio-quick-tools ').locator('[data-tool="gradient"]').click()
+    await select_tool(page, "draw", "pencil")
+    await select_tool(page, "effects", "gradient")
     assert await page.locator("#pro-gradient-mode").input_value() == "radial", "Gradient settings must persist when switching tools"
 
-    await page.locator('#studio-quick-tools ').locator('[data-tool="select-rect"]').click()
+    await select_tool(page, "selection", "select-rect")
     assert await page.locator("#pro-select-all").is_visible() and await page.locator("#pro-scale-x").is_visible(), "Selection tools must expose selection actions and scale"
     await page.locator("#pro-scale-x").fill("3")
-    await page.locator('#studio-quick-tools ').locator('[data-tool="pencil"]').click()
-    await page.locator('#studio-quick-tools ').locator('[data-tool="select-rect"]').click()
+    await select_tool(page, "draw", "pencil")
+    await select_tool(page, "selection", "select-rect")
     assert await page.locator("#pro-scale-x").input_value() == "3", "Selection scale must persist when switching tools"
 
-    await page.locator('#studio-quick-tools ').locator('[data-tool="bezier"]').click()
+    await select_tool(page, "shapes", "bezier")
     assert await page.locator("#pro-curve").is_visible(), "Bezier must expose curve tension"
     await page.locator("#pro-curve").evaluate("(el) => { el.value='14'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
-    await page.locator('#studio-quick-tools ').locator('[data-tool="pencil"]').click()
-    await page.locator('#studio-quick-tools ').locator('[data-tool="bezier"]').click()
+    await select_tool(page, "draw", "pencil")
+    await select_tool(page, "shapes", "bezier")
     assert await page.locator("#pro-curve").input_value() == "14", "Bezier tension must persist when switching tools"
 
-    await page.locator('#studio-quick-tools ').locator('[data-tool="picker"]').click()
+    await select_tool(page, "draw", "picker")
     assert await page.locator("#studio-context-title").inner_text() == "Eyedropper"
     assert await page.locator("#brush-size").is_hidden(), "Eyedropper must not show unrelated brush controls"
 
-    await page.locator('#studio-quick-tools ').locator('[data-tool="fill"]').click()
+    await select_tool(page, "draw", "fill")
     assert await page.locator("#adv-bucket").is_visible(), "Fill settings must return when Fill is reselected"
     await fill_toggle.click()
     before_fill = await read_pixel(page, 8, 8)
@@ -201,7 +222,7 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     # A locked active layer must not be modified by Fill.
     await page.locator("#undo").click()
     await fill_toggle.click()
-    await page.locator('#studio-quick-tools [data-tool="fill"]').click()
+    await select_tool(page, "draw", "fill")
     await page.locator("#tab-layers").click()
     lock = page.get_by_label("Lock Layer 1")
     await lock.check()
@@ -219,7 +240,7 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     # High-contrast Blueprint stays visible on light and negative artwork, but never changes pixels.
     await fill_toggle.click()
     await set_color(page, "#ffffff")
-    await page.locator('#studio-quick-tools [data-tool="fill"]').click()
+    await select_tool(page, "draw", "fill")
     await fill_toggle.click()
     await click_cell(page, 8, 8)
     blueprint = page.locator('[data-guide="blueprint"]')
@@ -253,8 +274,8 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     await set_color(page, "#ff0000")
     compass_button = page.locator('#studio-quick-tools [data-tool="compass"]')
     assert await compass_button.get_attribute("aria-label") == "Compass", "Compass tool must have a clear accessible name"
-    await page.locator("#studio-quick-tools").evaluate("(el) => { el.scrollLeft = el.scrollWidth; }")
-    await compass_button.click()
+    await page.locator('#studio-tool-categories [data-tool-category="shapes"]').click()
+    await select_tool(page, "shapes", "compass")
     assert await page.locator("#studio-context-title").inner_text() == "Compass"
     await fill_toggle.click()
     center_before = await read_pixel(page, 16, 16)
@@ -321,7 +342,7 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
         await page.locator("#studio-dock").wait_for(state="visible", timeout=5000)
         await set_color(page, "#00ff00")  # foreground color must not drive smudging
         await page.locator("#mix-brush-strength").evaluate("el => { el.value='100'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
-        await page.locator('#studio-quick-tools [data-tool="color-mix-brush"]').click()
+        await select_tool(page, "effects", "color-mix-brush")
         await mix_drawer_toggle.click()
         await page.wait_for_function("() => getComputedStyle(document.querySelector('#studio-tools-drawer')).visibility === 'hidden'", timeout=3000)
         await drag_cells(page, (8, 16), (9, 16))
@@ -413,7 +434,7 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     assert await page.locator("#magnifier-strength").is_hidden(), "Magnifier strength leaked into another tool"
     pixel_before_magnifier = await read_pixel(page, 4, 4)
     undo_before_magnifier = await page.locator("#undo").is_enabled()
-    await magnifier_button.click()
+    await select_tool(page, "view", "magnifier")
     assert await page.locator("#studio-context-title").inner_text() == "Magnifier", "Magnifier context title is missing"
     assert await page.locator("#magnifier-strength").is_visible(), "Magnifier strength control did not appear"
     assert await page.locator("#magnifier-size").is_visible(), "Magnifier size control did not appear"
@@ -473,7 +494,7 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     await page.locator("#studio-dock").wait_for(state="hidden", timeout=3000)
     await view_toggle.click()
     await page.locator("#studio-dock").wait_for(state="visible", timeout=5000)
-    await page.locator('#studio-quick-tools [data-tool="pencil"]').click()
+    await select_tool(page, "draw", "pencil")
     assert await page.locator("#magnifier-strength").is_hidden(), "Magnifier controls remained visible after switching to Pencil"
     await view_toggle.click()
     await page.locator("#studio-dock").wait_for(state="hidden", timeout=5000)
