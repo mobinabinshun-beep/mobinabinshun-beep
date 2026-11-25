@@ -290,7 +290,11 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
 
     if require_mix:
         mix_drawer_toggle = page.locator("#desktop-tools-toggle" if viewport["width"] > 700 else "#mobile-tools-toggle")
-        await mix_drawer_toggle.click()
+        drawer_is_visible = await page.locator("#studio-tools-drawer").evaluate(
+            "(el) => { const style=getComputedStyle(el); return style.display !== 'none' && style.visibility === 'visible'; }"
+        )
+        if not drawer_is_visible:
+            await mix_drawer_toggle.click()
         await page.locator("#studio-dock").wait_for(state="visible", timeout=5000)
         assert await page.locator('#studio-quick-tools [data-tool="color-mix-brush"]').count() == 1, "Color-mixing brush tool is missing"
         assert await page.locator('[aria-label="Fading brush intensity"]').count() == 1, "Fading control is missing"
