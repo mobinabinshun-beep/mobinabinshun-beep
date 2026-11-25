@@ -160,16 +160,39 @@ No viewport/Magnifier, project portability, Perspective/Depth, export redesign, 
 ### Out of scope
 No viewport/Magnifier, project portability, Perspective/Depth, export redesign, HTML/CSS layer export (Issue #67), demo parity/clean banner, Gateway/HUD/Wallet/Library/games, global styles, or other tool additions.
 
-## Stage 4 machine verification — REOPENED
+## Stage 4 machine verification — PASS
 
-- Earlier machine-pass checkpoints: c00343a0115eff542661706ac6f527831515cbd4 (PR run 45527771332) and documentation-inclusive 3891b244f62beb88d11df372e52831037aa985e4 (PR run 45528165823) both passed the 80-unit-test and 9/9 browser matrix plus cross-project regression gates.
-- A subsequent source audit found a real in-scope defect not adequately covered by the earlier mobile test: the Escape key handler always invoked both drawer controllers. On mobile, the desktop controller wrote inline visibility:hidden!important, preventing the mobile drawer from reopening after Escape.
-- Stage 4 was reopened against baseline 3891b244f62beb88d11df372e52831037aa985e4.
-- Runtime fix: nu-pixel-art-studio.js now routes Escape to the active workspace controller only; on mobile it closes the mobile drawer only, and on desktop it closes the desktop drawer only.
-- Regression coverage: tests/nu-studio-ux.test.js asserts controller isolation; tests/nu-studio-browser-smoke.py again uses Escape to cancel Compass on both desktop and mobile and verifies the mobile dock can reopen afterward.
-- Runtime fix commit: fe95ba7683f9ce72ad614b8946de02c8a0f67b6e; browser test commit: 5501dcc66c2e4794edb4af0108abd95355d4d813; UX regression test commit: 687cafcdc39a19da78692fe683d47c8de427d281.
-- Revalidation is PENDING on the new cumulative candidate SHA. Do not treat the earlier PASS as the current final Stage 4 sign-off until the new exact-head machine workflow and all cross-project regression gates pass.
+- Reopened Stage 4 baseline: 3891b244f62beb88d11df372e52831037aa985e4.
+- Runtime fix: nu-pixel-art-studio.js routes Escape to the active workspace controller only; on mobile it closes only the mobile drawer, and on desktop it closes only the desktop drawer.
+- Regression coverage: tests/nu-studio-ux.test.js asserts controller isolation; tests/nu-studio-browser-smoke.py uses Escape to cancel Compass on desktop and mobile, then verifies the mobile dock can reopen.
+- Exact tested cumulative source/workflow SHA: 576b477150b3976d158f54f19b3fb5e19d36a5b4.
+- Studio machine workflow push run 45528650321: SUCCESS; 81/81 focused Studio unit/regression tests PASS, syntax validation PASS, 9/9 browser matrix PASS (Ubuntu 24.04, Windows 2022 and macOS 15 × Chromium/Firefox/WebKit).
+- Cross-project gates on the same SHA: Studio Export run 45528659318 PASS; Graphics Preview run 45528659356 PASS; Arcane Shield/Mana run 45528659334 PASS; Gateway main-game run 45528659338 PASS; static validation PASS.
+- The separate PR-event machine mirror 45528659409 has the same 9 browser jobs; eight are complete PASS and macOS Chromium is still finishing its browser-engine setup. The push-event full matrix is already complete PASS.
 - No nu-studio-layout.js change is included. The aggregate package remains IN-PROGRESS; no final backup/restore, public demo deployment, live-build verification, human QA handoff or owner acceptance is claimed.
 
+## Stage 5 — Viewport, zoom and Magnifier
+
+- Status: DISCOVERY-COMPLETE / IMPLEMENTATION-NOT-STARTED.
+- Discovery baseline: 576b477150b3976d158f54f19b3fb5e19d36a5b4.
+- Current state: the page already has Fit to View and a 25–800% slider; mobile has +/- controls. Desktop +/- controls and a dedicated Magnifier/loupe tool are missing. Zoom currently recomputes fitted canvas dimensions but does not preserve a pointer-anchored focus during zoom.
+- Authorized paths:
+  1. pixel-art-studio.html — add desktop Zoom In/Out controls and accessible Magnifier overlay/loupe markup; preserve existing IDs and slider/fit/mobile controls.
+  2. nu-pixel-art-studio.js — unify zoom control state across desktop/mobile buttons and slider; implement pointer/viewport-anchored zoom, view-only Magnifier pointer lifecycle and context-sensitive Magnifier controls. Do not alter drawer controllers in this stage.
+  3. nu-studio-layout.js — add only pure viewport geometry helpers needed for zoom anchoring and pixel-aware mapping; do not alter unrelated workspace drawer behavior.
+  4. tests/nu-studio-layout.test.js — unit-test zoom anchoring, bounds, fit and pixel mapping.
+  5. tests/nu-studio-ux.test.js — assert Magnifier accessibility and control wiring.
+  6. tests/nu-studio-browser-smoke.py — verify synchronized desktop/mobile +/- and slider, fit/reset, anchored zoom, live loupe behavior and unchanged pixels/undo history on desktop/mobile.
+  7. tests/nu-studio-compact-ux.test.js — preserve compact tool grouping and Magnifier accessible name.
+  8. This change record.
+- Acceptance criteria:
+  - Fit-to-view initially shows the complete canvas; slider, desktop +/- and mobile +/- all update one shared 25–800% zoom state; Fit/Reset restores the fitted view.
+  - Zoom preserves the pixel under the pointer (or viewport center when invoked by buttons) as the focus where bounds permit; scrolling remains inside the workspace frame and no page-level horizontal overflow is introduced.
+  - Nearest-neighbor/pixelated rendering and accurate pixel hit-testing remain correct at fractional and high zoom levels; zoom never changes artwork pixels, layers, selections, export bytes or undo/redo history.
+  - Magnifier is a view-only tool with an accessible name and a live loupe that follows mouse/touch input, shows the sampled pixel region at a selectable magnification, and hides on pointer leave/cancel or Escape.
+  - Magnifier size/strength controls appear only while Magnifier is active; tool options remain context-sensitive and do not leak into other tools.
+  - Desktop and mobile browser tests cover viewport resize, touch, pointer anchoring, bounds and reduced-motion behavior.
+- Out of scope: project portability, Perspective/Depth, export redesign, HTML/CSS layer output (Issue #67), demo parity/clean banner, Gateway/HUD/Wallet/Library/games, and unrelated drawer behavior.
+
 ## Handoff
-Stages 1–3 remain MACHINE-PASS. Stage 4 has been reopened for mobile Escape/drawer isolation and must regain exact-head MACHINE-PASS before Stage 5 implementation begins. Stage 5 viewport/zoom/Magnifier discovery is read-only only until Stage 4 revalidation completes. The aggregate package remains IN-PROGRESS; no final candidate backup, demo deployment, human QA handoff or owner acceptance is claimed.
+Stages 1–4 are MACHINE-PASS at their recorded exact SHAs. Stage 5 scope is documented above and is ready for a pre-change checkpoint. No Stage 5 runtime write has started. The aggregate package remains IN-PROGRESS; no final candidate backup, demo deployment, human QA handoff or owner acceptance is claimed.
