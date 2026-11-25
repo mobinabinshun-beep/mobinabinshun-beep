@@ -245,7 +245,7 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
 
     # Compass previews a circle plus temporary center/radius guides; only the circumference commits.
     await fill_toggle.click()
-    await page.locator("#clear-canvas").click()
+    await page.locator("#new-canvas").click()
     await set_color(page, "#ff0000")
     compass_button = page.locator('#studio-quick-tools [data-tool="compass"]')
     assert await compass_button.get_attribute("aria-label") == "Compass", "Compass tool must have a clear accessible name"
