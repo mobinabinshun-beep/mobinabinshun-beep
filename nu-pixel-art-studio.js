@@ -661,7 +661,14 @@ function setDesktopToolsOpen(open){
 }
 desktopToolsToggle?.addEventListener("click",()=>setDesktopToolsOpen(!document.body.classList.contains("nu-desktop-tools-open")));
 
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){setMobileToolsOpen(false);setDesktopToolsOpen(false);}});
+document.addEventListener("keydown",e=>{
+ if(e.key!=="Escape")return;
+ if(mobileWorkspaceQuery.matches){
+  if(document.body.classList.contains("nu-mobile-tools-open"))setMobileToolsOpen(false);
+  return;
+ }
+ if(document.body.classList.contains("nu-desktop-tools-open"))setDesktopToolsOpen(false);
+});
 document.addEventListener("pointerdown",e=>{
  if(document.body.classList.contains("nu-mobile-tools-open")&&!mobileToolsDrawer?.contains(e.target)&&!$("mobile-workspace-dock")?.contains(e.target))setMobileToolsOpen(false);
  if(document.body.classList.contains("nu-desktop-tools-open")&&!mobileToolsDrawer?.contains(e.target)&&!$("desktop-workspace-rail")?.contains(e.target))setDesktopToolsOpen(false);
