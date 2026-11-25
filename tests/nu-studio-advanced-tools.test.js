@@ -121,9 +121,9 @@ test("fading brush blends against each destination pixel rather than the stroke 
  assert.doesNotMatch(block,/fadePixel\(pixels\[y\*width\+x\],v,fadeIntensity\)/);
 });
 
-test("Studio page visibly identifies the Fading and Color-Mixing human-QA-only candidate",()=>{
- assert.match(html,/TEST CANDIDATE — NOT HUMAN-APPROVED/);
- assert.match(html,/DEMO QA ONLY/);
- assert.match(html,/FADING \+ COLOR-MIXING BRUSH/);
- assert.doesNotMatch(html,/PR #238/);
+test("Studio public page uses the approved clean welcome while retaining brush capabilities",()=>{
+ assert.match(html,/Welcome to N\.U — Public Test Demo/);
+ assert.doesNotMatch(html,/TEST CANDIDATE|NOT HUMAN-APPROVED|DEMO QA ONLY|GEN 01|nu-studio-test-candidate/);
+ assert.match(js,/label:"Fading brush"/);
+ assert.match(js,/label:"Color-mixing brush"/);
 });
