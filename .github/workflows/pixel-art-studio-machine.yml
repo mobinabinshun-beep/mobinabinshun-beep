@@ -17,6 +17,7 @@ on:
       - "tests/nu-studio-browser-smoke.py"
       - ".github/workflows/pixel-art-studio-machine.yml"
       - "docs/operations/PIXEL-ART-STUDIO-2D-*.md"
+      - "docs/operations/PIXEL-ART-STUDIO-UX-CHANGE-RECORD-2026-11-24.md"
   workflow_dispatch:
 permissions:
   contents: read
