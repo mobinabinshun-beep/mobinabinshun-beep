@@ -59,6 +59,25 @@ test("active-tool context panel owns and reveals only relevant existing settings
  assert.match(runtime,/contextPanel\.dataset\.activeTool=tool/);
 });
 
+
+test("Compass is an accessible tool with a cancellable center-radius lifecycle",()=>{
+ assert.match(html,/data-tool="compass"[^>]*aria-label="Compass"/);
+ assert.match(runtime,/compass:\{icon:"⊙",label:"Compass"\}/);
+ assert.match(runtime,/compassState=\{center:\{\.\.\.strokeStart\},edge:\{\.\.\.strokeStart\},active:true\}/);
+ assert.match(runtime,/tool==="compass"\)compassState=null;render\(\)/);
+ assert.match(runtime,/e\.key==="Escape"&&drawing&&tool==="compass"/);
+});
+
+test("Blueprint and Compass guides use adaptive high-contrast render overlays",()=>{
+ assert.match(runtime,/guideHighContrast=true/);
+ assert.match(runtime,/const screenScale=Math\.max/);
+ assert.match(runtime,/strokeGuide/);
+ assert.match(runtime,/data-guide-contrast checked/);
+ assert.match(runtime,/Object\.values\(guideState\)\.some\(Boolean\)\|\|compassState\?\.active/);
+ assert.match(runtime,/function rasterSvgSource\(\)[\s\S]*?toRgba\(pixels,width,height\)/);
+ assert.match(runtime,/function graphicIRSource\(\)[\s\S]*?const visible=composite\(\)/);
+});
+
 test("English download and Fill feedback remains wired",()=>{
  for(const phrase of ["The file is ready.","PNG ready · ","SVG ready · ","SVG source code is ready to download.","Layer is locked. Unlock it to use Fill.","This area already uses the selected color."]){
   assert.ok(runtime.includes(phrase),phrase);
