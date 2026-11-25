@@ -133,6 +133,7 @@ test("Project portability exposes versioned save/open and explicit safe replacem
  for(const id of ["studio-project-actions","download-project","open-project","new-project","project-file","studio-project-confirm","studio-project-confirm-title","studio-project-confirm-message"]){
   assert.ok(html.includes('id="'+id+'"'),id);
  }
+ assert.match(html,/<details id="studio-project-actions"/);
  assert.match(html,/accept="\.nuproj,application\/json"/);
  assert.match(html,/value="cancel"/);
  assert.match(html,/value="confirm"/);
