@@ -672,7 +672,6 @@ async def check_project_portability(browser, base_url, viewport):
             await page.wait_for_function("() => document.querySelector('#studio-tools-drawer')?.dataset.workspaceDrawerState === 'closed'")
         await page.wait_for_timeout(350)
 
-    await page.locator("#studio-project-actions").evaluate("el => { el.open = true; }")
     await open_tab("tab-layers")
     await page.locator("#adv-layers button[aria-label='Select Layer 1']").wait_for(state="visible")
 
@@ -702,6 +701,7 @@ async def check_project_portability(browser, base_url, viewport):
     await open_tab("tab-pro")
     await page.locator("#pro-mask-add").click()
 
+    await page.locator("#studio-project-actions").evaluate("el => { el.open = true; }")
     async with page.expect_download() as download_info:
         await page.locator("#download-project").click()
     download = await download_info.value
@@ -718,10 +718,12 @@ async def check_project_portability(browser, base_url, viewport):
     assert project["groups"]["Group A"]["opacity"] == 80
     assert project["layers"][1]["opacity"] == 65 and project["active"] == 1
 
+    await page.locator("#studio-project-actions").evaluate("el => { el.open = false; }")
     await set_color(page, "#0000ff")
     await close_drawer()
     await click_cell(page, 6, 6)
     blue_pixel = await read_pixel(page, 6, 6)
+    await page.locator("#studio-project-actions").evaluate("el => { el.open = true; }")
     await page.locator("#project-file").set_input_files(project_path)
     await page.locator("#studio-project-confirm").wait_for(state="visible", timeout=5000)
     await page.locator("#studio-project-confirm button[value='cancel']").click()
@@ -732,6 +734,7 @@ async def check_project_portability(browser, base_url, viewport):
     await page.locator("#studio-project-confirm").wait_for(state="visible", timeout=5000)
     await page.locator("#studio-project-confirm button[value='confirm']").click()
     await page.wait_for_function("() => document.querySelector('#studio-status')?.textContent.includes('Project opened')")
+    await page.locator("#studio-project-actions").evaluate("el => { el.open = false; }")
     assert await read_pixel(page, 2, 2) == layer_one_pixel, "Layer 1 pixel did not round-trip exactly"
     assert await read_pixel(page, 6, 6) != blue_pixel, "Opening the saved project did not replace later unsaved edits"
     await open_tab("tab-layers")
@@ -742,9 +745,11 @@ async def check_project_portability(browser, base_url, viewport):
     assert "Mask active" in await restored_row.inner_text(), "Layer mask was not restored"
     assert await page.locator("#adv-layers button[aria-label='Select Layer 2']").get_attribute("aria-pressed") == "true", "Active layer was not restored"
 
+    await page.locator("#studio-project-actions").evaluate("el => { el.open = true; }")
     await page.locator("#new-project").click()
     await page.locator("#studio-project-confirm").wait_for(state="visible", timeout=5000)
     await page.locator("#studio-project-confirm button[value='cancel']").click()
+    await page.locator("#studio-project-actions").evaluate("el => { el.open = false; }")
     assert await read_pixel(page, 2, 2) == layer_one_pixel, "Cancelling New Project changed the current project"
 
     await open_tab("tab-palette")
@@ -760,6 +765,7 @@ async def check_project_portability(browser, base_url, viewport):
     await page.locator("#studio-project-confirm button[value='cancel']").click()
     assert await read_pixel(page, 2, 2) == layer_one_pixel, "Cancelling New Canvas changed the current project"
 
+    await page.locator("#studio-project-actions").evaluate("el => { el.open = true; }")
     await page.locator("#project-file").set_input_files({
         "name": "broken.nuproj",
         "mimeType": "application/json",
