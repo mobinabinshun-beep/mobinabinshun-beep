@@ -283,11 +283,7 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     await page.mouse.move(cancel_center["x"], cancel_center["y"])
     await page.mouse.down()
     await page.mouse.move(cancel_edge["x"], cancel_edge["y"], steps=3)
-    if viewport["width"] > 700:
-        await page.keyboard.press("Escape")
-    else:
-        # Mobile Escape also invokes the out-of-scope desktop drawer controller; use the supported pointer-cancel path here.
-        await page.locator("#pixel-canvas").dispatch_event("pointercancel", {"pointerId": 1})
+    await page.keyboard.press("Escape")
     await page.mouse.up()
     assert await read_pixel(page, 14, 8) == cancel_edge_before, "Compass cancellation must not commit preview pixels"
     assert await read_pixel(page, 8, 8) == cancel_center_before, "Compass cancellation must leave the center unchanged"
