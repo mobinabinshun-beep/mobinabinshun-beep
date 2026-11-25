@@ -100,7 +100,10 @@ function updateMagnifier(e){
  const crossX=(p.x-sx+.5)/sourceWidth*lensCanvas.width,crossY=(p.y-sy+.5)/sourceHeight*lensCanvas.height;
  lensCtx.strokeStyle="rgba(255,255,255,.9)";lensCtx.lineWidth=1.5;lensCtx.beginPath();lensCtx.moveTo(crossX-10,crossY);lensCtx.lineTo(crossX+10,crossY);lensCtx.moveTo(crossX,crossY-10);lensCtx.lineTo(crossX,crossY+10);lensCtx.stroke();
  $("studio-magnifier-label").textContent=magnifierFactor+"× · "+(p.x+1)+", "+(p.y+1);
- const size=magnifierSize,stageRect=stage.getBoundingClientRect(),left=clamp(e.clientX-stageRect.left+18,8,Math.max(8,stage.clientWidth-size-8)),top=clamp(e.clientY-stageRect.top+18,8,Math.max(8,stage.clientHeight-size-8));
+ const size=magnifierSize,stageRect=stage.getBoundingClientRect();let left=e.clientX-stageRect.left+18,top=e.clientY-stageRect.top+18;
+ if(left+size>stage.clientWidth-8)left=e.clientX-stageRect.left-size-18;
+ if(top+size>stage.clientHeight-8)top=e.clientY-stageRect.top-size-18;
+ left=clamp(left,8,Math.max(8,stage.clientWidth-size-8));top=clamp(top,8,Math.max(8,stage.clientHeight-size-8));
  lens.style.width=size+"px";lens.style.height=size+"px";lens.style.left=left+"px";lens.style.top=top+"px";lens.hidden=false;lens.setAttribute("aria-hidden","false");lastMagnifierPoint={clientX:e.clientX,clientY:e.clientY};
 }
 function put(x,y,value){pixels[y*width+x]=value;}

@@ -401,7 +401,12 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     await page.locator("#magnifier-size").evaluate("el => { el.value='180'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
     mag_canvas = await page.locator("#pixel-canvas").bounding_box()
     assert mag_canvas, "Canvas is missing for Magnifier smoke"
-    mag_point = {"x": mag_canvas["x"] + mag_canvas["width"] * 0.5, "y": mag_canvas["y"] + mag_canvas["height"] * 0.5}
+    visible_left = max(mag_canvas["x"] + 8, 8)
+    visible_right = min(mag_canvas["x"] + mag_canvas["width"] - 8, viewport["width"] - 8)
+    visible_top = max(mag_canvas["y"] + 8, 8)
+    visible_bottom = min(mag_canvas["y"] + mag_canvas["height"] - 8, viewport["height"] - 8)
+    assert visible_right > visible_left and visible_bottom > visible_top, f"Canvas has no visible pointer area: {mag_canvas}, viewport={viewport}"
+    mag_point = {"x": (visible_left + visible_right) / 2, "y": (visible_top + visible_bottom) / 2}
     assert await magnifier_button.get_attribute("aria-pressed") == "true", "Magnifier tool did not become active"
     await page.evaluate("() => { window.__magnifierPointerMoves=0; document.addEventListener('pointermove',()=>window.__magnifierPointerMoves++,{capture:true,once:true}); }")
     await page.mouse.move(mag_point["x"], mag_point["y"])
