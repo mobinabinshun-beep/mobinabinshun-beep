@@ -160,20 +160,16 @@ No viewport/Magnifier, project portability, Perspective/Depth, export redesign, 
 ### Out of scope
 No viewport/Magnifier, project portability, Perspective/Depth, export redesign, HTML/CSS layer export (Issue #67), demo parity/clean banner, Gateway/HUD/Wallet/Library/games, global styles, or other tool additions.
 
-## Stage 4 machine verification — PASS
+## Stage 4 machine verification — REOPENED
 
-- Exact tested source/workflow SHA: `c00343a0115eff542661706ac6f527831515cbd4`
-- Studio machine workflow PR run `45527771332`: SUCCESS.
-- Focused Studio unit/regression tests: 80/80 PASS; syntax checks PASS.
-- Browser matrix: 9/9 PASS — Ubuntu 24.04, Windows 2022 and macOS 15, each with Chromium, Firefox and WebKit. Desktop and mobile smoke ran for each browser engine.
-- Studio Export regression: run `45527771353` PASS.
-- Graphics Preview smoke: run `45527771334` PASS.
-- Arcane Shield/Mana regression: run `45527771274` PASS.
-- Gateway main-game regression: run `45527771403` PASS.
-- The browser checks verified high-contrast Blueprint overlays on light/negative artwork without changing pixel data; Compass center/radius preview, commit-only circle output, temporary-guide removal, cancellation, Undo and Redo.
-- The initial Stage 4 browser failures were traced to test-harness state handling and the mobile Escape interaction with the out-of-scope shared layout controller. The final in-scope browser smoke uses Escape on desktop and the existing pointer-cancel path on mobile. The separate mobile Escape/shared-drawer interaction is recorded in Repository Issue #68 and remains unmodified because `nu-studio-layout.js` is outside Stage 4's authorized paths.
-- Stage 1 Fill, Stage 2 English/accessibility and Stage 3 context-sensitive tool settings remain in the cumulative candidate. Their exact earlier machine-pass checkpoints remain separately recorded above.
-- Stage 4's exact source SHA is machine-verified; the final package is still IN-PROGRESS. No final package backup/restore, public demo deployment, live-build verification, human QA handoff or owner acceptance is claimed.
+- Earlier machine-pass checkpoints: c00343a0115eff542661706ac6f527831515cbd4 (PR run 45527771332) and documentation-inclusive 3891b244f62beb88d11df372e52831037aa985e4 (PR run 45528165823) both passed the 80-unit-test and 9/9 browser matrix plus cross-project regression gates.
+- A subsequent source audit found a real in-scope defect not adequately covered by the earlier mobile test: the Escape key handler always invoked both drawer controllers. On mobile, the desktop controller wrote inline visibility:hidden!important, preventing the mobile drawer from reopening after Escape.
+- Stage 4 was reopened against baseline 3891b244f62beb88d11df372e52831037aa985e4.
+- Runtime fix: nu-pixel-art-studio.js now routes Escape to the active workspace controller only; on mobile it closes the mobile drawer only, and on desktop it closes the desktop drawer only.
+- Regression coverage: tests/nu-studio-ux.test.js asserts controller isolation; tests/nu-studio-browser-smoke.py again uses Escape to cancel Compass on both desktop and mobile and verifies the mobile dock can reopen afterward.
+- Runtime fix commit: fe95ba7683f9ce72ad614b8946de02c8a0f67b6e; browser test commit: 5501dcc66c2e4794edb4af0108abd95355d4d813; UX regression test commit: 687cafcdc39a19da78692fe683d47c8de427d281.
+- Revalidation is PENDING on the new cumulative candidate SHA. Do not treat the earlier PASS as the current final Stage 4 sign-off until the new exact-head machine workflow and all cross-project regression gates pass.
+- No nu-studio-layout.js change is included. The aggregate package remains IN-PROGRESS; no final backup/restore, public demo deployment, live-build verification, human QA handoff or owner acceptance is claimed.
 
 ## Handoff
-Stages 1–4 are MACHINE-PASS at their respective recorded exact SHAs. Continue serially with Stage 5 viewport/zoom/Magnifier discovery and scope definition. The aggregate package remains IN-PROGRESS; no final candidate backup, demo deployment, human QA handoff or owner acceptance is claimed.
+Stages 1–3 remain MACHINE-PASS. Stage 4 has been reopened for mobile Escape/drawer isolation and must regain exact-head MACHINE-PASS before Stage 5 implementation begins. Stage 5 viewport/zoom/Magnifier discovery is read-only only until Stage 4 revalidation completes. The aggregate package remains IN-PROGRESS; no final candidate backup, demo deployment, human QA handoff or owner acceptance is claimed.
