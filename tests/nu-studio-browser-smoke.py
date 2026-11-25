@@ -660,18 +660,32 @@ async def check_project_portability(browser, base_url, viewport):
         await page.locator("#" + tab_id).wait_for(state="visible")
         await page.locator("#" + tab_id).click()
 
+    async def close_drawer():
+        if viewport["width"] <= 700:
+            mobile_open = await page.locator("body").evaluate("el => el.classList.contains('nu-mobile-tools-open')")
+            if mobile_open:
+                await page.locator("#mobile-tools-toggle").click()
+            await page.wait_for_function("() => !document.body.classList.contains('nu-mobile-tools-open')")
+        else:
+            if await drawer.get_attribute("data-workspace-drawer-state") == "open":
+                await page.locator("#desktop-tools-toggle").click()
+            await page.wait_for_function("() => document.querySelector('#studio-tools-drawer')?.dataset.workspaceDrawerState === 'closed'")
+        await page.wait_for_timeout(350)
+
     await page.locator("#studio-project-actions").evaluate("el => { el.open = true; }")
     await open_tab("tab-layers")
     await page.locator("#adv-layers button[aria-label='Select Layer 1']").wait_for(state="visible")
 
     await page.locator("#show-grid").evaluate("el => { el.checked = false; }")
     await set_color(page, "#ff0000")
+    await close_drawer()
     await click_cell(page, 2, 2)
     layer_one_pixel = await read_pixel(page, 2, 2)
     await open_tab("tab-layers")
 
     await page.locator("#adv-layers button[aria-label='Select Layer 2']").click()
     await set_color(page, "#00ff00")
+    await close_drawer()
     await click_cell(page, 4, 4)
     await open_tab("tab-layers")
     layer_two_row = page.locator("#adv-layers .adv-layer").nth(1)
@@ -705,11 +719,13 @@ async def check_project_portability(browser, base_url, viewport):
     assert project["layers"][1]["opacity"] == 65 and project["active"] == 1
 
     await set_color(page, "#0000ff")
+    await close_drawer()
     await click_cell(page, 6, 6)
     blue_pixel = await read_pixel(page, 6, 6)
     await page.locator("#project-file").set_input_files(project_path)
     await page.locator("#studio-project-confirm").wait_for(state="visible", timeout=5000)
     await page.locator("#studio-project-confirm button[value='cancel']").click()
+    await page.wait_for_function("() => document.querySelector('#project-file')?.value === ''")
     assert await read_pixel(page, 6, 6) == blue_pixel, "Cancelling project replacement changed current artwork"
 
     await page.locator("#project-file").set_input_files(project_path)
