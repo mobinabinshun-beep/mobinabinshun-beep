@@ -231,7 +231,7 @@
   }
   if(!Array.isArray(p.palette)||p.palette.length<1||p.palette.length>256||p.palette.some(c=>typeof c!=="string"||!/^#[0-9a-f]{6}$/i.test(c)))fail("palette is invalid.");
   if(typeof p.color!=="string"||!/^#[0-9a-f]{6}$/i.test(p.color))fail("selected color is invalid.");
-  if(typeof p.tool!=="string"||! /^[a-z][a-z0-9-]{0,39}$/.test(p.tool))fail("selected tool is invalid.");
+  if(!["pencil","eraser","fill","picker","line","rect","ellipse","rect-fill","ellipse-fill","select-rect","select-lasso","move-selection","gradient","texture","bezier","compass","magnifier","fading-brush","color-mix-brush"].includes(p.tool))fail("selected tool is invalid.");
   if(typeof p.imageImported!=="boolean"||typeof p.sourceInfo!=="string"||p.sourceInfo.length>512)fail("source metadata is invalid.");
   const s=p.settings;
   if(!record(s))fail("project settings are missing.");
@@ -250,7 +250,7 @@
      fadeIntensity:number("fadeIntensity",0,100),mixBrushStrength:number("mixBrushStrength",0,100),
      viewRotation:number("viewRotation",-360,360),
      guideState:{blueprint:s.guideState.blueprint,ruler:s.guideState.ruler,divisions:s.guideState.divisions,axes:s.guideState.axes,depth:s.guideState.depth},
-     guideHighContrast:s.guideHighContrast,magnifierFactor:number("magnifierFactor",2,12),magnifierSize:number("magnifierSize",120,220),
+     guideHighContrast:s.guideHighContrast,magnifierFactor:oneOf("magnifierFactor",[2,3,4,6,8]),magnifierSize:number("magnifierSize",120,220),
      bucket:oneOf("bucket",["contiguous","similar","global"]),tolerance:number("tolerance",0,441.673),
      symmetry:oneOf("symmetry",["none","horizontal","vertical","both"]),
      brushShape:oneOf("brushShape",["square","circle","diamond"]),
