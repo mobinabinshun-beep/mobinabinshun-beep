@@ -649,6 +649,7 @@ async def check_project_portability(browser, base_url, viewport):
         toggle_id = "#mobile-tools-toggle" if viewport["width"] <= 700 else "#desktop-tools-toggle"
         await page.locator(toggle_id).click()
     await page.locator("#studio-properties-panel").evaluate("el => { el.open = true; }")
+    await page.locator("#studio-project-actions").evaluate("el => { el.open = true; }")
     await page.locator("#tab-layers").click()
     await page.locator("#adv-layers button[aria-label='Select Layer 1']").wait_for(state="visible")
 
@@ -656,10 +657,12 @@ async def check_project_portability(browser, base_url, viewport):
     await set_color(page, "#ff0000")
     await click_cell(page, 2, 2)
     layer_one_pixel = await read_pixel(page, 2, 2)
+    await page.locator("#tab-layers").click()
 
     await page.locator("#adv-layers button[aria-label='Select Layer 2']").click()
     await set_color(page, "#00ff00")
     await click_cell(page, 4, 4)
+    await page.locator("#tab-layers").click()
     layer_two_row = page.locator("#adv-layers .adv-layer").nth(1)
     await layer_two_row.locator("input[type='range']").evaluate("el => { el.value='65'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
     await layer_two_row.locator("select").nth(0).select_option("screen")
