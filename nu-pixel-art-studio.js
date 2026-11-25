@@ -52,7 +52,7 @@ function setZoom(next,anchor,behavior="auto"){
  workspace.zoom=clamp(Math.round(Number(next)||100),25,800);
  $("workspace-zoom").value=workspace.zoom;
  updateCanvasDisplay();
- const after=canvas.getBoundingClientRect(),delta=window.NUStudioLayout.anchorScrollDelta(before,after,anchorX,anchorY);
+ const after=canvas.getBoundingClientRect(),delta=anchor&&!viewRotation?window.NUStudioLayout.pixelAnchorScrollDelta(before,after,anchorX,anchorY,width,height):window.NUStudioLayout.anchorScrollDelta(before,after,anchorX,anchorY);
  const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
  const left=clamp(frame.scrollLeft+delta.x,0,Math.max(0,frame.scrollWidth-frame.clientWidth));
  const top=clamp(frame.scrollTop+delta.y,0,Math.max(0,frame.scrollHeight-frame.clientHeight));

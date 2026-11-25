@@ -77,6 +77,7 @@ test("Desktop zoom buttons, slider and wheel share one anchored zoom state",()=>
  assert.match(html,/id="zoom-out"/);
  assert.match(runtime,/function setZoom\(next,anchor,behavior="auto"\)/);
  assert.match(runtime,/anchorScrollDelta\(before,after,anchorX,anchorY\)/);
+ assert.match(runtime,/pixelAnchorScrollDelta\(before,after,anchorX,anchorY,width,height\)/);
  assert.match(runtime,/canvas\.addEventListener\("wheel",e=>\{if\(!e\.ctrlKey\)return/);
  assert.match(runtime,/setZoom\(workspace\.zoom\+25,null,"smooth"\)/);
 });
