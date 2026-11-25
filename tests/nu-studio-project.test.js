@@ -99,6 +99,12 @@ test("rejects unsafe group keys and invalid layer metadata", () => {
   assert.throws(() => validateStudioProject(c), /opacity/);
 });
 
+test("accepts the perspective tool in versioned project files", () => {
+  const input = fixture();
+  input.project.tool = "perspective";
+  assert.equal(validateStudioProject(input).project.tool, "perspective");
+});
+
 test("rejects invalid settings and metadata", () => {
   const a = fixture(); a.project.settings.zoom = 900;
   assert.throws(() => validateStudioProject(a), /zoom is out of range/);
