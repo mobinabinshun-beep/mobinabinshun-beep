@@ -185,6 +185,7 @@ No viewport/Magnifier, project portability, Perspective/Depth, export redesign, 
   6. tests/nu-studio-browser-smoke.py — verify synchronized desktop/mobile +/- and slider, fit/reset, anchored zoom, live loupe behavior and unchanged pixels/undo history on desktop/mobile.
   7. tests/nu-studio-compact-ux.test.js — preserve compact tool grouping and Magnifier accessible name.
   8. This change record.
+9. `tests/nu-studio-native-dimension-import.test.js` — directly coupled assertion correction: distinguish the serialized `.nuproj` size bound from raster-image import, which retains no product-defined file/MIME/dimension/pixel ceiling. The earlier global source scan incorrectly treated the new project-file guard as a raster-import limit; the revised test scopes its assertions to the `image-file` handler and separately asserts the project-file bound.
 - Acceptance criteria:
   - Fit-to-view initially shows the complete canvas; slider, desktop +/- and mobile +/- all update one shared 25–800% zoom state; Fit/Reset restores the fitted view.
   - Zoom preserves the pixel under the pointer (or viewport center when invoked by buttons) as the focus where bounds permit; scrolling remains inside the workspace frame and no page-level horizontal overflow is introduced.
@@ -290,3 +291,7 @@ No Perspective/Depth implementation (next serial stage); no Demo/local deploymen
 - Focused project schema/unit tests, existing Studio unit/regression suites, browser interactions and the complete 3-OS × 3-browser matrix are required on one exact candidate SHA.
 - The Stage 7 pre-change recovery ref must be created from the exact source baseline above and read back/compared before the first runtime write. The already captured Runtime Baseline Snapshot remains the public-demo baseline; it is distinct from this source checkpoint and the eventual final-package backup.
 - No Stage 7 runtime implementation has started at the time this scope was recorded.
+
+### Directly coupled test-scope correction
+
+- The first regression pass exposed one stale global assertion in `tests/nu-studio-native-dimension-import.test.js`: it rejected any `file.size` check anywhere in the Studio runtime. Stage 7 deliberately bounds serialized project documents, while raster image import remains browser/device-capability based. The assertion now scopes the no-product-ceiling requirement to the raster import handler and separately verifies the project-document size guard. This is test-only scope expansion; no additional runtime path was added.
