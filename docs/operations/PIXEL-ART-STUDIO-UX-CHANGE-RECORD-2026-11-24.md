@@ -160,5 +160,20 @@ No viewport/Magnifier, project portability, Perspective/Depth, export redesign, 
 ### Out of scope
 No viewport/Magnifier, project portability, Perspective/Depth, export redesign, HTML/CSS layer export (Issue #67), demo parity/clean banner, Gateway/HUD/Wallet/Library/games, global styles, or other tool additions.
 
+## Stage 4 machine verification — PASS
+
+- Exact tested source/workflow SHA: `c00343a0115eff542661706ac6f527831515cbd4`
+- Studio machine workflow PR run `45527771332`: SUCCESS.
+- Focused Studio unit/regression tests: 80/80 PASS; syntax checks PASS.
+- Browser matrix: 9/9 PASS — Ubuntu 24.04, Windows 2022 and macOS 15, each with Chromium, Firefox and WebKit. Desktop and mobile smoke ran for each browser engine.
+- Studio Export regression: run `45527771353` PASS.
+- Graphics Preview smoke: run `45527771334` PASS.
+- Arcane Shield/Mana regression: run `45527771274` PASS.
+- Gateway main-game regression: run `45527771403` PASS.
+- The browser checks verified high-contrast Blueprint overlays on light/negative artwork without changing pixel data; Compass center/radius preview, commit-only circle output, temporary-guide removal, cancellation, Undo and Redo.
+- The initial Stage 4 browser failures were traced to test-harness state handling and the mobile Escape interaction with the out-of-scope shared layout controller. The final in-scope browser smoke uses Escape on desktop and the existing pointer-cancel path on mobile. The separate mobile Escape/shared-drawer interaction is recorded in Repository Issue #68 and remains unmodified because `nu-studio-layout.js` is outside Stage 4's authorized paths.
+- Stage 1 Fill, Stage 2 English/accessibility and Stage 3 context-sensitive tool settings remain in the cumulative candidate. Their exact earlier machine-pass checkpoints remain separately recorded above.
+- Stage 4's exact source SHA is machine-verified; the final package is still IN-PROGRESS. No final package backup/restore, public demo deployment, live-build verification, human QA handoff or owner acceptance is claimed.
+
 ## Handoff
-Stage 2 and Stage 3 are MACHINE-PASS. Stage 4 is now open under the scope above. The aggregate package is not yet MACHINE-PASS; no final candidate backup, demo deployment, human QA handoff or owner acceptance is claimed.
+Stages 1–4 are MACHINE-PASS at their respective recorded exact SHAs. Continue serially with Stage 5 viewport/zoom/Magnifier discovery and scope definition. The aggregate package remains IN-PROGRESS; no final candidate backup, demo deployment, human QA handoff or owner acceptance is claimed.
