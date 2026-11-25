@@ -764,7 +764,11 @@ const STUDIO_PROJECT_MAX_BYTES=128*1024*1024;
 function projectHasContent(){
  return width!==32||height!==32||adv.layers.some(layer=>
   layer.pixels.some(Boolean)||!!layer.mask||layer.opacity!==100||!layer.visible||layer.locked||layer.blend!=="normal"||layer.group!=="Ungrouped"
- )||!!(adv.selection&&adv.selection.some(Boolean))||Object.keys(adv.groups).length>0;
+ )||!!(adv.selection&&adv.selection.some(Boolean))||Object.keys(adv.groups).length>0||
+  palette.join("|")!==defaults.join("|")||color!=="#e8b94f"||tool!=="pencil"||imageImported||
+  workspace.zoom!==100||brushSize!==1||fadeIntensity!==50||mixBrushStrength!==60||viewRotation!==0||
+  Object.values(guideState).some(Boolean)||!guideHighContrast||magnifierFactor!==4||magnifierSize!==160||
+  adv.bucket!=="contiguous"||adv.tol!==0||adv.symmetry!=="none"||adv.brushShape!=="square"||adv.texture!=="none"||adv.textureDensity!==60;
 }
 async function confirmProjectReplacement(title,message){
  const dialog=$("studio-project-confirm");
@@ -815,7 +819,7 @@ function syncStudioProjectControls(p){
  magnifierFactor=s.magnifierFactor;magnifierSize=s.magnifierSize;
  adv.bucket=s.bucket;adv.tol=s.tolerance;adv.symmetry=s.symmetry;adv.brushShape=s.brushShape;adv.texture=s.texture;adv.textureDensity=s.textureDensity;
  const setValue=(id,value)=>{const el=$(id);if(el)el.value=String(value);};
- setValue("custom-color",color);setValue("brush-size",brushSize);setValue("brush-size-value",brushSize+" px");
+ setValue("custom-color",color);setValue("brush-size",brushSize);const brushValue=$("brush-size-value");if(brushValue)brushValue.textContent=brushSize+" px";
  setValue("adv-bucket",adv.bucket);setValue("adv-tol",adv.tol);setValue("adv-symmetry",adv.symmetry);
  setValue("pro-brush-shape",adv.brushShape);setValue("pro-texture",adv.texture);setValue("pro-texture-density",adv.textureDensity);
  setValue("mix-brush-strength",mixBrushStrength);setValue("magnifier-strength",magnifierFactor);setValue("magnifier-size",magnifierSize);
@@ -875,7 +879,7 @@ async function startNewStudioProject(){
 const resetGridBeforeProjectGuard=resetGrid;
 resetGrid=async function(next){
  if(projectHasContent()&&!(await confirmProjectReplacement("Clear the current project?","Changing the canvas size clears the current artwork and layer pixels. Download the project first if you want to keep it."))){
-  $("image-width").value=width;$("image-height").value=height;announce("Canvas change cancelled. Your current project is unchanged.");return false;
+  $("image-width").value=width;$("image-height").value=height;const grid=$("grid-size");if(grid)grid.value=String(width);announce("Canvas change cancelled. Your current project is unchanged.");return false;
  }
  resetGridBeforeProjectGuard(next);return true;
 };
