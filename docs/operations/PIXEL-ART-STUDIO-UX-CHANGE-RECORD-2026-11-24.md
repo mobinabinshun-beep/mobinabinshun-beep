@@ -231,17 +231,19 @@ Exact tested implementation/workflow SHA: `ce12b7fba76cc5e575e20c6128a2b094925c7
 - Stage 6 pre-repair recovery branch `backup/pre-studio-stage6-clean-welcome-2026-11-25` remains preserved at its recorded initial implementation SHA.
 
 ### Package status and next serial stage
-- Stage 6 implementation is MACHINE-PASS on the exact SHA above. The aggregate package remains IN-PROGRESS; no package-final backup, public demo deployment, live-build verification, HUMAN-QA-PENDING handoff or owner acceptance is claimed.
-- Per Repository Issue #68's serial order, the next package stage is Stage 7 — versioned project download/reopen with explicit safe-replace confirmation. Do not start runtime implementation until the Stage 7 exact allow-list, acceptance tests and pre-change checkpoint are recorded and verified.
+- Stage 6 remains MACHINE-PASS on its frozen candidate SHA `ce12b7fba76cc5e575e20c6128a2b094925c7ff6`; its backup ref is unchanged.
+- Stage 7 project portability implementation and both push/PR machine matrices are MACHINE-PASS on `10df67aaf8bcdf1eff2070e8002933e23a4c9743`. Its final documentation/workflow-inclusive SHA is being revalidated before the Stage 7 final recovery backup is created.
+- The aggregate Issue #68 package remains IN-PROGRESS. No package-final backup, public demo deployment, live-build verification, HUMAN-QA-PENDING handoff or owner acceptance is claimed.
+- Per Issue #68's serial order, Stage 8 — Perspective/Depth — is next, but runtime work must wait until the Stage 7 final documentation-inclusive SHA passes its exact-SHA gates and its recovery backup is verified.
 - Issue #67 HTML/CSS graphics-layer export remains independent and out of scope.
 
 
 ## Stage 7 — Versioned project download/reopen and safe replacement
 
 - Change ID: `NU-UPD-STUDIO-PROJECT-PORTABILITY-20261124`
-- Status: `SCOPE-RECORDED / PRE-CHANGE-CHECKPOINT-PENDING`
+- Status: `IMPLEMENTATION-MACHINE-PASS / PR-MIRROR-PASS — FINAL DOC/WORKFLOW SHA REVALIDATION PENDING`
 - Stage 6 MACHINE-PASS implementation SHA: `ce12b7fba76cc5e575e20c6128a2b094925c7ff6`; verified Stage 6 backup: `backup/studio-stage6-clean-welcome-2026-11-25`.
-- Stage 7 source baseline: successor branch `fix/studio-fill-ux-successor-20261124`, documentation-inclusive head `56261c875e111e520edd090122e7b9bcbf516435`. Stage 7 is a successor only; Stage 6 and Stage 5 frozen refs are not to be moved or edited.
+- Stage 7 source baseline: successor branch `fix/studio-fill-ux-successor-20261124`, exact pre-change SHA `5d72456c57909b64729597e110e8fefd4727ecdf`. Verified recovery ref `backup/pre-studio-stage7-project-portability-2026-11-25` points to this exact SHA. Stage 7 is a successor only; Stage 6 and Stage 5 frozen refs are not to be moved or edited.
 
 ### Discovery — existing reusable implementation
 
@@ -267,9 +269,10 @@ Exact tested implementation/workflow SHA: `ce12b7fba76cc5e575e20c6128a2b094925c7
 - Use a versioned, self-contained local file with a stable application identifier and explicit schema version (initial version 1); use a recognizable `.nuproj` extension and JSON media type.
 - Preserve canvas dimensions and editable pixels for every layer; layer names/order, active layer, opacity, visibility, lock, blend mode, group assignment, masks, group visibility/opacity and current selection; preserve palette/current color and persistent tool/brush/fill/texture/guide/view settings needed to resume editing.
 - Exclude transient pointer gestures, an in-progress Compass preview, hover/loupe pointer position, undo/redo history, object URLs and browser File handles. Temporary guides remain render-only and are never serialized as artwork pixels.
-- Convert typed arrays to explicit JSON arrays; validate the complete document and all bounds before any live state change. Reject unknown app/schema versions, malformed dimensions, wrong array lengths, invalid colors/enums/ranges, invalid active-layer references and over-limit files/canvases.
-- Restore atomically: parse → validate/normalize → obtain explicit user confirmation → apply the complete state → refresh UI. Any parse/validation/restore error or cancellation must leave the previous project unchanged.
-- Download/open must work locally/offline through browser file APIs; no server upload, remote storage, external dependency, or account service is introduced.
+- Convert typed arrays to explicit JSON arrays; validate the complete document and all bounds before any live state change. Reject unknown app/schema versions, malformed dimensions, wrong array lengths, invalid colors/enums/ranges, invalid active-layer references and over-limit files/canvases. The serialized project file is capped at 128 MiB; raster image import retains its separate browser/device-capability behavior and no new product-defined image-size ceiling.
+- Restore through parse → validate/normalize → explicit user confirmation when replacing existing work → apply the complete state → refresh UI. Parse/validation failures and user cancellation leave the previous project unchanged.
+- Preserve persistent tool settings needed to resume work, including grid visibility, gradient color/mode, curve tension, alpha and selection scaling; transient gestures, pointer/loupe position, File handles, object URLs and undo/redo history are excluded.
+- Download/open work locally/offline through browser file APIs; no server upload, remote storage, external dependency or account service is introduced. Original source image bytes are not embedded; source metadata is retained.
 
 ### Acceptance criteria
 
@@ -288,10 +291,21 @@ No Perspective/Depth implementation (next serial stage); no Demo/local deploymen
 
 ### Verification and checkpoint
 
-- Focused project schema/unit tests, existing Studio unit/regression suites, browser interactions and the complete 3-OS × 3-browser matrix are required on one exact candidate SHA.
-- The Stage 7 pre-change recovery ref must be created from the exact source baseline above and read back/compared before the first runtime write. The already captured Runtime Baseline Snapshot remains the public-demo baseline; it is distinct from this source checkpoint and the eventual final-package backup.
-- No Stage 7 runtime implementation has started at the time this scope was recorded.
+- Verified Stage 7 pre-change recovery ref: `backup/pre-studio-stage7-project-portability-2026-11-25` → exact source baseline `5d72456c57909b64729597e110e8fefd4727ecdf`.
+- Exact implementation candidate `10df67aaf8bcdf1eff2070e8002933e23a4c9743` passed the push Studio machine workflow `45562956829` and PR mirror `45562968482`; each completed `studio-unit` plus all 9 OS/browser jobs successfully (9/9).
+- Same exact SHA passed the cross-project gates: Studio export regression push `45562956833` and PR `45562968574`; graphics preview smoke `45562968573`; Gateway regression `45562968714`; Arcane Shield/Mana regression `45562968568`.
+- Compared with the pre-change checkpoint, the Stage 7 diff is confined to the nine authorized paths: workflow, canonical change record, Studio runtime, existing project helper, Studio HTML, browser smoke, native image-import regression assertion, new project schema tests and UX assertions.
+- The workflow PR path filter now includes this canonical change record so future status/evidence updates trigger the same machine gates.
+- Final docs/workflow-inclusive SHA must complete the same exact-SHA machine and cross-project checks before Stage 7 is frozen. The Stage 7 final backup will then be created/read back; it is distinct from the pre-change recovery ref and the eventual package-final backup. The Runtime Baseline Snapshot remains the public-demo baseline.
 
 ### Directly coupled test-scope correction
 
 - The first regression pass exposed one stale global assertion in `tests/nu-studio-native-dimension-import.test.js`: it rejected any `file.size` check anywhere in the Studio runtime. Stage 7 deliberately bounds serialized project documents, while raster image import remains browser/device-capability based. The assertion now scopes the no-product-ceiling requirement to the raster import handler and separately verifies the project-document size guard. This is test-only scope expansion; no additional runtime path was added.
+
+### Implementation and machine verification on the tested candidate
+
+- Implemented versioned `.nuproj` JSON v1 download/open, full editable-layer state serialization, strict schema validation, explicit safe-replace confirmation, New Project, Clear Canvas and New Canvas/grid-reset confirmation, and raster-image replacement confirmation. Project actions are progressively disclosed in the compact Project menu.
+- Project round-trip coverage includes layer pixels/transparency, layer metadata and active layer, masks, groups, selection, canvas dimensions, palette/current color, active tool, zoom/rotation, guides/grid, brush/fill/texture, gradient/curve/alpha and selection-scale settings.
+- A modal/outside-click interaction was corrected so confirming a project operation does not dismiss the tool drawer. The browser smoke suite follows the actual contextual panel ownership and closes the mobile/desktop drawer before canvas or toolbar interactions.
+- The raster-import regression assertion was narrowed to the raster-import handler and separately verifies the `.nuproj` file bound; no image import ceiling was added.
+- This is Stage 7 implementation verification only. The aggregate package remains open; no public deployment, final package backup, live-build parity verification, human QA handoff or owner acceptance has occurred.
