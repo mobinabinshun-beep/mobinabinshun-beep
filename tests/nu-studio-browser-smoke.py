@@ -249,6 +249,7 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     await set_color(page, "#ff0000")
     compass_button = page.locator('#studio-quick-tools [data-tool="compass"]')
     assert await compass_button.get_attribute("aria-label") == "Compass", "Compass tool must have a clear accessible name"
+    await page.locator("#studio-quick-tools").evaluate("(el) => { el.scrollLeft = el.scrollWidth; }")
     await compass_button.click()
     assert await page.locator("#studio-context-title").inner_text() == "Compass"
     await fill_toggle.click()
