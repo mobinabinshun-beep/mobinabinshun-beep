@@ -160,3 +160,12 @@
 - Do not render infrastructure/development/QA labels, build SHA, CI, backup or deployment metadata in public product UI. The only permitted public-demo introductory text is `Welcome to N.U — Public Test Demo`.
 - Keep candidate identity, SHA, test status, limitations and handoff evidence in repository documentation/technical metadata. Necessary functional, data-loss and security confirmations remain allowed.
 - This newer direct owner principle supersedes older visible TEST CANDIDATE / NOT HUMAN-APPROVED or build-identifier UI requirements; technical QA, backup, deployment verification and human acceptance gates remain mandatory.
+
+
+## Owner-mandated pre-write documentation and Archive gate (2026-11-25)
+- Before any state-changing operation in this product repository, apply the canonical [NU mandatory operation documentation and Archive gate](https://github.com/mobinabinshun-beep/Repository/blob/main/Governance/NU-MANDATORY-OPERATION-DOCUMENTATION-AND-ARCHIVE-GATE-fa.md).
+- Record the owner request/conversation summary, purpose, authority, rationale, exact scope, exclusions, risks, consequences and acceptance criteria before the first write.
+- Archive the exact pre-change state with per-file provenance/manifest and hashes, then fetch back and verify. If the required archive, recovery point or verification is unavailable, mark BLOCKED and do not write.
+- Archive the resulting state and record exact changed paths, commit, machine tests, deployment identity, human QA and owner decision separately.
+- This is a machine responsibility and a necessary prerequisite for MACHINE-PASS/MACHINE-APPROVED. It does not replace human QA or owner acceptance.
+- Never rely on model memory or chat history as the only durable record; do not archive secrets or unnecessary personal data.
