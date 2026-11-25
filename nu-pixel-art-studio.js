@@ -53,17 +53,21 @@ function setZoom(next,anchor,behavior="auto"){
  $("workspace-zoom").value=workspace.zoom;
  updateCanvasDisplay();
  const after=canvas.getBoundingClientRect(),delta=anchor&&!viewRotation?window.NUStudioLayout.pixelAnchorScrollDelta(before,after,anchorX,anchorY,width,height):window.NUStudioLayout.anchorScrollDelta(before,after,anchorX,anchorY);
- const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
  const left=clamp(frame.scrollLeft+delta.x,0,Math.max(0,frame.scrollWidth-frame.clientWidth));
  const top=clamp(frame.scrollTop+delta.y,0,Math.max(0,frame.scrollHeight-frame.clientHeight));
- frame.scrollTo({left,top,behavior:reduced?"auto":behavior});
+ scrollFrame(frame,left,top,behavior);
  updateCounters();
+}
+function scrollFrame(frame,left,top,behavior="auto"){
+ const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+ if(behavior==="smooth"&&!reduced){frame.scrollTo({left,top,behavior:"smooth"});return;}
+ const previous=frame.style.scrollBehavior;frame.style.scrollBehavior="auto";frame.scrollTo({left,top,behavior:"auto"});requestAnimationFrame(()=>{frame.style.scrollBehavior=previous;});
 }
 function applyZoom(){setZoom(Number($("workspace-zoom").value)||100,null,"auto");}
 $("workspace-zoom").addEventListener("input",applyZoom);
 $("zoom-in")?.addEventListener("click",()=>setZoom(workspace.zoom+25,null,"smooth"));
 $("zoom-out")?.addEventListener("click",()=>setZoom(workspace.zoom-25,null,"smooth"));
-$("fit-canvas").addEventListener("click",()=>{workspace.zoom=100;$("workspace-zoom").value=100;updateCanvasDisplay();$("workspace-frame").scrollTo({left:0,top:0,behavior:"auto"});updateCounters();});
+$("fit-canvas").addEventListener("click",()=>{workspace.zoom=100;$("workspace-zoom").value=100;updateCanvasDisplay();scrollFrame($("workspace-frame"),0,0,"auto");updateCounters();});
 canvas.addEventListener("wheel",e=>{if(!e.ctrlKey)return;e.preventDefault();setZoom(workspace.zoom+(e.deltaY<0?10:-10),{x:e.clientX,y:e.clientY},"auto");},{passive:false});
 let workspaceObserver=null;
 function observeWorkspace(){
