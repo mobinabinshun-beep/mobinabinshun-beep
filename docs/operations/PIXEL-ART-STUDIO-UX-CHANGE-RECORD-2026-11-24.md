@@ -362,3 +362,19 @@ No Demo/local parity or deployment work (Repository #68 serial Stage 8); no fina
 - Before the first Stage 8 runtime write, create `backup/pre-studio-stage8-perspective-depth-2026-11-25` from the exact documentation-inclusive Stage 8 scope head and verify its ref SHA is identical to the candidate head.
 - Focused geometry tests and the complete Studio machine/browser/cross-project gates must pass on one exact Stage 8 candidate SHA before the next serial stage is opened.
 - No Perspective/Depth runtime implementation has started at the time this scope is recorded.
+
+## Stage 7 closeout — Project portability (2026-11-25)
+
+- Candidate SHA: `1aa16d60b420a2bb6fe76932d1b774a9f93d0444`.
+- Studio machine workflow push run `45565665668`: SUCCESS. The job matrix completed all ten jobs: `studio-unit` plus 9 browser combinations (Ubuntu 24.04 / Chromium, Firefox, WebKit; Windows 2022 / Chromium, Firefox, WebKit; macOS 15 / Chromium, Firefox, WebKit).
+- Pull-request mirror `45565671169`: SUCCESS.
+- Cross-project PR gates on the same SHA: Gateway `45565671177` SUCCESS; Studio Export `45565671236` SUCCESS; Arcane Shield/Mana `45565671274` SUCCESS; Graphics Preview `45565671174` SUCCESS.
+- Pre-Stage-8 backup reference `backup/pre-studio-stage8-perspective-depth-2026-11-25-candidate-1aa16d6` was read back and resolves to the exact candidate SHA above.
+- Stage 7 is MACHINE-PASS / BACKUP-REF-VERIFIED on the evidence above. No live restore test of the backup has been performed; archive-level restore remains NOT-TESTED.
+
+## Stage 8 pre-change readiness — Perspective/Depth
+
+- The first attempt to create the originally named checkpoint ref found that name already existed at a different SHA `e5f6953b42aac3532afe9686f24dc1d1beed44db`; it was not overwritten. A new uniquely named checkpoint was created and read back at the exact Stage 7 SHA.
+- AGENTS.md requires a decomposed Runtime Baseline Snapshot of the currently running public demo before any runtime write. The live demo URL could not be fetched with the available GitHub/web access in this execution, and the live build identity/artifact inventory is therefore UNVERIFIED. The Stage 8 runtime write gate remains BLOCKED until that live baseline is captured and documented; no Stage 8 runtime file has been modified.
+- Existing projective geometry helpers and Stage 8 focused tests are already present in the candidate from earlier scope work. Runtime interaction wiring, tool entry, browser E2E and Stage 8 acceptance are not yet implemented/verified. Existing helpers are not evidence of a completed tool.
+- Next permitted action: obtain/capture the current public demo's deployed HTML, referenced JS/CSS/assets and build identity; hash and inventory them in a versioned Runtime Baseline Snapshot per unified protocol sections 18–19. Then start Stage 8 runtime work from the exact verified checkpoint.
