@@ -217,7 +217,19 @@ Stages 1–4 are MACHINE-PASS at their recorded exact SHAs. Stage 5 scope is doc
 - `tests/nu-studio-advanced-tools.test.js`: replace the old requirement to display `TEST CANDIDATE / NOT HUMAN-APPROVED / DEMO QA ONLY` with the newer owner-approved clean welcome requirement, while retaining assertions that Fading Brush and Color-Mixing Brush remain available.
 - The second test file was added to the Stage 6 direct test allow-list because the first complete regression run proved its legacy banner assertion conflicts with the 2026-11-24 clean-public-UI owner principle. No product behavior was changed to satisfy a stale internal-banner test.
 
-### Current verification
-- Reruns are in progress on the successor branch after the assertion updates; no Stage 6 MACHINE-PASS is claimed until the exact final SHA completes the Studio unit suite, full 3-OS × 3-browser matrix and cross-project regression gates.
-- Stage 1–5 machine evidence remains bound to its own exact SHAs; Stage 5 candidate remains frozen.
-- Aggregate package remains IN-PROGRESS. No final package backup, public demo deployment, live build verification, HUMAN-QA-PENDING handoff or owner acceptance is claimed.
+### Stage 6 machine verification — PASS
+
+Exact tested implementation/workflow SHA: `ce12b7fba76cc5e575e20c6128a2b094925c7ff6`
+
+- Studio machine push run `45555411847`: SUCCESS; Studio unit gate PASS and full browser matrix 9/9 PASS.
+- PR-event mirror run `45555418845`: SUCCESS; Studio unit gate PASS and full browser matrix 9/9 PASS.
+- Browser matrix in both runs: Ubuntu 24.04, Windows 2022 and macOS 15 × Chromium, Firefox and WebKit.
+- Cross-project check-runs on the exact SHA: Studio Export regression, static validation, Gateway regression, Arcane Shield/Mana regression and Graphics Preview smoke: all SUCCESS.
+- The earlier initial failure `45533401762` remains documented as stale test expectations; the corrected assertions are included in the passing exact-SHA runs.
+- Stage 5 remains frozen at `70746d1c5ecb5d7b14b1f9fda1e1ee14c7e9422d`; S2B remains frozen at `b57682a21f5f2536b709dc032a1873e19f92f0fc`. Neither was modified.
+- Stage 6 pre-repair recovery branch `backup/pre-studio-stage6-clean-welcome-2026-11-25` remains preserved at its recorded initial implementation SHA.
+
+### Package status and next serial stage
+- Stage 6 implementation is MACHINE-PASS on the exact SHA above. The aggregate package remains IN-PROGRESS; no package-final backup, public demo deployment, live-build verification, HUMAN-QA-PENDING handoff or owner acceptance is claimed.
+- Per Repository Issue #68's serial order, the next package stage is Stage 7 — versioned project download/reopen with explicit safe-replace confirmation. Do not start runtime implementation until the Stage 7 exact allow-list, acceptance tests and pre-change checkpoint are recorded and verified.
+- Issue #67 HTML/CSS graphics-layer export remains independent and out of scope.
