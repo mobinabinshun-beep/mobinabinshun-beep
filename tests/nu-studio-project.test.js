@@ -50,6 +50,11 @@ test("valid project normalizes colors and preserves all editable state", () => {
   assert.deepEqual(result.project.groups["Group A"], { visible: true, opacity: 82 });
   assert.equal(result.project.settings.zoom, 175);
   assert.equal(result.project.settings.texture, "dots");
+  assert.equal(result.project.settings.gradientMode, "radial");
+  assert.equal(result.project.settings.curveTension, 14);
+  assert.equal(result.project.settings.alpha, 85);
+  assert.equal(result.project.settings.showGrid, false);
+  assert.equal(result.project.settings.selectionScaleX, 3);
   assert.equal(input.project.palette[0], "#FF0000", "validation must not mutate the source document");
 });
 
