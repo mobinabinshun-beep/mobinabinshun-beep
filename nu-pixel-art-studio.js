@@ -214,6 +214,7 @@ $("image-file").addEventListener("change",async e=>{
   const extracted=imagePalette(data,Number($("palette-limit").value)||32,alphaCutoff);
   if(!extracted.length)throw new Error("No visible pixels remain above the transparency cutoff.");
   const mapped=window.NURasterImport.mapPixels(data,nextW,nextH,extracted,alphaCutoff,$("dither-image").checked);
+  if(projectHasContent()&&!(await confirmProjectReplacement("Replace current artwork?","Importing this image will replace the active layer and may resize the current canvas. Download the project first if you want to keep the current work."))){announce("Image import cancelled. Your current project is unchanged.");return;}
   const before=snapshot(),previous={width,height,pixels,palette,imageImported,zoom:workspace.zoom,originalImportFile,sourceInfo:$("source-info").textContent,sourcePreviewHidden:$("source-preview-panel").hidden,sourcePreviewSrc:$("source-preview").src};
   let nextPreviewUrl=null;
   try{
@@ -755,5 +756,150 @@ $("mobile-view-reset")?.addEventListener("click",()=>{
  $("fit-canvas").click();
  announce("Viewport reset; artwork pixels and undo history are unchanged.");
 });
+
+/* Stage 7 — versioned local project portability and explicit replacement safety. */
+const STUDIO_PROJECT_FORMAT="N.U-Pixel-Art-Studio-Project";
+const STUDIO_PROJECT_VERSION=1;
+const STUDIO_PROJECT_MAX_BYTES=128*1024*1024;
+function projectHasContent(){
+ return width!==32||height!==32||adv.layers.some(layer=>
+  layer.pixels.some(Boolean)||!!layer.mask||layer.opacity!==100||!layer.visible||layer.locked||layer.blend!=="normal"||layer.group!=="Ungrouped"
+ )||!!(adv.selection&&adv.selection.some(Boolean))||Object.keys(adv.groups).length>0;
+}
+async function confirmProjectReplacement(title,message){
+ const dialog=$("studio-project-confirm");
+ if(!dialog||typeof dialog.showModal!=="function")return window.confirm(title+"\n\n"+message);
+ $("studio-project-confirm-title").textContent=title;
+ $("studio-project-confirm-message").textContent=message;
+ dialog.returnValue="";
+ dialog.showModal();
+ return await new Promise(resolve=>dialog.addEventListener("close",()=>resolve(dialog.returnValue==="confirm"),{once:true}));
+}
+function buildStudioProjectDocument(){
+ adv.layers[adv.active].pixels=pixels.slice();
+ const project={
+  width,height,
+  layers:adv.layers.map(layer=>({
+   name:layer.name,pixels:layer.pixels.slice(),opacity:layer.opacity,visible:layer.visible,locked:layer.locked,
+   mask:layer.mask?Array.from(layer.mask,v=>v?1:0):null,blend:layer.blend||"normal",group:layer.group||"Ungrouped"
+  })),
+  active:adv.active,selection:adv.selection?Array.from(adv.selection,v=>v?1:0):null,
+  groups:JSON.parse(JSON.stringify(adv.groups||{})),
+  palette:palette.slice(),color,tool,imageImported,
+  sourceInfo:$("source-info")?.textContent||"",
+  settings:{
+   zoom:workspace.zoom,brushSize,fadeIntensity,mixBrushStrength,viewRotation,
+   guideState:{...guideState},guideHighContrast,magnifierFactor,magnifierSize,
+   bucket:adv.bucket,tolerance:adv.tol,symmetry:adv.symmetry,brushShape:adv.brushShape,
+   texture:adv.texture,textureDensity:adv.textureDensity
+  }
+ };
+ return window.NUStudioProTools.validateStudioProject({format:STUDIO_PROJECT_FORMAT,version:STUDIO_PROJECT_VERSION,createdAt:new Date().toISOString(),project},{maxPixels:cellLimit()});
+}
+function downloadStudioProject(){
+ try{
+  const documentData=buildStudioProjectDocument(),json=JSON.stringify(documentData),blob=new Blob([json],{type:"application/json;charset=utf-8"});
+  if(blob.size>STUDIO_PROJECT_MAX_BYTES)throw new Error("This project is too large for the supported project-file limit.");
+  const raw=($("export-name")?.value||"nu-pixel-art").trim().replace(/[^a-z0-9-_]+/gi,"-").replace(/^-+|-+$/g,"").slice(0,48)||"nu-pixel-art";
+  const url=URL.createObjectURL(blob),anchor=document.createElement("a");
+  anchor.href=url;anchor.download=raw+".nuproj";anchor.hidden=true;document.body.append(anchor);anchor.click();anchor.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
+  announce("Project downloaded. Keep the .nuproj file to continue editing later.");
+ }catch(error){announce("Project download failed: "+(error&&error.message?error.message:"unsupported project state"));}
+}
+function syncStudioProjectControls(p){
+ const s=p.settings;
+ color=p.color;palette=p.palette.slice();imageImported=p.imageImported;
+ workspace.zoom=s.zoom;brushSize=s.brushSize;fadeIntensity=s.fadeIntensity;mixBrushStrength=s.mixBrushStrength;
+ viewRotation=s.viewRotation;guideState={...s.guideState};guideHighContrast=s.guideHighContrast;
+ magnifierFactor=s.magnifierFactor;magnifierSize=s.magnifierSize;
+ adv.bucket=s.bucket;adv.tol=s.tolerance;adv.symmetry=s.symmetry;adv.brushShape=s.brushShape;adv.texture=s.texture;adv.textureDensity=s.textureDensity;
+ const setValue=(id,value)=>{const el=$(id);if(el)el.value=String(value);};
+ setValue("custom-color",color);setValue("brush-size",brushSize);setValue("brush-size-value",brushSize+" px");
+ setValue("adv-bucket",adv.bucket);setValue("adv-tol",adv.tol);setValue("adv-symmetry",adv.symmetry);
+ setValue("pro-brush-shape",adv.brushShape);setValue("pro-texture",adv.texture);setValue("pro-texture-density",adv.textureDensity);
+ setValue("mix-brush-strength",mixBrushStrength);setValue("magnifier-strength",magnifierFactor);setValue("magnifier-size",magnifierSize);
+ const fade=document.querySelector('[aria-label="Fading brush intensity"]');if(fade)fade.value=String(fadeIntensity);
+ document.querySelectorAll("[data-guide]").forEach(input=>{input.checked=!!guideState[input.dataset.guide];});
+ const contrast=document.querySelector("[data-guide-contrast]");if(contrast)contrast.checked=guideHighContrast;
+ const maskEdit=$("pro-mask-edit");if(maskEdit)maskEdit.checked=false;adv.maskEdit=false;
+ const groupTarget=$("pro-group-target");if(groupTarget)groupTarget.value=adv.layers[adv.active].group||"Ungrouped";
+ const group=adv.groups[groupTarget?.value||"Ungrouped"]||{visible:true,opacity:100};setValue("pro-group-opacity",group.opacity);
+ $("image-width").value=width;$("image-height").value=height;
+ $("source-info").textContent="Project reopened. Editable pixels and layers were restored; the original imported source file is not embedded.";
+ $("source-preview-panel").hidden=true;$("source-preview").removeAttribute("src");
+ renderPalette();$("custom-color").value=color;
+ setTool(p.tool);updateViewportRotation();updateCanvasDisplay();render();layerUI();
+}
+function applyStudioProjectDocument(documentData){
+ const p=documentData.project;
+ if(sourcePreviewUrl){URL.revokeObjectURL(sourcePreviewUrl);sourcePreviewUrl=null;}
+ originalImportFile=null;hideMagnifier();compassState=null;drawing=false;strokeSnapshot=null;mixBrushState=null;
+ undoStack=[];redoStack=[];
+ restore({
+  width:p.width,height:p.height,pixels:p.layers[p.active].pixels.slice(),
+  layers:p.layers.map(layer=>({...layer,pixels:layer.pixels.slice(),mask:layer.mask?Uint8Array.from(layer.mask):null})),
+  active:p.active,selection:p.selection?Uint8Array.from(p.selection):null,groups:JSON.parse(JSON.stringify(p.groups))
+ });
+ syncStudioProjectControls(p);
+ historyButtons();$("workspace-frame").scrollTo(0,0);
+ announce("Project opened. Your layers, artwork and saved editing settings are ready.");
+}
+async function openStudioProjectFile(file){
+ if(!file)return;
+ try{
+  if(file.size>STUDIO_PROJECT_MAX_BYTES)throw new Error("The project file exceeds the supported size limit.");
+  const parsed=JSON.parse(await file.text());
+  const validated=window.NUStudioProTools.validateStudioProject(parsed,{maxPixels:cellLimit()});
+  if(projectHasContent()&&!(await confirmProjectReplacement("Replace the current project?","The selected project is valid. Replacing the current project will discard its current work. Cancel to keep it unchanged."))){announce("Project opening cancelled. Your current project is unchanged.");return;}
+  applyStudioProjectDocument(validated);
+ }catch(error){announce("Project could not be opened: "+(error&&error.message?error.message:"invalid project file")+". Your current project is unchanged.");}
+ finally{$("project-file").value="";}
+}
+async function startNewStudioProject(){
+ if(projectHasContent()&&!(await confirmProjectReplacement("Start a new project?","The current project and its artwork will be cleared. Download the project first if you want to keep it."))){announce("New Project cancelled. Your current project is unchanged.");return;}
+ const blankLayers=Array.from({length:4},(_,i)=>({name:"Layer "+(i+1),pixels:Array(32*32).fill(null),opacity:100,visible:true,locked:false,mask:null,blend:"normal",group:"Ungrouped"}));
+ adv.groups={};adv.maskEdit=false;adv.active=0;adv.selection=null;
+ adv.bucket="contiguous";adv.tol=0;adv.symmetry="none";adv.brushShape="square";adv.texture="none";adv.textureDensity=60;
+ palette=defaults.slice();color="#e8b94f";tool="pencil";imageImported=false;
+ workspace.zoom=100;brushSize=1;fadeIntensity=50;mixBrushStrength=60;viewRotation=0;
+ guideState={blueprint:false,ruler:false,divisions:false,axes:false,depth:false};guideHighContrast=true;magnifierFactor=4;magnifierSize=160;
+ applyStudioProjectDocument({project:{width:32,height:32,layers:blankLayers,active:0,selection:null,groups:{},palette,color,tool,imageImported,settings:{
+  zoom:100,brushSize:1,fadeIntensity:50,mixBrushStrength:60,viewRotation:0,
+  guideState,guideHighContrast:true,magnifierFactor:4,magnifierSize:160,bucket:"contiguous",tolerance:0,
+  symmetry:"none",brushShape:"square",texture:"none",textureDensity:60
+ }}});
+ $("source-info").textContent="New project. Import an image or start drawing on the transparent canvas.";
+ announce("New project created. Your previous project was not changed until confirmation.");
+}
+const resetGridBeforeProjectGuard=resetGrid;
+resetGrid=async function(next){
+ if(projectHasContent()&&!(await confirmProjectReplacement("Clear the current project?","Changing the canvas size clears the current artwork and layer pixels. Download the project first if you want to keep it."))){
+  $("image-width").value=width;$("image-height").value=height;announce("Canvas change cancelled. Your current project is unchanged.");return false;
+ }
+ resetGridBeforeProjectGuard(next);return true;
+};
+$("download-project")?.addEventListener("click",downloadStudioProject);
+$("open-project")?.addEventListener("click",()=>$("project-file").click());
+$("project-file")?.addEventListener("change",e=>openStudioProjectFile(e.target.files&&e.target.files[0]));
+$("new-project")?.addEventListener("click",startNewStudioProject);
+$("clear-canvas")?.addEventListener("click",e=>{
+ e.stopImmediatePropagation();
+ (async()=>{
+  if(adv.layers[adv.active].locked){announce("Layer is locked. Unlock it before clearing.");return;}
+  if(projectHasContent()&&!(await confirmProjectReplacement("Clear the active layer?","The active layer's selected artwork will be cleared. Download the project first if you want to keep it."))){announce("Clear cancelled. Your current project is unchanged.");return;}
+  const before=histAdv();pixels=pixels.map((value,index)=>!adv.selection||adv.selection[index]?null:value);
+  adv.layers[adv.active].pixels=pixels.slice();commitHistory(before);render();announce("Active layer cleared.");
+ })();
+},true);
+$("adv-clear")?.addEventListener("click",e=>{
+ e.stopImmediatePropagation();
+ (async()=>{
+  if(adv.layers[adv.active].locked){announce("Layer is locked.");return;}
+  if(projectHasContent()&&!(await confirmProjectReplacement("Clear the active layer?","The active layer's selected artwork will be cleared. Download the project first if you want to keep it."))){announce("Clear cancelled. Your current project is unchanged.");return;}
+  const before=histAdv();pixels=pixels.map((value,index)=>!adv.selection||adv.selection[index]?null:value);
+  adv.layers[adv.active].pixels=pixels.slice();commitHistory(before);render();announce("Active layer cleared.");
+ })();
+},true);
 
 })();
