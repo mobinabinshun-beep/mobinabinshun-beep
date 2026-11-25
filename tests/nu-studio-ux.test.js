@@ -144,4 +144,5 @@ test("Project portability exposes versioned save/open and explicit safe replacem
  assert.match(runtime,/Project opening cancelled\. Your current project is unchanged\./);
  assert.match(runtime,/Image import cancelled\. Your current project is unchanged\./);
  assert.match(runtime,/resetGridBeforeProjectGuard=resetGrid/);
+ assert.match(runtime,/e\.target\?\.closest\?\.\("#studio-project-confirm"\)\)return/);
 });
