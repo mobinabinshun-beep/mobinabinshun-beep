@@ -2,6 +2,7 @@
 """Cross-browser Studio smoke and color-mixing interaction checks for CI."""
 import argparse
 import asyncio
+import json
 import re
 from urllib.parse import urljoin
 
@@ -632,6 +633,105 @@ async def check_touch(browser, base_url):
     await context.close()
 
 
+async def check_project_portability(browser, base_url, viewport):
+    context = await browser.new_context(viewport=viewport)
+    page = await context.new_page()
+    errors = []
+    page.on("pageerror", lambda error: errors.append(str(error)))
+    response = await page.goto(urljoin(base_url.rstrip("/") + "/", "pixel-art-studio.html"), wait_until="domcontentloaded", timeout=60000)
+    assert response and response.status == 200, "Project test could not load Studio"
+    await page.locator("#pixel-canvas").wait_for(state="visible", timeout=30000)
+
+    drawer = page.locator("#studio-tools-drawer")
+    if not await drawer.is_visible():
+        toggle_id = "#mobile-tools-toggle" if viewport["width"] <= 700 else "#desktop-tools-toggle"
+        await page.locator(toggle_id).click()
+    await page.locator("#studio-properties-panel").evaluate("el => { el.open = true; }")
+    await page.locator("#tab-pro").click()
+    await page.locator("#adv-layers button[aria-label='Select Layer 1']").wait_for(state="visible")
+
+    await page.locator("#show-grid").evaluate("el => { el.checked = false; }")
+    await set_color(page, "#ff0000")
+    await click_cell(page, 2, 2)
+    layer_one_pixel = await read_pixel(page, 2, 2)
+
+    await page.locator("#adv-layers button[aria-label='Select Layer 2']").click()
+    await set_color(page, "#00ff00")
+    await click_cell(page, 4, 4)
+    layer_two_row = page.locator("#adv-layers .adv-layer").nth(1)
+    await layer_two_row.locator("input[type='range']").evaluate("el => { el.value='65'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
+    await layer_two_row.locator("select").nth(0).select_option("screen")
+    await page.locator("#pro-group-target").select_option("Group A")
+    await page.locator("#pro-group-opacity").evaluate("el => { el.value='80'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
+    await page.locator("#pro-group-assign").click()
+    await page.locator("#pro-select-all").click()
+    await page.locator("#pro-mask-add").click()
+
+    async with page.expect_download() as download_info:
+        await page.locator("#download-project").click()
+    download = await download_info.value
+    project_path = await download.path()
+    assert project_path, "Project download did not produce a local file"
+    with open(project_path, "r", encoding="utf-8") as stream:
+        project_data = json.load(stream)
+    project = project_data["project"]
+    assert project_data["format"] == "N.U-Pixel-Art-Studio-Project" and project_data["version"] == 1
+    assert len(project["layers"]) == 4 and len(project["layers"][1]["pixels"]) == 32 * 32
+    assert project["layers"][1]["mask"] and len(project["layers"][1]["mask"]) == 32 * 32
+    assert project["selection"] and len(project["selection"]) == 32 * 32
+    assert project["layers"][1]["blend"] == "screen" and project["layers"][1]["group"] == "Group A"
+    assert project["groups"]["Group A"]["opacity"] == 80
+    assert project["layers"][1]["opacity"] == 65 and project["active"] == 1
+
+    await set_color(page, "#0000ff")
+    await click_cell(page, 6, 6)
+    blue_pixel = await read_pixel(page, 6, 6)
+    await page.locator("#project-file").set_input_files(project_path)
+    await page.locator("#studio-project-confirm").wait_for(state="visible", timeout=5000)
+    await page.locator("#studio-project-confirm button[value='cancel']").click()
+    assert await read_pixel(page, 6, 6) == blue_pixel, "Cancelling project replacement changed current artwork"
+
+    await page.locator("#project-file").set_input_files(project_path)
+    await page.locator("#studio-project-confirm").wait_for(state="visible", timeout=5000)
+    await page.locator("#studio-project-confirm button[value='confirm']").click()
+    await page.wait_for_function("() => document.querySelector('#studio-status')?.textContent.includes('Project opened')")
+    assert await read_pixel(page, 2, 2) == layer_one_pixel, "Layer 1 pixel did not round-trip exactly"
+    assert await read_pixel(page, 6, 6) != blue_pixel, "Opening the saved project did not replace later unsaved edits"
+    restored_row = page.locator("#adv-layers .adv-layer").nth(1)
+    assert await restored_row.locator("input[type='range']").input_value() == "65", "Layer opacity was not restored"
+    assert await restored_row.locator("select").nth(0).input_value() == "screen", "Layer blend mode was not restored"
+    assert await restored_row.locator("select").nth(1).input_value() == "Group A", "Layer group was not restored"
+    assert "Mask active" in await restored_row.inner_text(), "Layer mask was not restored"
+    assert await page.locator("#adv-layers button[aria-label='Select Layer 2']").get_attribute("aria-pressed") == "true", "Active layer was not restored"
+
+    await page.locator("#new-project").click()
+    await page.locator("#studio-project-confirm").wait_for(state="visible", timeout=5000)
+    await page.locator("#studio-project-confirm button[value='cancel']").click()
+    assert await read_pixel(page, 2, 2) == layer_one_pixel, "Cancelling New Project changed the current project"
+
+    await page.locator("#clear-canvas").evaluate("el => { const section=el.closest('details'); if(section)section.open=true; }")
+    await page.locator("#clear-canvas").scroll_into_view_if_needed()
+    await page.locator("#clear-canvas").click()
+    await page.locator("#studio-project-confirm").wait_for(state="visible", timeout=5000)
+    await page.locator("#studio-project-confirm button[value='cancel']").click()
+    assert await read_pixel(page, 2, 2) == layer_one_pixel, "Cancelling Clear changed the current project"
+
+    await page.locator("#new-canvas").click()
+    await page.locator("#studio-project-confirm").wait_for(state="visible", timeout=5000)
+    await page.locator("#studio-project-confirm button[value='cancel']").click()
+    assert await read_pixel(page, 2, 2) == layer_one_pixel, "Cancelling New Canvas changed the current project"
+
+    await page.locator("#project-file").set_input_files({
+        "name": "broken.nuproj",
+        "mimeType": "application/json",
+        "buffer": b"{not valid json"
+    })
+    await page.wait_for_function("() => document.querySelector('#studio-status')?.textContent.includes('Project could not be opened')")
+    assert await read_pixel(page, 2, 2) == layer_one_pixel, "Malformed project file partially replaced the current project"
+    assert not errors, f"Uncaught browser errors during project portability test: {errors}"
+    await context.close()
+
+
 async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--base-url", default="http://127.0.0.1:8765")
@@ -647,6 +747,8 @@ async def main():
             await check_entry_pages(browser, args.base_url, {"width": 1280, "height": 900})
             await check_studio(browser, args.base_url, {"width": 1280, "height": 900}, args.require_mix)
             await check_studio(browser, args.base_url, {"width": 390, "height": 844}, args.require_mix)
+            await check_project_portability(browser, args.base_url, {"width": 1280, "height": 900})
+            await check_project_portability(browser, args.base_url, {"width": 390, "height": 844})
             if args.browser == "chromium" and not args.live:
                 await check_touch(browser, args.base_url)
         finally:
