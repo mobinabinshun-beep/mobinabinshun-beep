@@ -649,7 +649,7 @@ async def check_project_portability(browser, base_url, viewport):
         toggle_id = "#mobile-tools-toggle" if viewport["width"] <= 700 else "#desktop-tools-toggle"
         await page.locator(toggle_id).click()
     await page.locator("#studio-properties-panel").evaluate("el => { el.open = true; }")
-    await page.locator("#tab-pro").click()
+    await page.locator("#tab-layers").click()
     await page.locator("#adv-layers button[aria-label='Select Layer 1']").wait_for(state="visible")
 
     await page.locator("#show-grid").evaluate("el => { el.checked = false; }")
@@ -663,6 +663,7 @@ async def check_project_portability(browser, base_url, viewport):
     layer_two_row = page.locator("#adv-layers .adv-layer").nth(1)
     await layer_two_row.locator("input[type='range']").evaluate("el => { el.value='65'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
     await layer_two_row.locator("select").nth(0).select_option("screen")
+    await page.locator("#tab-pro").click()
     await page.locator("#pro-group-target").select_option("Group A")
     await page.locator("#pro-group-opacity").evaluate("el => { el.value='80'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
     await page.locator("#pro-group-assign").click()
@@ -699,6 +700,7 @@ async def check_project_portability(browser, base_url, viewport):
     await page.wait_for_function("() => document.querySelector('#studio-status')?.textContent.includes('Project opened')")
     assert await read_pixel(page, 2, 2) == layer_one_pixel, "Layer 1 pixel did not round-trip exactly"
     assert await read_pixel(page, 6, 6) != blue_pixel, "Opening the saved project did not replace later unsaved edits"
+    await page.locator("#tab-layers").click()
     restored_row = page.locator("#adv-layers .adv-layer").nth(1)
     assert await restored_row.locator("input[type='range']").input_value() == "65", "Layer opacity was not restored"
     assert await restored_row.locator("select").nth(0).input_value() == "screen", "Layer blend mode was not restored"
@@ -711,6 +713,7 @@ async def check_project_portability(browser, base_url, viewport):
     await page.locator("#studio-project-confirm button[value='cancel']").click()
     assert await read_pixel(page, 2, 2) == layer_one_pixel, "Cancelling New Project changed the current project"
 
+    await page.locator("#tab-palette").click()
     await page.locator("#clear-canvas").evaluate("el => { const section=el.closest('details'); if(section)section.open=true; }")
     await page.locator("#clear-canvas").scroll_into_view_if_needed()
     await page.locator("#clear-canvas").click()
