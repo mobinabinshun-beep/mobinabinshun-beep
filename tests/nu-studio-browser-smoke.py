@@ -683,7 +683,7 @@ async def check_project_portability(browser, base_url, viewport):
     await page.locator("#pro-group-assign").click()
     await open_tab("tab-pro")
     await select_tool(page, "selection", "select-rect")
-    await open_tab("tab-pro")
+    await open_tab("tab-palette")
     await page.locator("#pro-select-all").click()
     await open_tab("tab-pro")
     await page.locator("#pro-mask-add").click()
