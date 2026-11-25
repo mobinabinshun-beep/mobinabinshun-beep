@@ -180,20 +180,20 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     await page.locator('#studio-quick-tools ').locator('[data-tool="fill"]').click()
     assert await page.locator("#adv-bucket").is_visible(), "Fill settings must return when Fill is reselected"
     await fill_toggle.click()
-    before_fill = await read_pixel(page, 0, 0)
-    await click_cell(page, 0, 0)
-    assert await read_pixel(page, 0, 0) == [0, 255, 0], "Fill did not color the clicked transparent pixel"
+    before_fill = await read_pixel(page, 8, 8)
+    await click_cell(page, 8, 8)
+    assert await read_pixel(page, 8, 8) == [0, 255, 0], "Fill did not color the clicked transparent pixel"
     assert await read_pixel(page, 31, 31) == [0, 255, 0], "Fill did not cover the connected transparent canvas"
     await fill_toggle.click()
     fill_button = page.locator('#studio-quick-tools [data-tool="fill"]')
     assert await fill_button.get_attribute("aria-pressed") == "true", "Fill tool lost its active state after the first fill"
     await fill_button.click()  # Explicitly reselect before verifying same-color no-op behavior.
     await fill_toggle.click()
-    await click_cell(page, 31, 31)
+    await click_cell(page, 8, 8)
     status = await page.locator("#studio-status").text_content()
     assert "already uses the selected color" in (status or ""), f"Same-color Fill did not explain its no-op: {status}"
     await page.locator("#undo").click()
-    after_undo = await read_pixel(page, 0, 0)
+    after_undo = await read_pixel(page, 8, 8)
     assert after_undo == before_fill, f"One Undo did not restore the pre-Fill transparent canvas: before={before_fill}, after={after_undo}"
     await page.locator("#redo").click()
     assert await read_pixel(page, 31, 31) == [0, 255, 0], "Redo did not restore the full-canvas Fill"
@@ -206,8 +206,8 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     lock = page.get_by_label("Lock Layer 1")
     await lock.check()
     await fill_toggle.click()
-    await click_cell(page, 0, 0)
-    locked_pixel = await read_pixel(page, 0, 0)
+    await click_cell(page, 8, 8)
+    locked_pixel = await read_pixel(page, 8, 8)
     status = await page.locator("#studio-status").text_content()
     assert locked_pixel == before_fill, "Fill changed a locked layer"
     assert "Layer is locked" in (status or ""), f"Locked Fill did not explain why it stopped: {status}"
