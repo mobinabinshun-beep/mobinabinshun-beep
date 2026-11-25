@@ -196,3 +196,28 @@ No viewport/Magnifier, project portability, Perspective/Depth, export redesign, 
 
 ## Handoff
 Stages 1–4 are MACHINE-PASS at their recorded exact SHAs. Stage 5 scope is documented above and is ready for a pre-change checkpoint. No Stage 5 runtime write has started. The aggregate package remains IN-PROGRESS; no final candidate backup, demo deployment, human QA handoff or owner acceptance is claimed.
+
+
+## Stage 6 — Clean public welcome and progressive tool categories
+
+- Owner scope opened in Repository Issue #68 comment on 2026-11-25.
+- Stage 5 frozen parent: `70746d1c5ecb5d7b14b1f9fda1e1ee14c7e9422d`; its verified backup remains immutable.
+- Stage 6 initial implementation commit: `289a9fdc3ebfd2eba909d41083873a5069a1603b`.
+- Stage 6 initial CI run `45533401762`: FAIL. This was caused by stale assertions that still required the superseded public QA banner and old ungrouped tool labels/metadata; it did not establish a runtime failure. Browser matrix was skipped because the Studio unit gate failed.
+- A pre-repair recovery ref was created at the exact initial Stage 6 implementation SHA: `backup/pre-studio-stage6-clean-welcome-2026-11-25`.
+
+### Implemented Stage 6 scope
+- Public intro is now exactly `Welcome to N.U — Public Test Demo`; internal QA/build labels and `GEN 01` are removed from the product page.
+- Five accessible tool categories are present: Draw, Shapes, Selection, Effects and View. Only the selected category's tools are shown; selecting a tool switches to its owning category.
+- Category tabs expose tab semantics, keyboard left/right navigation and selected-state/tabindex updates.
+- Tool names, visible labels and decorative icon semantics remain explicit; tool-specific context settings and prior Fill/Compass/Magnifier behavior are retained.
+
+### Directly coupled regression-test repair
+- `tests/nu-studio-ux.test.js`: replace stale “Quick tools / Canvas tools” copy assertions with the new dock/category labels; update Magnifier and Compass metadata assertions to include their owning categories.
+- `tests/nu-studio-advanced-tools.test.js`: replace the old requirement to display `TEST CANDIDATE / NOT HUMAN-APPROVED / DEMO QA ONLY` with the newer owner-approved clean welcome requirement, while retaining assertions that Fading Brush and Color-Mixing Brush remain available.
+- The second test file was added to the Stage 6 direct test allow-list because the first complete regression run proved its legacy banner assertion conflicts with the 2026-11-24 clean-public-UI owner principle. No product behavior was changed to satisfy a stale internal-banner test.
+
+### Current verification
+- Reruns are in progress on the successor branch after the assertion updates; no Stage 6 MACHINE-PASS is claimed until the exact final SHA completes the Studio unit suite, full 3-OS × 3-browser matrix and cross-project regression gates.
+- Stage 1–5 machine evidence remains bound to its own exact SHAs; Stage 5 candidate remains frozen.
+- Aggregate package remains IN-PROGRESS. No final package backup, public demo deployment, live build verification, HUMAN-QA-PENDING handoff or owner acceptance is claimed.
