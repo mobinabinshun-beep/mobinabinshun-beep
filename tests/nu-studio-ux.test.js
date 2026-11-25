@@ -64,7 +64,7 @@ test("Compass is an accessible tool with a cancellable center-radius lifecycle",
  assert.match(html,/data-tool="compass"[^>]*aria-label="Compass"/);
  assert.match(runtime,/compass:\{icon:"⊙",label:"Compass"\}/);
  assert.match(runtime,/compassState=\{center:\{\.\.\.strokeStart\},edge:\{\.\.\.strokeStart\},active:true\}/);
- assert.match(runtime,/tool==="compass"\)compassState=null;render\(\)/);
+ assert.match(runtime,/if\(tool==="compass"\)\{compassState=null;render\(\);\}/);
  assert.match(runtime,/e\.key==="Escape"&&drawing&&tool==="compass"/);
 });
 
