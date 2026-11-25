@@ -380,6 +380,26 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     assert after_anchor_pixel == before_anchor_pixel, f"Pointer-anchored zoom shifted the source pixel: before={before_anchor_pixel}, after={after_anchor_pixel}"
     await page.locator("#fit-canvas").click()
 
+    # Zoom bounds, reduced-motion behavior and viewport resizing.
+    await page.locator("#workspace-zoom").evaluate("el => { el.value='1'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
+    assert await page.locator("#workspace-zoom").input_value() == "25", "Zoom lower bound was not enforced"
+    await page.locator("#workspace-zoom").evaluate("el => { el.value='900'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
+    assert await page.locator("#workspace-zoom").input_value() == "800", "Zoom upper bound was not enforced"
+    await page.emulate_media(reduced_motion="reduce")
+    assert await page.locator("#workspace-frame").evaluate("el => getComputedStyle(el).scrollBehavior") == "auto", "Reduced-motion preference did not disable smooth workspace scrolling"
+    if viewport["width"] > 700:
+        await page.locator("#zoom-in").click()
+        await page.locator("#zoom-out").click()
+    else:
+        await page.locator("#mobile-zoom-in").click()
+        await page.locator("#mobile-zoom-out").click()
+    await page.emulate_media(reduced_motion="no-preference")
+    await page.set_viewport_size({"width": max(320, viewport["width"] - 40), "height": viewport["height"]})
+    await page.locator("#fit-canvas").click()
+    assert await page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 1"), "Viewport resize introduced page-level horizontal overflow"
+    await page.set_viewport_size(viewport)
+    await page.locator("#fit-canvas").click()
+
     # Magnifier is view-only: it exposes controls only when selected and never changes artwork/history.
     view_toggle = page.locator("#desktop-tools-toggle" if viewport["width"] > 700 else "#mobile-tools-toggle")
     view_open_class = "nu-desktop-tools-open" if viewport["width"] > 700 else "nu-mobile-tools-open"
@@ -433,6 +453,19 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     await page.locator("#studio-magnifier").wait_for(state="visible", timeout=3000)
     assert "6×" in await page.locator("#studio-magnifier-label").inner_text(), "Magnifier strength label did not update"
     assert await page.locator("#studio-magnifier").evaluate("el => el.style.width") == "180px", "Magnifier size control did not update the lens"
+    # Pointer leaving the canvas hides the loupe; re-entering restores it.
+    await page.mouse.move(10, 10)
+    await page.locator("#studio-magnifier").wait_for(state="hidden", timeout=3000)
+    await page.mouse.move(mag_point["x"], mag_point["y"])
+    await page.locator("#studio-magnifier").wait_for(state="visible", timeout=3000)
+    # Mobile viewport also exercises the touch-pointer lifecycle without changing artwork.
+    if viewport["width"] <= 700:
+        await page.locator("#pixel-canvas").dispatch_event("pointerdown", {"clientX": mag_point["x"], "clientY": mag_point["y"], "pointerId": 17, "pointerType": "touch", "button": 0, "buttons": 1, "isPrimary": True, "bubbles": True})
+        await page.locator("#studio-magnifier").wait_for(state="visible", timeout=3000)
+        await page.locator("#pixel-canvas").dispatch_event("pointermove", {"clientX": mag_point["x"] + 6, "clientY": mag_point["y"] + 6, "pointerId": 17, "pointerType": "touch", "buttons": 1, "isPrimary": True, "bubbles": True})
+        assert await page.locator("#studio-magnifier").is_visible(), "Touch pointer movement did not keep Magnifier visible"
+        await page.locator("#pixel-canvas").dispatch_event("pointerup", {"clientX": mag_point["x"] + 6, "clientY": mag_point["y"] + 6, "pointerId": 17, "pointerType": "touch", "buttons": 0, "isPrimary": True, "bubbles": True})
+        await page.locator("#studio-magnifier").wait_for(state="hidden", timeout=3000)
     assert await read_pixel(page, 4, 4) == pixel_before_magnifier, "Magnifier modified artwork pixels"
     assert await page.locator("#undo").is_enabled() == undo_before_magnifier, "Magnifier created an undo history entry"
     await page.keyboard.press("Escape")
@@ -440,6 +473,8 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     await page.locator("#studio-dock").wait_for(state="hidden", timeout=3000)
     await view_toggle.click()
     await page.locator("#studio-dock").wait_for(state="visible", timeout=5000)
+    await page.locator('#studio-quick-tools [data-tool="pencil"]').click()
+    assert await page.locator("#magnifier-strength").is_hidden(), "Magnifier controls remained visible after switching to Pencil"
     await view_toggle.click()
     await page.locator("#studio-dock").wait_for(state="hidden", timeout=5000)
 
