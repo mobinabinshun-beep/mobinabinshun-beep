@@ -270,6 +270,8 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
     await page.locator("#clear-canvas").evaluate("(el) => { const section = el.closest('details'); if (section) section.open = true; }")
     await page.locator("#clear-canvas").scroll_into_view_if_needed()
     await page.locator("#clear-canvas").click()
+    await page.locator("#studio-project-confirm").wait_for(state="visible", timeout=5000)
+    await page.locator("#studio-project-confirm button[value='confirm']").click()
     await page.locator("#studio-tools-drawer").evaluate("(el) => { el.scrollTop = 0; }")
     await page.locator("#studio-dock").wait_for(state="visible", timeout=5000)
     await set_color(page, "#ff0000")
