@@ -768,8 +768,10 @@ function projectHasContent(){
  )||!!(adv.selection&&adv.selection.some(Boolean))||Object.keys(adv.groups).length>0||
   palette.join("|")!==defaults.join("|")||color!=="#e8b94f"||tool!=="pencil"||imageImported||
   workspace.zoom!==100||brushSize!==1||fadeIntensity!==50||mixBrushStrength!==60||viewRotation!==0||
-  Object.values(guideState).some(Boolean)||!guideHighContrast||magnifierFactor!==4||magnifierSize!==160||
-  adv.bucket!=="contiguous"||adv.tol!==0||adv.symmetry!=="none"||adv.brushShape!=="square"||adv.texture!=="none"||adv.textureDensity!==60;
+  Object.values(guideState).some(Boolean)||!guideHighContrast||$("show-grid")?.checked===false||magnifierFactor!==4||magnifierSize!==160||
+  adv.bucket!=="contiguous"||adv.tol!==0||adv.symmetry!=="none"||adv.brushShape!=="square"||adv.texture!=="none"||adv.textureDensity!==60||
+  $("pro-gradient-color")?.value!=="#65dcff"||$("pro-gradient-mode")?.value!=="linear"||Number($("pro-curve")?.value)!==24||
+  Number($("adv-alpha")?.value)!==100||Number($("pro-scale-x")?.value)!==2||Number($("pro-scale-y")?.value)!==2;
 }
 async function confirmProjectReplacement(title,message){
  const dialog=$("studio-project-confirm");
@@ -794,9 +796,12 @@ function buildStudioProjectDocument(){
   sourceInfo:$("source-info")?.textContent||"",
   settings:{
    zoom:workspace.zoom,brushSize,fadeIntensity,mixBrushStrength,viewRotation,
-   guideState:{...guideState},guideHighContrast,magnifierFactor,magnifierSize,
+   guideState:{...guideState},guideHighContrast,showGrid:$("show-grid")?.checked!==false,magnifierFactor,magnifierSize,
    bucket:adv.bucket,tolerance:adv.tol,symmetry:adv.symmetry,brushShape:adv.brushShape,
-   texture:adv.texture,textureDensity:adv.textureDensity
+   texture:adv.texture,textureDensity:adv.textureDensity,
+   gradientColor:$("pro-gradient-color")?.value||"#65dcff",gradientMode:$("pro-gradient-mode")?.value||"linear",
+   curveTension:Number($("pro-curve")?.value)||24,alpha:Number($("adv-alpha")?.value)||100,
+   selectionScaleX:Number($("pro-scale-x")?.value)||2,selectionScaleY:Number($("pro-scale-y")?.value)||2
   }
  };
  return window.NUStudioProTools.validateStudioProject({format:STUDIO_PROJECT_FORMAT,version:STUDIO_PROJECT_VERSION,createdAt:new Date().toISOString(),project},{maxPixels:cellLimit()});
@@ -827,6 +832,9 @@ function syncStudioProjectControls(p){
  const fade=document.querySelector('[aria-label="Fading brush intensity"]');if(fade)fade.value=String(fadeIntensity);
  document.querySelectorAll("[data-guide]").forEach(input=>{input.checked=!!guideState[input.dataset.guide];});
  const contrast=document.querySelector("[data-guide-contrast]");if(contrast)contrast.checked=guideHighContrast;
+ const gridToggle=$("show-grid");if(gridToggle)gridToggle.checked=s.showGrid;
+ setValue("pro-gradient-color",s.gradientColor);setValue("pro-gradient-mode",s.gradientMode);setValue("pro-curve",s.curveTension);
+ setValue("adv-alpha",s.alpha);setValue("pro-scale-x",s.selectionScaleX);setValue("pro-scale-y",s.selectionScaleY);
  const maskEdit=$("pro-mask-edit");if(maskEdit)maskEdit.checked=false;adv.maskEdit=false;
  const groupTarget=$("pro-group-target");if(groupTarget)groupTarget.value=adv.layers[adv.active].group||"Ungrouped";
  const group=adv.groups[groupTarget?.value||"Ungrouped"]||{visible:true,opacity:100};setValue("pro-group-opacity",group.opacity);
@@ -871,8 +879,9 @@ async function startNewStudioProject(){
  guideState={blueprint:false,ruler:false,divisions:false,axes:false,depth:false};guideHighContrast=true;magnifierFactor=4;magnifierSize=160;
  applyStudioProjectDocument({project:{width:32,height:32,layers:blankLayers,active:0,selection:null,groups:{},palette,color,tool,imageImported,settings:{
   zoom:100,brushSize:1,fadeIntensity:50,mixBrushStrength:60,viewRotation:0,
-  guideState,guideHighContrast:true,magnifierFactor:4,magnifierSize:160,bucket:"contiguous",tolerance:0,
-  symmetry:"none",brushShape:"square",texture:"none",textureDensity:60
+  guideState,guideHighContrast:true,showGrid:true,magnifierFactor:4,magnifierSize:160,bucket:"contiguous",tolerance:0,
+  symmetry:"none",brushShape:"square",texture:"none",textureDensity:60,
+  gradientColor:"#65dcff",gradientMode:"linear",curveTension:24,alpha:100,selectionScaleX:2,selectionScaleY:2
  }}});
  $("source-info").textContent="New project. Import an image or start drawing on the transparent canvas.";
  announce("New project created. Your previous project was not changed until confirmation.");
