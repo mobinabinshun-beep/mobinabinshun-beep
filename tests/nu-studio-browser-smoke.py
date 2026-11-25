@@ -298,7 +298,7 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
         if not drawer_is_open:
             await mix_drawer_toggle.click()
             await page.wait_for_function(
-                "(className) => document.body.classList.contains(className)", drawer_open_class, timeout=5000
+                "(className) => document.body.classList.contains(className)", arg=drawer_open_class, timeout=5000
             )
         await page.locator("#studio-dock").wait_for(state="visible", timeout=5000)
         assert await page.locator('#studio-quick-tools [data-tool="color-mix-brush"]').count() == 1, "Color-mixing brush tool is missing"
