@@ -128,3 +128,20 @@ test("Public demo exposes only the approved welcome intro and accessible progres
  assert.match(runtime,/e\.key!=="ArrowRight"&&e\.key!=="ArrowLeft"/);
  assert.match(runtime,/role="tablist" aria-label="Tool categories"/);
 });
+
+test("Project portability exposes versioned save/open and explicit safe replacement",()=>{
+ for(const id of ["studio-project-actions","download-project","open-project","new-project","project-file","studio-project-confirm","studio-project-confirm-title","studio-project-confirm-message"]){
+  assert.ok(html.includes('id="'+id+'"'),id);
+ }
+ assert.match(html,/accept="\.nuproj,application\/json"/);
+ assert.match(html,/value="cancel"/);
+ assert.match(html,/value="confirm"/);
+ assert.match(runtime,/STUDIO_PROJECT_FORMAT="N\.U-Pixel-Art-Studio-Project"/);
+ assert.match(runtime,/STUDIO_PROJECT_VERSION=1/);
+ assert.match(runtime,/validateStudioProject/);
+ assert.match(runtime,/function buildStudioProjectDocument\(\)/);
+ assert.match(runtime,/function applyStudioProjectDocument\(documentData\)/);
+ assert.match(runtime,/Project opening cancelled\. Your current project is unchanged\./);
+ assert.match(runtime,/Image import cancelled\. Your current project is unchanged\./);
+ assert.match(runtime,/resetGridBeforeProjectGuard=resetGrid/);
+});
