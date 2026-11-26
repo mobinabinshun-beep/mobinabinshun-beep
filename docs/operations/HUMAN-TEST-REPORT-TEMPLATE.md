@@ -66,3 +66,10 @@ A test report is HUMAN-QA-PASSED only when device, OS, browser, viewport, input 
 | Mobile / accessibility | Chart remains legible; selector and links work with touch and keyboard | | | |
 
 **Exchange chart interpretation:** this candidate plots local asset-balance history, not market prices or exchange rates. Do not report the line as a market valuation or profit/loss curve. The current ledger retains at most 40 transactions, and balances are browser-local.
+
+
+## N.U Game Studio game-QA evidence ledger
+
+For games produced by **N.U Game Studio** only, use this canonical template for each human test session. Store the completed session record and linked findings in the private [Manual-Testing-and-Reporting-Log](https://github.com/mobinabinshun-beep/Manual-Testing-and-Reporting-Log).
+
+The ledger is owned by N.U Game Studio and is not the QA system for all N.U/Niroo products or other Bishun Studio departments. It records human observations and retests for this department's games only; this template remains the single canonical editable report template. Owner acceptance and product-release decisions remain separate.
