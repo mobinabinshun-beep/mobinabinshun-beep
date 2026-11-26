@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://niroo-universe.invalid/schemas/nu-module-v1.schema.json",
+  "title": "N.U Module Manifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["manifestVersion", "id", "name", "generation", "platforms", "entry", "abi"],
+  "properties": {
+    "manifestVersion": { "const": 1 },
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,63}$" },
+    "name": { "type": "string", "minLength": 1, "maxLength": 100 },
+    "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+([+-][A-Za-z0-9.-]+)?$" },
+    "generation": { "type": "integer", "minimum": 1 },
+    "platforms": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["windows-x86", "windows-x64", "linux-x64", "macos-arm64", "macos-x64", "android-arm64", "ios-arm64", "web"] } },
+    "entry": { "type": "string", "minLength": 1, "maxLength": 240 },
+    "abi": { "type": "string", "pattern": "^nu-module/[0-9]+$" },
+    "requires": { "type": "array", "items": { "type": "object", "required": ["id", "range"], "properties": { "id": { "type": "string" }, "range": { "type": "string" } }, "additionalProperties": false } },
+    "capabilities": { "type": "array", "uniqueItems": true, "items": { "enum": ["render.2d", "render.web", "input.pointer", "input.keyboard", "storage.module", "network.http", "audio.output"] } },
+    "resourceHints": { "type": "object", "properties": { "memoryMiB": { "type": "integer", "minimum": 1 }, "cpuWeight": { "type": "integer", "minimum": 1, "maximum": 100 }, "targetFps": { "type": "integer", "minimum": 1, "maximum": 120 } }, "additionalProperties": false },
+    "integrity": { "type": "object", "required": ["algorithm", "digest"], "properties": { "algorithm": { "const": "sha256" }, "digest": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" } }, "additionalProperties": false },
+    "publisherSignature": { "type": "string", "description": "Detached signature over canonical manifest and package digest; required before production distribution." }
+  }
+}
