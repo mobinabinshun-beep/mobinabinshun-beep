@@ -1,0 +1,56 @@
+name: N.U Launcher — Windows x86 installer
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/xp-safe-native-launcher-v0.1
+    paths:
+      - "launcher/native/**"
+      - "installer/**"
+      - ".github/workflows/launcher-windows-x86.yml"
+      - "assets/Original reference image file for Niroo Universe (N.U).png"
+permissions:
+  contents: read
+jobs:
+  build-windows-x86:
+    runs-on: windows-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Install 32-bit MinGW toolchain
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW32
+          update: true
+          install: mingw-w64-i686-gcc
+      - name: Prepare payload and compile XP-targeted executable
+        shell: msys2 {0}
+        run: |
+          mkdir -p dist/payload/assets
+          cp "assets/Original reference image file for Niroo Universe (N.U).png" "dist/payload/assets/"
+          g++ launcher/native/nu-launcher-win32.cpp \
+            -std=c++11 -O2 -municode -mwindows \
+            -static -static-libgcc -static-libstdc++ \
+            -Wl,--major-subsystem-version,5 \
+            -Wl,--minor-subsystem-version,1 \
+            -o "dist/payload/N.U Launcher.exe" \
+            -lgdiplus -lshell32 -luser32 -lgdi32
+          objdump -f "dist/payload/N.U Launcher.exe"
+          objdump -p "dist/payload/N.U Launcher.exe" | grep -E "Subsystem|MajorSubsystemVersion|MinorSubsystemVersion"
+      - name: Install NSIS
+        shell: pwsh
+        run: choco install nsis --yes --no-progress
+      - name: Build setup executable
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist | Out-Null
+          & "${env:ProgramFiles(x86)}\NSIS\makensis.exe" /V3 "/DAPP_VERSION=0.1.0" installer/NULauncher.nsi
+          if ($LASTEXITCODE -ne 0) { throw "NSIS build failed" }
+          Get-Item "dist/N.U-Launcher-Setup-0.1.0-x86.exe" | Format-List Name,Length
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: N.U-Launcher-Setup-0.1.0-x86
+          path: dist/N.U-Launcher-Setup-0.1.0-x86.exe
+          if-no-files-found: error
+          retention-days: 30
