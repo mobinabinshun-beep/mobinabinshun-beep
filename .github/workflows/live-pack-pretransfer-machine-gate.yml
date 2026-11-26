@@ -72,6 +72,7 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
+          from urllib.parse import unquote
           import re
           root=Path(".")
           pages=["index.html","launcher.html","pixel-art-studio.html","casino.html","exchange.html","sim-pixel-demo.html","404.html"]
@@ -83,17 +84,18 @@ jobs:
               if not raw or raw.startswith(("#","http:","https:","//","data:","blob:","mailto:","tel:","javascript:")):
                   return
               raw=raw.split("#",1)[0].split("?",1)[0]
-              if not raw:
-                  return
               if raw.startswith("./"): raw=raw[2:]
               elif raw.startswith("../"): raw=str((Path(origin).parent/ raw).as_posix())
+              raw=unquote(raw)
+              if not raw:
+                  return
               p=root/raw
               if raw.endswith("/"):
                   if not p.is_dir(): missing.add(f"{origin}: {raw}")
               elif not p.is_file():
                   missing.add(f"{origin}: {raw}")
               checked+=1
-          attr=re.compile(r"""(?:src|href|poster|data|action)=["']([^"']+)["']""",re.I)
+          attr=re.compile(r"""\b(?:src|href|poster|data|action)=["']([^"']+)["']""",re.I)
           css_url=re.compile(r"""url\(\s*["']?([^)"']+)["']?\s*\)""",re.I)
           for page in pages:
               html=(root/page).read_text(encoding="utf-8")
@@ -123,8 +125,8 @@ jobs:
           assert "README.md?calibration=" not in (root/"nu-launcher.js").read_text(encoding="utf-8")
           assert "downloadHumanReport" not in (root/"nu-player-ui.js").read_text(encoding="utf-8")
           assert "wallet-human-report" not in (root/"index.html").read_text(encoding="utf-8")
-          assert "export-report" not in (root/"launcher.html").read_text(encoding="utf-8")
           assert "exportReport" not in (root/"nu-launcher.js").read_text(encoding="utf-8")
+          assert "export-report" not in (root/"launcher.html").read_text(encoding="utf-8")
           assert not missing, "Missing local runtime dependencies: " + "; ".join(sorted(missing))
           print(f"Verified {checked} local references, all service-worker assets, health/build identity and QA-report removal")
           PY
