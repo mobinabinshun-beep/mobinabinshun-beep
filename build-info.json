@@ -1,5 +1,22 @@
 {
-  "sourceCommit": "BUILD-ID-PENDING",
+  "sourceRepository": "mobinabinshun-beep/mobinabinshun-beep",
+  "sourceCommit": "2b80544b35e2be4145c6b696521859fcc46399d6",
   "status": "TEST CANDIDATE — NOT HUMAN-APPROVED",
-  "humanQa": "PENDING"
+  "machineQaStatus": "ALL-SUCCESS",
+  "machineQaRunIds": [
+    45772797074,
+    45772797046,
+    45772805072,
+    45772805055,
+    45772805075,
+    45772805233,
+    45772805125,
+    45772805097,
+    45772805077,
+    45772805263
+  ],
+  "humanQa": "PENDING",
+  "ownerProductApproval": "PENDING",
+  "baselineArchiveCommit": "a9668afc7f806aae634b0fd361f724a46a1f00b4",
+  "candidateArchiveCommit": "ffb728488fe0412f17179434f9ebf3f1eb03328c"
 }
