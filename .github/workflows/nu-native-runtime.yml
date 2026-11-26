@@ -1,0 +1,60 @@
+name: N.U Native Runtime
+on:
+  push:
+    branches:
+      - feat/nu-native-runtime-gen1-foundation
+  pull_request:
+    paths:
+      - "native/**"
+      - ".github/workflows/nu-native-runtime.yml"
+jobs:
+  portable-core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install CMake and compiler
+        run: sudo apt-get update && sudo apt-get install -y cmake build-essential
+      - name: Configure C90 build
+        run: cmake -S native -B build -DCMAKE_C_FLAGS="-Wall -Wextra -Werror -pedantic"
+      - name: Build
+        run: cmake --build build --parallel
+      - name: Run portable C90 tests
+        run: ctest --test-dir build --output-on-failure
+      - name: Validate Generation 1 pack manifest
+        run: python3 native/test_gen1_pack_manifest.py
+  win32-xp-api-cross-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install 32-bit MinGW cross compiler
+        run: sudo apt-get update && sudo apt-get install -y gcc-mingw-w64-i686 python3-pil
+      - name: Extract canonical still background image
+        run: python3 native/build.py
+      - name: Compile Win32 host with XP API target and PE subsystem 5.01
+        run: >
+          i686-w64-mingw32-gcc -std=c90 -Wall -Wextra -Werror -pedantic -Os
+          -DWINVER=0x0501 -D_WIN32_WINNT=0x0501
+          native/nu_runtime.c native/win32_host.c
+          -o dist/NULauncher.exe -mwindows -lcomdlg32 -lgdi32
+          -Wl,--major-subsystem-version,5 -Wl,--minor-subsystem-version,1
+      - name: Inspect PE subsystem
+        run: |
+          i686-w64-mingw32-objdump -p dist/NULauncher.exe > pe-report.txt
+          grep -E "Subsystem|MajorSubsystemVersion|MinorSubsystemVersion|DLL Name" pe-report.txt
+          grep -Eq "MajorSubsystemVersion[[:space:]]+5" pe-report.txt
+          grep -Eq "MinorSubsystemVersion[[:space:]]+1" pe-report.txt
+      - name: Create candidate checksums
+        run: |
+          cd dist
+          sha256sum NULauncher.exe background.bmp README.txt > SHA256SUMS.txt
+      - name: Upload Windows candidate executable and static artwork
+        uses: actions/upload-artifact@v4
+        with:
+          name: nu-launcher-win32-xp-candidate
+          path: |
+            dist/NULauncher.exe
+            dist/background.bmp
+            dist/README.txt
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 14
