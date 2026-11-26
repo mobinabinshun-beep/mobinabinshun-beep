@@ -68,21 +68,68 @@ jobs:
         run: |
           grep -Fq './health.txt?nu_probe=' nu-engine.js
           grep -Fq './health.txt?calibration=' nu-launcher.js
-      - name: Verify local script and stylesheet references
+      - name: Verify dependency closure, health probes, and service-worker scope
         run: |
           python - <<'PY'
           from pathlib import Path
           import re
-          pages = ["index.html", "launcher.html", "pixel-art-studio.html", "casino.html", "exchange.html", "sim-pixel-demo.html", "404.html"]
-          refs = []
+          root=Path(".")
+          pages=["index.html","launcher.html","pixel-art-studio.html","casino.html","exchange.html","sim-pixel-demo.html","404.html"]
+          missing=set()
+          checked=0
+          def check(raw,origin):
+              global checked
+              raw=raw.strip().strip('"\\'')
+              if not raw or raw.startswith(("#","http:","https:","//","data:","blob:","mailto:","tel:","javascript:")):
+                  return
+              raw=raw.split("#",1)[0].split("?",1)[0]
+              if not raw:
+                  return
+              if raw.startswith("./"): raw=raw[2:]
+              elif raw.startswith("../"): raw=str((Path(origin).parent/ raw).as_posix())
+              p=root/raw
+              if raw.endswith("/"):
+                  if not p.is_dir(): missing.add(f"{origin}: {raw}")
+              elif not p.is_file():
+                  missing.add(f"{origin}: {raw}")
+              checked+=1
           for page in pages:
-              html = Path(page).read_text(encoding="utf-8")
-              refs.extend(re.findall(r'<script[^>]+src=["\']\./([^"\'?]+)', html))
-              refs.extend(re.findall(r'<link[^>]+href=["\']\./([^"\'?]+)', html))
-          missing = sorted({name for name in refs if not Path(name).is_file()})
-          if missing:
-              raise SystemExit("Missing local runtime references: " + ", ".join(missing))
-          print(f"Validated {len(refs)} local script/style references across {len(pages)} pages")
+              html=(root/page).read_text(encoding="utf-8")
+              for value in re.findall(r'\\b(?:src|href|poster|data|action)=["\\']([^"\\']+)["\\']',html,re.I):
+                  check(value,page)
+              for value in re.findall(r'url\\(\\s*["\\']?([^)"\\']+)["\\']?\\s*\\)',html,re.I):
+                  check(value,page)
+          for p in sorted(root.glob("*.css")):
+              css=p.read_text(encoding="utf-8")
+              for value in re.findall(r'url\\(\\s*["\\']?([^)"\\']+)["\\']?\\s*\\)',css,re.I):
+                  check(value,p.name)
+          for p in sorted(root.glob("*.svg")):
+              svg=p.read_text(encoding="utf-8")
+              for value in re.findall(r'(?:href|xlink:href)=["\\']([^"\\']+)["\\']',svg,re.I):
+                  check(value,p.name)
+          for p in sorted(root.glob("*.js")):
+              js=p.read_text(encoding="utf-8")
+              for value in re.findall(r'["\\'](\\.{1,2}/[^"\\']+)["\\']',js):
+                  check(value,p.name)
+          sw=(root/"nu-exchange-sw.js").read_text(encoding="utf-8")
+          assets=re.search(r'const APP_ASSETS=\\[(.*?)\\];',sw,re.S)
+          assert assets, "service-worker APP_ASSETS list missing"
+          for value in re.findall(r'["\\']([^"\\']+)["\\']',assets.group(1)):
+              check(value,"nu-exchange-sw.js")
+          exchange=(root/"exchange.html").read_text(encoding="utf-8")
+          assert 'navigator.serviceWorker.register("./nu-exchange-sw.js")' in exchange
+          assert "new URL(path,self.registration.scope)" in sw
+          assert './health.txt?nu_probe=' in (root/"nu-engine.js").read_text(encoding="utf-8")
+          assert './health.txt?calibration=' in (root/"nu-launcher.js").read_text(encoding="utf-8")
+          assert './build-info.json' in (root/"index.html").read_text(encoding="utf-8")
+          assert (root/"health.txt").is_file() and "status=ok" in (root/"health.txt").read_text(encoding="utf-8")
+          assert (root/"build-info.json").is_file()
+          assert "README.md?nu_probe=" not in (root/"nu-engine.js").read_text(encoding="utf-8")
+          assert "README.md?calibration=" not in (root/"nu-launcher.js").read_text(encoding="utf-8")
+          assert "downloadHumanReport" not in (root/"nu-player-ui.js").read_text(encoding="utf-8")
+          assert "exportReport" not in (root/"nu-launcher.js").read_text(encoding="utf-8")
+          assert not missing, "Missing local runtime dependencies: " + "; ".join(sorted(missing))
+          print(f"Verified {checked} local references, all service-worker assets, health/build identity and QA-report removal")
           PY
       - name: Run complete Node regression suite
         run: node --test tests/*.test.js
