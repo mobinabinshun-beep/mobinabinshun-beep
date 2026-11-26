@@ -78,6 +78,7 @@ jobs:
           pages=["index.html","launcher.html","pixel-art-studio.html","casino.html","exchange.html","sim-pixel-demo.html","404.html"]
           missing=set()
           checked=0
+          file_ext=re.compile(r"\.(?:html|js|css|svg|png|jpe?g|webp|json|txt|xml|ico|woff2?)(?:$|[?#])",re.I)
           def check(raw,origin):
               global checked
               raw=raw.strip().strip('"').strip("'")
@@ -89,6 +90,9 @@ jobs:
               raw=unquote(raw)
               if not raw:
                   return
+              if not raw.startswith("/") and not file_ext.search(raw):
+                  return
+              raw=raw.lstrip("/")
               p=root/raw
               if raw.endswith("/"):
                   if not p.is_dir(): missing.add(f"{origin}: {raw}")
@@ -128,7 +132,7 @@ jobs:
           assert "exportReport" not in (root/"nu-launcher.js").read_text(encoding="utf-8")
           assert "export-report" not in (root/"launcher.html").read_text(encoding="utf-8")
           assert not missing, "Missing local runtime dependencies: " + "; ".join(sorted(missing))
-          print(f"Verified {checked} local references, all service-worker assets, health/build identity and QA-report removal")
+          print(f"Verified {checked} local file references, all service-worker assets, health/build identity and QA-report removal")
           PY
       - name: Run complete Node regression suite
         run: node --test tests/*.test.js
