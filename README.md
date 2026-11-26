@@ -48,7 +48,7 @@ The public Pages site is the **experimental test lab**, not a production release
 - No online account, cloud save, cross-device synchronization, real-money payment, deposit, withdrawal or cash-out exists.
 - N-BI upgrade pricing/cost curve and X/N Credit issuance/conversion are not active because their prices/rates are not approved.
 - Shield Level 2 purchase price/path is not approved; only its runtime gate is present.
-- The visual world is a procedural pixel-art interpretation, not an approved canonical NirooCity map.
+- The visual world uses the preserved owner-supplied NirooCity source artwork as its base; the procedural renderer remains an independent fallback. Human visual acceptance of composition, scale and camera framing is still required.
 - The capability sampler is a conservative browser heuristic, not a CPU/GPU benchmark or hardware-safety guarantee.
 - Ten quality levels currently adjust the ambient renderer; per-game adaptive budgets remain future work.
 - The browser demo is not a native Windows, Android, macOS, legacy Java or downloadable offline launcher.

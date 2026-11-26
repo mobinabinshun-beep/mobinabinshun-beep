@@ -41,6 +41,14 @@ jobs:
           python -m json.tool NU-GENERATION-1-MANIFEST.json >/dev/null
           test -s health.txt
           grep -Fxq 'status=ok' health.txt
+          python - <<'PY'
+          import json
+          m=json.load(open("NU-GENERATION-1-MANIFEST.json",encoding="utf-8"))
+          g=m["graphicsRuntime"]
+          assert g["publicAssetStatus"] == "PRESENT_IN_SOURCE_AND_CANDIDATE; SHA-256 VERIFIED"
+          assert g["assetSha256"] == "901b19a90892ecc7e5185891a7d1a1e822299188043d2220650c2bd7e176ea52"
+          assert m["healthProbe"]["file"] == "health.txt"
+          PY
       - name: Verify canonical scene asset byte identity
         run: |
           set -euo pipefail
