@@ -1,0 +1,46 @@
+name: N.U Native Launcher Foundation
+
+on:
+  push:
+    branches:
+      - feature/nu-native-launcher-gen1-foundation-2026-11-17
+    paths:
+      - "native-launcher/**"
+      - ".github/workflows/nu-native-launcher.yml"
+  pull_request:
+    paths:
+      - "native-launcher/**"
+      - ".github/workflows/nu-native-launcher.yml"
+
+jobs:
+  portable-core-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile portable core smoke test
+        working-directory: native-launcher
+        run: cc -std=c89 -pedantic -Wall -Wextra -Werror -I src tests/core_smoke.c src/nu_core.c -o nu-core-smoke
+      - name: Run portable core smoke test
+        working-directory: native-launcher
+        run: ./nu-core-smoke
+
+  windows-xp-target-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install 32-bit MinGW cross compiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-mingw-w64-i686
+      - name: Build Win32 GUI executable with XP subsystem target
+        working-directory: native-launcher
+        run: |
+          mkdir -p build
+          i686-w64-mingw32-gcc -D_WIN32_WINNT=0x0501 -std=c89 -O2 -Wall -Wextra -I src src/win32_host.c src/nu_core.c -o build/nu-launcher.exe -mwindows -static -static-libgcc -Wl,--subsystem,windows:5.01 -luser32 -lgdi32 -lkernel32
+          file build/nu-launcher.exe
+      - name: Upload native launcher build
+        uses: actions/upload-artifact@v4
+        with:
+          name: nu-launcher-win32-xp-target
+          path: native-launcher/build/nu-launcher.exe
+          if-no-files-found: error
