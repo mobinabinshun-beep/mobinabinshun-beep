@@ -32,6 +32,14 @@ jobs:
           test -s site/index.html
           test -s site/health.txt
           test -s site/build-info.json
+          test "$(find site -type f | wc -l | tr -d ' ')" = "63"
+          test "$(find site -maxdepth 1 -type f -name '*.js' | wc -l | tr -d ' ')" = "38"
+          test "$(find site -maxdepth 1 -type f -name '*.css' | wc -l | tr -d ' ')" = "6"
+          test ! -e site/README.md
+          test ! -e site/LIVE-PACK-CONTRACT.md
+          test ! -e site/OWNER-SCOPE-ADDENDUM.md
+          test ! -e site/Operations
+          test ! -e site/.github
           test -s site/assets/nu-celestial-city.png
           grep -Fq 'https://mobinabinshun-beep.github.io/mobinabinshun-beep/' site/index.html
           grep -Fq 'https://mobinabinshun-beep.github.io/mobinabinshun-beep/' site/sitemap.xml
