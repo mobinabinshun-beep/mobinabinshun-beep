@@ -154,17 +154,6 @@
       row.append(title,detail);root.appendChild(row);
     });
   }
-  function buildHumanReport(){
-    const s=load(),lines=["N.U PUBLIC DEMO · HUMAN TEST REPORT","Generated: "+new Date().toISOString(),"Mode: local browser demo; no online account or cloud ledger.","Player ID: "+(s.playerId||"guest/local"),"Balances: "+NUWallet.assetRows(s).map(x=>x.label+"="+x.value).join(", "),"","RECENT WALLET TRANSACTIONS (last 24)"];
-    s.transactions.slice(-24).forEach((tx,i)=>{const deltas=Object.entries(tx.deltas||{}).filter(([,v])=>Number(v)!==0).map(([k,v])=>(Number(v)>0?"+":"")+v+" "+k).join(", ");lines.push((i+1)+". "+(tx.at||"")+" | "+(tx.title||tx.kind||"Transaction")+" | "+(tx.direction||"LOCAL")+" | "+deltas+" | game="+(tx.gameId||tx.source||"-")+" | wave="+(tx.waveId||"-")+" | roundId="+(tx.roundId||"-")+" | category="+(tx.category||"-")+" | successfulInteractions="+(tx.successfulInteractionCount??"-")+" | balance="+(tx.resultingBalance??"-")+" | idempotency="+(tx.idempotencyKey||"-"));});
-    lines.push("","MANUAL ACCEPTANCE CHECKLIST","[ ] Missed clicks do not advance the 10-success counter.","[ ] Each successful Bubble Hunt interaction adds +1 XP; exit produces one aggregate incoming XP row.","[ ] Each successful Mana Collector interaction adds +1 Mana; exit produces one aggregate incoming Mana row.","[ ] Each successful Chaos Attack shot adds +3 XP and spends 10 Mana; exit produces aggregate +XP and -Mana rows.","[ ] Completing 10 successful interactions grants +1 HP only when below 10 HP.","[ ] Exiting early keeps earned rewards and does not grant the completion HP reward.","[ ] Repeated exit/reload does not duplicate a settled Wave.","[ ] Store purchase of one Golden HP Capsule records -10 XP and +1 capsule as a separate purchase operation.","[ ] Casino uses a selected spendable wallet asset and a base wager between 1 and the available balance.","[ ] Casino wager and payout appear as separate outgoing/incoming wallet rows with one round ID.","[ ] Casino loss advances 1× → 2× → 4× → 8×; win/break-even resets to 1×; leaving resets the sequence.","","LIMITATIONS","Balances and ledger are stored in this browser's localStorage. They are test data, not real money, transferable value, server-backed identity, or cloud-synchronized records.","A downloaded report is a local snapshot prepared by this browser; it is not independently verified or submitted to N.U.","Human device, accessibility, and deployment acceptance remains required.");
-    return lines.join("\n");
-  }
-  function downloadHumanReport(){
-    const blob=new Blob([buildHumanReport()],{type:"text/plain;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");
-    a.href=url;a.download="nu-public-demo-human-test-report-"+new Date().toISOString().slice(0,10)+".txt";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
-  }
-  const reportButton=$("wallet-human-report");if(reportButton)reportButton.addEventListener("click",downloadHumanReport);
   function renderProfile(){
     if(!$("player-id"))return;
     const s=ensureIdentity(),name=safeText(s.displayName,"N.U Explorer"),callsign=safeText(s.callsign,"Unassigned");

@@ -55,7 +55,7 @@
   },
   "notes": [
     "Generation 1.32 public demo candidate (2026-11-15): N.U Casino now reads spendable assets from the shared wallet, allows a 1..balance base wager, applies the resettable 1x/2x/4x/8x double-up ladder, and records wager/payout as separate outgoing/incoming rows with a casino round ID. Existing game payout rules are preserved. Casino rounds are not core-game Waves. Local virtual demo only; no real-money flows or server ledger.",
-    "Generation 1 public demo candidate (2026-11-15): core games settle rewards and gameplay costs as per-Wave, per-asset/category local wallet rows with idempotency keys; interrupted Waves are recovered on reload. Store purchase and capsule use create separate incoming/outgoing rows. Wallet offers a local human-test report download. This is browser-local test state only; server wallet, cloud sync, production-grade idempotency and human/device acceptance remain pending.",
+    "Generation 1 public demo candidate (2026-11-15): core games settle rewards and gameplay costs as per-Wave, per-asset/category local wallet rows with idempotency keys; interrupted Waves are recovered on reload. Store purchase and capsule use create separate incoming/outgoing rows. Human acceptance evidence is collected through the separate QA process; no internal report-download control is exposed in the player UI. This is browser-local test state only; server wallet, cloud sync, production-grade idempotency and human/device acceptance remain pending.",
     "Generation 1 Exchange wallet bridge: reads the canonical nu-world-save-v1 profile, asset rows, unpriced X/N fields and recent transactions. Game manifests are discovered on launcher startup and reconciled after wallet saves / module inventory events. Protocol metadata only; no shadow wallet or settlement.",
     "Generation 1 Exchange visual refinement: adds a restrained ambient background-flow animation derived from recent local economic behavior, bounded to ±3 index points and 3 display-volume units, plus player-drawn trend/horizontal/vertical lines and shaded analysis zones. All ambient pulses and drawings are presentation-only and never write wallet transactions.",
     "Generation 1.35 candidate (2026-11-15): Gateway is the single in-game navigation gate with Back, Menu and Profile one-click actions. Opening it freezes the game round and all ambient renderers until a decision; duplicate in-game navigation buttons are hidden. The centered menu lists concise module titles with keyboard keycaps: player modules first, then Painting, Random Game and the three core games. Store-purchased assets are durably excluded from Exchange selectors and virtual market charts. Latest Exchange chart controls (zoom, grid, wicks, volume, moving average, themes, palettes and parametric bands) are preserved.",
@@ -158,7 +158,8 @@
     "offlineLauncher": false,
     "onlineAuthoritativeServices": false,
     "archiveSource": "NU-INGEST-ARCHIVE/ASSETS/NU-Celestial-City/Original reference image file for Niroo Universe (N.U).png",
-    "publicAssetStatus": "PENDING_UPLOAD_TO_EXECUTION_REPOSITORY"
+    "publicAssetStatus": "PRESENT_IN_SOURCE_AND_CANDIDATE; SHA-256 VERIFIED",
+    "assetSha256": "901b19a90892ecc7e5185891a7d1a1e822299188043d2220650c2bd7e176ea52"
   },
   "libraryTools": [
     {
@@ -315,5 +316,10 @@
       "moduleContent": "rendered-on-destination-pages"
     },
     "future": "Other sections may receive their own access-controlled Gateway analogue only after separate approval."
+  },
+  "healthProbe": {
+    "file": "health.txt",
+    "scope": "same-origin",
+    "purpose": "small reachability response used by runtime and launcher checks; contains no player data"
   }
 }
