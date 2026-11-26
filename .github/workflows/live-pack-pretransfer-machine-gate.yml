@@ -39,6 +39,7 @@ jobs:
       - name: Validate project and package manifests
         run: |
           python -m json.tool NU-GENERATION-1-MANIFEST.json >/dev/null
+          python -m json.tool build-info.json >/dev/null
           test -s health.txt
           grep -Fxq 'status=ok' health.txt
           python - <<'PY'
