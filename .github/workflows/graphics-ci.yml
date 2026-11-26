@@ -42,7 +42,8 @@ jobs:
         run: |
           set -euo pipefail
           grep -Fq 'const ASSET="./assets/nu-celestial-city.png"' nu-background-engine.js
-          if [ -f assets/nu-celestial-city.png ]; then test -s assets/nu-celestial-city.png; else echo "Canonical PNG not yet transferred; procedural fallback must remain available."; fi
+          test -s assets/nu-celestial-city.png
+          echo "901b19f01536e96f4c2fddf64e3c7e9e24c1ed63ef9d84f39e65d1bd5ec9f40b  assets/nu-celestial-city.png" | sha256sum -c -
           grep -Fq 'id="nu-background-image"' nu-background-engine.js
           grep -Fq 'z-index:var(--nu-layer-world-background,0);overflow:hidden' nu-background-engine.js
           grep -Fq 'world.insertBefore(node,world.firstChild)' nu-background-engine.js

@@ -28,7 +28,7 @@ async function sampleNetwork(){
  for(let i=0;i<4;i++){
   const started=performance.now();
   try{
-   const response=await fetch("./README.md?nu_probe="+Date.now()+"_"+i,{cache:"no-store",credentials:"same-origin"});
+   const response=await fetch("./health.txt?nu_probe="+Date.now()+"_"+i,{cache:"no-store",credentials:"same-origin"});
    if(!response.ok)throw new Error("probe failed");
    await response.arrayBuffer();
    probes.push(Math.round(performance.now()-started));

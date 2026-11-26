@@ -1,0 +1,98 @@
+name: N.U Live-Pack pre-transfer machine gate
+
+on:
+  pull_request:
+    branches:
+      - "Official-public-information-and-discovery-hub-for-N.U-(Niroo-Universe),-its-publishing-network,-projects,-publications-and-related-creative-works"
+  push:
+    branches:
+      - "Official-public-information-and-discovery-hub-for-N.U-(Niroo-Universe),-its-publishing-network,-projects,-publications-and-related-creative-works"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nu-live-pack-pretransfer-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  runtime-tests:
+    name: Runtime integrity and complete regression suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check every root JavaScript module
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' file; do
+            node --check "$file"
+          done < <(find . -maxdepth 1 -type f -name '*.js' -print0)
+      - name: Validate project and package manifests
+        run: |
+          python -m json.tool NU-GENERATION-1-MANIFEST.json >/dev/null
+          test -s health.txt
+          grep -Fxq 'status=ok' health.txt
+      - name: Verify canonical scene asset byte identity
+        run: |
+          set -euo pipefail
+          test -s assets/nu-celestial-city.png
+          echo "901b19f01536e96f4c2fddf64e3c7e9e24c1ed63ef9d84f39e65d1bd5ec9f40b  assets/nu-celestial-city.png" | sha256sum -c -
+          grep -Fq 'const ASSET="./assets/nu-celestial-city.png"' nu-background-engine.js
+      - name: Verify public UI has no internal QA banners or issue-report controls
+        run: |
+          ! grep -Eq 'PUBLIC TEST BUILD|TEST CANDIDATE — NOT HUMAN-APPROVED|REPORT STUDIO TEST|DOWNLOAD HUMAN TEST REPORT' index.html pixel-art-studio.html launcher.html
+      - name: Verify same-origin health probe wiring
+        run: |
+          grep -Fq './health.txt?nu_probe=' nu-engine.js
+          grep -Fq './health.txt?calibration=' nu-launcher.js
+      - name: Verify local script and stylesheet references
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          pages = ["index.html", "launcher.html", "pixel-art-studio.html", "casino.html", "exchange.html", "sim-pixel-demo.html", "404.html"]
+          refs = []
+          for page in pages:
+              html = Path(page).read_text(encoding="utf-8")
+              refs.extend(re.findall(r'<script[^>]+src=["\']\./([^"\'?]+)', html))
+              refs.extend(re.findall(r'<link[^>]+href=["\']\./([^"\'?]+)', html))
+          missing = sorted({name for name in refs if not Path(name).is_file()})
+          if missing:
+              raise SystemExit("Missing local runtime references: " + ", ".join(missing))
+          print(f"Validated {len(refs)} local script/style references across {len(pages)} pages")
+          PY
+      - name: Run complete Node regression suite
+        run: node --test tests/*.test.js
+
+  browser-smoke:
+    name: Chromium desktop and mobile interaction smoke
+    needs: runtime-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Playwright and Chromium
+        run: |
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Start local candidate server
+        run: |
+          python -m http.server 8765 --bind 127.0.0.1 > /tmp/nu-candidate-http.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8765/pixel-art-studio.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/nu-candidate-http.log
+          exit 1
+      - name: Verify Studio browser interactions
+        run: python tests/nu-studio-browser-smoke.py --base-url http://127.0.0.1:8765 --browser chromium --require-mix

@@ -1,0 +1,3 @@
+N.U runtime health probe
+status=ok
+purpose=same-origin reachability check
