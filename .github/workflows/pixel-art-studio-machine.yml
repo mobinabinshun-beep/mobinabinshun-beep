@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - feat/pixel-art-studio-2d-tools-2026-11-21
+      - fix/live-pack-machine-ready-2026-11-26
   pull_request:
     paths:
       - "nu-pixel-art-studio.js"
