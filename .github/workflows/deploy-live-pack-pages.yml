@@ -1,0 +1,62 @@
+name: Deploy the canonical Live-Pack to the existing N.U Pages URL
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  deploy-live-pack:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out deployment workflow repository
+        uses: actions/checkout@v4
+      - name: Fetch the one canonical Live-Pack
+        run: |
+          set -euo pipefail
+          git clone --depth 1 https://github.com/mobinabinshun-beep/Live-Pack.git site
+          echo "LIVE_PACK_COMMIT=$(git -C site rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Validate the runtime pack before publishing
+        run: |
+          set -euo pipefail
+          test -s site/index.html
+          test -s site/health.txt
+          test -s site/build-info.json
+          test -s site/assets/nu-celestial-city.png
+          grep -Fq 'https://mobinabinshun-beep.github.io/mobinabinshun-beep/' site/index.html
+          grep -Fq 'https://mobinabinshun-beep.github.io/mobinabinshun-beep/' site/sitemap.xml
+          node -e "const x=require('./site/build-info.json');if(!x.sourceCommit||x.humanQa!=='PENDING')process.exit(1)"
+          while IFS= read -r -d '' file; do node --check "$file"; done < <(find site -maxdepth 1 -type f -name '*.js' -print0)
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          root=Path("site")
+          pages=["index.html","launcher.html","pixel-art-studio.html","casino.html","exchange.html","sim-pixel-demo.html","404.html"]
+          refs=[]
+          for page in pages:
+              html=(root/page).read_text(encoding="utf-8")
+              refs += re.findall(r'<script[^>]+src=["\']\./([^"\'?]+)',html)
+              refs += re.findall(r'<link[^>]+href=["\']\./([^"\'?]+)',html)
+          missing=sorted({p for p in refs if not (root/p).is_file()})
+          if missing: raise SystemExit("Missing runtime files: "+", ".join(missing))
+          print(f"Verified {len(refs)} local references across {len(pages)} pages")
+          PY
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Upload only the canonical Live-Pack runtime
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - name: Deploy to the existing GitHub Pages project URL
+        id: deployment
+        uses: actions/deploy-pages@v4
