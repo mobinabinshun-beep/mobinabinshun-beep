@@ -101,7 +101,7 @@ jobs:
               for value in css_url.findall(html): check(value,page)
           for p in sorted(root.glob("*.css")):
               for value in css_url.findall(p.read_text(encoding="utf-8")): check(value,p.name)
-          for p in sorted(root.glob("*.svg")):
+          for p in sorted(root.rglob("*.svg")):
               svg=p.read_text(encoding="utf-8")
               for value in re.findall(r"""(?:href|xlink:href)=["']([^"']+)["']""",svg,re.I): check(value,p.name)
           for p in sorted(root.glob("*.js")):
@@ -122,6 +122,8 @@ jobs:
           assert "README.md?nu_probe=" not in (root/"nu-engine.js").read_text(encoding="utf-8")
           assert "README.md?calibration=" not in (root/"nu-launcher.js").read_text(encoding="utf-8")
           assert "downloadHumanReport" not in (root/"nu-player-ui.js").read_text(encoding="utf-8")
+          assert "wallet-human-report" not in (root/"index.html").read_text(encoding="utf-8")
+          assert "export-report" not in (root/"launcher.html").read_text(encoding="utf-8")
           assert "exportReport" not in (root/"nu-launcher.js").read_text(encoding="utf-8")
           assert not missing, "Missing local runtime dependencies: " + "; ".join(sorted(missing))
           print(f"Verified {checked} local references, all service-worker assets, health/build identity and QA-report removal")
