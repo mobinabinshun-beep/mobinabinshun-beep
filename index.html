@@ -13,6 +13,10 @@
 <script src="./nu-motion.js"></script>
 </head>
 <body>
+<div id="nu-candidate-status" role="status" style="position:relative;z-index:10000;padding:7px 12px;text-align:center;background:#172c3a;color:#d9f0ff;border-bottom:1px solid #4f829e;font:700 11px/1.5 system-ui,sans-serif;letter-spacing:.05em">TEST CANDIDATE — NOT HUMAN-APPROVED · HUMAN QA REQUIRED · SOURCE <span id="nu-build-sha">BUILD ID PENDING</span></div>
+<script>
+(async()=>{const el=document.getElementById("nu-build-sha");if(!el)return;try{const r=await fetch("./build-info.json",{cache:"no-store"});if(!r.ok)throw new Error("build identity unavailable");const d=await r.json();el.textContent=d.sourceCommit||"BUILD ID UNAVAILABLE";}catch(_){el.textContent="BUILD ID PENDING";}})();
+</script>
 <div class="world">
 <div class="sky"></div><canvas id="pixel-world" aria-hidden="true"></canvas><canvas id="world-canvas" aria-hidden="true"></canvas><div class="horizon"></div>
 <div class="shell">

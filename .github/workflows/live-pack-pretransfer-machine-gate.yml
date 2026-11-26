@@ -59,7 +59,9 @@ jobs:
       - name: Verify public UI has no internal QA banners or issue-report controls
         run: |
           ! grep -Eq 'PUBLIC TEST BUILD|REPORT STUDIO TEST|DOWNLOAD HUMAN TEST REPORT' index.html launcher.html
+          grep -Fq 'TEST CANDIDATE — NOT HUMAN-APPROVED' index.html
           grep -Fq 'TEST CANDIDATE — NOT HUMAN-APPROVED' pixel-art-studio.html
+          grep -Fq './build-info.json' index.html
           ! grep -Fq 'REPORT STUDIO TEST' pixel-art-studio.html
       - name: Verify same-origin health probe wiring
         run: |
