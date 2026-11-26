@@ -6,7 +6,7 @@ const canvas=$("pixel-canvas"),ctx=canvas.getContext("2d",{willReadFrequently:tr
 const defaults=["#111827","#243447","#3e596b","#78909c","#d8e2e8","#ffffff","#a63c50","#e45b63","#f29c67","#e8b94f","#f8dc86","#76a86c","#3f795e","#4b9cba","#5577b8","#8a6bb5"];
 let width=32,height=32,pixels=Array(width*height).fill(null),palette=defaults.slice(),color="#e8b94f",tool="pencil",drawing=false,strokeSnapshot=null,undoStack=[],redoStack=[],imageImported=false,qualityProfile=null,workspace={zoom:100},resizeLock=true,lastDimension="width",brushSize=1,strokeStart=null,sourcePreviewUrl=null,originalImportFile=null;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-let fadeIntensity=50,mixBrushStrength=60,mixBrushState=null,viewRotation=0,guideState={blueprint:false,ruler:false,divisions:false,axes:false,depth:false};
+let fadeIntensity=50,mixBrushStrength=60,mixBrushState=null,viewRotation=0,guideState={blueprint:false,ruler:false,divisions:false,axes:false,depth:false},guideHighContrast=true,compassState=null,magnifierFactor=4,magnifierSize=160,lastMagnifierPoint=null,toolContextRefresh=()=>{},activeToolCategory="draw",toolCategoryRefresh=()=>{};
 function announce(msg){$("studio-status").textContent=msg;}
 function snapshot(){return {width,height,pixels:pixels.slice()};}
 function historyLimitFor(state){return Math.max(1,Math.min(60,Math.floor(2000000/Math.max(1,state.pixels.length))));}
@@ -22,8 +22,8 @@ function updateCanvasDisplay(){
  if(!window.NUStudioLayout){announce("Workspace geometry module is unavailable. Refresh the Studio.");return;}
  const fitted=window.NUStudioLayout.fit(width,height,frame.clientWidth,frame.clientHeight,workspace.zoom,28);
  canvas.style.width=fitted.width+"px";canvas.style.height=fitted.height+"px";
- frame.style.alignItems=workspace.zoom>100?"flex-start":"center";
- frame.style.justifyContent=workspace.zoom>100?"flex-start":"center";
+ frame.style.alignItems=fitted.overflowY?"flex-start":"center";
+ frame.style.justifyContent=fitted.overflowX?"flex-start":"center";
  $("workspace-zoom").value=workspace.zoom;$("workspace-zoom-value").textContent=workspace.zoom+"%";
 }
 const renderColorCache=new Map();
@@ -45,9 +45,41 @@ function render(){
 }
 function resizeArtwork(nextW,nextH,method="nearest"){nextW=clamp(Math.round(nextW),1,16384);nextH=clamp(Math.round(nextH),1,16384);if(nextW*nextH>cellLimit()){announce("This device profile allows up to "+cellLimit().toLocaleString()+" editable pixels. Reduce the dimensions or choose a lighter workspace.");return false;}const before=snapshot(),next=Array(nextW*nextH).fill(null);for(let y=0;y<nextH;y++)for(let x=0;x<nextW;x++){const sx=Math.min(width-1,Math.floor((x+.5)*width/nextW)),sy=Math.min(height-1,Math.floor((y+.5)*height/nextH));next[y*nextW+x]=pixels[sy*width+sx];}width=nextW;height=nextH;pixels=next;commitHistory(before);$("image-width").value=width;$("image-height").value=height;updateCanvasDisplay();render();announce("Artwork resized to "+width+" × "+height+" px using "+method+" sampling. Original import remains unchanged outside the working copy.");return true;}
 function initAdaptive(){const fallback=()=>{qualityProfile={tier:"balanced",level:3,budget:{maxCanvasPixels:520000,dpr:1},reducedMotion:false};$("quality-profile").textContent="Balanced · fallback";};if(!window.NUGraphicsCore){fallback();return;}window.NUGraphicsCore.start().then(p=>{qualityProfile=p;$("quality-profile").textContent=p.tier+" · level "+p.level;$("quality-detail").textContent="Editable pixel budget: "+cellLimit().toLocaleString()+" cells";updateCounters();}).catch(fallback);}
-function applyZoom(){workspace.zoom=clamp(Number($("workspace-zoom").value)||100,25,800);updateCanvasDisplay();updateCounters();}
+function setZoom(next,anchor,behavior="auto"){
+ const frame=$("workspace-frame"),before=canvas.getBoundingClientRect(),frameRect=frame.getBoundingClientRect();
+ const anchorX=anchor&&Number.isFinite(anchor.x)?anchor.x:frameRect.left+frame.clientWidth/2;
+ const anchorY=anchor&&Number.isFinite(anchor.y)?anchor.y:frameRect.top+frame.clientHeight/2;
+ workspace.zoom=clamp(Math.round(Number(next)||100),25,800);
+ $("workspace-zoom").value=workspace.zoom;
+ updateCanvasDisplay();
+ const targetPixel=anchor&&!viewRotation?window.NUStudioLayout.pixelAt(anchorX,anchorY,before,width,height):null;
+ const after=canvas.getBoundingClientRect(),delta=targetPixel?window.NUStudioLayout.pixelAnchorScrollDelta(before,after,anchorX,anchorY,width,height):window.NUStudioLayout.anchorScrollDelta(before,after,anchorX,anchorY);
+ const maxLeft=Math.max(0,frame.scrollWidth-frame.clientWidth),maxTop=Math.max(0,frame.scrollHeight-frame.clientHeight);
+ const left=clamp(frame.scrollLeft+delta.x,0,maxLeft),top=clamp(frame.scrollTop+delta.y,0,maxTop);
+ scrollFrame(frame,left,top,behavior);
+ if(targetPixel){
+  for(let attempt=0;attempt<2;attempt++){
+   const rect=canvas.getBoundingClientRect(),actualPixel=window.NUStudioLayout.pixelAt(anchorX,anchorY,rect,width,height);
+   if(actualPixel.x===targetPixel.x&&actualPixel.y===targetPixel.y)break;
+   const correction=window.NUStudioLayout.pixelAnchorCorrection(targetPixel,actualPixel,rect,width,height);
+   const correctedLeft=clamp(frame.scrollLeft+correction.x,0,maxLeft),correctedTop=clamp(frame.scrollTop+correction.y,0,maxTop);
+   if(correctedLeft===frame.scrollLeft&&correctedTop===frame.scrollTop)break;
+   scrollFrame(frame,correctedLeft,correctedTop,"auto");
+  }
+ }
+ updateCounters();
+}
+function scrollFrame(frame,left,top,behavior="auto"){
+ const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+ if(behavior==="smooth"&&!reduced){frame.scrollTo({left,top,behavior:"smooth"});return;}
+ const previous=frame.style.scrollBehavior;frame.style.scrollBehavior="auto";frame.scrollTo({left,top,behavior:"auto"});requestAnimationFrame(()=>{frame.style.scrollBehavior=previous;});
+}
+function applyZoom(){setZoom(Number($("workspace-zoom").value)||100,null,"auto");}
 $("workspace-zoom").addEventListener("input",applyZoom);
-$("fit-canvas").addEventListener("click",()=>{workspace.zoom=100;applyZoom();$("workspace-frame").scrollTo(0,0);});
+$("zoom-in")?.addEventListener("click",()=>setZoom(workspace.zoom+25,null,"smooth"));
+$("zoom-out")?.addEventListener("click",()=>setZoom(workspace.zoom-25,null,"smooth"));
+$("fit-canvas").addEventListener("click",()=>{workspace.zoom=100;$("workspace-zoom").value=100;updateCanvasDisplay();scrollFrame($("workspace-frame"),0,0,"auto");updateCounters();});
+canvas.addEventListener("wheel",e=>{if(!e.ctrlKey)return;e.preventDefault();setZoom(workspace.zoom+(e.deltaY<0?10:-10),{x:e.clientX,y:e.clientY},"auto");},{passive:false});
 let workspaceObserver=null;
 function observeWorkspace(){
  const stage=document.querySelector(".stage"),frame=$("workspace-frame");
@@ -61,13 +93,29 @@ observeWorkspace();
 $("image-lock").addEventListener("change",e=>{resizeLock=e.target.checked;});
 $("image-width").addEventListener("input",()=>{lastDimension="width";});$("image-height").addEventListener("input",()=>{lastDimension="height";});$("apply-image-size").addEventListener("click",()=>{let w=clamp(Number($("image-width").value)||width,1,2048),h=clamp(Number($("image-height").value)||height,1,2048);if(resizeLock){const ratio=width/height;if(lastDimension==="width")h=Math.max(1,Math.round(w/ratio));else w=Math.max(1,Math.round(h*ratio));}$("image-width").value=w;$("image-height").value=h;resizeArtwork(w,h,"nearest-neighbor");});
 function renderPalette(){const root=$("palette");root.innerHTML="";palette.forEach((c,i)=>{const b=document.createElement("button");b.type="button";b.className="swatch";b.style.background=c;b.title=c;b.setAttribute("aria-label","Palette color "+c);b.setAttribute("aria-pressed",String(c.toLowerCase()===color.toLowerCase()));b.addEventListener("click",()=>{color=c;$("custom-color").value=c;renderPalette();});root.appendChild(b);});const transparent=document.createElement("button");transparent.type="button";transparent.className="swatch";transparent.setAttribute("aria-label","Transparent");transparent.title="Transparent / eraser";transparent.addEventListener("click",()=>setTool("eraser"));root.appendChild(transparent);}
-function setTool(next){tool=next;mixBrushState=null;document.querySelectorAll("[data-tool]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tool===tool)));canvas.style.cursor=tool==="picker"?"copy":tool==="eraser"?"cell":tool==="fill"?"copy":"crosshair";}
+function setTool(next){if(next!=="magnifier")hideMagnifier();tool=next;mixBrushState=null;compassState=null;const selectedToolButton=document.querySelector('[data-tool="'+tool+'"]');if(selectedToolButton?.dataset.category)toolCategoryRefresh(selectedToolButton.dataset.category);document.querySelectorAll("[data-tool]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tool===tool)));canvas.style.cursor=tool==="magnifier"?"zoom-in":tool==="picker"?"copy":tool==="eraser"?"cell":tool==="fill"?"copy":"crosshair";toolContextRefresh();}
 function coords(e){
  const r=canvas.getBoundingClientRect();
  if(!viewRotation)return window.NUStudioLayout.pixelAt(e.clientX,e.clientY,r,width,height);
  const cx=r.left+r.width/2,cy=r.top+r.height/2,a=-viewRotation*Math.PI/180,dx=e.clientX-cx,dy=e.clientY-cy;
  const ux=dx*Math.cos(a)-dy*Math.sin(a)+cx,uy=dx*Math.sin(a)+dy*Math.cos(a)+cy,w=canvas.offsetWidth,h=canvas.offsetHeight;
  return {x:clamp(Math.floor((ux-(cx-w/2))/w*width),0,width-1),y:clamp(Math.floor((uy-(cy-h/2))/h*height),0,height-1)};
+}
+function hideMagnifier(){const lens=$("studio-magnifier");if(!lens)return;lens.hidden=true;lens.setAttribute("aria-hidden","true");lastMagnifierPoint=null;}
+function updateMagnifier(e){
+ const lens=$("studio-magnifier"),lensCanvas=$("studio-magnifier-canvas"),stage=document.querySelector(".stage");
+ if(tool!=="magnifier"||!e||!lens||!lensCanvas||!stage){hideMagnifier();return;}
+ const p=coords(e),lensCtx=lensCanvas.getContext("2d"),sourceWidth=Math.max(1,Math.min(width,Math.floor(lensCanvas.width/magnifierFactor))),sourceHeight=Math.max(1,Math.min(height,Math.floor(lensCanvas.height/magnifierFactor)));
+ const sx=clamp(p.x-Math.floor(sourceWidth/2),0,Math.max(0,width-sourceWidth)),sy=clamp(p.y-Math.floor(sourceHeight/2),0,Math.max(0,height-sourceHeight));
+ lensCtx.clearRect(0,0,lensCanvas.width,lensCanvas.height);lensCtx.imageSmoothingEnabled=false;lensCtx.drawImage(canvas,sx,sy,sourceWidth,sourceHeight,0,0,lensCanvas.width,lensCanvas.height);
+ const crossX=(p.x-sx+.5)/sourceWidth*lensCanvas.width,crossY=(p.y-sy+.5)/sourceHeight*lensCanvas.height;
+ lensCtx.strokeStyle="rgba(255,255,255,.9)";lensCtx.lineWidth=1.5;lensCtx.beginPath();lensCtx.moveTo(crossX-10,crossY);lensCtx.lineTo(crossX+10,crossY);lensCtx.moveTo(crossX,crossY-10);lensCtx.lineTo(crossX,crossY+10);lensCtx.stroke();
+ $("studio-magnifier-label").textContent=magnifierFactor+"× · "+(p.x+1)+", "+(p.y+1);
+ const size=magnifierSize,stageRect=stage.getBoundingClientRect();let left=e.clientX-stageRect.left+18,top=e.clientY-stageRect.top+18;
+ if(left+size>stage.clientWidth-8)left=e.clientX-stageRect.left-size-18;
+ if(top+size>stage.clientHeight-8)top=e.clientY-stageRect.top-size-18;
+ left=clamp(left,8,Math.max(8,stage.clientWidth-size-8));top=clamp(top,8,Math.max(8,stage.clientHeight-size-8));
+ lens.style.width=size+"px";lens.style.height=size+"px";lens.style.left=left+"px";lens.style.top=top+"px";lens.hidden=false;lens.setAttribute("aria-hidden","false");lastMagnifierPoint={clientX:e.clientX,clientY:e.clientY};
 }
 function put(x,y,value){pixels[y*width+x]=value;}
 function flood(x,y,next){const start=pixels[y*width+x];if(start===next)return;const stack=[[x,y]],seen=new Uint8Array(width*height);while(stack.length){const [cx,cy]=stack.pop(),i=cy*width+cx;if(cx<0||cy<0||cx>=width||cy>=height||seen[i]||pixels[i]!==start)continue;seen[i]=1;pixels[i]=next;stack.push([cx+1,cy],[cx-1,cy],[cx,cy+1],[cx,cy-1]);}}
@@ -86,26 +134,32 @@ function drawShape(start,end){
   const left=Math.min(x0,x1),right=Math.max(x0,x1),top=Math.min(y0,y1),bottom=Math.max(y0,y1);
   if(tool==="rect-fill"){for(let y=top;y<=bottom;y++)for(let x=left;x<=right;x++)paintBrush(x,y,value);}
   else{for(let x=left;x<=right;x++){paintBrush(x,top,value);paintBrush(x,bottom,value);}for(let y=top;y<=bottom;y++){paintBrush(left,y,value);paintBrush(right,y,value);}}
- }else if(tool==="ellipse"||tool==="ellipse-fill"){
-  const rx=Math.max(.5,Math.abs(x1-x0)/2),ry=Math.max(.5,Math.abs(y1-y0)/2),cx=(x0+x1)/2,cy=(y0+y1)/2;
+ }else if(tool==="ellipse"||tool==="ellipse-fill"||tool==="compass"){
+  const compassRadius=Math.max(.5,Math.round(Math.hypot(x1-x0,y1-y0))),rx=tool==="compass"?compassRadius:Math.max(.5,Math.abs(x1-x0)/2),ry=tool==="compass"?compassRadius:Math.max(.5,Math.abs(y1-y0)/2),cx=tool==="compass"?x0:(x0+x1)/2,cy=tool==="compass"?y0:(y0+y1)/2;
   const left=Math.floor(cx-rx-1),right=Math.ceil(cx+rx+1),top=Math.floor(cy-ry-1),bottom=Math.ceil(cy+ry+1),tolerance=Math.max(1/rx,1/ry)*1.4;
   for(let y=top;y<=bottom;y++)for(let x=left;x<=right;x++){const d=((x-cx)*(x-cx))/(rx*rx)+((y-cy)*(y-cy))/(ry*ry);if(tool==="ellipse-fill"?d<=1:Math.abs(d-1)<=tolerance)paintBrush(x,y,value);}
  }
 }
-function paintAt(e){const p=coords(e),i=p.y*width+p.x;if(tool==="picker"){if(pixels[i]){color=pixels[i];$("custom-color").value=color;renderPalette();}return;}if(tool==="fill"){flood(p.x,p.y,color);render();return;}paintBrush(p.x,p.y,tool==="eraser"?null:color);render();}
+function paintAt(e){const p=coords(e),i=p.y*width+p.x;if(tool==="picker"){if(pixels[i]){color=pixels[i];$("custom-color").value=color;renderPalette();}return 0;}if(tool==="fill"){const changed=flood(p.x,p.y,color);render();return changed;}paintBrush(p.x,p.y,tool==="eraser"?null:color);render();return 1;}
 canvas.addEventListener("pointerdown",e=>{
- e.preventDefault();if(tool==="color-mix-brush"&&adv.layers[adv.active].locked){announce("Layer locked · رنگ‌ها ترکیب نشدند.");return;}if(tool==="color-mix-brush"&&adv.maskEdit){announce("برای ترکیب رنگ، ویرایش ماسک را خاموش کنید.");return;}mixBrushState=null;canvas.setPointerCapture(e.pointerId);drawing=true;strokeSnapshot=snapshot();strokeStart=coords(e);
- if(tool==="fill"||tool==="picker"){paintAt(e);if(tool==="fill")commitHistory(strokeSnapshot);drawing=false;strokeSnapshot=null;strokeStart=null;return;}
- if(tool==="line"||tool==="rect"||tool==="ellipse"||tool==="rect-fill"||tool==="ellipse-fill"){drawShape(strokeStart,strokeStart);render();}else paintAt(e);
+ e.preventDefault();if(tool==="magnifier"){if(e.pointerType==="touch"){try{canvas.setPointerCapture(e.pointerId)}catch(_){}}updateMagnifier(e);return;}if(tool==="color-mix-brush"&&adv.layers[adv.active].locked){announce("Layer locked. The color-mixing brush cannot paint on a locked layer.");return;}if(tool==="color-mix-brush"&&adv.maskEdit){announce("Turn off mask editing to use the color-mixing brush.");return;}mixBrushState=null;canvas.setPointerCapture(e.pointerId);drawing=true;strokeSnapshot=snapshot();strokeStart=coords(e);
+ if(tool==="fill"||tool==="picker"){const changed=paintAt(e);if(tool==="fill"&&changed>0)commitHistory(strokeSnapshot);drawing=false;strokeSnapshot=null;strokeStart=null;return;}
+ if(tool==="line"||tool==="rect"||tool==="ellipse"||tool==="rect-fill"||tool==="ellipse-fill"||tool==="compass"){if(tool==="compass")compassState={center:{...strokeStart},edge:{...strokeStart},active:true};drawShape(strokeStart,strokeStart);render();}else paintAt(e);
 });
+document.addEventListener("pointermove",e=>{
+ if(tool!=="magnifier")return;
+ const r=canvas.getBoundingClientRect();
+ if(e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom)updateMagnifier(e);else hideMagnifier();
+},true);
 canvas.addEventListener("pointermove",e=>{
  if(!drawing||!(e.buttons||e.pointerType==="touch"))return;
- if(tool==="line"||tool==="rect"||tool==="ellipse"||tool==="rect-fill"||tool==="ellipse-fill"){pixels=strokeSnapshot.pixels.slice();drawShape(strokeStart,coords(e));render();}
+ if(tool==="line"||tool==="rect"||tool==="ellipse"||tool==="rect-fill"||tool==="ellipse-fill"||tool==="compass"){pixels=strokeSnapshot.pixels.slice();const edge=coords(e);if(tool==="compass"&&compassState)compassState.edge={...edge};drawShape(strokeStart,edge);render();}
  else paintAt(e);
 });
-function endStroke(){if(!drawing)return;drawing=false;commitHistory(strokeSnapshot);strokeSnapshot=null;strokeStart=null;mixBrushState=null;}
-function cancelStroke(){if(!drawing)return;if(tool==="color-mix-brush"&&strokeSnapshot&&strokeSnapshot.layers)restore(strokeSnapshot);else pixels=strokeSnapshot.pixels.slice();drawing=false;strokeSnapshot=null;strokeStart=null;mixBrushState=null;render();}
-canvas.addEventListener("pointerup",endStroke);canvas.addEventListener("pointercancel",cancelStroke);canvas.addEventListener("lostpointercapture",cancelStroke);
+function endStroke(){if(!drawing)return;drawing=false;commitHistory(strokeSnapshot);strokeSnapshot=null;strokeStart=null;mixBrushState=null;if(tool==="compass"){compassState=null;render();}}
+function cancelStroke(){if(!drawing)return;if(tool==="color-mix-brush"&&strokeSnapshot&&strokeSnapshot.layers)restore(strokeSnapshot);else pixels=strokeSnapshot.pixels.slice();drawing=false;strokeSnapshot=null;strokeStart=null;mixBrushState=null;compassState=null;render();}
+canvas.addEventListener("pointerup",e=>{endStroke();if(tool==="magnifier"&&e.pointerType==="touch")hideMagnifier();});canvas.addEventListener("pointercancel",e=>{cancelStroke();hideMagnifier();});canvas.addEventListener("lostpointercapture",cancelStroke);canvas.addEventListener("pointerleave",()=>{if(tool==="magnifier")hideMagnifier();});
+document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(tool==="magnifier")hideMagnifier();if(drawing&&tool==="compass"){e.preventDefault();cancelStroke();}});
 document.querySelectorAll("[data-tool]").forEach(b=>b.addEventListener("click",()=>setTool(b.dataset.tool)));
 $("custom-color").addEventListener("input",e=>{color=e.target.value.toLowerCase();renderPalette();setTool("pencil");});
 $("brush-size").addEventListener("input",e=>{brushSize=clamp(Number(e.target.value)||1,1,16);$("brush-size-value").textContent=brushSize+" px";});
@@ -160,6 +214,7 @@ $("image-file").addEventListener("change",async e=>{
   const extracted=imagePalette(data,Number($("palette-limit").value)||32,alphaCutoff);
   if(!extracted.length)throw new Error("No visible pixels remain above the transparency cutoff.");
   const mapped=window.NURasterImport.mapPixels(data,nextW,nextH,extracted,alphaCutoff,$("dither-image").checked);
+  if(projectHasContent()&&!(await confirmProjectReplacement("Replace current artwork?","Importing this image will replace the active layer and may resize the current canvas. Download the project first if you want to keep the current work."))){announce("Image import cancelled. Your current project is unchanged.");return;}
   const before=snapshot(),previous={width,height,pixels,palette,imageImported,zoom:workspace.zoom,originalImportFile,sourceInfo:$("source-info").textContent,sourcePreviewHidden:$("source-preview-panel").hidden,sourcePreviewSrc:$("source-preview").src};
   let nextPreviewUrl=null;
   try{
@@ -257,7 +312,7 @@ function download(blob,name){
  else{a.style.position="fixed";a.style.left="12px";a.style.bottom="12px";a.style.zIndex="9999";document.body.appendChild(a);}
  if(pendingDownloadUrl)URL.revokeObjectURL(pendingDownloadUrl);
  pendingDownloadUrl=url;
- try{a.click();}catch(error){announce("فایل آماده است؛ لینک دانلود روی صفحه را لمس کنید.");}
+ try{a.click();}catch(error){announce("The file is ready. Use the download link on the page.");}
  setTimeout(()=>{if(pendingDownloadUrl===url){URL.revokeObjectURL(url);pendingDownloadUrl=null;}},1800000);
  return true;
 }
@@ -315,7 +370,7 @@ $("export-png").addEventListener("click",()=>{
   const finish=blob=>{
    try{
     if(!blob)throw new Error("PNG encoding returned an empty file.");
-    const name=filename("png");download(blob,name);announce("PNG آماده است · "+size.width+" × "+size.height+" · لینک دریافت روی صفحه قرار گرفت.");
+    const name=filename("png");download(blob,name);announce("PNG ready · "+size.width+" × "+size.height+" · The download link is available on the page.");
    }catch(err){announce("PNG export failed: "+err.message);}
    finally{button.disabled=false;source.width=source.height=out.width=out.height=1;}
   };
@@ -351,14 +406,30 @@ render=function(){
  adv.layers[adv.active].pixels=pixels.slice();const active=pixels;pixels=composite();renderBase();
  if(adv.selection){ctx.save();ctx.strokeStyle="#ffffff";ctx.lineWidth=Math.max(.12,Math.min(width,height)*.001);ctx.setLineDash([1,1]);ctx.beginPath();for(let y=0;y<height;y++)for(let x=0;x<width;x++){const i=y*width+x;if(!adv.selection[i])continue;if(y===0||!adv.selection[i-width]){ctx.moveTo(x,y);ctx.lineTo(x+1,y);}if(y===height-1||!adv.selection[i+width]){ctx.moveTo(x,y+1);ctx.lineTo(x+1,y+1);}if(x===0||!adv.selection[i-1]){ctx.moveTo(x,y);ctx.lineTo(x,y+1);}if(x===width-1||!adv.selection[i+1]){ctx.moveTo(x+1,y);ctx.lineTo(x+1,y+1);}}ctx.stroke();ctx.restore();}
  pixels=active;
- if(Object.values(guideState).some(Boolean)){
-  ctx.save();ctx.lineWidth=Math.max(.12,Math.min(width,height)*.002);
-  if(guideState.blueprint){ctx.strokeStyle="rgba(65,190,255,.65)";ctx.setLineDash([2,2]);ctx.strokeRect(1,1,width-2,height-2);}
-  if(guideState.divisions){ctx.strokeStyle="rgba(255,200,100,.55)";ctx.setLineDash([1,2]);ctx.beginPath();for(let x=width/4;x<width;x+=width/4){ctx.moveTo(x,0);ctx.lineTo(x,height);}for(let y=height/4;y<height;y+=height/4){ctx.moveTo(0,y);ctx.lineTo(width,y);}ctx.stroke();}
-  if(guideState.axes){ctx.strokeStyle="rgba(255,120,120,.8)";ctx.setLineDash([]);ctx.beginPath();ctx.moveTo(0,height/2);ctx.lineTo(width,height/2);ctx.moveTo(width/2,0);ctx.lineTo(width/2,height);ctx.moveTo(0,0);ctx.lineTo(width,height);ctx.moveTo(width,0);ctx.lineTo(0,height);ctx.stroke();}
-  if(guideState.depth){ctx.strokeStyle="rgba(120,255,190,.8)";ctx.beginPath();ctx.moveTo(0,height);ctx.lineTo(width,0);ctx.stroke();}
-  if(guideState.ruler){ctx.fillStyle="rgba(255,220,150,.9)";ctx.strokeStyle="rgba(255,220,150,.8)";ctx.font="2px monospace";ctx.beginPath();const step=Math.max(1,Math.floor(Math.max(width,height)/8));for(let x=0;x<width;x+=step){ctx.moveTo(x+.5,0);ctx.lineTo(x+.5,Math.min(2,height));ctx.fillText(String(x),x+.5,Math.min(3,height));}for(let y=0;y<height;y+=step){ctx.moveTo(0,y+.5);ctx.lineTo(Math.min(2,width),y+.5);ctx.fillText(String(y),Math.min(2,width-1),y+.5);}ctx.stroke();}
-  ctx.restore();
+ if(Object.values(guideState).some(Boolean)||compassState?.active){
+  let luminance=0,samples=0;const stride=Math.max(1,Math.floor(pixels.length/256));
+  for(let i=0;i<pixels.length;i+=stride){const c=pixels[i];if(!c){luminance+=22;samples++;continue;}const r=parseInt(c.slice(1,3),16),g=parseInt(c.slice(3,5),16),b=parseInt(c.slice(5,7),16);luminance+=.2126*r+.7152*g+.0722*b;samples++;}
+  const lightBackground=luminance/Math.max(1,samples)>145,haloColor=guideHighContrast?(lightBackground?"rgba(0,0,0,.98)":"rgba(255,255,255,.98)"):"rgba(0,0,0,.22)";
+  const accents=lightBackground?{blue:"rgba(0,82,165,.98)",gold:"rgba(155,82,0,.98)",red:"rgba(165,24,42,.98)",green:"rgba(0,112,68,.98)",ruler:"rgba(92,62,0,.98)",compass:"rgba(165,72,0,.99)"}:{blue:"rgba(90,220,255,.99)",gold:"rgba(255,194,64,.99)",red:"rgba(255,112,132,.99)",green:"rgba(90,255,190,.99)",ruler:"rgba(255,236,165,.99)",compass:"rgba(255,224,112,.99)"};
+  const screenScale=Math.max(.01,canvas.getBoundingClientRect().width/Math.max(1,width)),guideWidth=clamp(1.7/screenScale,.05,2.5);
+  const strokeGuide=(path,accent,dash=[])=>{ctx.save();ctx.lineCap="round";ctx.lineJoin="round";ctx.setLineDash(dash.map(v=>v/screenScale));ctx.beginPath();path();ctx.strokeStyle=haloColor;ctx.lineWidth=guideHighContrast?guideWidth*2.7:guideWidth*1.15;ctx.stroke();ctx.beginPath();path();ctx.strokeStyle=accent;ctx.lineWidth=guideWidth;ctx.stroke();ctx.restore();};
+  if(guideState.blueprint)strokeGuide(()=>ctx.rect(1,1,width-2,height-2),accents.blue,[2,2]);
+  if(guideState.divisions)strokeGuide(()=>{for(let x=width/4;x<width;x+=width/4){ctx.moveTo(x,0);ctx.lineTo(x,height);}for(let y=height/4;y<height;y+=height/4){ctx.moveTo(0,y);ctx.lineTo(width,y);}},accents.gold,[1,2]);
+  if(guideState.axes)strokeGuide(()=>{ctx.moveTo(0,height/2);ctx.lineTo(width,height/2);ctx.moveTo(width/2,0);ctx.lineTo(width/2,height);ctx.moveTo(0,0);ctx.lineTo(width,height);ctx.moveTo(width,0);ctx.lineTo(0,height);},accents.red);
+  if(guideState.depth)strokeGuide(()=>{ctx.moveTo(0,height);ctx.lineTo(width,0);},accents.green);
+  if(guideState.ruler){
+   const step=Math.max(1,Math.floor(Math.max(width,height)/8));
+   strokeGuide(()=>{for(let x=0;x<width;x+=step){ctx.moveTo(x+.5,0);ctx.lineTo(x+.5,Math.min(2,height));}for(let y=0;y<height;y+=step){ctx.moveTo(0,y+.5);ctx.lineTo(Math.min(2,width),y+.5);}},accents.ruler);
+   ctx.save();ctx.font=Math.max(.35,9/screenScale)+"px monospace";ctx.fillStyle=accents.ruler;ctx.shadowColor=haloColor;ctx.shadowBlur=guideHighContrast?2/screenScale:0;
+   for(let x=0;x<width;x+=step)ctx.fillText(String(x),x+.5,Math.min(3,height-.2));
+   for(let y=0;y<height;y+=step)ctx.fillText(String(y),Math.min(2,width-1),y+.5);
+   ctx.restore();
+  }
+  if(compassState?.active){
+   const cx=compassState.center.x+.5,cy=compassState.center.y+.5,ex=compassState.edge.x+.5,ey=compassState.edge.y+.5,dotRadius=Math.max(.3,2.6/screenScale);
+   strokeGuide(()=>{ctx.moveTo(cx,cy);ctx.lineTo(ex,ey);},accents.compass,[2,1]);
+   ctx.save();ctx.beginPath();ctx.arc(cx,cy,dotRadius,0,Math.PI*2);ctx.fillStyle=haloColor;ctx.fill();ctx.beginPath();ctx.arc(cx,cy,dotRadius*.55,0,Math.PI*2);ctx.fillStyle=accents.compass;ctx.fill();ctx.restore();
+  }
  }
 };
 svgSource=function(){const active=pixels;adv.layers[adv.active].pixels=active.slice();const visible=composite();try{pixels=visible;return svgSourceBase();}finally{pixels=active;}};
@@ -369,10 +440,10 @@ function histAdv(){return snapshot();}
 function layerUI(){
  const root=$("adv-layers");if(!root)return;root.innerHTML="";
  adv.layers.forEach((l,i)=>{const row=document.createElement("div");row.className="adv-layer";
- const pick=document.createElement("button");pick.type="button";pick.textContent=(i===adv.active?"● ":"")+"لایه "+(i+1);pick.setAttribute("aria-pressed",String(i===adv.active));pick.onclick=()=>{adv.layers[adv.active].pixels=pixels.slice();adv.active=i;pixels=l.pixels.slice();$("pro-mask-edit").checked=false;adv.maskEdit=false;render();layerUI();};
- const visLabel=document.createElement("label");visLabel.className="layer-toggle";const vis=document.createElement("input");vis.type="checkbox";vis.checked=l.visible;vis.setAttribute("aria-label","Show "+l.name);vis.onchange=()=>{l.visible=vis.checked;render();};visLabel.append(vis,document.createTextNode(" 👁 نمایش"));
- const lockLabel=document.createElement("label");lockLabel.className="layer-toggle";const lock=document.createElement("input");lock.type="checkbox";lock.checked=l.locked;lock.setAttribute("aria-label","Lock "+l.name);lock.onchange=()=>{l.locked=lock.checked;};lockLabel.append(lock,document.createTextNode(" 🔒 قفل"));
- const opacity=document.createElement("label");opacity.className="layer-opacity";opacity.textContent="شفافیت · "+l.opacity+"%";const range=document.createElement("input");range.type="range";range.min=0;range.max=100;range.value=l.opacity;range.setAttribute("aria-label",l.name+" opacity");range.oninput=()=>{l.opacity=+range.value;opacity.firstChild.textContent="شفافیت · "+l.opacity+"%";render();};opacity.append(range);
+ const pick=document.createElement("button");pick.type="button";pick.textContent=(i===adv.active?"● ":"")+"Layer "+(i+1);pick.setAttribute("aria-label","Select Layer "+(i+1));pick.title="Select Layer "+(i+1);pick.setAttribute("aria-pressed",String(i===adv.active));pick.onclick=()=>{adv.layers[adv.active].pixels=pixels.slice();adv.active=i;pixels=l.pixels.slice();$("pro-mask-edit").checked=false;adv.maskEdit=false;render();layerUI();};
+ const visLabel=document.createElement("label");visLabel.className="layer-toggle";const vis=document.createElement("input");vis.type="checkbox";vis.checked=l.visible;vis.setAttribute("aria-label","Show "+l.name);vis.onchange=()=>{l.visible=vis.checked;render();};visLabel.append(vis,document.createTextNode(" Visible"));
+ const lockLabel=document.createElement("label");lockLabel.className="layer-toggle";const lock=document.createElement("input");lock.type="checkbox";lock.checked=l.locked;lock.setAttribute("aria-label","Lock "+l.name);lock.onchange=()=>{l.locked=lock.checked;};lockLabel.append(lock,document.createTextNode(" Locked"));
+ const opacity=document.createElement("label");opacity.className="layer-opacity";opacity.textContent="Opacity · "+l.opacity+"%";const range=document.createElement("input");range.type="range";range.min=0;range.max=100;range.value=l.opacity;range.setAttribute("aria-label",l.name+" opacity");range.oninput=()=>{l.opacity=+range.value;opacity.firstChild.textContent="Opacity · "+l.opacity+"%";render();};opacity.append(range);
  const blend=document.createElement("label");blend.className="layer-opacity";blend.textContent="Blend";const blendSelect=document.createElement("select");blendSelect.setAttribute("aria-label",l.name+" blend mode");for(const [v,n] of [["normal","Normal"],["multiply","Multiply"],["screen","Screen"],["add","Add"],["darken","Darken"],["lighten","Lighten"]]){const o=document.createElement("option");o.value=v;o.textContent=n;blendSelect.append(o);}blendSelect.value=l.blend||"normal";blendSelect.onchange=()=>{l.blend=blendSelect.value;render();};blend.append(blendSelect);
  const group=document.createElement("label");group.className="layer-opacity";group.textContent="Group";const groupSelect=document.createElement("select");groupSelect.setAttribute("aria-label",l.name+" group");for(const v of ["Ungrouped","Group A","Group B","UI","Background","Foreground"]){const o=document.createElement("option");o.value=v;o.textContent=v;groupSelect.append(o);}groupSelect.value=l.group||"Ungrouped";groupSelect.onchange=()=>{l.group=groupSelect.value;};group.append(groupSelect);
  const maskNote=document.createElement("span");maskNote.className="layer-toggle";maskNote.textContent=l.mask?"◩ Mask active":"No mask";row.append(pick,visLabel,lockLabel,opacity,blend,group,maskNote);root.append(row);});
@@ -380,10 +451,10 @@ function layerUI(){
 function advPanel(){
  const existingColorField=$("custom-color").closest(".field"),existingPaletteField=$("palette").closest(".field"),existingExtract=$("extract-palette"),existingBrushField=$("brush-size").closest(".field");
  const st=document.createElement("style");
- st.textContent="#studio-dock{margin-top:12px;border:1px solid #65dcff55;border-radius:13px;background:#081522;overflow:hidden}#studio-dock .dock-head{display:flex;justify-content:space-between;gap:8px;padding:9px 12px;border-bottom:1px solid #ffffff18}#studio-dock .dock-head strong{font-size:12px;color:#ffc86b}#studio-quick-tools{display:flex;gap:6px;padding:9px;overflow-x:auto}#studio-quick-tools .tool{flex:0 0 auto;min-width:82px;min-height:48px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px}#studio-quick-tools .tool .tool-icon{font-size:18px}#studio-quick-tools .tool[aria-pressed=true]{border-color:#ffc86b;background:#3a2a16;color:#ffe6a5}#studio-brush{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:0 12px 10px}#studio-brush label{font-size:11px;color:#b8c9d6}#studio-brush input{width:100%;accent-color:#65dcff}#studio-brush .dock-field{display:grid;gap:5px;flex:1 1 180px;min-width:130px;margin:9px 0;color:#b8c9d6;font-size:11px}#studio-brush .dock-note{font-size:10px;color:#9bb1c3;line-height:1.45}#studio-tabs{display:flex;gap:5px;padding:8px;overflow-x:auto;border-block:1px solid #ffffff18}#studio-tabs button{flex:1 0 auto;min-width:80px;border:1px solid #65dcff44;border-radius:8px;background:#102536;color:#d9eaf4;padding:9px 7px;font-size:11px}#studio-tabs button[aria-selected=true]{background:#23445a;border-color:#ffc86b;color:#fff0c8}#studio-tabpanels{padding:10px 12px}#studio-tabpanels [role=tabpanel][hidden]{display:none}#studio-tabpanels .adv-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:8px 0}#studio-tabpanels button{border:1px solid #65dcff55;background:#102a3b;color:#eaf6ff;border-radius:8px;padding:9px;font-size:12px;min-height:38px}#studio-tabpanels input,#studio-tabpanels select{max-width:100%;min-width:0;background:#071018;color:#eaf6ff;border:1px solid #65dcff44;border-radius:7px;padding:7px}#studio-tabpanels input[type=range]{width:100%;accent-color:#65dcff}#studio-tabpanels .adv-layer{display:grid;grid-template-columns:minmax(90px,1fr) auto auto;gap:8px;align-items:center;margin:8px 0}#studio-tabpanels .adv-layer .layer-toggle{font-size:10px;color:#c8d7e2;white-space:nowrap}#studio-tabpanels .adv-layer .layer-opacity{grid-column:1/-1;display:grid;gap:4px;font-size:10px;color:#9bb1c3}#studio-tabpanels .adv-layer .layer-opacity input{width:100%}#studio-tabpanels .adv-layer .layer-opacity select{width:100%}#studio-tabpanels .dock-field{display:grid;gap:5px;margin:9px 0;color:#b8c9d6;font-size:11px}#studio-tabpanels .dock-note{font-size:11px;color:#9bb1c3;line-height:1.6}#studio-tabpanels .dock-palette{display:grid;grid-template-columns:140px 1fr;gap:12px}#studio-tabpanels #palette{grid-template-columns:repeat(auto-fill,minmax(28px,1fr))}#studio-tabpanels .swatch{height:30px}#studio-tabpanels .dock-actions{display:flex;gap:7px;flex-wrap:wrap}#studio-tabpanels .dock-actions button{flex:1 1 130px}@media(max-width:600px){#studio-tabpanels .dock-palette{grid-template-columns:1fr}#studio-quick-tools .tool{min-width:74px}}@media(max-width:600px){.shell{width:calc(100% - 12px);padding-top:8px}.layout{grid-template-columns:minmax(0,1fr);min-width:0}.layout>main{min-width:0}.stage{width:100%;height:68vh;min-height:320px;max-height:calc(100dvh - 220px);padding:6px;box-sizing:border-box}.workspace-wrap{width:100%;height:100%;min-width:0;overflow:hidden}.workspace-frame{width:100%;height:100%;min-width:0;max-width:100%;box-sizing:border-box;padding:6px;overflow:auto}#pixel-canvas{max-width:100%!important;max-height:100%!important;height:auto!important}}";
+ st.textContent="#studio-dock{margin-top:12px;width:100%;min-width:0;max-width:100%;box-sizing:border-box;border:1px solid #65dcff55;border-radius:13px;background:#081522;overflow:hidden}#studio-dock .dock-head{display:flex;justify-content:space-between;gap:8px;padding:9px 12px;border-bottom:1px solid #ffffff18}#studio-dock .dock-head strong{font-size:12px;color:#ffc86b}#studio-tool-categories{display:flex;flex-wrap:wrap;gap:6px;padding:8px 9px 0}#studio-tool-categories [role=tab]{border:1px solid #65dcff55;background:#102a3b;color:#eaf6ff;border-radius:8px;padding:7px 10px;min-height:34px;font-size:11px}#studio-tool-categories [role=tab][aria-selected=true]{border-color:#ffc86b;background:#3a2a16;color:#ffe6a5}#studio-quick-tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(74px,1fr));width:100%;min-width:0;max-width:100%;box-sizing:border-box;gap:6px;padding:9px;overflow-x:hidden;overflow-y:auto;max-height:180px;scrollbar-width:thin}#studio-quick-tools .tool{min-width:0;min-height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:7px 5px;font-size:11px}#studio-quick-tools .tool .tool-icon{font-size:18px}#studio-quick-tools [hidden]{display:none!important}#studio-quick-tools .tool[aria-pressed=true]{border-color:#ffc86b;background:#3a2a16;color:#ffe6a5}#studio-brush{display:grid;gap:8px;padding:10px 12px;border-block:1px solid #ffffff18;background:#0b1b2a}#studio-brush .tool-context-head{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#ffc86b;font-size:12px}#studio-brush .tool-context-head span{color:#8fa8bb;font-size:10px;letter-spacing:.06em;text-transform:uppercase}#studio-brush .tool-context-hint{margin:0;color:#9bb1c3;font-size:11px;line-height:1.45}#studio-brush .dock-field{display:grid;gap:5px;min-width:0;margin:2px 0;color:#b8c9d6;font-size:11px}#studio-brush input,#studio-brush select{max-width:100%;min-width:0;background:#071018;color:#eaf6ff;border:1px solid #65dcff44;border-radius:7px;padding:7px}#studio-brush input[type=range]{width:100%;accent-color:#65dcff}#studio-brush button{border:1px solid #65dcff55;background:#102a3b;color:#eaf6ff;border-radius:8px;padding:9px;font-size:12px;min-height:38px}#studio-brush .adv-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:2px 0}#studio-brush [data-context-owner][hidden]{display:none!important}#studio-brush label{font-size:11px;color:#b8c9d6}#studio-brush input{width:100%;accent-color:#65dcff}#studio-brush .dock-field{display:grid;gap:5px;flex:1 1 180px;min-width:130px;margin:9px 0;color:#b8c9d6;font-size:11px}#studio-brush .dock-note{font-size:10px;color:#9bb1c3;line-height:1.45}#studio-tabs{display:flex;gap:5px;padding:8px;overflow-x:auto;border-block:1px solid #ffffff18}#studio-tabs button{flex:1 0 auto;min-width:80px;border:1px solid #65dcff44;border-radius:8px;background:#102536;color:#d9eaf4;padding:9px 7px;font-size:11px}#studio-tabs button[aria-selected=true]{background:#23445a;border-color:#ffc86b;color:#fff0c8}#studio-tabpanels{padding:10px 12px}#studio-tabpanels [role=tabpanel][hidden]{display:none}#studio-tabpanels .adv-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:8px 0}#studio-tabpanels button{border:1px solid #65dcff55;background:#102a3b;color:#eaf6ff;border-radius:8px;padding:9px;font-size:12px;min-height:38px}#studio-tabpanels input,#studio-tabpanels select{max-width:100%;min-width:0;background:#071018;color:#eaf6ff;border:1px solid #65dcff44;border-radius:7px;padding:7px}#studio-tabpanels input[type=range]{width:100%;accent-color:#65dcff}#studio-tabpanels .adv-layer{display:grid;grid-template-columns:minmax(90px,1fr) auto auto;gap:8px;align-items:center;margin:8px 0}#studio-tabpanels .adv-layer .layer-toggle{font-size:10px;color:#c8d7e2;white-space:nowrap}#studio-tabpanels .adv-layer .layer-opacity{grid-column:1/-1;display:grid;gap:4px;font-size:10px;color:#9bb1c3}#studio-tabpanels .adv-layer .layer-opacity input{width:100%}#studio-tabpanels .adv-layer .layer-opacity select{width:100%}#studio-tabpanels .dock-field{display:grid;gap:5px;margin:9px 0;color:#b8c9d6;font-size:11px}#studio-tabpanels .dock-note{font-size:11px;color:#9bb1c3;line-height:1.6}#studio-tabpanels .dock-palette{display:grid;grid-template-columns:140px 1fr;gap:12px}#studio-tabpanels #palette{grid-template-columns:repeat(auto-fill,minmax(28px,1fr))}#studio-tabpanels .swatch{height:30px}#studio-tabpanels .dock-actions{display:flex;gap:7px;flex-wrap:wrap}#studio-tabpanels .dock-actions button{flex:1 1 130px}@media(max-width:600px){#studio-tabpanels .dock-palette{grid-template-columns:1fr}#studio-quick-tools .tool{min-width:74px}}@media(max-width:600px){.shell{width:calc(100% - 12px);padding-top:8px}.layout{grid-template-columns:minmax(0,1fr);min-width:0}.layout>main{min-width:0}.stage{width:100%;height:68vh;min-height:320px;max-height:calc(100dvh - 220px);padding:6px;box-sizing:border-box}.workspace-wrap{width:100%;height:100%;min-width:0;overflow:hidden}.workspace-frame{width:100%;height:100%;min-width:0;max-width:100%;box-sizing:border-box;padding:6px;overflow:auto}#pixel-canvas{max-width:100%!important;max-height:100%!important;height:auto!important}}";
  document.head.append(st);
  const d=document.createElement("section");d.id="studio-dock";d.setAttribute("aria-label","Creative tools dock");
- d.innerHTML='<div class="dock-head"><strong>ابزارهای سریع</strong><span>کنار بوم طراحی</span></div><nav id="studio-quick-tools" aria-label="Main drawing tools"></nav><div id="studio-brush"></div><div id="studio-tabs" role="tablist" aria-label="Advanced tool categories"><button type="button" role="tab" id="tab-palette" aria-controls="panel-palette" aria-selected="true" data-tab="palette">🎨 رنگ</button><button type="button" role="tab" id="tab-layers" aria-controls="panel-layers" aria-selected="false" data-tab="layers">🧱 لایه‌ها</button><button type="button" role="tab" id="tab-fill" aria-controls="panel-fill" aria-selected="false" data-tab="fill">🪣 سطل رنگ</button><button type="button" role="tab" id="tab-transform" aria-controls="panel-transform" aria-selected="false" data-tab="transform">↔ تبدیل</button><button type="button" role="tab" id="tab-adjust" aria-controls="panel-adjust" aria-selected="false" data-tab="adjust">☀ تنظیم تصویر</button><button type="button" role="tab" id="tab-compose" aria-controls="panel-compose" aria-selected="false" data-tab="compose">🧩 ترکیب</button><button type="button" role="tab" id="tab-pro" aria-controls="panel-pro" aria-selected="false" data-tab="pro">✦ حرفه‌ای</button><button type="button" role="tab" id="tab-export" aria-controls="panel-export" aria-selected="false" data-tab="export">⇩ فایل‌ها</button></div><div id="studio-tabpanels"><section id="panel-palette" role="tabpanel" aria-labelledby="tab-palette"><div class="dock-palette"><div><div id="dock-color-slot"></div><button id="adv-add">＋ Add color</button><button id="adv-replace">Replace selected</button></div><div><p class="dock-note">Choose a swatch, sample a pixel, or create a new color.</p><div id="dock-palette-slot"></div><button id="adv-extract">Extract active layer colors</button></div></div></section><section id="panel-layers" role="tabpanel" aria-labelledby="tab-layers" hidden><p class="dock-note">Select a layer. Eye = show/hide, lock = protect, slider = opacity.</p><div id="adv-layers"></div><button id="adv-clear" type="button">Clear active layer</button></section><section id="panel-fill" role="tabpanel" aria-labelledby="tab-fill" hidden><label class="dock-field">Fill area <select id="adv-bucket"><option value="contiguous">Connected area only</option><option value="similar">Connected similar colors</option><option value="global">Every exact match in layer</option></select></label><label class="dock-field">Color tolerance <input id="adv-tol" type="range" min="0" max="180" value="0"></label><p class="dock-note">Choose a mode, then use the bucket tool on the canvas.</p></section><section id="panel-transform" role="tabpanel" aria-labelledby="tab-transform" hidden><label class="dock-field">Paint symmetry <select id="adv-symmetry"><option value="none">Off</option><option value="horizontal">Horizontal</option><option value="vertical">Vertical</option><option value="both">Horizontal + vertical</option></select></label><div class="adv-grid"><button data-x="h">↔ Mirror horizontal</button><button data-x="v">↕ Mirror vertical</button><button data-x="90">⤾ Rotate 90°</button><button data-x="180">↻ Rotate 180°</button><button data-x="neg">◐ Negative</button><button data-x="crop">▣ Crop</button></div><div class="adv-grid"><label class="dock-field">X <input id="crop-x" type="number" value="0" min="0"></label><label class="dock-field">Y <input id="crop-y" type="number" value="0" min="0"></label><label class="dock-field">Width <input id="crop-w" type="number" value="16" min="1"></label><label class="dock-field">Height <input id="crop-h" type="number" value="16" min="1"></label></div></section><section id="panel-adjust" role="tabpanel" aria-labelledby="tab-adjust" hidden><label class="dock-field">Brightness <input id="adj-b" type="range" min="-100" max="100" value="0"></label><label class="dock-field">Contrast <input id="adj-c" type="range" min="-100" max="100" value="0"></label><label class="dock-field">Saturation <input id="adj-s" type="range" min="-100" max="100" value="0"></label><label class="dock-field">Warm ↔ Cool <input id="adj-w" type="range" min="-100" max="100" value="0"></label><div class="dock-actions"><button id="adj-apply">Apply color settings</button><button id="adj-shine">✨ Shine</button><button id="adj-fade">Fade / soften</button><button id="adj-sharpen">Sharpen edges</button></div><p class="dock-note">RGB channel offsets</p><div class="adv-grid"><label class="dock-field">Red ± <input id="rgb-r" type="number" value="0"></label><label class="dock-field">Green ± <input id="rgb-g" type="number" value="0"></label><label class="dock-field">Blue ± <input id="rgb-b" type="number" value="0"></label><button id="rgb-apply">Apply RGB</button></div></section><section id="panel-compose" role="tabpanel" aria-labelledby="tab-compose" hidden><label class="dock-field">Add image over artwork <input id="adv-overlay" type="file" accept="image/*"></label><label class="dock-field">Key color <input id="adv-key" type="color" value="#00ff00"></label><label class="dock-field">Key tolerance <input id="adv-keytol" type="range" min="0" max="220" value="60"></label><button id="adv-chroma">Remove key color</button><div class="adv-grid"><label class="dock-field">Text <input id="adv-text" value="N.U" maxlength="32"></label><label class="dock-field">Text size <input id="adv-textsize" type="number" min="6" max="96" value="16"></label></div><button id="adv-textadd">Add text to active layer</button><label class="dock-field">Blend over painted pixels <input id="adv-alpha" type="range" min="10" max="100" value="100"></label><p class="dock-note">Text is rasterized at current pixel resolution.</p></section><section id="panel-pro" role="tabpanel" aria-labelledby="tab-pro" hidden><div class="dock-note">ابزارهای انتخاب، انتقال، تغییر اندازه، گرادیان، قلم بافت‌دار، منحنی و ماسک لایه. عملیات روی لایهٔ فعال انجام می‌شود.</div><div class="adv-grid"><button id="pro-select-all" type="button">انتخاب همه</button><button id="pro-deselect" type="button">لغو انتخاب</button><button id="pro-invert-selection" type="button">معکوس انتخاب</button><button id="pro-scale-selection" type="button">تغییر اندازهٔ انتخاب</button></div><div class="adv-grid"><label class="dock-field">مقیاس افقی × <input id="pro-scale-x" type="number" min="0.1" max="16" step="0.1" value="2"></label><label class="dock-field">مقیاس عمودی × <input id="pro-scale-y" type="number" min="0.1" max="16" step="0.1" value="2"></label></div><div class="adv-grid"><label class="dock-field">رنگ دوم گرادیان <input id="pro-gradient-color" type="color" value="#65dcff"></label><label class="dock-field">نوع گرادیان <select id="pro-gradient-mode"><option value="linear">خطی</option><option value="radial">شعاعی</option></select></label></div><div class="adv-grid"><label class="dock-field">شکل قلم <select id="pro-brush-shape"><option value="square">مربعی</option><option value="circle">گرد</option><option value="diamond">لوزی</option></select></label><label class="dock-field">بافت قلم <select id="pro-texture"><option value="none">بدون بافت</option><option value="dots">نقطه‌ای</option><option value="diagonal">مورب</option><option value="grain">دانه‌ای</option></select></label></div><label class="dock-field">تراکم بافت <input id="pro-texture-density" type="range" min="5" max="100" value="60"></label><label class="dock-field">انحنای منحنی بزیه <input id="pro-curve" type="range" min="-64" max="64" value="24"></label><div class="dock-note">ماسک غیرمخرب لایه</div><div class="adv-grid"><button id="pro-mask-add" type="button">افزودن ماسک</button><button id="pro-mask-invert" type="button">معکوس ماسک</button><button id="pro-mask-apply" type="button">اعمال ماسک</button><button id="pro-mask-remove" type="button">حذف ماسک</button></div><label class="dock-field"><input id="pro-mask-edit" type="checkbox"> ویرایش ماسک با قلم (پاک‌کن = پنهان‌سازی)</label><div class="dock-note">مدیریت گروه لایه‌ها</div><div class="adv-grid"><label class="dock-field">گروه فعال <select id="pro-group-target"><option>Ungrouped</option><option>Group A</option><option>Group B</option><option>UI</option><option>Background</option><option>Foreground</option></select></label><label class="dock-field">شفافیت گروه <input id="pro-group-opacity" type="range" min="0" max="100" value="100"></label></div><div class="adv-grid"><button id="pro-group-toggle" type="button">نمایش / پنهان گروه</button><button id="pro-group-assign" type="button">قرار دادن لایه در گروه</button></div><p class="dock-note">برای انتقال انتخاب، ابتدا محدوده را با Select یا Lasso مشخص کنید و سپس Move را انتخاب کنید. مقیاس انتخاب با نمونه‌برداری نزدیک‌ترین همسایه انجام می‌شود.</p></section><section id="panel-export" role="tabpanel" aria-labelledby="tab-export" hidden><div class="dock-actions"><button id="adv-original">⇩ Original source</button><button id="adv-png">⇩ PNG image</button><button id="adv-svg">⇩ SVG artwork</button><button id="adv-ico">⇩ Windows ICO</button><button id="adv-svg-code">⇩ SVG machine code</button><button id="adv-ir">⇩ Graphic IR / machine data</button></div><div id="adv-export-downloads" class="dock-note" aria-live="polite" style="margin-top:12px"></div><p class="dock-note">هر خروجی مستقل ساخته می‌شود. دادهٔ گرافیک IR با کدگذاری فشردهٔ ردیفی تولید می‌شود و به تحلیل سنگین وابسته نیست. SVG در ابعاد بسیار بزرگ، برای حفظ تصویر از نسخهٔ SVG با تصویر جاسازی‌شده استفاده می‌کند.</p></section></div>';
+ d.innerHTML='<div class="dock-head"><strong>Tools</strong><span>Choose a category, then a tool</span></div><div id="studio-tool-categories" role="tablist" aria-label="Tool categories"><button type="button" role="tab" aria-controls="studio-quick-tools" aria-label="Draw tools" data-tool-category="draw" aria-selected="true" tabindex="0">✏️ Draw</button><button type="button" role="tab" aria-controls="studio-quick-tools" aria-label="Shape tools" data-tool-category="shapes" aria-selected="false" tabindex="-1">▭ Shapes</button><button type="button" role="tab" aria-controls="studio-quick-tools" aria-label="Selection tools" data-tool-category="selection" aria-selected="false" tabindex="-1">▣ Selection</button><button type="button" role="tab" aria-controls="studio-quick-tools" aria-label="Effects tools" data-tool-category="effects" aria-selected="false" tabindex="-1">◩ Effects</button><button type="button" role="tab" aria-controls="studio-quick-tools" aria-label="View tools" data-tool-category="view" aria-selected="false" tabindex="-1">🔍 View</button></div><nav id="studio-quick-tools" aria-label="Tools in selected category"></nav><div id="studio-brush"></div><div id="studio-tabs" role="tablist" aria-label="Advanced tool categories"><button type="button" role="tab" id="tab-palette" aria-controls="panel-palette" aria-selected="true" data-tab="palette">🎨 Color</button><button type="button" role="tab" id="tab-layers" aria-controls="panel-layers" aria-selected="false" data-tab="layers">🧱 Layers</button><button type="button" role="tab" id="tab-fill" aria-controls="panel-fill" aria-selected="false" data-tab="fill">🪣 Fill</button><button type="button" role="tab" id="tab-transform" aria-controls="panel-transform" aria-selected="false" data-tab="transform">↔ Transform</button><button type="button" role="tab" id="tab-adjust" aria-controls="panel-adjust" aria-selected="false" data-tab="adjust">☀ Adjust</button><button type="button" role="tab" id="tab-compose" aria-controls="panel-compose" aria-selected="false" data-tab="compose">🧩 Compose</button><button type="button" role="tab" id="tab-pro" aria-controls="panel-pro" aria-selected="false" data-tab="pro">✦ Advanced</button><button type="button" role="tab" id="tab-export" aria-controls="panel-export" aria-selected="false" data-tab="export">⇩ Export</button></div><div id="studio-tabpanels"><section id="panel-palette" role="tabpanel" aria-labelledby="tab-palette"><div class="dock-palette"><div><div id="dock-color-slot"></div><button id="adv-add">＋ Add color</button><button id="adv-replace">Replace selected</button></div><div><p class="dock-note">Choose a swatch, sample a pixel, or create a new color.</p><div id="dock-palette-slot"></div><button id="adv-extract">Extract active layer colors</button></div></div></section><section id="panel-layers" role="tabpanel" aria-labelledby="tab-layers" hidden><p class="dock-note">Select a layer. Eye = show/hide, lock = protect, slider = opacity.</p><div id="adv-layers"></div><button id="adv-clear" type="button">Clear active layer</button></section><section id="panel-fill" role="tabpanel" aria-labelledby="tab-fill" hidden><label class="dock-field">Fill area <select id="adv-bucket"><option value="contiguous">Connected area only</option><option value="similar">Connected similar colors</option><option value="global">Every exact match in layer</option></select></label><label class="dock-field">Color tolerance <input id="adv-tol" type="range" min="0" max="180" value="0"></label><p class="dock-note">Fill mode and tolerance appear in Tool options when Fill is selected.</p></section><section id="panel-transform" role="tabpanel" aria-labelledby="tab-transform" hidden><label class="dock-field">Paint symmetry <select id="adv-symmetry"><option value="none">Off</option><option value="horizontal">Horizontal</option><option value="vertical">Vertical</option><option value="both">Horizontal + vertical</option></select></label><div class="adv-grid"><button data-x="h">↔ Mirror horizontal</button><button data-x="v">↕ Mirror vertical</button><button data-x="90">⤾ Rotate 90°</button><button data-x="180">↻ Rotate 180°</button><button data-x="neg">◐ Negative</button><button data-x="crop">▣ Crop</button></div><div class="adv-grid"><label class="dock-field">X <input id="crop-x" type="number" value="0" min="0"></label><label class="dock-field">Y <input id="crop-y" type="number" value="0" min="0"></label><label class="dock-field">Width <input id="crop-w" type="number" value="16" min="1"></label><label class="dock-field">Height <input id="crop-h" type="number" value="16" min="1"></label></div></section><section id="panel-adjust" role="tabpanel" aria-labelledby="tab-adjust" hidden><label class="dock-field">Brightness <input id="adj-b" type="range" min="-100" max="100" value="0"></label><label class="dock-field">Contrast <input id="adj-c" type="range" min="-100" max="100" value="0"></label><label class="dock-field">Saturation <input id="adj-s" type="range" min="-100" max="100" value="0"></label><label class="dock-field">Warm ↔ Cool <input id="adj-w" type="range" min="-100" max="100" value="0"></label><div class="dock-actions"><button id="adj-apply">Apply color settings</button><button id="adj-shine">✨ Shine</button><button id="adj-fade">Fade / soften</button><button id="adj-sharpen">Sharpen edges</button></div><p class="dock-note">RGB channel offsets</p><div class="adv-grid"><label class="dock-field">Red ± <input id="rgb-r" type="number" value="0"></label><label class="dock-field">Green ± <input id="rgb-g" type="number" value="0"></label><label class="dock-field">Blue ± <input id="rgb-b" type="number" value="0"></label><button id="rgb-apply">Apply RGB</button></div></section><section id="panel-compose" role="tabpanel" aria-labelledby="tab-compose" hidden><label class="dock-field">Add image over artwork <input id="adv-overlay" type="file" accept="image/*"></label><label class="dock-field">Key color <input id="adv-key" type="color" value="#00ff00"></label><label class="dock-field">Key tolerance <input id="adv-keytol" type="range" min="0" max="220" value="60"></label><button id="adv-chroma">Remove key color</button><div class="adv-grid"><label class="dock-field">Text <input id="adv-text" value="N.U" maxlength="32"></label><label class="dock-field">Text size <input id="adv-textsize" type="number" min="6" max="96" value="16"></label></div><button id="adv-textadd">Add text to active layer</button><label class="dock-field">Blend over painted pixels <input id="adv-alpha" type="range" min="10" max="100" value="100"></label><p class="dock-note">Text is rasterized at current pixel resolution.</p></section><section id="panel-pro" role="tabpanel" aria-labelledby="tab-pro" hidden><div class="dock-note">Layer-mask and group operations remain in Advanced. Options for the active drawing tool appear above.</div><div class="adv-grid"><button id="pro-select-all" type="button">Select all</button><button id="pro-deselect" type="button">Deselect</button><button id="pro-invert-selection" type="button">Invert selection</button><button id="pro-scale-selection" type="button">Scale selection</button></div><div class="adv-grid"><label class="dock-field">Horizontal scale × <input id="pro-scale-x" type="number" min="0.1" max="16" step="0.1" value="2"></label><label class="dock-field">Vertical scale × <input id="pro-scale-y" type="number" min="0.1" max="16" step="0.1" value="2"></label></div><div class="adv-grid"><label class="dock-field">Gradient end color <input id="pro-gradient-color" type="color" value="#65dcff"></label><label class="dock-field">Gradient type <select id="pro-gradient-mode"><option value="linear">Linear</option><option value="radial">Radial</option></select></label></div><div class="adv-grid"><label class="dock-field">Brush shape <select id="pro-brush-shape"><option value="square">Square</option><option value="circle">Round</option><option value="diamond">Diamond</option></select></label><label class="dock-field">Brush texture <select id="pro-texture"><option value="none">None</option><option value="dots">Dots</option><option value="diagonal">Diagonal</option><option value="grain">Grain</option></select></label></div><label class="dock-field">Texture density <input id="pro-texture-density" type="range" min="5" max="100" value="60"></label><label class="dock-field">Bezier curve tension <input id="pro-curve" type="range" min="-64" max="64" value="24"></label><div class="dock-note">Non-destructive layer mask</div><div class="adv-grid"><button id="pro-mask-add" type="button">Add mask</button><button id="pro-mask-invert" type="button">Invert mask</button><button id="pro-mask-apply" type="button">Apply mask</button><button id="pro-mask-remove" type="button">Remove mask</button></div><label class="dock-field"><input id="pro-mask-edit" type="checkbox"> Edit mask with brush (eraser hides)</label><div class="dock-note">Layer group management</div><div class="adv-grid"><label class="dock-field">Active group <select id="pro-group-target"><option>Ungrouped</option><option>Group A</option><option>Group B</option><option>UI</option><option>Background</option><option>Foreground</option></select></label><label class="dock-field">Group opacity <input id="pro-group-opacity" type="range" min="0" max="100" value="100"></label></div><div class="adv-grid"><button id="pro-group-toggle" type="button">Show / hide group</button><button id="pro-group-assign" type="button">Assign layer to group</button></div><p class="dock-note">To move content, create a selection with Select or Lasso, then choose Move. Selection scaling uses nearest-neighbor sampling.</p></section><section id="panel-export" role="tabpanel" aria-labelledby="tab-export" hidden><div class="dock-actions"><button id="adv-original">⇩ Original source</button><button id="adv-png">⇩ PNG image</button><button id="adv-svg">⇩ SVG artwork</button><button id="adv-ico">⇩ Windows ICO</button><button id="adv-svg-code">⇩ SVG machine code</button><button id="adv-ir">⇩ Graphic IR / machine data</button></div><div id="adv-export-downloads" class="dock-note" aria-live="polite" style="margin-top:12px"></div><p class="dock-note">Each export is generated independently. Graphic IR uses compact row-run encoding and does not require heavy analysis. For very large artwork, SVG may embed a raster image to preserve the artwork.</p></section></div>';
  const drawer=$("studio-tools-drawer");
  const legacyPanels=[...drawer.querySelectorAll(":scope > details.panel")];
  const toolsPanel=legacyPanels[0],vectorPanel=legacyPanels[1],exportPanel=legacyPanels[2];
@@ -411,14 +482,43 @@ function advPanel(){
  propertiesPanel.append(propertiesContent);
  vectorPanel.remove();
  drawer.insertBefore(propertiesPanel,exportPanel);
- drawer.append(d);
- const quick=$("studio-quick-tools"),names={pencil:["✏️","Pencil","قلم"],eraser:["🧽","Eraser","پاک‌کن"],fill:["🪣","Fill","سطل رنگ"],picker:["🎯","Pick color","نمونه‌رنگ"],line:["／","Line","خط"],rect:["▭","Rectangle","مستطیل"],ellipse:["◯","Ellipse","بیضی"],"rect-fill":["▰","Filled rectangle","مستطیل توپر"],"ellipse-fill":["●","Filled ellipse","بیضی توپر"],"select-rect":["▣","Rect selection","انتخاب"],"select-lasso":["〰","Lasso selection","انتخاب آزاد"],"move-selection":["✥","Move selection","جابجایی"],gradient:["◩","Gradient","گرادیان"],texture:["▦","Texture brush","قلم بافت"],bezier:["⌁","Bezier curve","منحنی"],"fading-brush":["🌫️","Fading brush","قلم محوشونده"],"color-mix-brush":["🖌️","Color-mixing brush","قلم ترکیب رنگ"]};
- document.querySelectorAll("[data-tool]").forEach(b=>{const n=names[b.dataset.tool];if(!n)return;b.innerHTML='<span class="tool-icon" aria-hidden="true">'+n[0]+'</span><span>'+n[2]+'</span>';b.title=n[1]+' · '+n[2];b.setAttribute('aria-label',n[1]+' · '+n[2]);quick.append(b);});
- $("studio-brush").append(existingBrushField);
- const fadeField=document.createElement("label");fadeField.className="dock-field";fadeField.textContent="Fading brush intensity · شدت محوشدن";const fadeRange=document.createElement("input");fadeRange.type="range";fadeRange.min="1";fadeRange.max="100";fadeRange.value=String(fadeIntensity);fadeRange.setAttribute("aria-label","Fading brush intensity");fadeRange.oninput=()=>{fadeIntensity=+fadeRange.value;};fadeField.append(fadeRange);$("studio-brush").append(fadeField);
- const fadeButton=document.createElement("button");fadeButton.type="button";fadeButton.className="tool";fadeButton.dataset.tool="fading-brush";fadeButton.setAttribute("aria-pressed","false");fadeButton.textContent="🌫️ قلم محوشونده";fadeButton.addEventListener("click",()=>setTool("fading-brush"));quick.append(fadeButton);
- const mixField=document.createElement("label");mixField.className="dock-field";mixField.textContent="Color mixing strength · قدرت ترکیب رنگ";const mixRange=document.createElement("input");mixRange.type="range";mixRange.min="1";mixRange.max="100";mixRange.step="1";mixRange.value=String(mixBrushStrength);mixRange.id="mix-brush-strength";mixRange.setAttribute("aria-label","Color mixing strength");mixRange.oninput=()=>{mixBrushStrength=+mixRange.value;};mixField.append(mixRange);const mixHint=document.createElement("small");mixHint.className="dock-note";mixHint.textContent="رنگ موجود روی بوم را برمی‌دارد و در مسیر حرکت با رنگ‌های مجاور ترکیب می‌کند؛ ناحیهٔ شفاف را رنگ‌آمیزی نمی‌کند.";mixField.append(mixHint);$("studio-brush").append(mixField);
- const mixButton=document.createElement("button");mixButton.type="button";mixButton.className="tool";mixButton.dataset.tool="color-mix-brush";mixButton.setAttribute("aria-pressed","false");mixButton.innerHTML="<span class=\"tool-icon\" aria-hidden=\"true\">🖌️</span><span>قلم ترکیب رنگ</span>";mixButton.title="Color-mixing brush · قلم ترکیب رنگ";mixButton.setAttribute("aria-label","Color-mixing brush · قلم ترکیب رنگ");mixButton.addEventListener("click",()=>setTool("color-mix-brush"));quick.append(mixButton);
+ drawer.prepend(d);
+ const quick=$("studio-quick-tools"),names={pencil:{icon:"✏️",label:"Pencil",shortcut:"B",category:"draw"},eraser:{icon:"🧽",label:"Eraser",shortcut:"E",category:"draw"},fill:{icon:"🪣",label:"Fill",shortcut:"G",category:"draw"},picker:{icon:"🎯",label:"Eyedropper",shortcut:"I",category:"draw"},line:{icon:"／",label:"Line",shortcut:"L",category:"shapes"},rect:{icon:"▭",label:"Rectangle",shortcut:"R",category:"shapes"},ellipse:{icon:"◯",label:"Ellipse",shortcut:"O",category:"shapes"},"rect-fill":{icon:"▰",label:"Filled rectangle",category:"shapes"},"ellipse-fill":{icon:"●",label:"Filled ellipse",category:"shapes"},"select-rect":{icon:"▣",label:"Rectangular selection",category:"selection"},"select-lasso":{icon:"〰",label:"Lasso selection",category:"selection"},"move-selection":{icon:"✥",label:"Move selection",category:"selection"},gradient:{icon:"◩",label:"Gradient",category:"effects"},texture:{icon:"▦",label:"Texture brush",category:"effects"},bezier:{icon:"⌁",label:"Bezier curve",category:"shapes"},"fading-brush":{icon:"🌫️",label:"Fading brush",category:"effects"},"color-mix-brush":{icon:"🖌️",label:"Color-mixing brush",category:"effects"},compass:{icon:"🧭",label:"Compass",category:"shapes"},magnifier:{icon:"🔍",label:"Magnifier",category:"view"}};
+ document.querySelectorAll("[data-tool]").forEach(b=>{const n=names[b.dataset.tool];if(!n)return;b.dataset.category=n.category;b.innerHTML='<span class="tool-icon" aria-hidden="true">'+n.icon+'</span><span>'+n.label+'</span>';b.title=n.shortcut?n.label+' ('+n.shortcut+')':n.label;b.setAttribute("aria-label",n.label+(n.shortcut?", "+n.shortcut+" shortcut":""));quick.append(b);});
+ const categoryButtons=[...document.querySelectorAll("#studio-tool-categories [data-tool-category]")];
+ toolCategoryRefresh=(next)=>{if(next)activeToolCategory=next;categoryButtons.forEach(b=>{const on=b.dataset.toolCategory===activeToolCategory;b.setAttribute("aria-selected",String(on));b.tabIndex=on?0:-1;});quick.querySelectorAll("[data-tool]").forEach(b=>{b.hidden=b.dataset.category!==activeToolCategory;});};
+ categoryButtons.forEach((b,i)=>{b.addEventListener("click",()=>toolCategoryRefresh(b.dataset.toolCategory));b.addEventListener("keydown",e=>{if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft")return;e.preventDefault();const nextIndex=(i+(e.key==="ArrowRight"?1:categoryButtons.length-1))%categoryButtons.length,next=categoryButtons[nextIndex];toolCategoryRefresh(next.dataset.toolCategory);next.focus();});});
+ toolCategoryRefresh();
+ const contextPanel=$("studio-brush");contextPanel.setAttribute("role","region");contextPanel.setAttribute("aria-label","Active tool options");
+ const contextHead=document.createElement("div");contextHead.className="tool-context-head";const contextTitle=document.createElement("strong");contextTitle.id="studio-context-title";const contextTag=document.createElement("span");contextTag.textContent="Tool options";contextHead.append(contextTitle,contextTag);
+ const contextHint=document.createElement("p");contextHint.id="studio-context-hint";contextHint.className="tool-context-hint";contextHint.setAttribute("aria-live","polite");contextPanel.append(contextHead,contextHint);
+ existingBrushField.dataset.contextOwner="paint";contextPanel.append(existingBrushField);
+ const moveContextField=(id,owner)=>{const control=$(id);if(!control)return null;const field=control.closest(".dock-field")||control.closest("label")||control;field.dataset.contextOwner=owner;contextPanel.append(field);return field;};
+ moveContextField("adv-symmetry","paint");moveContextField("pro-brush-shape","paint");moveContextField("pro-mask-edit","paint");
+ moveContextField("pro-texture","texture");moveContextField("pro-texture-density","texture");moveContextField("pro-curve","bezier");
+ moveContextField("adv-bucket","fill");moveContextField("adv-tol","fill");
+ moveContextField("pro-gradient-color","gradient");moveContextField("pro-gradient-mode","gradient");
+ const selectionActions=$("pro-select-all").parentElement;selectionActions.dataset.contextOwner="selection";contextPanel.append(selectionActions);
+ const selectionScale=$("pro-scale-x").closest(".adv-grid");selectionScale.dataset.contextOwner="selection";contextPanel.append(selectionScale);
+ document.querySelectorAll("#studio-tabpanels .adv-grid").forEach(group=>{if(!group.children.length)group.remove();});
+ const contextLabels={pencil:"Pencil",eraser:"Eraser",fill:"Fill",picker:"Eyedropper",line:"Line",rect:"Rectangle",ellipse:"Ellipse","rect-fill":"Filled rectangle","ellipse-fill":"Filled ellipse","select-rect":"Rectangular selection","select-lasso":"Lasso selection","move-selection":"Move selection",gradient:"Gradient",texture:"Texture brush",bezier:"Bezier curve",compass:"Compass","fading-brush":"Fading brush","color-mix-brush":"Color-mixing brush",magnifier:"Magnifier"};
+ const contextHints={pencil:"Draw with the selected color on the active layer.",eraser:"Erase pixels on the active layer.",fill:"Choose a fill mode and tolerance, then select a canvas area.",picker:"Sample a color from the canvas.",line:"Draw a straight line with the current brush settings.",rect:"Draw a rectangle with the current brush settings.",ellipse:"Draw an ellipse with the current brush settings.","rect-fill":"Draw a filled rectangle.","ellipse-fill":"Draw a filled ellipse.","select-rect":"Create a rectangular selection, then refine or scale it.","select-lasso":"Draw a freehand selection, then refine or scale it.","move-selection":"Move or scale the active selection.",gradient:"Choose a gradient mode and end color before drawing.",texture:"Choose a brush shape and texture density for textured strokes.","fading-brush":"Adjust how quickly pigment fades along a stroke.","color-mix-brush":"Adjust how strongly existing canvas colors blend.","bezier":"Adjust the curve tension before placing control points.",compass:"Choose a center point, drag to set the radius, then release to commit the circle.",magnifier:"Move over the canvas to inspect pixels in a live, view-only loupe."};
+ const contextOwners={pencil:["paint"],eraser:["paint"],line:["paint"],rect:["paint"],ellipse:["paint"],"rect-fill":["paint"],"ellipse-fill":["paint"],"fading-brush":["paint","fading"],"color-mix-brush":["paint","mix"],texture:["paint","texture"],fill:["fill"],gradient:["gradient"],"select-rect":["selection"],"select-lasso":["selection"],"move-selection":["selection"],bezier:["bezier"],magnifier:["magnifier"]};
+ toolContextRefresh=()=>{const owners=contextOwners[tool]||[];contextTitle.textContent=contextLabels[tool]||"Tool options";contextHint.textContent=contextHints[tool]||"No additional settings for this tool.";contextPanel.dataset.activeTool=tool;contextPanel.querySelectorAll("[data-context-owner]").forEach(node=>{node.hidden=!owners.includes(node.dataset.contextOwner);});};
+ const magnifierField=document.createElement("div");magnifierField.className="dock-field";magnifierField.dataset.contextOwner="magnifier";
+ const magnifierStrengthLabel=document.createElement("label");magnifierStrengthLabel.htmlFor="magnifier-strength";magnifierStrengthLabel.textContent="Magnification";
+ const magnifierStrength=document.createElement("select");magnifierStrength.id="magnifier-strength";magnifierStrength.setAttribute("aria-label","Magnifier strength");
+ for(const factor of [2,3,4,6,8]){const option=document.createElement("option");option.value=String(factor);option.textContent=factor+"×";magnifierStrength.append(option);}
+ magnifierStrength.value=String(magnifierFactor);magnifierStrength.addEventListener("change",()=>{magnifierFactor=Number(magnifierStrength.value)||4;if(lastMagnifierPoint)updateMagnifier(lastMagnifierPoint);});
+ const magnifierSizeLabel=document.createElement("label");magnifierSizeLabel.htmlFor="magnifier-size";magnifierSizeLabel.textContent="Lens size";
+ const magnifierSizeControl=document.createElement("input");magnifierSizeControl.type="range";magnifierSizeControl.id="magnifier-size";magnifierSizeControl.min="120";magnifierSizeControl.max="220";magnifierSizeControl.step="10";magnifierSizeControl.value=String(magnifierSize);magnifierSizeControl.setAttribute("aria-label","Magnifier lens size");
+ magnifierSizeControl.addEventListener("input",()=>{magnifierSize=Number(magnifierSizeControl.value)||160;const lens=$("studio-magnifier");lens.style.width=magnifierSize+"px";lens.style.height=magnifierSize+"px";if(lastMagnifierPoint)updateMagnifier(lastMagnifierPoint);});
+ magnifierField.append(magnifierStrengthLabel,magnifierStrength,magnifierSizeLabel,magnifierSizeControl);contextPanel.append(magnifierField);
+ toolContextRefresh();
+ const fadeField=document.createElement("label");fadeField.className="dock-field";fadeField.dataset.contextOwner="fading";fadeField.textContent="Fading brush intensity";const fadeRange=document.createElement("input");fadeRange.type="range";fadeRange.min="1";fadeRange.max="100";fadeRange.value=String(fadeIntensity);fadeRange.setAttribute("aria-label","Fading brush intensity");fadeRange.oninput=()=>{fadeIntensity=+fadeRange.value;};fadeField.append(fadeRange);$("studio-brush").append(fadeField);
+ const fadeButton=document.createElement("button");fadeButton.type="button";fadeButton.className="tool";fadeButton.dataset.tool="fading-brush";fadeButton.dataset.category="effects";fadeButton.setAttribute("aria-pressed","false");fadeButton.innerHTML='<span class="tool-icon" aria-hidden="true">🌫️</span><span>Fading brush</span>';fadeButton.title="Fading brush";fadeButton.setAttribute("aria-label","Fading brush");fadeButton.addEventListener("click",()=>setTool("fading-brush"));quick.append(fadeButton);
+ const mixField=document.createElement("label");mixField.className="dock-field";mixField.dataset.contextOwner="mix";mixField.textContent="Color mixing strength";const mixRange=document.createElement("input");mixRange.type="range";mixRange.min="1";mixRange.max="100";mixRange.step="1";mixRange.value=String(mixBrushStrength);mixRange.id="mix-brush-strength";mixRange.setAttribute("aria-label","Color mixing strength");mixRange.oninput=()=>{mixBrushStrength=+mixRange.value;};mixField.append(mixRange);const mixHint=document.createElement("small");mixHint.className="dock-note";mixHint.textContent="Samples existing canvas pigment and blends nearby colors along the stroke. Transparent areas are not painted.";mixField.append(mixHint);$("studio-brush").append(mixField);
+ const mixButton=document.createElement("button");mixButton.type="button";mixButton.className="tool";mixButton.dataset.tool="color-mix-brush";mixButton.dataset.category="effects";mixButton.setAttribute("aria-pressed","false");mixButton.innerHTML="<span class=\"tool-icon\" aria-hidden=\"true\">🖌️</span><span>Color-mixing brush</span>";mixButton.title="Color-mixing brush";mixButton.setAttribute("aria-label","Color-mixing brush");mixButton.addEventListener("click",()=>setTool("color-mix-brush"));quick.append(mixButton);toolCategoryRefresh();toolContextRefresh();
  $("dock-color-slot").append(existingColorField);
  $("dock-palette-slot").append(existingPaletteField);
  $("panel-palette").querySelector(".dock-palette>div:last-child").append(existingExtract);
@@ -436,12 +536,12 @@ function advPanel(){
  $("adj-shine").onclick=()=>mapAdv(c=>c.map(v=>v+28));$("adj-fade").onclick=()=>mapAdv(c=>c.map(v=>v*.8+128*.2));$("adj-sharpen").onclick=sharpenAdv;
  $("adv-overlay").onchange=overlayAdv;$("adv-chroma").onclick=chromaAdv;$("adv-textadd").onclick=textAdv;
  $("adv-original").onclick=()=>{if(!originalImportFile)return announce("No original imported file.");download(new Blob([originalImportFile],{type:originalImportFile.type}),"original-"+originalImportFile.name);};
- $("adv-svg").onclick=()=>{try{const r=svgSource(),name=filename("edited.svg");download(new Blob([r.source],{type:"image/svg+xml;charset=utf-8"}),name);announce("SVG آماده است · "+(r.fallback?"نسخهٔ سازگار با تصویر جاسازی‌شده":"بردار قابل‌ویرایش")+" · لینک دریافت روی صفحه قرار گرفت.");}catch(e){announce("SVG export failed: "+e.message);}};
+ $("adv-svg").onclick=()=>{try{const r=svgSource(),name=filename("edited.svg");download(new Blob([r.source],{type:"image/svg+xml;charset=utf-8"}),name);announce("SVG ready · "+(r.fallback?"embedded-image fallback":"editable vector")+" · The download link is available on the page.");}catch(e){announce("SVG export failed: "+e.message);}};
  $("adv-ico").onclick=()=>{try{if(!window.NUIcoExport)throw new Error("ICO export engine did not load.");adv.layers[adv.active].pixels=pixels.slice();const visible=composite();const bytes=window.NUIcoExport.buildIco(visible,width,height);const name=filename("ico");download(new Blob([bytes],{type:"image/x-icon"}),name);announce("Windows ICO ready · multi-size · transparency preserved.");}catch(e){announce("ICO export failed: "+e.message);}};
  $("export-ico").onclick=()=>$("adv-ico").click();
  $("adv-png").onclick=()=>$("export-png").click();
  $("adv-ir").onclick=()=>$("export-ir").click();
- $("adv-svg-code").onclick=()=>{try{const r=svgSource(),name=filename("svg-source.txt");download(new Blob([r.source],{type:"text/plain;charset=utf-8"}),name);announce("کد کامل SVG آمادهٔ دریافت است.");}catch(e){announce("SVG code export failed: "+e.message);}};
+ $("adv-svg-code").onclick=()=>{try{const r=svgSource(),name=filename("svg-source.txt");download(new Blob([r.source],{type:"text/plain;charset=utf-8"}),name);announce("SVG source code is ready to download.");}catch(e){announce("SVG code export failed: "+e.message);}};
  layerUI();
 }
 function mapAdv(fn){if(adv.layers[adv.active].locked)return announce("Layer locked");const before=histAdv();pixels=pixels.map((c,i)=>c&&(!adv.selection||adv.selection[i])?hexRGB(fn(rgb(c))):c);adv.layers[adv.active].pixels=pixels.slice();commitHistory(before);render();}
@@ -479,13 +579,19 @@ const paintAdv=paintBrush;paintBrush=function(x,y,v){
  }
 };
 const floodAdv=flood;flood=function(x,y,next){
- if(adv.layers[adv.active].locked)return;
- if(adv.selection){
-  const start=pixels[y*width+x],match=c=>adv.bucket==="global"?c===start:adv.bucket==="similar"?dist(c,start)<=adv.tol:c===start;
-  if(adv.bucket==="global"){pixels=pixels.map((c,i)=>adv.selection[i]&&match(c)?next:c);return;}
-  const q=[y*width+x],seen=new Uint8Array(width*height);while(q.length){const i=q.pop();if(i<0||i>=pixels.length||seen[i]||!adv.selection[i]||!match(pixels[i]))continue;seen[i]=1;pixels[i]=next;const xx=i%width,yy=Math.floor(i/width);if(xx)q.push(i-1);if(xx<width-1)q.push(i+1);if(yy)q.push(i-width);if(yy<height-1)q.push(i+width);}return;
+ const layer=adv.layers[adv.active];
+ if(layer.locked){announce("Layer is locked. Unlock it to use Fill.");return 0;}
+ if(adv.maskEdit){announce("Turn off mask editing before using Fill.");return 0;}
+ const result=window.NUStudioProTools.bucketFill(pixels,width,height,x,y,next,adv.bucket,adv.tol,adv.selection,layer.mask);
+ if(result.changed===0){
+  const messages={"same-color":"This area already uses the selected color.","outside-selection":"The Fill point is outside the active selection.","outside-mask":"The Fill point is hidden by the active layer mask.","no-match":"No matching pixels were found to fill."};
+  announce(messages[result.reason]||"Nothing changed. Check the active layer and selection.");
+  return 0;
  }
- const start=pixels[y*width+x];if(adv.bucket==="global"){pixels=pixels.map(c=>c===start?next:c);return;}if(adv.bucket==="similar"){const q=[y*width+x],seen=new Uint8Array(width*height);while(q.length){const i=q.pop();if(i<0||i>=pixels.length||seen[i]||dist(pixels[i],start)>adv.tol)continue;seen[i]=1;pixels[i]=next;const xx=i%width,yy=Math.floor(i/width);if(xx)q.push(i-1);if(xx<width-1)q.push(i+1);if(yy)q.push(i-width);if(yy<height-1)q.push(i+width);}return;}floodAdv(x,y,next);
+ pixels=result.pixels;
+ layer.pixels=pixels.slice();
+ announce("Filled "+result.changed.toLocaleString()+" pixels on "+layer.name+".");
+ return result.changed;
 };
 
 const resizeArtworkBase=resizeArtwork;
@@ -516,9 +622,9 @@ function installStudio2DControls(){
  const rotation=document.createElement("div");rotation.className="dock-field";rotation.innerHTML='<strong>Free layer rotation</strong><label>Angle <input id="pro-free-rotation" type="range" min="-180" max="180" value="0"></label><output id="pro-free-rotation-value">0°</output><button id="pro-rotate-layer" type="button">Rotate active layer</button>';panel.append(rotation);
  $("pro-free-rotation").oninput=e=>$("pro-free-rotation-value").textContent=e.target.value+"°";
  $("pro-rotate-layer").onclick=()=>applyFreeLayerRotation(+$("pro-free-rotation").value);
- const guides=document.createElement("section");guides.className="adaptive-control";guides.style.marginTop="12px";guides.innerHTML='<strong>VIEW GUIDES</strong><div class="adv-grid"><label><input type="checkbox" data-guide="blueprint"> Blueprint</label><label><input type="checkbox" data-guide="ruler"> Ruler</label><label><input type="checkbox" data-guide="divisions"> Divisions</label><label><input type="checkbox" data-guide="axes"> Angular axes</label><label><input type="checkbox" data-guide="depth"> Depth axis</label></div><button id="view-rotate-reset" type="button">Reset viewport rotation</button>';
+ const guides=document.createElement("section");guides.className="adaptive-control";guides.style.marginTop="12px";guides.innerHTML='<strong>VIEW GUIDES</strong><div class="adv-grid"><label><input type="checkbox" data-guide="blueprint"> Blueprint</label><label><input type="checkbox" data-guide="ruler"> Ruler</label><label><input type="checkbox" data-guide="divisions"> Divisions</label><label><input type="checkbox" data-guide="axes"> Angular axes</label><label><input type="checkbox" data-guide="depth"> Depth axis</label><label><input type="checkbox" data-guide-contrast checked> High contrast</label></div><button id="view-rotate-reset" type="button">Reset viewport rotation</button>';
  document.querySelector(".view-tools")?.append(guides);
- guides.querySelectorAll("[data-guide]").forEach(input=>input.addEventListener("change",e=>{guideState[e.target.dataset.guide]=e.target.checked;render();}));
+ guides.querySelectorAll("[data-guide]").forEach(input=>input.addEventListener("change",e=>{guideState[e.target.dataset.guide]=e.target.checked;render();}));guides.querySelector("[data-guide-contrast]")?.addEventListener("change",e=>{guideHighContrast=e.target.checked;render();});
  $("view-rotate-reset")?.addEventListener("click",()=>{viewRotation=0;canvas.style.transform="";announce("Viewport rotation reset; artwork unchanged.");});
 }
 installStudio2DControls();
@@ -622,16 +728,20 @@ function setDesktopToolsOpen(open){
 }
 desktopToolsToggle?.addEventListener("click",()=>setDesktopToolsOpen(!document.body.classList.contains("nu-desktop-tools-open")));
 
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){setMobileToolsOpen(false);setDesktopToolsOpen(false);}});
+document.addEventListener("keydown",e=>{
+ if(e.key!=="Escape")return;
+ if(mobileWorkspaceQuery.matches){
+  if(document.body.classList.contains("nu-mobile-tools-open"))setMobileToolsOpen(false);
+  return;
+ }
+ if(document.body.classList.contains("nu-desktop-tools-open"))setDesktopToolsOpen(false);
+});
 document.addEventListener("pointerdown",e=>{
+ if(e.target?.closest?.("#studio-project-confirm"))return;
  if(document.body.classList.contains("nu-mobile-tools-open")&&!mobileToolsDrawer?.contains(e.target)&&!$("mobile-workspace-dock")?.contains(e.target))setMobileToolsOpen(false);
  if(document.body.classList.contains("nu-desktop-tools-open")&&!mobileToolsDrawer?.contains(e.target)&&!$("desktop-workspace-rail")?.contains(e.target))setDesktopToolsOpen(false);
 });
-function setMobileZoom(next){
- workspace.zoom=clamp(next,25,800);
- $("workspace-zoom").value=workspace.zoom;
- applyZoom();
-}
+function setMobileZoom(next){setZoom(next,null,"smooth");}
 $("mobile-zoom-in")?.addEventListener("click",()=>setMobileZoom(workspace.zoom+25));
 $("mobile-zoom-out")?.addEventListener("click",()=>setMobileZoom(workspace.zoom-25));
 $("mobile-view-rotation")?.addEventListener("input",e=>{
@@ -647,5 +757,163 @@ $("mobile-view-reset")?.addEventListener("click",()=>{
  $("fit-canvas").click();
  announce("Viewport reset; artwork pixels and undo history are unchanged.");
 });
+
+/* Stage 7 — versioned local project portability and explicit replacement safety. */
+const STUDIO_PROJECT_FORMAT="N.U-Pixel-Art-Studio-Project";
+const STUDIO_PROJECT_VERSION=1;
+const STUDIO_PROJECT_MAX_BYTES=128*1024*1024;
+function projectHasContent(){
+ return width!==32||height!==32||adv.layers.some(layer=>
+  layer.pixels.some(Boolean)||!!layer.mask||layer.opacity!==100||!layer.visible||layer.locked||layer.blend!=="normal"||layer.group!=="Ungrouped"
+ )||!!(adv.selection&&adv.selection.some(Boolean))||Object.keys(adv.groups).length>0||
+  palette.join("|")!==defaults.join("|")||color!=="#e8b94f"||tool!=="pencil"||imageImported||
+  workspace.zoom!==100||brushSize!==1||fadeIntensity!==50||mixBrushStrength!==60||viewRotation!==0||
+  Object.values(guideState).some(Boolean)||!guideHighContrast||$("show-grid")?.checked===false||magnifierFactor!==4||magnifierSize!==160||
+  adv.bucket!=="contiguous"||adv.tol!==0||adv.symmetry!=="none"||adv.brushShape!=="square"||adv.texture!=="none"||adv.textureDensity!==60||
+  $("pro-gradient-color")?.value!=="#65dcff"||$("pro-gradient-mode")?.value!=="linear"||Number($("pro-curve")?.value)!==24||
+  Number($("adv-alpha")?.value)!==100||Number($("pro-scale-x")?.value)!==2||Number($("pro-scale-y")?.value)!==2;
+}
+async function confirmProjectReplacement(title,message){
+ const dialog=$("studio-project-confirm");
+ if(!dialog||typeof dialog.showModal!=="function")return window.confirm(title+"\n\n"+message);
+ $("studio-project-confirm-title").textContent=title;
+ $("studio-project-confirm-message").textContent=message;
+ dialog.returnValue="";
+ dialog.showModal();
+ return await new Promise(resolve=>dialog.addEventListener("close",()=>resolve(dialog.returnValue==="confirm"),{once:true}));
+}
+function buildStudioProjectDocument(){
+ adv.layers[adv.active].pixels=pixels.slice();
+ const project={
+  width,height,
+  layers:adv.layers.map(layer=>({
+   name:layer.name,pixels:layer.pixels.slice(),opacity:layer.opacity,visible:layer.visible,locked:layer.locked,
+   mask:layer.mask?Array.from(layer.mask,v=>v?1:0):null,blend:layer.blend||"normal",group:layer.group||"Ungrouped"
+  })),
+  active:adv.active,selection:adv.selection?Array.from(adv.selection,v=>v?1:0):null,
+  groups:JSON.parse(JSON.stringify(adv.groups||{})),
+  palette:palette.slice(),color,tool,imageImported,
+  sourceInfo:$("source-info")?.textContent||"",
+  settings:{
+   zoom:workspace.zoom,brushSize,fadeIntensity,mixBrushStrength,viewRotation,
+   guideState:{...guideState},guideHighContrast,showGrid:$("show-grid")?.checked!==false,magnifierFactor,magnifierSize,
+   bucket:adv.bucket,tolerance:adv.tol,symmetry:adv.symmetry,brushShape:adv.brushShape,
+   texture:adv.texture,textureDensity:adv.textureDensity,
+   gradientColor:$("pro-gradient-color")?.value||"#65dcff",gradientMode:$("pro-gradient-mode")?.value||"linear",
+   curveTension:Number($("pro-curve")?.value??24),alpha:Number($("adv-alpha")?.value??100),
+   selectionScaleX:Number($("pro-scale-x")?.value)||2,selectionScaleY:Number($("pro-scale-y")?.value)||2
+  }
+ };
+ return window.NUStudioProTools.validateStudioProject({format:STUDIO_PROJECT_FORMAT,version:STUDIO_PROJECT_VERSION,createdAt:new Date().toISOString(),project},{maxPixels:cellLimit()});
+}
+function downloadStudioProject(){
+ try{
+  const documentData=buildStudioProjectDocument(),json=JSON.stringify(documentData),blob=new Blob([json],{type:"application/json;charset=utf-8"});
+  if(blob.size>STUDIO_PROJECT_MAX_BYTES)throw new Error("This project is too large for the supported project-file limit.");
+  const raw=($("export-name")?.value||"nu-pixel-art").trim().replace(/[^a-z0-9-_]+/gi,"-").replace(/^-+|-+$/g,"").slice(0,48)||"nu-pixel-art";
+  const url=URL.createObjectURL(blob),anchor=document.createElement("a");
+  anchor.href=url;anchor.download=raw+".nuproj";anchor.hidden=true;document.body.append(anchor);anchor.click();anchor.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
+  announce("Project downloaded. Keep the .nuproj file to continue editing later.");
+ }catch(error){announce("Project download failed: "+(error&&error.message?error.message:"unsupported project state"));}
+}
+function syncStudioProjectControls(p){
+ const s=p.settings;
+ color=p.color;palette=p.palette.slice();imageImported=p.imageImported;
+ workspace.zoom=s.zoom;brushSize=s.brushSize;fadeIntensity=s.fadeIntensity;mixBrushStrength=s.mixBrushStrength;
+ viewRotation=s.viewRotation;guideState={...s.guideState};guideHighContrast=s.guideHighContrast;
+ magnifierFactor=s.magnifierFactor;magnifierSize=s.magnifierSize;
+ adv.bucket=s.bucket;adv.tol=s.tolerance;adv.symmetry=s.symmetry;adv.brushShape=s.brushShape;adv.texture=s.texture;adv.textureDensity=s.textureDensity;
+ const setValue=(id,value)=>{const el=$(id);if(el)el.value=String(value);};
+ setValue("custom-color",color);setValue("brush-size",brushSize);const brushValue=$("brush-size-value");if(brushValue)brushValue.textContent=brushSize+" px";
+ setValue("adv-bucket",adv.bucket);setValue("adv-tol",adv.tol);setValue("adv-symmetry",adv.symmetry);
+ setValue("pro-brush-shape",adv.brushShape);setValue("pro-texture",adv.texture);setValue("pro-texture-density",adv.textureDensity);
+ setValue("mix-brush-strength",mixBrushStrength);setValue("magnifier-strength",magnifierFactor);setValue("magnifier-size",magnifierSize);
+ const fade=document.querySelector('[aria-label="Fading brush intensity"]');if(fade)fade.value=String(fadeIntensity);
+ document.querySelectorAll("[data-guide]").forEach(input=>{input.checked=!!guideState[input.dataset.guide];});
+ const contrast=document.querySelector("[data-guide-contrast]");if(contrast)contrast.checked=guideHighContrast;
+ const gridToggle=$("show-grid");if(gridToggle)gridToggle.checked=s.showGrid;
+ setValue("pro-gradient-color",s.gradientColor);setValue("pro-gradient-mode",s.gradientMode);setValue("pro-curve",s.curveTension);
+ setValue("adv-alpha",s.alpha);setValue("pro-scale-x",s.selectionScaleX);setValue("pro-scale-y",s.selectionScaleY);
+ const maskEdit=$("pro-mask-edit");if(maskEdit)maskEdit.checked=false;adv.maskEdit=false;
+ const groupTarget=$("pro-group-target");if(groupTarget)groupTarget.value=adv.layers[adv.active].group||"Ungrouped";
+ const group=adv.groups[groupTarget?.value||"Ungrouped"]||{visible:true,opacity:100};setValue("pro-group-opacity",group.opacity);
+ $("image-width").value=width;$("image-height").value=height;
+ $("source-info").textContent="Project reopened. Editable pixels and layers were restored; the original imported source file is not embedded.";
+ $("source-preview-panel").hidden=true;$("source-preview").removeAttribute("src");
+ renderPalette();$("custom-color").value=color;
+ setTool(p.tool);updateViewportRotation();updateCanvasDisplay();render();layerUI();
+}
+function applyStudioProjectDocument(documentData){
+ const p=documentData.project;
+ if(sourcePreviewUrl){URL.revokeObjectURL(sourcePreviewUrl);sourcePreviewUrl=null;}
+ originalImportFile=null;hideMagnifier();compassState=null;drawing=false;strokeSnapshot=null;mixBrushState=null;
+ undoStack=[];redoStack=[];
+ restore({
+  width:p.width,height:p.height,pixels:p.layers[p.active].pixels.slice(),
+  layers:p.layers.map(layer=>({...layer,pixels:layer.pixels.slice(),mask:layer.mask?Uint8Array.from(layer.mask):null})),
+  active:p.active,selection:p.selection?Uint8Array.from(p.selection):null,groups:JSON.parse(JSON.stringify(p.groups))
+ });
+ syncStudioProjectControls(p);
+ historyButtons();$("workspace-frame").scrollTo(0,0);
+ announce("Project opened. Your layers, artwork and saved editing settings are ready.");
+}
+async function openStudioProjectFile(file){
+ if(!file)return;
+ try{
+  if(file.size>STUDIO_PROJECT_MAX_BYTES)throw new Error("The project file exceeds the supported size limit.");
+  const parsed=JSON.parse(await file.text());
+  const validated=window.NUStudioProTools.validateStudioProject(parsed,{maxPixels:cellLimit()});
+  if(projectHasContent()&&!(await confirmProjectReplacement("Replace the current project?","The selected project is valid. Replacing the current project will discard its current work. Cancel to keep it unchanged."))){announce("Project opening cancelled. Your current project is unchanged.");return;}
+  applyStudioProjectDocument(validated);
+ }catch(error){announce("Project could not be opened: "+(error&&error.message?error.message:"invalid project file")+". Your current project is unchanged.");}
+ finally{$("project-file").value="";}
+}
+async function startNewStudioProject(){
+ if(projectHasContent()&&!(await confirmProjectReplacement("Start a new project?","The current project and its artwork will be cleared. Download the project first if you want to keep it."))){announce("New Project cancelled. Your current project is unchanged.");return;}
+ const blankLayers=Array.from({length:4},(_,i)=>({name:"Layer "+(i+1),pixels:Array(32*32).fill(null),opacity:100,visible:true,locked:false,mask:null,blend:"normal",group:"Ungrouped"}));
+ adv.groups={};adv.maskEdit=false;adv.active=0;adv.selection=null;
+ adv.bucket="contiguous";adv.tol=0;adv.symmetry="none";adv.brushShape="square";adv.texture="none";adv.textureDensity=60;
+ palette=defaults.slice();color="#e8b94f";tool="pencil";imageImported=false;
+ workspace.zoom=100;brushSize=1;fadeIntensity=50;mixBrushStrength=60;viewRotation=0;
+ guideState={blueprint:false,ruler:false,divisions:false,axes:false,depth:false};guideHighContrast=true;magnifierFactor=4;magnifierSize=160;
+ applyStudioProjectDocument({project:{width:32,height:32,layers:blankLayers,active:0,selection:null,groups:{},palette,color,tool,imageImported,settings:{
+  zoom:100,brushSize:1,fadeIntensity:50,mixBrushStrength:60,viewRotation:0,
+  guideState,guideHighContrast:true,showGrid:true,magnifierFactor:4,magnifierSize:160,bucket:"contiguous",tolerance:0,
+  symmetry:"none",brushShape:"square",texture:"none",textureDensity:60,
+  gradientColor:"#65dcff",gradientMode:"linear",curveTension:24,alpha:100,selectionScaleX:2,selectionScaleY:2
+ }}});
+ $("source-info").textContent="New project. Import an image or start drawing on the transparent canvas.";
+ announce("New project created. Your previous project was not changed until confirmation.");
+}
+const resetGridBeforeProjectGuard=resetGrid;
+resetGrid=async function(next){
+ if(projectHasContent()&&!(await confirmProjectReplacement("Clear the current project?","Changing the canvas size clears the current artwork and layer pixels. Download the project first if you want to keep it."))){
+  $("image-width").value=width;$("image-height").value=height;const grid=$("grid-size");if(grid)grid.value=String(width);announce("Canvas change cancelled. Your current project is unchanged.");return false;
+ }
+ resetGridBeforeProjectGuard(next);return true;
+};
+$("download-project")?.addEventListener("click",downloadStudioProject);
+$("open-project")?.addEventListener("click",()=>$("project-file").click());
+$("project-file")?.addEventListener("change",e=>openStudioProjectFile(e.target.files&&e.target.files[0]));
+$("new-project")?.addEventListener("click",startNewStudioProject);
+$("clear-canvas")?.addEventListener("click",e=>{
+ e.stopImmediatePropagation();
+ (async()=>{
+  if(adv.layers[adv.active].locked){announce("Layer is locked. Unlock it before clearing.");return;}
+  if(projectHasContent()&&!(await confirmProjectReplacement("Clear the active layer?","The active layer's selected artwork will be cleared. Download the project first if you want to keep it."))){announce("Clear cancelled. Your current project is unchanged.");return;}
+  const before=histAdv();pixels=pixels.map((value,index)=>!adv.selection||adv.selection[index]?null:value);
+  adv.layers[adv.active].pixels=pixels.slice();commitHistory(before);render();announce("Active layer cleared.");
+ })();
+},true);
+$("adv-clear")?.addEventListener("click",e=>{
+ e.stopImmediatePropagation();
+ (async()=>{
+  if(adv.layers[adv.active].locked){announce("Layer is locked.");return;}
+  if(projectHasContent()&&!(await confirmProjectReplacement("Clear the active layer?","The active layer's selected artwork will be cleared. Download the project first if you want to keep it."))){announce("Clear cancelled. Your current project is unchanged.");return;}
+  const before=histAdv();pixels=pixels.map((value,index)=>!adv.selection||adv.selection[index]?null:value);
+  adv.layers[adv.active].pixels=pixels.slice();commitHistory(before);render();announce("Active layer cleared.");
+ })();
+},true);
 
 })();

@@ -1,0 +1,380 @@
+# Pixel Art Studio — Stage 2 International UX Change Record
+
+- Package: `NU-QA-STUDIO-HUMAN-REPORT-20261124`
+- Stage: 2 — International English, icon clarity and accessibility semantics
+- Related correction/package: `NU-FIX-STUDIO-FILL-BEHAVIOR-20261124`
+- Parent record: Repository Issue #68
+- Date: 2026-11-25
+- Status: `MACHINE-PASS`
+- Stage 1 Fill candidate: `bc4108790d2a84d773fa21524964719d40238e17` — MACHINE-PASS
+- Stage 2 starting baseline: candidate branch `fix/studio-fill-ux-successor-20261124`, SHA `bc4108790d2a84d773fa21524964719d40238e17`
+- Stage 2 tested source/workflow SHA: `676b08306d2e46e394b7b3e653029820d5228fe5`
+- Recovery baseline: `backup/pre-studio-fill-ux-successor-2026-11-24`, verified identical to original implementation baseline `ef57a6ec40feea195359dcb9581a5746d63bbd2b`
+- Current default branch HEAD at stage entry: `8e23c76e4dab7c1cb23ef68b3b964e51a2f314c7`; three commits ahead of original baseline, all confined to unrelated simulation demo/core/tests and its workflow. The Studio candidate is intentionally kept on its authorized isolated successor branch; no unrelated default-branch changes are imported.
+
+## Exact Stage 2 scope
+
+### Authorized paths
+1. `pixel-art-studio.html` — replace remaining mixed Persian/English product copy with English; improve explicit accessible names and icon semantics for the static Studio tool controls; preserve all existing IDs, actions and layout contracts.
+2. `nu-pixel-art-studio.js` — replace Persian user-facing runtime messages and dynamic dock/tab/layer/tool labels with English; provide stable English `aria-label` and `title` values for generated tool buttons; mark decorative glyphs as hidden from assistive technology.
+3. `tests/nu-studio-ux.test.js` — new focused assertions for English-only Studio UI copy and accessible names/labels.
+4. `tests/nu-studio-browser-smoke.py` — add browser assertions for generated quick-tool accessible names and English dock labels.
+5. `tests/nu-studio-compact-ux.test.js` — update two directly coupled legacy source-copy assertions from Persian to the new English labels/accessibility contract. This dependency was discovered by the first full regression run; the failures were assertion drift, not runtime failures.
+6. `.github/workflows/pixel-art-studio-machine.yml` — include the new English/accessibility UX unit test and the updated compact-UX regression test in the focused Studio unit command; keep the existing workflow matrix and permissions unchanged.
+7. This Stage 2 change record.
+
+### Explicitly out of scope
+- No changes to Fill behavior or its Stage 1 implementation/tests.
+- No progressive-disclosure redesign, tool ownership/context-sensitive controls, Blueprint/Compass, viewport/zoom/Magnifier, project portability, Perspective/Depth, Demo/local parity or public clean-demo banner in this stage; those remain later serial stages.
+- The existing QA banner is intentionally left untouched here; its removal belongs to Stage 8 clean public UI and must be tested with the parity handoff.
+- No HTML/CSS graphics-layer export (Repository Issue #67).
+- No Gateway, Library, games, HUD, Wallet/economy, global CSS, shared interaction/input contracts, build/deploy runtime or unrelated files.
+- No deletion or reduction of any existing tool, control, export, shortcut, layer, selection, data or behavior.
+
+## Acceptance criteria
+- Studio page and generated Studio runtime UI contain no Persian-language product copy.
+- Every static and generated drawing-tool button has a meaningful English accessible name; decorative glyphs do not pollute the accessible name.
+- Dynamic dock headings, tabs, tool labels, layer controls, hints and status/error/download messages are English and remain understandable.
+- Existing element IDs, data-tool values, event handlers, keyboard shortcuts, controls, exports and Fill behavior remain intact.
+- Focused unit tests, Studio integration/regression tests, browser smoke on desktop/mobile, and the configured 3-OS × 3-browser matrix pass on one exact Stage 2 SHA.
+- No unrelated diff; exact diff reviewed before Stage 2 is marked MACHINE-PASS.
+
+## Verification plan
+- Run Node syntax checks and all focused Studio unit/integration tests using the existing `pixel-art-studio-machine.yml` workflow.
+- Run Playwright desktop/mobile browser smoke for Chromium, Firefox and WebKit on Ubuntu 24.04, Windows 2022 and macOS 15.
+- Record workflow run IDs, exact SHA, pass/fail, and any NOT-TESTED coverage.
+- Preserve Stage 1 Fill regression evidence and ensure it remains passing.
+
+## Stage 2 machine verification — PASS
+
+Exact tested SHA: `676b08306d2e46e394b7b3e653029820d5228fe5`
+
+- Studio machine workflow run `45512323771`: SUCCESS.
+- Focused Studio unit tests: 77/77 PASS, including `nu-studio-ux.test.js` and `nu-studio-compact-ux.test.js`.
+- Browser matrix: 9/9 PASS — Ubuntu 24.04 (Chromium, Firefox, WebKit); Windows 2022 (Chromium, Firefox, WebKit); macOS 15 (Chromium, Firefox, WebKit).
+- Static validation: PASS.
+- Studio Export regression: PASS.
+- Graphics Preview smoke: PASS.
+- Arcane Shield/Mana regression: PASS.
+- Gateway regression: PASS.
+- Earlier assertion-only failure was traced to two legacy expectations in `nu-studio-compact-ux.test.js`; after updating those directly coupled assertions and adding both UX suites to the workflow command, the exact SHA above passed all checks.
+- Read-back confirms zero Persian-script characters in `pixel-art-studio.html` and `nu-pixel-art-studio.js`.
+- Stage 1 Fill implementation and regression coverage remain in the candidate; Stage 1 PASS evidence remains separately recorded at SHA `bc4108790d2a84d773fa21524964719d40238e17`.
+
+## Stage 3 — Progressive disclosure, tool ownership and context-sensitive options
+
+- Status: `MACHINE-PASS`
+- Stage 3 baseline: successor branch `fix/studio-fill-ux-successor-20261124`, SHA `3a79a25a36c0f217eb0d44fcd8a3d7a8ad55ab89`
+- Stage 3 tested source/workflow SHA: `ec81c2ea5ab0d574d7c770eb49fddbc12c0419e4`
+- Stage 3 machine workflow run: `45514014255` (SUCCESS)
+- Stage 2 MACHINE-PASS evidence remains bound to SHA `676b08306d2e46e394b7b3e653029820d5228fe5`.
+
+### Authorized paths
+1. `nu-pixel-art-studio.js` — create a compact tool-options context panel in the existing dock; move/reuse existing settings nodes without duplicating IDs or dropping controls; show only settings owned by the active tool/family; keep current tabs and operations.
+2. `tests/nu-studio-ux.test.js` — assert tool-to-setting ownership and no duplicate controls.
+3. `tests/nu-studio-browser-smoke.py` — verify actual visible options change when switching between Pencil, Fill, Fading Brush, Color-Mixing Brush, Texture, Gradient and selection tools on desktop/mobile.
+4. `tests/nu-studio-compact-ux.test.js` — preserve compact drawer/tab and tool grouping invariants while asserting context-panel integration.
+5. This change record.
+
+### Context ownership contract
+- Paint family (Pencil, Eraser, Line, Rectangle, Ellipse, filled shapes): brush size and shared brush-shape/symmetry options.
+- Fading Brush: paint-family options plus fading intensity only.
+- Color-Mixing Brush: paint-family options plus mixing strength only.
+- Texture Brush: paint-family options plus texture type/density only.
+- Fill: bucket mode and color tolerance only; do not expose brush-only controls.
+- Gradient: gradient mode and end color only.
+- Selection/Move: selection operations and scale controls only.
+- Eyedropper and tools without configurable options: no unrelated settings; show a concise tool-specific description.
+- Existing settings retain their IDs, event handlers, values and behavior. Existing tabs remain available; no feature is deleted.
+
+### Acceptance criteria
+- Selecting a tool updates the context panel immediately and identifies the active tool.
+- Irrelevant settings are hidden, not deleted; switching back restores their values.
+- No duplicate IDs or detached/unreachable controls; all settings remain keyboard/screen-reader accessible.
+- Existing progressive disclosure (drawer collapsed by default; one tab panel active) is preserved and the context panel stays compact.
+- Browser tests prove the setting visibility matrix and value persistence on desktop/mobile.
+- Fill Stage 1 and all Stage 2 English/accessibility regressions remain green.
+
+### Out of scope
+No new tools, redesign of the eight tabs, Blueprint/Compass, viewport/zoom/Magnifier, project portability, Perspective/Depth, Demo/local parity, clean-demo banner, Issue #67, export changes, or changes to HTML/CSS/global styles/Gateway/HUD/Wallet/Library/other games.
+
+### Stage 3 machine verification — PASS
+
+Exact tested SHA: `ec81c2ea5ab0d574d7c770eb49fddbc12c0419e4`
+
+- Studio machine workflow push run `45514014255`: SUCCESS.
+- Focused Studio unit tests: 78/78 PASS.
+- Browser matrix: 9/9 PASS — Ubuntu 24.04, Windows 2022 and macOS 15, each with Chromium, Firefox and WebKit.
+- Browser smoke verified the active-tool settings visibility contract for Pencil, Fill, Fading Brush, Color-Mixing Brush, Texture Brush, Gradient, Selection, Bezier and Eyedropper.
+- Browser smoke changed Fill tolerance, fading intensity, mixing strength, texture type/density, gradient mode, selection scale and Bezier tension; each value persisted after switching away and back.
+- Static validation, Studio Export, Graphics Preview, Gateway and Arcane Shield/Mana regression checks: PASS on the exact candidate SHA.
+- Pre-Stage 3 checkpoint branch `backup/pre-studio-stage3-context-2026-11-25` verified identical to its starting SHA `c3f137bbfb41603b9814ea5d412677177e165e01`.
+
+## Stage 4 — Blueprint guide contrast and Compass circle tool
+
+- Status: `IN-PROGRESS`
+- Stage 4 code baseline: `ec81c2ea5ab0d574d7c770eb49fddbc12c0419e4` (Stage 3 MACHINE-PASS; next checkpoint branch will be recorded before runtime writes).
+
+### Authorized paths
+1. `pixel-art-studio.html` — add one accessible Compass drawing-tool entry to the existing shape/tool list; preserve existing IDs and tool controls.
+2. `nu-pixel-art-studio.js` — implement adaptive high-contrast guide strokes, screen-space guide thickness, optional high-contrast toggle, Compass center/radius preview and circle commit/cancel lifecycle. Preview center/radius are render-only overlays and must never enter pixel data or exports.
+3. `tests/nu-studio-ux.test.js` — assert Compass wiring and guide rendering/overlay separation.
+4. `tests/nu-studio-browser-smoke.py` — verify guide visibility and Compass interaction on desktop/mobile, including preview vs committed output, cancellation and undo.
+5. `tests/nu-studio-compact-ux.test.js` — preserve tool grouping and accessible Compass name.
+6. This change record.
+
+### Acceptance criteria
+- Blueprint, ruler, divisions, axes and depth guides remain distinguishable on dark/light/checkerboard/colored/image/negative artwork using a contrast halo plus a crisp accent stroke.
+- Guide line width is computed from displayed canvas scale so lines remain legible at zoom levels without overwhelming pixel art.
+- High-contrast mode defaults on and can be toggled without changing artwork data.
+- Compass supports center selection → radius drag → circle preview → commit/cancel; the preview shows the circle plus temporary center point and radius line.
+- On commit, only the circle is written to pixel data; center/radius guides disappear immediately and are absent from PNG/SVG/project exports.
+- Cancel restores the exact pre-operation image; commit is one undo step and redo restores the circle.
+- Existing guide toggles, tool IDs, keyboard behavior, Fill, context options and Stage 1–3 tests remain intact.
+
+### Out of scope
+No viewport/Magnifier, project portability, Perspective/Depth, export redesign, HTML/CSS layer export (Issue #67), demo parity/clean banner, Gateway/HUD/Wallet/Library/games, global styles, or other tool additions.
+
+## Stage 4 — Blueprint guide contrast and Compass circle tool
+
+- Status: `IN-PROGRESS`
+- Stage 4 code baseline: `ec81c2ea5ab0d574d7c770eb49fddbc12c0419e4` (Stage 3 MACHINE-PASS; next checkpoint branch will be recorded before runtime writes).
+
+### Authorized paths
+1. `pixel-art-studio.html` — add one accessible Compass drawing-tool entry to the existing shape/tool list; preserve existing IDs and tool controls.
+2. `nu-pixel-art-studio.js` — implement adaptive high-contrast guide strokes, screen-space guide thickness, optional high-contrast toggle, Compass center/radius preview and circle commit/cancel lifecycle. Preview center/radius are render-only overlays and must never enter pixel data or exports.
+3. `tests/nu-studio-ux.test.js` — assert Compass wiring and guide rendering/overlay separation.
+4. `tests/nu-studio-browser-smoke.py` — verify guide visibility and Compass interaction on desktop/mobile, including preview vs committed output, cancellation and undo.
+5. `tests/nu-studio-compact-ux.test.js` — preserve tool grouping and accessible Compass name.
+6. This change record.
+
+### Acceptance criteria
+- Blueprint, ruler, divisions, axes and depth guides remain distinguishable on dark/light/checkerboard/colored/image/negative artwork using a contrast halo plus a crisp accent stroke.
+- Guide line width is computed from displayed canvas scale so lines remain legible at zoom levels without overwhelming pixel art.
+- High-contrast mode defaults on and can be toggled without changing artwork data.
+- Compass supports center selection → radius drag → circle preview → commit/cancel; the preview shows the circle plus temporary center point and radius line.
+- On commit, only the circle is written to pixel data; center/radius guides disappear immediately and are absent from PNG/SVG/project exports.
+- Cancel restores the exact pre-operation image; commit is one undo step and redo restores the circle.
+- Existing guide toggles, tool IDs, keyboard behavior, Fill, context options and Stage 1–3 tests remain intact.
+
+### Out of scope
+No viewport/Magnifier, project portability, Perspective/Depth, export redesign, HTML/CSS layer export (Issue #67), demo parity/clean banner, Gateway/HUD/Wallet/Library/games, global styles, or other tool additions.
+
+## Stage 4 machine verification — PASS
+
+- Reopened Stage 4 baseline: 3891b244f62beb88d11df372e52831037aa985e4.
+- Runtime fix: nu-pixel-art-studio.js routes Escape to the active workspace controller only; on mobile it closes only the mobile drawer, and on desktop it closes only the desktop drawer.
+- Regression coverage: tests/nu-studio-ux.test.js asserts controller isolation; tests/nu-studio-browser-smoke.py uses Escape to cancel Compass on desktop and mobile, then verifies the mobile dock can reopen.
+- Exact tested cumulative source/workflow SHA: 576b477150b3976d158f54f19b3fb5e19d36a5b4.
+- Studio machine workflow push run 45528650321: SUCCESS; 81/81 focused Studio unit/regression tests PASS, syntax validation PASS, 9/9 browser matrix PASS (Ubuntu 24.04, Windows 2022 and macOS 15 × Chromium/Firefox/WebKit).
+- Cross-project gates on the same SHA: Studio Export run 45528659318 PASS; Graphics Preview run 45528659356 PASS; Arcane Shield/Mana run 45528659334 PASS; Gateway main-game run 45528659338 PASS; static validation PASS.
+- The separate PR-event machine mirror 45528659409 has the same 9 browser jobs; eight are complete PASS and macOS Chromium is still finishing its browser-engine setup. The push-event full matrix is already complete PASS.
+- No nu-studio-layout.js change is included. The aggregate package remains IN-PROGRESS; no final backup/restore, public demo deployment, live-build verification, human QA handoff or owner acceptance is claimed.
+
+## Stage 5 — Viewport, zoom and Magnifier
+
+- Status: DISCOVERY-COMPLETE / IMPLEMENTATION-NOT-STARTED.
+- Discovery baseline: 576b477150b3976d158f54f19b3fb5e19d36a5b4.
+- Current state: the page already has Fit to View and a 25–800% slider; mobile has +/- controls. Desktop +/- controls and a dedicated Magnifier/loupe tool are missing. Zoom currently recomputes fitted canvas dimensions but does not preserve a pointer-anchored focus during zoom.
+- Authorized paths:
+  1. pixel-art-studio.html — add desktop Zoom In/Out controls and accessible Magnifier overlay/loupe markup; preserve existing IDs and slider/fit/mobile controls.
+  2. nu-pixel-art-studio.js — unify zoom control state across desktop/mobile buttons and slider; implement pointer/viewport-anchored zoom, view-only Magnifier pointer lifecycle and context-sensitive Magnifier controls. Do not alter drawer controllers in this stage.
+  3. nu-studio-layout.js — add only pure viewport geometry helpers needed for zoom anchoring and pixel-aware mapping; do not alter unrelated workspace drawer behavior.
+  4. tests/nu-studio-layout.test.js — unit-test zoom anchoring, bounds, fit and pixel mapping.
+  5. tests/nu-studio-ux.test.js — assert Magnifier accessibility and control wiring.
+  6. tests/nu-studio-browser-smoke.py — verify synchronized desktop/mobile +/- and slider, fit/reset, anchored zoom, live loupe behavior and unchanged pixels/undo history on desktop/mobile.
+  7. tests/nu-studio-compact-ux.test.js — preserve compact tool grouping and Magnifier accessible name.
+  8. This change record.
+9. `tests/nu-studio-native-dimension-import.test.js` — directly coupled assertion correction: distinguish the serialized `.nuproj` size bound from raster-image import, which retains no product-defined file/MIME/dimension/pixel ceiling. The earlier global source scan incorrectly treated the new project-file guard as a raster-import limit; the revised test scopes its assertions to the `image-file` handler and separately asserts the project-file bound.
+- Acceptance criteria:
+  - Fit-to-view initially shows the complete canvas; slider, desktop +/- and mobile +/- all update one shared 25–800% zoom state; Fit/Reset restores the fitted view.
+  - Zoom preserves the pixel under the pointer (or viewport center when invoked by buttons) as the focus where bounds permit; scrolling remains inside the workspace frame and no page-level horizontal overflow is introduced.
+  - Nearest-neighbor/pixelated rendering and accurate pixel hit-testing remain correct at fractional and high zoom levels; zoom never changes artwork pixels, layers, selections, export bytes or undo/redo history.
+  - Magnifier is a view-only tool with an accessible name and a live loupe that follows mouse/touch input, shows the sampled pixel region at a selectable magnification, and hides on pointer leave/cancel or Escape.
+  - Magnifier size/strength controls appear only while Magnifier is active; tool options remain context-sensitive and do not leak into other tools.
+  - Desktop and mobile browser tests cover viewport resize, touch, pointer anchoring, bounds and reduced-motion behavior.
+- Out of scope: project portability, Perspective/Depth, export redesign, HTML/CSS layer output (Issue #67), demo parity/clean banner, Gateway/HUD/Wallet/Library/games, and unrelated drawer behavior.
+
+## Handoff
+Stages 1–4 are MACHINE-PASS at their recorded exact SHAs. Stage 5 scope is documented above and is ready for a pre-change checkpoint. No Stage 5 runtime write has started. The aggregate package remains IN-PROGRESS; no final candidate backup, demo deployment, human QA handoff or owner acceptance is claimed.
+
+
+## Stage 6 — Clean public welcome and progressive tool categories
+
+- Owner scope opened in Repository Issue #68 comment on 2026-11-25.
+- Stage 5 frozen parent: `70746d1c5ecb5d7b14b1f9fda1e1ee14c7e9422d`; its verified backup remains immutable.
+- Stage 6 initial implementation commit: `289a9fdc3ebfd2eba909d41083873a5069a1603b`.
+- Stage 6 initial CI run `45533401762`: FAIL. This was caused by stale assertions that still required the superseded public QA banner and old ungrouped tool labels/metadata; it did not establish a runtime failure. Browser matrix was skipped because the Studio unit gate failed.
+- A pre-repair recovery ref was created at the exact initial Stage 6 implementation SHA: `backup/pre-studio-stage6-clean-welcome-2026-11-25`.
+
+### Implemented Stage 6 scope
+- Public intro is now exactly `Welcome to N.U — Public Test Demo`; internal QA/build labels and `GEN 01` are removed from the product page.
+- Five accessible tool categories are present: Draw, Shapes, Selection, Effects and View. Only the selected category's tools are shown; selecting a tool switches to its owning category.
+- Category tabs expose tab semantics, keyboard left/right navigation and selected-state/tabindex updates.
+- Tool names, visible labels and decorative icon semantics remain explicit; tool-specific context settings and prior Fill/Compass/Magnifier behavior are retained.
+
+### Directly coupled regression-test repair
+- `tests/nu-studio-ux.test.js`: replace stale “Quick tools / Canvas tools” copy assertions with the new dock/category labels; update Magnifier and Compass metadata assertions to include their owning categories.
+- `tests/nu-studio-advanced-tools.test.js`: replace the old requirement to display `TEST CANDIDATE / NOT HUMAN-APPROVED / DEMO QA ONLY` with the newer owner-approved clean welcome requirement, while retaining assertions that Fading Brush and Color-Mixing Brush remain available.
+- The second test file was added to the Stage 6 direct test allow-list because the first complete regression run proved its legacy banner assertion conflicts with the 2026-11-24 clean-public-UI owner principle. No product behavior was changed to satisfy a stale internal-banner test.
+
+### Stage 6 machine verification — PASS
+
+Exact tested implementation/workflow SHA: `ce12b7fba76cc5e575e20c6128a2b094925c7ff6`
+
+- Studio machine push run `45555411847`: SUCCESS; Studio unit gate PASS and full browser matrix 9/9 PASS.
+- PR-event mirror run `45555418845`: SUCCESS; Studio unit gate PASS and full browser matrix 9/9 PASS.
+- Browser matrix in both runs: Ubuntu 24.04, Windows 2022 and macOS 15 × Chromium, Firefox and WebKit.
+- Cross-project check-runs on the exact SHA: Studio Export regression, static validation, Gateway regression, Arcane Shield/Mana regression and Graphics Preview smoke: all SUCCESS.
+- The earlier initial failure `45533401762` remains documented as stale test expectations; the corrected assertions are included in the passing exact-SHA runs.
+- Stage 5 remains frozen at `70746d1c5ecb5d7b14b1f9fda1e1ee14c7e9422d`; S2B remains frozen at `b57682a21f5f2536b709dc032a1873e19f92f0fc`. Neither was modified.
+- Stage 6 pre-repair recovery branch `backup/pre-studio-stage6-clean-welcome-2026-11-25` remains preserved at its recorded initial implementation SHA.
+
+### Package status and next serial stage
+- Product-local Stage 6 (clean welcome/tool categories) remains MACHINE-PASS at `ce12b7fba76cc5e575e20c6128a2b094925c7ff6`; its verified backup is unchanged. This was an early clean-UI hardening slice and does not close the later Demo/local parity gate.
+- Product-local Stage 7 (project portability; Issue #68 serial Stage 6) is MACHINE-PASS on tested SHA `0bfd28472e10faa5dc28f35700c9714296624efb`; its final backup `backup/studio-stage7-project-portability-2026-11-25` is verified at that exact SHA.
+- The aggregate Issue #68 package remains IN-PROGRESS. No package-final backup, public demo deployment, live-build verification, HUMAN-QA-PENDING handoff or owner acceptance is claimed.
+- Next: product-local Stage 8 Perspective/Depth, corresponding to Issue #68 serial Stage 7. The final Demo/local parity and clean-public-UI gate remains Issue #68 serial Stage 8; full final package machine/human QA remains serial Stage 9.
+- Issue #67 HTML/CSS graphics-layer export remains independent and out of scope.
+
+
+## Stage 7 — Versioned project download/reopen and safe replacement
+
+- Change ID: `NU-UPD-STUDIO-PROJECT-PORTABILITY-20261124`
+- Status: `MACHINE-PASS / PR-MIRROR-PASS / FINAL-BACKUP-VERIFIED`
+- Stage 6 MACHINE-PASS implementation SHA: `ce12b7fba76cc5e575e20c6128a2b094925c7ff6`; verified Stage 6 backup: `backup/studio-stage6-clean-welcome-2026-11-25`.
+- Stage 7 source baseline: successor branch `fix/studio-fill-ux-successor-20261124`, exact pre-change SHA `5d72456c57909b64729597e110e8fefd4727ecdf`. Verified recovery ref `backup/pre-studio-stage7-project-portability-2026-11-25` points to this exact SHA. Stage 7 is a successor only; Stage 6 and Stage 5 frozen refs are not to be moved or edited.
+
+### Discovery — existing reusable implementation
+
+- The Studio already has a browser-local editing model; no server persistence or account storage is required for portability.
+- Existing advanced state already tracks four layers, active layer, layer visibility/lock/opacity/blend/group, optional masks, groups, and selection. The advanced history snapshot/restore path already copies layer pixels, masks, selection and group metadata.
+- Existing import/export paths use browser File/Blob/object-URL APIs and a file input. These are the preferred local/offline primitives to extend.
+- The simple base snapshot only contains width/height/active pixels; the advanced snapshot/restore extension is the reusable state contract for a complete project. Project serialization must explicitly convert typed arrays (masks/selection) to JSON-safe arrays and must not rely on implicit typed-array JSON serialization.
+- Existing destructive entry points include New Canvas/reset, Clear Canvas and raster image import. These currently can replace or clear artwork without a common explicit project-replacement confirmation. Project-open must validate the complete file before prompting and must not mutate the current workspace before confirmation.
+
+### Authorized paths
+
+1. `pixel-art-studio.html` — add compact Project actions (Download Project, Open Project and explicit New Project), a project-file input, and an accessible confirmation surface with separate cancel/replace actions. Preserve existing import/export actions and IDs.
+2. `nu-pixel-art-studio.js` — serialize/restore the full editable project; wire download/open; validate before state mutation; apply project state atomically; synchronize layer UI, context controls, palette, canvas dimensions, history and view after restore; require confirmation before Open Project, New Project, Clear Canvas, grid-reset/New Canvas and raster import replace existing work.
+3. `nu-studio-pro-tools.js` — add pure, DOM-independent project schema validation/normalization helpers to the existing helper module; no new parallel project module.
+4. `tests/nu-studio-project.test.js` (new) — unit tests for schema/version, normalization, limits, pixel/layer/mask/selection validation, invalid values, malformed data and rejection without partial mutation.
+5. `tests/nu-studio-ux.test.js` — assert Project actions, accessible labels and confirmation semantics.
+6. `tests/nu-studio-browser-smoke.py` — desktop/mobile round-trip, cancellation, malformed-file preservation, replacement confirmation, New/Clear/import confirmation and state persistence.
+7. `.github/workflows/pixel-art-studio-machine.yml` — include the new project unit suite in the existing Studio unit gate; do not alter permissions or the 3-OS × 3-browser matrix.
+8. This change record.
+
+### Project data contract
+
+- Use a versioned, self-contained local file with a stable application identifier and explicit schema version (initial version 1); use a recognizable `.nuproj` extension and JSON media type.
+- Preserve canvas dimensions and editable pixels for every layer; layer names/order, active layer, opacity, visibility, lock, blend mode, group assignment, masks, group visibility/opacity and current selection; preserve palette/current color and persistent tool/brush/fill/texture/guide/view settings needed to resume editing.
+- Exclude transient pointer gestures, an in-progress Compass preview, hover/loupe pointer position, undo/redo history, object URLs and browser File handles. Temporary guides remain render-only and are never serialized as artwork pixels.
+- Convert typed arrays to explicit JSON arrays; validate the complete document and all bounds before any live state change. Reject unknown app/schema versions, malformed dimensions, wrong array lengths, invalid colors/enums/ranges, invalid active-layer references and over-limit files/canvases. The serialized project file is capped at 128 MiB; raster image import retains its separate browser/device-capability behavior and no new product-defined image-size ceiling.
+- Restore through parse → validate/normalize → explicit user confirmation when replacing existing work → apply the complete state → refresh UI. Parse/validation failures and user cancellation leave the previous project unchanged.
+- Preserve persistent tool settings needed to resume work, including grid visibility, gradient color/mode, curve tension, alpha and selection scaling; transient gestures, pointer/loupe position, File handles, object URLs and undo/redo history are excluded.
+- Download/open work locally/offline through browser file APIs; no server upload, remote storage, external dependency or account service is introduced. Original source image bytes are not embedded; source metadata is retained.
+
+### Acceptance criteria
+
+- A project downloaded from the Studio can be reopened in a fresh page/session and reproduces all editable layers, masks, groups, selection, canvas dimensions, palette and saved editing settings.
+- Layer pixel data and transparency round-trip exactly; project export/import does not flatten the layer stack or turn guides into artwork.
+- Invalid, unsupported, truncated, oversized or malformed project files are rejected with a clear product message and no partial replacement.
+- Opening a valid project prompts before replacing current work. Cancel preserves the exact current state; confirm replaces it with the validated project.
+- New Project, Clear Canvas, New Canvas/grid reset and raster-image import replacement each require an explicit confirmation when existing work would be discarded. Cancel means no data, dimensions, layer, selection, undo state or preview changes.
+- Successful restore clears stale undo/redo history, exits transient mask/pointer/Compass modes safely, updates the active layer and tool context, and leaves the canvas usable.
+- Existing raster import, Fill, layers/masks/groups, Compass, Magnifier, exports and Stage 1–6 regressions remain intact.
+- Desktop/mobile browser tests prove the same file format and confirmation behavior; the configured 3-OS × 3-browser matrix and all relevant cross-project gates pass on one exact SHA.
+
+### Explicit exclusions
+
+No Perspective/Depth implementation (next serial stage); no Demo/local deployment or parity work (later package stage); no HTML/CSS graphics-layer export (Repository Issue #67 remains independent); no Gateway, HUD, Wallet, Library, games, global CSS, unrelated modules or new backend/storage service. No changes to S2B, frozen Stage 5, or frozen Stage 6 candidate refs.
+
+### Verification and checkpoint
+
+- Verified Stage 7 pre-change recovery ref: `backup/pre-studio-stage7-project-portability-2026-11-25` → exact source baseline `5d72456c57909b64729597e110e8fefd4727ecdf`.
+- Exact implementation candidate `10df67aaf8bcdf1eff2070e8002933e23a4c9743` passed the push Studio machine workflow `45562956829` and PR mirror `45562968482`; each completed `studio-unit` plus all 9 OS/browser jobs successfully (9/9).
+- Same exact SHA passed the cross-project gates: Studio export regression push `45562956833` and PR `45562968574`; graphics preview smoke `45562968573`; Gateway regression `45562968714`; Arcane Shield/Mana regression `45562968568`.
+- Compared with the pre-change checkpoint, the Stage 7 diff is confined to the nine authorized paths: workflow, canonical change record, Studio runtime, existing project helper, Studio HTML, browser smoke, native image-import regression assertion, new project schema tests and UX assertions.
+- The workflow PR path filter now includes this canonical change record so future status/evidence updates trigger the same machine gates.
+- Final docs/workflow-inclusive SHA `0bfd28472e10faa5dc28f35700c9714296624efb` passed the same exact-SHA machine and cross-project checks. Final backup `backup/studio-stage7-project-portability-2026-11-25` was created and read back at that exact SHA; it is distinct from the pre-change recovery ref and the eventual package-final backup. The Runtime Baseline Snapshot remains the public-demo baseline.
+
+### Directly coupled test-scope correction
+
+- The first regression pass exposed one stale global assertion in `tests/nu-studio-native-dimension-import.test.js`: it rejected any `file.size` check anywhere in the Studio runtime. Stage 7 deliberately bounds serialized project documents, while raster image import remains browser/device-capability based. The assertion now scopes the no-product-ceiling requirement to the raster import handler and separately verifies the project-document size guard. This is test-only scope expansion; no additional runtime path was added.
+
+### Implementation and machine verification on the tested candidate
+
+- Implemented versioned `.nuproj` JSON v1 download/open, full editable-layer state serialization, strict schema validation, explicit safe-replace confirmation, New Project, Clear Canvas and New Canvas/grid-reset confirmation, and raster-image replacement confirmation. Project actions are progressively disclosed in the compact Project menu.
+- Project round-trip coverage includes layer pixels/transparency, layer metadata and active layer, masks, groups, selection, canvas dimensions, palette/current color, active tool, zoom/rotation, guides/grid, brush/fill/texture, gradient/curve/alpha and selection-scale settings.
+- A modal/outside-click interaction was corrected so confirming a project operation does not dismiss the tool drawer. The browser smoke suite follows the actual contextual panel ownership and closes the mobile/desktop drawer before canvas or toolbar interactions.
+- The raster-import regression assertion was narrowed to the raster-import handler and separately verifies the `.nuproj` file bound; no image import ceiling was added.
+- This is Stage 7 implementation verification only. The aggregate package remains open; no public deployment, final package backup, live-build parity verification, human QA handoff or owner acceptance has occurred.
+### Stage numbering alignment with Repository #68
+
+- The product-local change record has an additional Stage 6 clean-welcome/tool-category slice completed before project portability. Repository #68's owner-defined serial order calls project portability serial Stage 6 and Perspective/Depth serial Stage 7; the product-local labels therefore map as follows: local Stage 7 = Repository #68 serial Stage 6, and local Stage 8 = Repository #68 serial Stage 7.
+- The early clean-welcome slice does not count the complete Repository #68 serial Stage 8 Demo/local parity, deployment identity and clean-public-UI acceptance gate as complete. The final package gate remains open.
+
+## Stage 8 — Perspective/Depth geometry and transform workflow
+
+- Change ID: `NU-UPD-STUDIO-PERSPECTIVE-DEPTH-20261124`.
+- Governance mapping: product-local Stage 8; Repository #68 serial Stage 7.
+- Status: `SCOPE-RECORDED / PRE-CHANGE-CHECKPOINT-PENDING`.
+- Parent candidate: verified product-local Stage 7 backup SHA `0bfd28472e10faa5dc28f35700c9714296624efb`; no runtime write is permitted until the exact Stage 8 pre-change checkpoint is created and read back.
+
+### Authorized paths
+
+1. `pixel-art-studio.html` — add an icon-first, accessible Perspective tool entry in the existing Effects category and compact contextual controls for depth, angle, corner handles, preview, reset, commit and cancel.
+2. `nu-pixel-art-studio.js` — implement the Perspective interaction lifecycle, render-only quad/handle preview, active-layer/selection/mask integration, safe cancel and one-step commit/undo/redo. Do not modify other tool behavior.
+3. `nu-studio-pro-tools.js` — add pure DOM-independent projective-geometry helpers: quad validation, source-to-quad mapping and inverse nearest-neighbor raster sampling with transparency preservation.
+4. `tests/nu-studio-perspective.test.js` (new) — geometry, identity, skew/depth, degenerate/self-intersecting quad, clipping, alpha/transparency and pixel-sampling tests.
+5. `tests/nu-studio-project.test.js` — add the new `perspective` tool identifier to the versioned project schema whitelist and assert project save/restore preserves it.
+6. `tests/nu-studio-ux.test.js` — assert accessible tool name, contextual ownership, keyboard-operable handles and visible control semantics.
+7. `tests/nu-studio-browser-smoke.py` — desktop/mobile preview, corner drag, depth/angle adjustment, cancel/no-op, commit, undo/redo and layer/selection/mask preservation.
+8. `.github/workflows/pixel-art-studio-machine.yml` — add the new focused perspective unit suite to the existing Studio unit command; preserve the existing 3-OS × 3-browser matrix and permissions.
+9. This change record.
+
+### Geometry and behavior contract
+
+- The transform source is the active layer's pixel rectangle when no selection exists, or the selected region when a selection exists. Pixels outside the selected region remain unchanged; active-layer masks and locks are honored.
+- The quadrilateral uses stable corner order: top-left, top-right, bottom-right, bottom-left. Corner handles may be dragged independently; depth and angle controls provide a deterministic starting perspective and remain adjustable before commit.
+- Preview is render-only: no pixel array, mask, selection, layer metadata, export or history mutation occurs before Commit. Cancel/Escape restores the exact pre-preview state.
+- Commit uses inverse projective mapping and nearest-neighbor sampling appropriate for pixel art; transparent pixels remain transparent, output is clipped to the canvas, and temporary handles/guides never become artwork.
+- Reject non-finite, degenerate, self-intersecting, non-convex or below-minimum-area quads with a clear product message and no partial mutation. Locked layers cannot be transformed.
+- A successful commit is one undo step; undo/redo restores the exact pre/post-transform pixels, masks and selection. No-op transforms do not add history.
+- The tool is stored as `perspective` in the existing versioned project file and restores with its owning Effects category/context. No new project format or storage service is introduced.
+
+### Acceptance criteria
+
+- A rectangular sprite/layer can be transformed into a perspective quadrilateral by dragging each corner and adjusting depth/angle; the preview is accurate and responsive on desktop and mobile.
+- Identity transform reproduces the exact original pixels. Non-identity transforms preserve palette colors and alpha via nearest-neighbor sampling; no blur/interpolation is introduced.
+- With a selection, only selected pixels transform; outside pixels, selection mask, active-layer mask, group, opacity, visibility and blend metadata remain intact.
+- Cancel/Escape leaves pixels, dimensions, masks, selection, history and layer metadata unchanged. Commit creates exactly one undo step and undo/redo round-trips exactly.
+- Invalid or degenerate geometry is rejected without partial mutation. Locked-layer behavior is safe and explicit.
+- Existing Fill, project save/reopen, Compass, Magnifier, exports and all previous stages remain regression-tested.
+- Focused unit tests, Studio regression tests, desktop/mobile browser checks, all 9 OS/browser combinations and cross-project gates pass on one exact SHA.
+
+### Explicit exclusions
+
+No Demo/local parity or deployment work (Repository #68 serial Stage 8); no final package QA/deployment (serial Stage 9); no HTML/CSS graphics-layer export (Repository #67); no Gateway, HUD, Wallet, Library, games, global CSS, shared layout/controller refactor, backend/storage service or unrelated Studio tools. S2B and frozen Stage 5/6 candidates remain immutable.
+
+### Verification and checkpoint
+
+- Before the first Stage 8 runtime write, create `backup/pre-studio-stage8-perspective-depth-2026-11-25` from the exact documentation-inclusive Stage 8 scope head and verify its ref SHA is identical to the candidate head.
+- Focused geometry tests and the complete Studio machine/browser/cross-project gates must pass on one exact Stage 8 candidate SHA before the next serial stage is opened.
+- No Perspective/Depth runtime implementation has started at the time this scope is recorded.
+
+## Stage 7 closeout — Project portability (2026-11-25)
+
+- Candidate SHA: `1aa16d60b420a2bb6fe76932d1b774a9f93d0444`.
+- Studio machine workflow push run `45565665668`: SUCCESS. The job matrix completed all ten jobs: `studio-unit` plus 9 browser combinations (Ubuntu 24.04 / Chromium, Firefox, WebKit; Windows 2022 / Chromium, Firefox, WebKit; macOS 15 / Chromium, Firefox, WebKit).
+- Pull-request mirror `45565671169`: SUCCESS.
+- Cross-project PR gates on the same SHA: Gateway `45565671177` SUCCESS; Studio Export `45565671236` SUCCESS; Arcane Shield/Mana `45565671274` SUCCESS; Graphics Preview `45565671174` SUCCESS.
+- Pre-Stage-8 backup reference `backup/pre-studio-stage8-perspective-depth-2026-11-25-candidate-1aa16d6` was read back and resolves to the exact candidate SHA above.
+- Stage 7 is MACHINE-PASS / BACKUP-REF-VERIFIED on the evidence above. No live restore test of the backup has been performed; archive-level restore remains NOT-TESTED.
+
+## Stage 8 pre-change readiness — Perspective/Depth
+
+- The first attempt to create the originally named checkpoint ref found that name already existed at a different SHA `e5f6953b42aac3532afe9686f24dc1d1beed44db`; it was not overwritten. A new uniquely named checkpoint was created and read back at the exact Stage 7 SHA.
+- AGENTS.md requires a decomposed Runtime Baseline Snapshot of the currently running public demo before any runtime write. The live demo URL could not be fetched with the available GitHub/web access in this execution, and the live build identity/artifact inventory is therefore UNVERIFIED. The Stage 8 runtime write gate remains BLOCKED until that live baseline is captured and documented; no Stage 8 runtime file has been modified.
+- Existing projective geometry helpers and Stage 8 focused tests are already present in the candidate from earlier scope work. Runtime interaction wiring, tool entry, browser E2E and Stage 8 acceptance are not yet implemented/verified. Existing helpers are not evidence of a completed tool.
+- Next permitted action: obtain/capture the current public demo's deployed HTML, referenced JS/CSS/assets and build identity; hash and inventory them in a versioned Runtime Baseline Snapshot per unified protocol sections 18–19. Then start Stage 8 runtime work from the exact verified checkpoint.

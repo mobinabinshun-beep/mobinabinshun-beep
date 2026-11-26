@@ -20,7 +20,7 @@ test("selection gestures are isolated from normal canvas paint events",()=>{
 });
 test("selection clipping is respected by brush, fill and color adjustments",()=>{
  assert.match(js,/if\(adv\.selection&&!adv\.selection\[key\]\)continue/);
- assert.match(js,/!adv\.selection\[i\]\|\|!match\(pixels\[i\]\)/);
+ assert.match(js,/bucketFill\(pixels,width,height,x,y,next,adv\.bucket,adv\.tol,adv\.selection,layer\.mask\)/);
  assert.match(js,/adv\.selection\[i\]\)\?hexRGB/);
 });
 test("layer masks and blend/group metadata participate in snapshots and compositing",()=>{

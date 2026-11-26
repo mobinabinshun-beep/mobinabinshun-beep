@@ -2,6 +2,8 @@
 """Cross-browser Studio smoke and color-mixing interaction checks for CI."""
 import argparse
 import asyncio
+import json
+import re
 from urllib.parse import urljoin
 
 from playwright.async_api import async_playwright
@@ -35,6 +37,13 @@ async def click_cell(page, x, y):
     target = await page.evaluate("(p) => document.elementFromPoint(p.x,p.y)?.id", point)
     assert target == "pixel-canvas", f"Pointer target is not the canvas: {target}"
     await page.mouse.click(point["x"], point["y"])
+
+
+async def select_tool(page, category, tool):
+    category_tab = page.locator(f'#studio-tool-categories [data-tool-category="{category}"]')
+    if await category_tab.get_attribute("aria-selected") != "true":
+        await category_tab.click()
+    await page.locator(f'#studio-quick-tools [data-tool="{tool}"]').click()
 
 
 async def drag_cells(page, start, end):
@@ -84,11 +93,237 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
         assert await page.locator("#" + panel_id).count() == 1, f"Advanced panel {panel_id} is missing"
     await page.wait_for_function("() => { const c=document.querySelector('#pixel-canvas'); return c && c.width>0 && c.height>0 && c.getBoundingClientRect().width>0; }", timeout=30000)
     assert await page.locator('#studio-quick-tools [data-tool="fading-brush"]').count() == 1, "Fading must remain a separate tool"
-    await page.locator("#show-grid").evaluate("el => { el.checked=false; }")
+    await page.locator("#show-grid").evaluate("el => { el.checked=false; el.dispatchEvent(new Event('change',{bubbles:true})); }")
+
+    # Fill must paint a completely transparent canvas, preserve undo/redo, and explain no-op/locked states.
+    await set_color(page, "#00ff00")
+    fill_toggle = page.locator("#desktop-tools-toggle" if viewport["width"] > 700 else "#mobile-tools-toggle")
+    await fill_toggle.click()
+    await page.locator("#studio-dock").wait_for(state="visible", timeout=5000)
+    body_text = await page.locator("body").inner_text()
+    assert not re.search(r"[\u0600-\u06FF]", body_text), "Studio visible UI contains non-English Persian copy"
+    category_tabs = page.locator("#studio-tool-categories [role=tab]")
+    assert await category_tabs.count() == 5, "Five top-level tool categories must be available"
+    assert await page.locator('#studio-tool-categories [data-tool-category="draw"]').get_attribute("aria-selected") == "true", "Draw must be the initial category"
+    assert await page.locator('#studio-quick-tools [data-tool="pencil"]').is_visible(), "Draw tools must be visible initially"
+    assert await page.locator('#studio-quick-tools [data-tool="magnifier"]').is_hidden(), "View tools must stay hidden until View is selected"
+    await page.locator('#studio-tool-categories [data-tool-category="draw"]').focus()
+    await page.keyboard.press("ArrowRight")
+    assert await page.locator('#studio-tool-categories [data-tool-category="shapes"]').get_attribute("aria-selected") == "true", "ArrowRight must advance the category tab"
+    await page.keyboard.press("ArrowLeft")
+    assert await page.locator('#studio-tool-categories [data-tool-category="draw"]').get_attribute("aria-selected") == "true", "ArrowLeft must return to Draw"
+    await page.locator('#studio-tool-categories [data-tool-category="view"]').click()
+    assert await page.locator('#studio-quick-tools [data-tool="magnifier"]').is_visible(), "View category must reveal Magnifier"
+    assert await page.locator('#studio-quick-tools [data-tool="pencil"]').is_hidden(), "View category must hide Draw tools"
+    await page.locator('#studio-tool-categories [data-tool-category="draw"]').click()
+    quick_tools = page.locator("#studio-quick-tools [data-tool]")
+    assert await quick_tools.count() >= 15, "The full quick-tool set is missing"
+    for tool_index in range(await quick_tools.count()):
+        tool_button = quick_tools.nth(tool_index)
+        label = await tool_button.get_attribute("aria-label")
+        title = await tool_button.get_attribute("title")
+        assert label and re.match(r"^[A-Za-z]", label), f"Tool {tool_index} has no descriptive English accessible name: {label}"
+        assert title and re.match(r"^[A-Za-z]", title), f"Tool {tool_index} has no English tooltip: {title}"
+    expected_tabs = ["Color", "Layers", "Fill", "Transform", "Adjust", "Compose", "Advanced", "Export"]
+    for tab_index, expected_label in enumerate(expected_tabs):
+        actual_label = (await page.locator("#studio-tabs [role=tab]").nth(tab_index).inner_text()).strip()
+        assert actual_label.endswith(expected_label), f"Tab {tab_index} label mismatch: {actual_label}"
+
+    tool_context_panel = page.locator("#studio-brush")
+    assert await tool_context_panel.is_visible(), "Active-tool options panel is missing"
+    assert await page.locator("#studio-context-title").inner_text() == "Pencil"
+    assert await page.locator("#brush-size").is_visible(), "Pencil must expose brush size"
+    assert await page.locator("#adv-symmetry").is_visible(), "Paint tools must expose symmetry"
+    assert await page.locator("#adv-bucket").is_hidden(), "Fill settings must stay hidden for Pencil"
+    assert await page.locator("#mix-brush-strength").is_hidden(), "Mixing strength must stay hidden for Pencil"
+
+    await select_tool(page, "draw", "fill")
+    assert await page.locator("#studio-context-title").inner_text() == "Fill"
+    assert await page.locator("#adv-bucket").is_visible() and await page.locator("#adv-tol").is_visible(), "Fill must expose mode and tolerance"
+    assert await page.locator("#brush-size").is_hidden(), "Fill must not show brush-only settings"
+    await page.locator("#adv-tol").evaluate("(el) => { el.value='31'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
+    await select_tool(page, "draw", "pencil")
+    await select_tool(page, "draw", "fill")
+    assert await page.locator("#adv-tol").input_value() == "31", "Fill tolerance must persist when switching tools"
+
+    await select_tool(page, "effects", "fading-brush")
+    assert await page.locator("#studio-context-title").inner_text() == "Fading brush"
+    assert await page.get_by_label("Fading brush intensity").is_visible(), "Fading Brush must expose intensity"
+    assert await page.locator("#mix-brush-strength").is_hidden(), "Fading Brush must hide mixing strength"
+    fade_control = page.get_by_label("Fading brush intensity")
+    await fade_control.evaluate("(el) => { el.value='73'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
+    await select_tool(page, "draw", "pencil")
+    await select_tool(page, "effects", "fading-brush")
+    assert await page.get_by_label("Fading brush intensity").input_value() == "73", "Fading intensity must persist when switching tools"
+
+    await select_tool(page, "effects", "color-mix-brush")
+    assert await page.locator("#mix-brush-strength").is_visible(), "Color-Mixing Brush must expose strength"
+    assert await page.get_by_label("Fading brush intensity").is_hidden(), "Color-Mixing Brush must hide fading intensity"
+    await page.locator("#mix-brush-strength").evaluate("(el) => { el.value='84'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
+    await select_tool(page, "draw", "pencil")
+    await select_tool(page, "effects", "color-mix-brush")
+    assert await page.locator("#mix-brush-strength").input_value() == "84", "Mixing strength must persist when switching tools"
+
+    await select_tool(page, "effects", "texture")
+    assert await page.locator("#pro-texture").is_visible() and await page.locator("#pro-texture-density").is_visible(), "Texture Brush must expose texture type and density"
+    assert await page.locator("#pro-brush-shape").is_visible(), "Texture Brush must expose brush shape"
+    await page.locator("#pro-texture").select_option("diagonal")
+    await page.locator("#pro-texture-density").evaluate("(el) => { el.value='47'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
+    await select_tool(page, "draw", "pencil")
+    await select_tool(page, "effects", "texture")
+    assert await page.locator("#pro-texture").input_value() == "diagonal" and await page.locator("#pro-texture-density").input_value() == "47", "Texture settings must persist when switching tools"
+
+    await select_tool(page, "effects", "gradient")
+    assert await page.locator("#pro-gradient-mode").is_visible() and await page.locator("#pro-gradient-color").is_visible(), "Gradient must expose mode and end color"
+    assert await page.locator("#adv-bucket").is_hidden(), "Gradient must not show Fill settings"
+    await page.locator("#pro-gradient-mode").select_option("radial")
+    await select_tool(page, "draw", "pencil")
+    await select_tool(page, "effects", "gradient")
+    assert await page.locator("#pro-gradient-mode").input_value() == "radial", "Gradient settings must persist when switching tools"
+
+    await select_tool(page, "selection", "select-rect")
+    assert await page.locator("#pro-select-all").is_visible() and await page.locator("#pro-scale-x").is_visible(), "Selection tools must expose selection actions and scale"
+    await page.locator("#pro-scale-x").fill("3")
+    await select_tool(page, "draw", "pencil")
+    await select_tool(page, "selection", "select-rect")
+    assert await page.locator("#pro-scale-x").input_value() == "3", "Selection scale must persist when switching tools"
+
+    await select_tool(page, "shapes", "bezier")
+    assert await page.locator("#pro-curve").is_visible(), "Bezier must expose curve tension"
+    await page.locator("#pro-curve").evaluate("(el) => { el.value='14'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
+    await select_tool(page, "draw", "pencil")
+    await select_tool(page, "shapes", "bezier")
+    assert await page.locator("#pro-curve").input_value() == "14", "Bezier tension must persist when switching tools"
+
+    await select_tool(page, "draw", "picker")
+    assert await page.locator("#studio-context-title").inner_text() == "Eyedropper"
+    assert await page.locator("#brush-size").is_hidden(), "Eyedropper must not show unrelated brush controls"
+
+    await select_tool(page, "draw", "fill")
+    assert await page.locator("#adv-bucket").is_visible(), "Fill settings must return when Fill is reselected"
+    await fill_toggle.click()
+    before_fill = await read_pixel(page, 8, 8)
+    await click_cell(page, 8, 8)
+    assert await read_pixel(page, 8, 8) == [0, 255, 0], "Fill did not color the clicked transparent pixel"
+    assert await read_pixel(page, 31, 31) == [0, 255, 0], "Fill did not cover the connected transparent canvas"
+    await fill_toggle.click()
+    fill_button = page.locator('#studio-quick-tools [data-tool="fill"]')
+    assert await fill_button.get_attribute("aria-pressed") == "true", "Fill tool lost its active state after the first fill"
+    await fill_button.click()  # Explicitly reselect before verifying same-color no-op behavior.
+    await fill_toggle.click()
+    await click_cell(page, 8, 8)
+    status = await page.locator("#studio-status").text_content()
+    assert "already uses the selected color" in (status or ""), f"Same-color Fill did not explain its no-op: {status}"
+    await page.locator("#undo").click()
+    after_undo = await read_pixel(page, 8, 8)
+    assert after_undo == before_fill, f"One Undo did not restore the pre-Fill transparent canvas: before={before_fill}, after={after_undo}"
+    await page.locator("#redo").click()
+    assert await read_pixel(page, 31, 31) == [0, 255, 0], "Redo did not restore the full-canvas Fill"
+
+    # A locked active layer must not be modified by Fill.
+    await page.locator("#undo").click()
+    await fill_toggle.click()
+    await select_tool(page, "draw", "fill")
+    await page.locator("#tab-layers").click()
+    lock = page.get_by_label("Lock Layer 1")
+    await lock.check()
+    await fill_toggle.click()
+    await click_cell(page, 8, 8)
+    locked_pixel = await read_pixel(page, 8, 8)
+    status = await page.locator("#studio-status").text_content()
+    assert locked_pixel == before_fill, "Fill changed a locked layer"
+    assert "Layer is locked" in (status or ""), f"Locked Fill did not explain why it stopped: {status}"
+    await fill_toggle.click()
+    await page.locator("#tab-layers").click()
+    await lock.uncheck()
+    await fill_toggle.click()
+
+    # High-contrast Blueprint stays visible on light and negative artwork, but never changes pixels.
+    await fill_toggle.click()
+    await set_color(page, "#ffffff")
+    await select_tool(page, "draw", "fill")
+    await fill_toggle.click()
+    await click_cell(page, 8, 8)
+    blueprint = page.locator('[data-guide="blueprint"]')
+    contrast_toggle = page.locator("[data-guide-contrast]")
+    assert await contrast_toggle.is_checked(), "High-contrast guides must be enabled by default"
+    light_baseline = await read_pixel(page, 1, 1)
+    await blueprint.check()
+    light_guide = await read_pixel(page, 1, 1)
+    assert light_guide != light_baseline, "Blueprint guide is not visible on a light background"
+    await blueprint.uncheck()
+    assert await read_pixel(page, 1, 1) == light_baseline, "Turning off Blueprint changed the artwork pixels"
+
+    await fill_toggle.click()
+    await page.locator("#tab-transform").click()
+    await page.locator('button[data-x="neg"]').click()
+    await fill_toggle.click()
+    dark_baseline = await read_pixel(page, 1, 1)
+    await blueprint.check()
+    dark_guide = await read_pixel(page, 1, 1)
+    assert dark_guide != dark_baseline, "Blueprint guide is not visible on a negative/dark background"
+    await blueprint.uncheck()
+    assert await read_pixel(page, 1, 1) == dark_baseline, "Negative-background guide overlay leaked into artwork pixels"
+
+    # Compass previews a circle plus temporary center/radius guides; only the circumference commits.
+    await fill_toggle.click()
+    await page.locator("#clear-canvas").evaluate("(el) => { const section = el.closest('details'); if (section) section.open = true; }")
+    await page.locator("#clear-canvas").scroll_into_view_if_needed()
+    await page.locator("#clear-canvas").click()
+    await page.locator("#studio-project-confirm").wait_for(state="visible", timeout=5000)
+    await page.locator("#studio-project-confirm button[value='confirm']").click()
+    await page.locator("#studio-tools-drawer").evaluate("(el) => { el.scrollTop = 0; }")
+    await page.locator("#studio-dock").wait_for(state="visible", timeout=5000)
+    await set_color(page, "#ff0000")
+    compass_button = page.locator('#studio-quick-tools [data-tool="compass"]')
+    assert await compass_button.get_attribute("aria-label") == "Compass", "Compass tool must have a clear accessible name"
+    await page.locator('#studio-tool-categories [data-tool-category="shapes"]').click()
+    await select_tool(page, "shapes", "compass")
+    assert await page.locator("#studio-context-title").inner_text() == "Compass"
+    await fill_toggle.click()
+    center_before = await read_pixel(page, 16, 16)
+    radius_line_before = await read_pixel(page, 20, 16)
+    start_point = await cell_point(page, 16, 16)
+    radius_point = await cell_point(page, 24, 16)
+    await page.mouse.move(start_point["x"], start_point["y"])
+    await page.mouse.down()
+    await page.mouse.move(radius_point["x"], radius_point["y"], steps=3)
+    preview_center = await read_pixel(page, 16, 16)
+    preview_radius_line = await read_pixel(page, 20, 16)
+    assert preview_center != center_before and preview_radius_line != radius_line_before, "Compass preview must show temporary center and radius guides"
+    await page.mouse.up()
+    assert await read_pixel(page, 16, 16) == center_before, "Compass center marker must disappear after commit"
+    assert await read_pixel(page, 20, 16) == radius_line_before, "Compass radius guide must disappear after commit"
+    assert await read_pixel(page, 24, 16) == [255, 0, 0], "Compass must commit the circle circumference"
+    await page.locator("#undo").click()
+    assert await read_pixel(page, 24, 16) == radius_line_before, "One Undo must remove the committed Compass circle"
+    await page.locator("#redo").click()
+    assert await read_pixel(page, 24, 16) == [255, 0, 0], "Redo must restore the Compass circle"
+
+    cancel_center = await cell_point(page, 8, 8)
+    cancel_edge = await cell_point(page, 14, 8)
+    cancel_edge_before = await read_pixel(page, 14, 8)
+    cancel_center_before = await read_pixel(page, 8, 8)
+    await page.mouse.move(cancel_center["x"], cancel_center["y"])
+    await page.mouse.down()
+    await page.mouse.move(cancel_edge["x"], cancel_edge["y"], steps=3)
+    await page.keyboard.press("Escape")
+    await page.mouse.up()
+    assert await read_pixel(page, 14, 8) == cancel_edge_before, "Compass cancellation must not commit preview pixels"
+    assert await read_pixel(page, 8, 8) == cancel_center_before, "Compass cancellation must leave the center unchanged"
 
     if require_mix:
-        mix_drawer_toggle = page.locator("#desktop-tools-toggle" if viewport["width"] > 700 else "#mobile-tools-toggle")
-        await mix_drawer_toggle.click()
+        is_mobile_workspace = viewport["width"] <= 700
+        mix_drawer_toggle = page.locator("#mobile-tools-toggle" if is_mobile_workspace else "#desktop-tools-toggle")
+        drawer_open_class = "nu-mobile-tools-open" if is_mobile_workspace else "nu-desktop-tools-open"
+        drawer_is_open = await page.locator("body").evaluate(
+            "(el, className) => el.classList.contains(className)", drawer_open_class
+        )
+        if not drawer_is_open:
+            await mix_drawer_toggle.click()
+            await page.wait_for_function(
+                "(className) => document.body.classList.contains(className)", arg=drawer_open_class, timeout=5000
+            )
         await page.locator("#studio-dock").wait_for(state="visible", timeout=5000)
         assert await page.locator('#studio-quick-tools [data-tool="color-mix-brush"]').count() == 1, "Color-mixing brush tool is missing"
         assert await page.locator('[aria-label="Fading brush intensity"]').count() == 1, "Fading control is missing"
@@ -110,7 +345,7 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
         await page.locator("#studio-dock").wait_for(state="visible", timeout=5000)
         await set_color(page, "#00ff00")  # foreground color must not drive smudging
         await page.locator("#mix-brush-strength").evaluate("el => { el.value='100'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
-        await page.locator('#studio-quick-tools [data-tool="color-mix-brush"]').click()
+        await select_tool(page, "effects", "color-mix-brush")
         await mix_drawer_toggle.click()
         await page.wait_for_function("() => getComputedStyle(document.querySelector('#studio-tools-drawer')).visibility === 'hidden'", timeout=3000)
         await drag_cells(page, (8, 16), (9, 16))
@@ -138,6 +373,134 @@ async def check_studio(browser, base_url, viewport, require_mix, touch_test=Fals
         await lock.uncheck()
         await mix_drawer_toggle.click()
         await page.wait_for_function("() => getComputedStyle(document.querySelector('#studio-tools-drawer')).visibility === 'hidden'", timeout=3000)
+
+    # Zoom controls share one state and preserve pointer focus when the frame can scroll.
+    await page.locator("#fit-canvas").click()
+    if viewport["width"] > 700:
+        await page.locator("#zoom-in").click()
+        assert await page.locator("#workspace-zoom").input_value() == "125", "Desktop zoom-in did not update shared zoom state"
+        await page.locator("#zoom-out").click()
+        assert await page.locator("#workspace-zoom").input_value() == "100", "Desktop zoom-out did not update shared zoom state"
+    else:
+        await page.locator("#mobile-zoom-in").click()
+        assert await page.locator("#workspace-zoom").input_value() == "125", "Mobile zoom-in did not update shared zoom state"
+        await page.locator("#mobile-zoom-out").click()
+        assert await page.locator("#workspace-zoom").input_value() == "100", "Mobile zoom-out did not update shared zoom state"
+    await page.locator("#workspace-zoom").evaluate("el => { el.value='200'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
+    assert await page.locator("#workspace-zoom").input_value() == "200", "Zoom slider did not update shared state"
+    zoom_canvas = await page.locator("#pixel-canvas").bounding_box()
+    assert zoom_canvas, "Canvas is missing before pointer-anchored zoom"
+    anchor = {"x": zoom_canvas["x"] + zoom_canvas["width"] * 0.38, "y": zoom_canvas["y"] + zoom_canvas["height"] * 0.42}
+    before_anchor_pixel = await page.evaluate(
+        """({x,y}) => { const c=document.querySelector('#pixel-canvas'); return NUStudioLayout.pixelAt(x,y,c.getBoundingClientRect(),c.width,c.height); }""",
+        anchor,
+    )
+    await page.locator("#pixel-canvas").dispatch_event("wheel", {"deltaY": -120, "ctrlKey": True, "clientX": anchor["x"], "clientY": anchor["y"]})
+    assert await page.locator("#workspace-zoom").input_value() == "210", "Ctrl+wheel did not zoom at the pointer"
+    after_anchor_pixel = await page.evaluate(
+        """({x,y}) => { const c=document.querySelector('#pixel-canvas'); return NUStudioLayout.pixelAt(x,y,c.getBoundingClientRect(),c.width,c.height); }""",
+        anchor,
+    )
+    assert after_anchor_pixel == before_anchor_pixel, f"Pointer-anchored zoom shifted the source pixel: before={before_anchor_pixel}, after={after_anchor_pixel}"
+    await page.locator("#fit-canvas").click()
+
+    # Zoom bounds, reduced-motion behavior and viewport resizing.
+    await page.locator("#workspace-zoom").evaluate("el => { el.value='1'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
+    assert await page.locator("#workspace-zoom").input_value() == "25", "Zoom lower bound was not enforced"
+    await page.locator("#workspace-zoom").evaluate("el => { el.value='900'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
+    assert await page.locator("#workspace-zoom").input_value() == "800", "Zoom upper bound was not enforced"
+    await page.emulate_media(reduced_motion="reduce")
+    assert await page.locator("#workspace-frame").evaluate("el => getComputedStyle(el).scrollBehavior") == "auto", "Reduced-motion preference did not disable smooth workspace scrolling"
+    if viewport["width"] > 700:
+        await page.locator("#zoom-in").click()
+        await page.locator("#zoom-out").click()
+    else:
+        await page.locator("#mobile-zoom-in").click()
+        await page.locator("#mobile-zoom-out").click()
+    await page.emulate_media(reduced_motion="no-preference")
+    await page.set_viewport_size({"width": max(320, viewport["width"] - 40), "height": viewport["height"]})
+    await page.locator("#fit-canvas").click()
+    assert await page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 1"), "Viewport resize introduced page-level horizontal overflow"
+    await page.set_viewport_size(viewport)
+    await page.locator("#fit-canvas").click()
+
+    # Magnifier is view-only: it exposes controls only when selected and never changes artwork/history.
+    view_toggle = page.locator("#desktop-tools-toggle" if viewport["width"] > 700 else "#mobile-tools-toggle")
+    view_open_class = "nu-desktop-tools-open" if viewport["width"] > 700 else "nu-mobile-tools-open"
+    is_view_drawer_open = await page.locator("body").evaluate("(el, className) => el.classList.contains(className)", view_open_class)
+    if not is_view_drawer_open:
+        await view_toggle.click()
+        await page.wait_for_function("(className) => document.body.classList.contains(className)", arg=view_open_class, timeout=5000)
+    await page.locator("#studio-dock").wait_for(state="visible", timeout=5000)
+    magnifier_button = page.locator('#studio-quick-tools [data-tool="magnifier"]')
+    assert await magnifier_button.count() == 1, "Magnifier quick tool is missing"
+    assert await page.locator("#magnifier-strength").is_hidden(), "Magnifier strength leaked into another tool"
+    pixel_before_magnifier = await read_pixel(page, 4, 4)
+    undo_before_magnifier = await page.locator("#undo").is_enabled()
+    await select_tool(page, "view", "magnifier")
+    assert await page.locator("#studio-context-title").inner_text() == "Magnifier", "Magnifier context title is missing"
+    assert await page.locator("#magnifier-strength").is_visible(), "Magnifier strength control did not appear"
+    assert await page.locator("#magnifier-size").is_visible(), "Magnifier size control did not appear"
+    await page.locator("#magnifier-strength").select_option("6")
+    await page.locator("#magnifier-size").evaluate("el => { el.value='180'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
+    mag_canvas = await page.locator("#pixel-canvas").bounding_box()
+    assert mag_canvas, "Canvas is missing for Magnifier smoke"
+    visible_left = max(mag_canvas["x"] + 8, 8)
+    visible_right = min(mag_canvas["x"] + mag_canvas["width"] - 8, viewport["width"] - 8)
+    visible_top = max(mag_canvas["y"] + 8, 8)
+    visible_bottom = min(mag_canvas["y"] + mag_canvas["height"] - 8, viewport["height"] - 8)
+    assert visible_right > visible_left and visible_bottom > visible_top, f"Canvas has no visible pointer area: {mag_canvas}, viewport={viewport}"
+    mag_point = {"x": (visible_left + visible_right) / 2, "y": (visible_top + visible_bottom) / 2}
+    assert await magnifier_button.get_attribute("aria-pressed") == "true", "Magnifier tool did not become active"
+    await page.evaluate("() => { window.__magnifierPointerMoves=0; document.addEventListener('pointermove',()=>window.__magnifierPointerMoves++,{capture:true,once:true}); }")
+    await page.mouse.move(mag_point["x"], mag_point["y"])
+    magnifier_debug = await page.evaluate(
+        """({x,y}) => {
+            const canvas=document.querySelector('#pixel-canvas'), lens=document.querySelector('#studio-magnifier'),
+                  lensCanvas=document.querySelector('#studio-magnifier-canvas'), stage=document.querySelector('.stage'),
+                  target=document.elementFromPoint(x,y);
+            return {
+                toolPressed:document.querySelector('#studio-quick-tools [data-tool="magnifier"]')?.getAttribute('aria-pressed'),
+                title:document.querySelector('#studio-context-title')?.textContent,
+                lensHidden:lens?.hidden, lensAria:lens?.getAttribute('aria-hidden'),
+                lensCanvas:!!lensCanvas, lensContext:!!lensCanvas?.getContext('2d'), stage:!!stage,
+                canvasRect:canvas?.getBoundingClientRect().toJSON(), stageRect:stage?.getBoundingClientRect().toJSON(),
+                target:target?.id || target?.className || target?.tagName,
+                pointerEvents:canvas ? getComputedStyle(canvas).pointerEvents : null,
+                pointerMoveCount:window.__magnifierPointerMoves
+            };
+        }""",
+        mag_point,
+    )
+    assert magnifier_debug["pointerMoveCount"] > 0, f"Playwright mouse movement did not deliver pointermove: {magnifier_debug}"
+    assert not magnifier_debug["lensHidden"], f"Real mouse movement did not reveal Magnifier: {magnifier_debug}; page_errors={page_errors}"
+    await page.locator("#studio-magnifier").wait_for(state="visible", timeout=3000)
+    assert "6×" in await page.locator("#studio-magnifier-label").inner_text(), "Magnifier strength label did not update"
+    assert await page.locator("#studio-magnifier").evaluate("el => el.style.width") == "180px", "Magnifier size control did not update the lens"
+    # Pointer leaving the canvas hides the loupe; re-entering restores it.
+    await page.mouse.move(10, 10)
+    await page.locator("#studio-magnifier").wait_for(state="hidden", timeout=3000)
+    await page.mouse.move(mag_point["x"], mag_point["y"])
+    await page.locator("#studio-magnifier").wait_for(state="visible", timeout=3000)
+    # Mobile viewport also exercises the touch-pointer lifecycle without changing artwork.
+    if viewport["width"] <= 700:
+        await page.locator("#pixel-canvas").dispatch_event("pointerdown", {"clientX": mag_point["x"], "clientY": mag_point["y"], "pointerId": 17, "pointerType": "touch", "button": 0, "buttons": 1, "isPrimary": True, "bubbles": True})
+        await page.locator("#studio-magnifier").wait_for(state="visible", timeout=3000)
+        await page.locator("#pixel-canvas").dispatch_event("pointermove", {"clientX": mag_point["x"] + 6, "clientY": mag_point["y"] + 6, "pointerId": 17, "pointerType": "touch", "buttons": 1, "isPrimary": True, "bubbles": True})
+        assert await page.locator("#studio-magnifier").is_visible(), "Touch pointer movement did not keep Magnifier visible"
+        await page.locator("#pixel-canvas").dispatch_event("pointerup", {"clientX": mag_point["x"] + 6, "clientY": mag_point["y"] + 6, "pointerId": 17, "pointerType": "touch", "buttons": 0, "isPrimary": True, "bubbles": True})
+        await page.locator("#studio-magnifier").wait_for(state="hidden", timeout=3000)
+    assert await read_pixel(page, 4, 4) == pixel_before_magnifier, "Magnifier modified artwork pixels"
+    assert await page.locator("#undo").is_enabled() == undo_before_magnifier, "Magnifier created an undo history entry"
+    await page.keyboard.press("Escape")
+    await page.locator("#studio-magnifier").wait_for(state="hidden", timeout=3000)
+    await page.locator("#studio-dock").wait_for(state="hidden", timeout=3000)
+    await view_toggle.click()
+    await page.locator("#studio-dock").wait_for(state="visible", timeout=5000)
+    await select_tool(page, "draw", "pencil")
+    assert await page.locator("#magnifier-strength").is_hidden(), "Magnifier controls remained visible after switching to Pencil"
+    await view_toggle.click()
+    await page.locator("#studio-dock").wait_for(state="hidden", timeout=5000)
 
     frame = await page.locator("#workspace-frame").bounding_box()
     canvas = await page.locator("#pixel-canvas").bounding_box()
@@ -272,6 +635,152 @@ async def check_touch(browser, base_url):
     await context.close()
 
 
+async def check_project_portability(browser, base_url, viewport):
+    context = await browser.new_context(viewport=viewport)
+    page = await context.new_page()
+    errors = []
+    page.on("pageerror", lambda error: errors.append(str(error)))
+    response = await page.goto(urljoin(base_url.rstrip("/") + "/", "pixel-art-studio.html"), wait_until="domcontentloaded", timeout=60000)
+    assert response and response.status == 200, "Project test could not load Studio"
+    await page.locator("#pixel-canvas").wait_for(state="visible", timeout=30000)
+
+    drawer = page.locator("#studio-tools-drawer")
+    async def open_tab(tab_id):
+        if viewport["width"] <= 700:
+            mobile_open = await page.locator("body").evaluate("el => el.classList.contains('nu-mobile-tools-open')")
+            if not mobile_open:
+                await page.locator("#mobile-tools-toggle").click()
+            await page.wait_for_function("() => document.body.classList.contains('nu-mobile-tools-open')")
+        else:
+            if await drawer.get_attribute("data-workspace-drawer-state") != "open":
+                await page.locator("#desktop-tools-toggle").click()
+            await page.wait_for_function("() => document.querySelector('#studio-tools-drawer')?.dataset.workspaceDrawerState === 'open'")
+        await page.wait_for_timeout(350)
+        await page.locator("#studio-properties-panel").evaluate("el => { el.open = true; }")
+        await page.locator("#" + tab_id).wait_for(state="visible")
+        await page.locator("#" + tab_id).click()
+
+    async def close_drawer():
+        if viewport["width"] <= 700:
+            mobile_open = await page.locator("body").evaluate("el => el.classList.contains('nu-mobile-tools-open')")
+            if mobile_open:
+                await page.locator("#mobile-tools-toggle").click()
+            await page.wait_for_function("() => !document.body.classList.contains('nu-mobile-tools-open')")
+        else:
+            if await drawer.get_attribute("data-workspace-drawer-state") == "open":
+                await page.locator("#desktop-tools-toggle").click()
+            await page.wait_for_function("() => document.querySelector('#studio-tools-drawer')?.dataset.workspaceDrawerState === 'closed'")
+        await page.wait_for_timeout(350)
+
+    await open_tab("tab-layers")
+    await page.locator("#adv-layers button[aria-label='Select Layer 1']").wait_for(state="visible")
+
+    await page.locator("#show-grid").evaluate("el => { el.checked = false; }")
+    await set_color(page, "#ff0000")
+    await close_drawer()
+    await click_cell(page, 2, 2)
+    layer_one_pixel = await read_pixel(page, 2, 2)
+    await open_tab("tab-layers")
+
+    await page.locator("#adv-layers button[aria-label='Select Layer 2']").click()
+    await set_color(page, "#00ff00")
+    await close_drawer()
+    await click_cell(page, 4, 4)
+    await open_tab("tab-layers")
+    layer_two_row = page.locator("#adv-layers .adv-layer").nth(1)
+    await layer_two_row.locator("input[type='range']").evaluate("el => { el.value='65'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
+    await layer_two_row.locator("select").nth(0).select_option("screen")
+    await open_tab("tab-pro")
+    await page.locator("#pro-group-target").select_option("Group A")
+    await page.locator("#pro-group-opacity").evaluate("el => { el.value='80'; el.dispatchEvent(new Event('input',{bubbles:true})); }")
+    await page.locator("#pro-group-assign").click()
+    await open_tab("tab-pro")
+    await select_tool(page, "selection", "select-rect")
+    await open_tab("tab-palette")
+    await page.locator("#pro-select-all").click()
+    await open_tab("tab-pro")
+    await page.locator("#pro-mask-add").click()
+    await close_drawer()
+
+    await page.locator("#studio-project-actions").evaluate("el => { el.open = true; }")
+    async with page.expect_download() as download_info:
+        await page.locator("#download-project").click()
+    download = await download_info.value
+    project_path = await download.path()
+    assert project_path, "Project download did not produce a local file"
+    with open(project_path, "r", encoding="utf-8") as stream:
+        project_data = json.load(stream)
+    project = project_data["project"]
+    assert project_data["format"] == "N.U-Pixel-Art-Studio-Project" and project_data["version"] == 1
+    assert len(project["layers"]) == 4 and len(project["layers"][1]["pixels"]) == 32 * 32
+    assert project["layers"][1]["mask"] and len(project["layers"][1]["mask"]) == 32 * 32
+    assert project["selection"] and len(project["selection"]) == 32 * 32
+    assert project["layers"][1]["blend"] == "screen" and project["layers"][1]["group"] == "Group A"
+    assert project["groups"]["Group A"]["opacity"] == 80
+    assert project["layers"][1]["opacity"] == 65 and project["active"] == 1
+
+    await page.locator("#studio-project-actions").evaluate("el => { el.open = false; }")
+    await set_color(page, "#0000ff")
+    await close_drawer()
+    await click_cell(page, 6, 6)
+    blue_pixel = await read_pixel(page, 6, 6)
+    await page.locator("#studio-project-actions").evaluate("el => { el.open = true; }")
+    await page.locator("#project-file").set_input_files(project_path)
+    await page.locator("#studio-project-confirm").wait_for(state="visible", timeout=5000)
+    await page.locator("#studio-project-confirm button[value='cancel']").click()
+    await page.wait_for_function("() => document.querySelector('#project-file')?.value === ''")
+    assert await read_pixel(page, 6, 6) == blue_pixel, "Cancelling project replacement changed current artwork"
+
+    await page.locator("#project-file").set_input_files(project_path)
+    await page.locator("#studio-project-confirm").wait_for(state="visible", timeout=5000)
+    await page.locator("#studio-project-confirm button[value='confirm']").click()
+    await page.wait_for_function("() => document.querySelector('#studio-status')?.textContent.includes('Project opened')")
+    await page.locator("#studio-project-actions").evaluate("el => { el.open = false; }")
+    assert await read_pixel(page, 2, 2) == layer_one_pixel, "Layer 1 pixel did not round-trip exactly"
+    assert await read_pixel(page, 6, 6) != blue_pixel, "Opening the saved project did not replace later unsaved edits"
+    await open_tab("tab-layers")
+    restored_row = page.locator("#adv-layers .adv-layer").nth(1)
+    assert await restored_row.locator("input[type='range']").input_value() == "65", "Layer opacity was not restored"
+    assert await restored_row.locator("select").nth(0).input_value() == "screen", "Layer blend mode was not restored"
+    assert await restored_row.locator("select").nth(1).input_value() == "Group A", "Layer group was not restored"
+    assert "Mask active" in await restored_row.inner_text(), "Layer mask was not restored"
+    assert await page.locator("#adv-layers button[aria-label='Select Layer 2']").get_attribute("aria-pressed") == "true", "Active layer was not restored"
+    await close_drawer()
+
+    await page.locator("#studio-project-actions").evaluate("el => { el.open = true; }")
+    await page.locator("#new-project").click()
+    await page.locator("#studio-project-confirm").wait_for(state="visible", timeout=5000)
+    await page.locator("#studio-project-confirm button[value='cancel']").click()
+    await page.locator("#studio-project-actions").evaluate("el => { el.open = false; }")
+    assert await read_pixel(page, 2, 2) == layer_one_pixel, "Cancelling New Project changed the current project"
+
+    await open_tab("tab-palette")
+    await page.locator("#clear-canvas").evaluate("el => { const section=el.closest('details'); if(section)section.open=true; }")
+    await page.locator("#clear-canvas").scroll_into_view_if_needed()
+    await page.locator("#clear-canvas").click()
+    await page.locator("#studio-project-confirm").wait_for(state="visible", timeout=5000)
+    await page.locator("#studio-project-confirm button[value='cancel']").click()
+    assert await read_pixel(page, 2, 2) == layer_one_pixel, "Cancelling Clear changed the current project"
+    await close_drawer()
+
+    await page.locator("#new-canvas").click()
+    await page.locator("#studio-project-confirm").wait_for(state="visible", timeout=5000)
+    await page.locator("#studio-project-confirm button[value='cancel']").click()
+    assert await read_pixel(page, 2, 2) == layer_one_pixel, "Cancelling New Canvas changed the current project"
+
+    await page.locator("#studio-project-actions").evaluate("el => { el.open = true; }")
+    await page.locator("#project-file").set_input_files({
+        "name": "broken.nuproj",
+        "mimeType": "application/json",
+        "buffer": b"{not valid json"
+    })
+    await page.wait_for_function("() => document.querySelector('#studio-status')?.textContent.includes('Project could not be opened')")
+    await page.locator("#studio-project-actions").evaluate("el => { el.open = false; }")
+    assert await read_pixel(page, 2, 2) == layer_one_pixel, "Malformed project file partially replaced the current project"
+    assert not errors, f"Uncaught browser errors during project portability test: {errors}"
+    await context.close()
+
+
 async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--base-url", default="http://127.0.0.1:8765")
@@ -287,6 +796,8 @@ async def main():
             await check_entry_pages(browser, args.base_url, {"width": 1280, "height": 900})
             await check_studio(browser, args.base_url, {"width": 1280, "height": 900}, args.require_mix)
             await check_studio(browser, args.base_url, {"width": 390, "height": 844}, args.require_mix)
+            await check_project_portability(browser, args.base_url, {"width": 1280, "height": 900})
+            await check_project_portability(browser, args.base_url, {"width": 390, "height": 844})
             if args.browser == "chromium" and not args.live:
                 await check_touch(browser, args.base_url)
         finally:
