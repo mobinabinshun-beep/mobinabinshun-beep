@@ -79,7 +79,7 @@ jobs:
           checked=0
           def check(raw,origin):
               global checked
-              raw=raw.strip().strip('"\\'')
+              raw=raw.strip().strip('"').strip("'")
               if not raw or raw.startswith(("#","http:","https:","//","data:","blob:","mailto:","tel:","javascript:")):
                   return
               raw=raw.split("#",1)[0].split("?",1)[0]
@@ -93,29 +93,24 @@ jobs:
               elif not p.is_file():
                   missing.add(f"{origin}: {raw}")
               checked+=1
+          attr=re.compile(r"""(?:src|href|poster|data|action)=["']([^"']+)["']""",re.I)
+          css_url=re.compile(r"""url\(\s*["']?([^)"']+)["']?\s*\)""",re.I)
           for page in pages:
               html=(root/page).read_text(encoding="utf-8")
-              for value in re.findall(r'\\b(?:src|href|poster|data|action)=["\\']([^"\\']+)["\\']',html,re.I):
-                  check(value,page)
-              for value in re.findall(r'url\\(\\s*["\\']?([^)"\\']+)["\\']?\\s*\\)',html,re.I):
-                  check(value,page)
+              for value in attr.findall(html): check(value,page)
+              for value in css_url.findall(html): check(value,page)
           for p in sorted(root.glob("*.css")):
-              css=p.read_text(encoding="utf-8")
-              for value in re.findall(r'url\\(\\s*["\\']?([^)"\\']+)["\\']?\\s*\\)',css,re.I):
-                  check(value,p.name)
+              for value in css_url.findall(p.read_text(encoding="utf-8")): check(value,p.name)
           for p in sorted(root.glob("*.svg")):
               svg=p.read_text(encoding="utf-8")
-              for value in re.findall(r'(?:href|xlink:href)=["\\']([^"\\']+)["\\']',svg,re.I):
-                  check(value,p.name)
+              for value in re.findall(r"""(?:href|xlink:href)=["']([^"']+)["']""",svg,re.I): check(value,p.name)
           for p in sorted(root.glob("*.js")):
               js=p.read_text(encoding="utf-8")
-              for value in re.findall(r'["\\'](\\.{1,2}/[^"\\']+)["\\']',js):
-                  check(value,p.name)
+              for value in re.findall(r"""["'](\.{1,2}/[^"']+)["']""",js): check(value,p.name)
           sw=(root/"nu-exchange-sw.js").read_text(encoding="utf-8")
-          assets=re.search(r'const APP_ASSETS=\\[(.*?)\\];',sw,re.S)
+          assets=re.search(r"""const APP_ASSETS=\[(.*?)\];""",sw,re.S)
           assert assets, "service-worker APP_ASSETS list missing"
-          for value in re.findall(r'["\\']([^"\\']+)["\\']',assets.group(1)):
-              check(value,"nu-exchange-sw.js")
+          for value in re.findall(r"""["']([^"']+)["']""",assets.group(1)): check(value,"nu-exchange-sw.js")
           exchange=(root/"exchange.html").read_text(encoding="utf-8")
           assert 'navigator.serviceWorker.register("./nu-exchange-sw.js")' in exchange
           assert "new URL(path,self.registration.scope)" in sw
